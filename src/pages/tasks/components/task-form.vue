@@ -30,7 +30,7 @@ const { isFieldDirty, handleSubmit } = useForm({
   initialValues,
 })
 const onSubmit = handleSubmit((values) => {
-  toast('You submitted the following values:', {
+  toast('提交的数据如下：', {
     description: h('pre', { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' }, h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))),
   })
   emits('close')
@@ -42,9 +42,9 @@ const onSubmit = handleSubmit((values) => {
     <form class="w-2/3 space-y-6" @submit="onSubmit">
       <FormField v-slot="{ componentField }" name="title" :validate-on-blur="!isFieldDirty">
         <UiFormItem>
-          <UiFormLabel>Title</UiFormLabel>
+          <UiFormLabel>标题</UiFormLabel>
           <UiFormControl>
-            <UiInput type="text" placeholder="shadcn" v-bind="componentField" />
+            <UiInput type="text" placeholder="输入任务标题" v-bind="componentField" />
           </UiFormControl>
           <UiFormDescription />
           <UiFormMessage />
@@ -52,11 +52,11 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
       <FormField v-slot="{ componentField }" name="status" :validate-on-blur="!isFieldDirty">
         <UiFormItem>
-          <UiFormLabel>status</UiFormLabel>
+          <UiFormLabel>状态</UiFormLabel>
           <UiFormControl>
             <UiSelect v-bind="componentField">
               <UiSelectTrigger class="w-[180px]">
-                <UiSelectValue placeholder="Select a status" />
+                <UiSelectValue placeholder="选择状态" />
               </UiSelectTrigger>
               <UiSelectContent>
                 <UiSelectGroup>
@@ -76,7 +76,7 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
       <FormField v-slot="{ componentField }" name="label" :validate-on-blur="!isFieldDirty">
         <UiFormItem>
-          <UiFormLabel>label</UiFormLabel>
+          <UiFormLabel>标签</UiFormLabel>
           <UiFormControl>
             <UiRadioGroup
               class="flex flex-col space-y-1"
@@ -101,7 +101,7 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
       <FormField v-slot="{ componentField }" name="priority" :validate-on-blur="!isFieldDirty">
         <UiFormItem>
-          <UiFormLabel>priority</UiFormLabel>
+          <UiFormLabel>优先级</UiFormLabel>
           <UiFormControl>
             <UiRadioGroup
               class="flex flex-col space-y-1"
@@ -126,7 +126,7 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
 
       <UiButton type="submit">
-        Submit
+        提交
       </UiButton>
     </form>
   </div>

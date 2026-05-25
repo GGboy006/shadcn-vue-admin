@@ -28,7 +28,7 @@ const { handleSubmit } = useForm({
 })
 
 const onSubmit = handleSubmit((values) => {
-  toast('You submitted the following values:', {
+  toast('提交的数据如下：', {
     description: h(
       'pre',
       { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' },
@@ -42,7 +42,7 @@ const onSubmit = handleSubmit((values) => {
   <form class="space-y-8" @submit="onSubmit">
     <FormField v-slot="{ componentField }" name="email">
       <FormItem>
-        <FormLabel>Email address</FormLabel>
+        <FormLabel>邮箱地址</FormLabel>
         <FormControl>
           <Input type="text" v-bind="componentField" />
         </FormControl>
@@ -53,14 +53,14 @@ const onSubmit = handleSubmit((values) => {
     <FormField v-slot="{ componentField }" name="role">
       <FormItem>
         <FormLabel>
-          Role
+          角色
           <span class="text-destructive"> *</span>
         </FormLabel>
         <FormControl>
           <Select v-bind="componentField">
             <FormControl>
               <SelectTrigger class="w-full">
-                <SelectValue placeholder="Select a role" />
+                <SelectValue placeholder="选择角色" />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
@@ -78,7 +78,7 @@ const onSubmit = handleSubmit((values) => {
 
     <FormField v-slot="{ componentField }" name="description">
       <FormItem>
-        <FormLabel>Description(Optional)</FormLabel>
+        <FormLabel>备注（可选）</FormLabel>
         <FormControl>
           <Textarea v-bind="componentField" />
         </FormControl>
@@ -87,7 +87,7 @@ const onSubmit = handleSubmit((values) => {
     </FormField>
 
     <Button type="submit" class="w-full">
-      Invite
+      发送邀请
       <SendIcon />
     </Button>
   </form>

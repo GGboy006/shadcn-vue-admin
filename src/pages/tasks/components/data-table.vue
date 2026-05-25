@@ -17,23 +17,23 @@ const taskDeleteBatchOpen = ref(false)
 </script>
 
 <template>
-  <DataTableBulkActions entity-name="task" :table="table">
+  <DataTableBulkActions entity-name="任务" :table="table">
     <UiTooltip>
       <UiTooltipTrigger as-child>
         <UiButton
           variant="destructive"
           size="icon"
           class="size-8"
-          aria-label="Delete selected tasks"
-          title="Delete selected tasks"
+          aria-label="删除选中的任务"
+          title="删除选中的任务"
           @click="taskDeleteBatchOpen = true"
         >
           <Trash2Icon />
-          <span class="sr-only">Delete selected tasks</span>
+          <span class="sr-only">删除选中的任务</span>
         </UiButton>
       </UiTooltipTrigger>
       <UiTooltipContent>
-        <p>Delete selected tasks</p>
+        <p>删除选中的任务</p>
       </UiTooltipContent>
     </UiTooltip>
 

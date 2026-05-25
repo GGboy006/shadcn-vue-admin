@@ -37,7 +37,7 @@ const { handleSubmit, resetForm } = useForm({
 })
 
 const onSubmit = handleSubmit((values) => {
-  toast('You submitted the following values:', {
+  toast('提交的数据如下：', {
     description: h('pre', { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' }, h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))),
   })
 })
@@ -46,22 +46,22 @@ const onSubmit = handleSubmit((values) => {
 <template>
   <div>
     <h3 class="text-lg font-medium">
-      Profile
+      个人资料
     </h3>
     <p class="text-sm text-muted-foreground">
-      This is how others will see you on the site.
+      这是其他人在网站上看到您的信息。
     </p>
   </div>
   <Separator orientation="horizontal" class="my-4" />
   <form class="space-y-8" @submit="onSubmit">
     <FormField v-slot="{ componentField }" name="username">
       <FormItem>
-        <FormLabel>Username</FormLabel>
+        <FormLabel>用户名</FormLabel>
         <FormControl>
-          <Input type="text" placeholder="shadcn" v-bind="componentField" />
+          <Input type="text" placeholder="输入用户名" v-bind="componentField" />
         </FormControl>
         <FormDescription>
-          This is your public display name. It can be your real name or a pseudonym. You can only change this once every 30 days.
+          这是您的公开显示名称，可以是真实姓名或昵称。每30天只能修改一次。
         </FormDescription>
         <FormMessage />
       </FormItem>
@@ -69,12 +69,12 @@ const onSubmit = handleSubmit((values) => {
 
     <FormField v-slot="{ componentField }" name="email">
       <FormItem>
-        <FormLabel>Email</FormLabel>
+        <FormLabel>邮箱</FormLabel>
 
         <Select v-bind="componentField">
           <FormControl>
             <SelectTrigger>
-              <SelectValue placeholder="Select an email" />
+              <SelectValue placeholder="选择邮箱" />
             </SelectTrigger>
           </FormControl>
           <SelectContent>
@@ -86,7 +86,7 @@ const onSubmit = handleSubmit((values) => {
           </SelectContent>
         </Select>
         <FormDescription>
-          You can manage verified email addresses in your email settings.
+          您可以在邮箱设置中管理已验证的邮箱地址。
         </FormDescription>
         <FormMessage />
       </FormItem>
@@ -94,12 +94,12 @@ const onSubmit = handleSubmit((values) => {
 
     <FormField v-slot="{ componentField }" name="bio">
       <FormItem>
-        <FormLabel>Bio</FormLabel>
+        <FormLabel>个人简介</FormLabel>
         <FormControl>
-          <Textarea placeholder="Tell us a little bit about yourself" v-bind="componentField" />
+          <Textarea placeholder="简单介绍一下您自己" v-bind="componentField" />
         </FormControl>
         <FormDescription>
-          You can <span>@mention</span> other users and organizations to link to them.
+          您可以 <span>@提及</span> 其他用户和组织以链接到他们。
         </FormDescription>
         <FormMessage />
       </FormItem>
@@ -111,10 +111,10 @@ const onSubmit = handleSubmit((values) => {
           <FormField v-slot="{ componentField }" :name="`urls[${index}].value`">
             <FormItem>
               <FormLabel :class="cn(index !== 0 && 'sr-only')">
-                URLs
+                网址
               </FormLabel>
               <FormDescription :class="cn(index !== 0 && 'sr-only')">
-                Add links to your website, blog, or social media profiles.
+                添加您的网站、博客或社交媒体主页链接。
               </FormDescription>
               <div class="relative flex items-center">
                 <FormControl>
@@ -136,14 +136,14 @@ const onSubmit = handleSubmit((values) => {
           class="w-20 mt-2 text-xs"
           @click="push({ value: '' })"
         >
-          Add URL
+          添加网址
         </Button>
       </FieldArray>
     </div>
 
     <div class="flex justify-start gap-2">
       <Button type="submit">
-        Update profile
+        更新资料
       </Button>
 
       <Button
@@ -151,7 +151,7 @@ const onSubmit = handleSubmit((values) => {
         variant="outline"
         @click="resetForm"
       >
-        Reset form
+        重置表单
       </Button>
     </div>
   </form>

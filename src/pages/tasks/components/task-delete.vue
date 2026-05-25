@@ -10,7 +10,7 @@ const props = defineProps<{
 }>()
 
 function handleRemove() {
-  toast(`The following task has been deleted:`, {
+  toast(`以下任务已删除：`, {
     description: h('pre', { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' }, h('code', { class: 'text-white' }, JSON.stringify(props.task, null, 2))),
   })
 }
@@ -20,23 +20,23 @@ function handleRemove() {
   <div>
     <ModalHeader>
       <ModalTitle>
-        Delete this task: {{ task.id }} ?
+        删除任务: {{ task.id }} ?
       </ModalTitle>
       <ModalDescription>
-        You are about to delete a task with the ID {{ task.id }}. This action cannot be undone.
+        您即将删除 ID 为 {{ task.id }} 的任务，此操作不可撤销。
       </ModalDescription>
     </ModalHeader>
 
     <ModalFooter>
       <ModalClose as-child>
         <UiButton variant="outline">
-          Cancel
+          取消
         </UiButton>
       </ModalClose>
 
       <ModalClose as-child>
         <UiButton variant="destructive" @click="handleRemove">
-          Delete
+          删除
         </UiButton>
       </ModalClose>
     </ModalFooter>

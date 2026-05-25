@@ -62,7 +62,7 @@ const onSubmit = handleSubmit((values) => {
     <form class="space-y-8" @submit="onSubmit">
       <FormField v-slot="{ componentField }" name="firstName">
         <FormItem>
-          <FormLabel>First Name</FormLabel>
+          <FormLabel>姓</FormLabel>
           <FormControl>
             <Input type="text" v-bind="componentField" />
           </FormControl>
@@ -71,7 +71,7 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
       <FormField v-slot="{ componentField }" name="lastName">
         <FormItem>
-          <FormLabel>Last Name</FormLabel>
+          <FormLabel>名</FormLabel>
           <FormControl>
             <Input type="text" v-bind="componentField" />
           </FormControl>
@@ -80,7 +80,7 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
       <FormField v-slot="{ componentField }" name="username">
         <FormItem>
-          <FormLabel>User Name</FormLabel>
+          <FormLabel>用户名</FormLabel>
           <FormControl>
             <Input type="text" v-bind="componentField" />
           </FormControl>
@@ -90,7 +90,7 @@ const onSubmit = handleSubmit((values) => {
 
       <FormField v-slot="{ componentField }" name="email">
         <FormItem>
-          <FormLabel>Email address</FormLabel>
+          <FormLabel>邮箱地址</FormLabel>
           <FormControl>
             <Input type="text" v-bind="componentField" />
           </FormControl>
@@ -100,7 +100,7 @@ const onSubmit = handleSubmit((values) => {
 
       <FormField v-slot="{ componentField }" name="phoneNumber">
         <FormItem>
-          <FormLabel>Phone Number</FormLabel>
+          <FormLabel>手机号码</FormLabel>
           <FormControl>
             <Input type="text" v-bind="componentField" />
           </FormControl>
@@ -110,12 +110,12 @@ const onSubmit = handleSubmit((values) => {
 
       <FormField v-slot="{ componentField }" name="status">
         <FormItem>
-          <FormLabel>Status</FormLabel>
+          <FormLabel>状态</FormLabel>
           <FormControl>
             <Select v-bind="componentField">
               <FormControl>
                 <SelectTrigger class="w-full">
-                  <SelectValue placeholder="Select a status" />
+                  <SelectValue placeholder="选择状态" />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
@@ -132,7 +132,7 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
       <FormField v-slot="{ componentField }" name="role">
         <FormItem>
-          <FormLabel>Role</FormLabel>
+          <FormLabel>角色</FormLabel>
           <FormControl>
             <Select v-bind="componentField">
               <FormControl>
@@ -154,7 +154,7 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
 
       <Button type="submit" class="w-full">
-        SaveChanges
+        保存
       </Button>
     </form>
   </div>

@@ -15,7 +15,7 @@ export const columns: ColumnDef<User>[] = [
   SelectColumn as ColumnDef<User>,
   {
     accessorKey: 'username',
-    header: ({ column }) => h(DataTableColumnHeader<User>, { column, title: 'username' }),
+    header: ({ column }) => h(DataTableColumnHeader<User>, { column, title: '用户名' }),
     cell: ({ row }) => h('div', { }, row.getValue('username')),
     enableSorting: false,
     enableHiding: false,
@@ -24,7 +24,7 @@ export const columns: ColumnDef<User>[] = [
 
   {
     accessorKey: 'email',
-    header: ({ column }) => h(DataTableColumnHeader<User>, { column, title: 'Email' }),
+    header: ({ column }) => h(DataTableColumnHeader<User>, { column, title: '邮箱' }),
     cell: ({ row }) => h('div', { }, [
       h('span', {}, row.getValue('email')),
       h(Copy, { class: 'ml-2', size: 'sm', content: (row.getValue('email') || '') as string }),
@@ -35,7 +35,7 @@ export const columns: ColumnDef<User>[] = [
 
   {
     accessorKey: 'phoneNumber',
-    header: ({ column }) => h(DataTableColumnHeader<User>, { column, title: 'PhoneNumber' }),
+    header: ({ column }) => h(DataTableColumnHeader<User>, { column, title: '手机号' }),
     cell: ({ row }) => h('div', { }, row.getValue('phoneNumber')),
     enableSorting: false,
     enableResizing: true,
@@ -43,7 +43,7 @@ export const columns: ColumnDef<User>[] = [
 
   {
     accessorKey: 'status',
-    header: ({ column }) => h(DataTableColumnHeader<User>, { column, title: 'Status' }),
+    header: ({ column }) => h(DataTableColumnHeader<User>, { column, title: '状态' }),
 
     cell: ({ row }) => {
       const callType = callTypes.find(callType => callType.value === row.getValue('status'))
@@ -61,7 +61,7 @@ export const columns: ColumnDef<User>[] = [
 
   {
     accessorKey: 'role',
-    header: ({ column }) => h(DataTableColumnHeader<User>, { column, title: 'Role' }),
+    header: ({ column }) => h(DataTableColumnHeader<User>, { column, title: '角色' }),
     cell: ({ row }) => {
       const priority = userTypes.find(
         priority => priority.value === row.getValue('role'),

@@ -13,16 +13,16 @@ import TermsOfServiceButton from './components/terms-of-service-button.vue'
       <UiCard class="max-w-sm mx-auto">
         <UiCardHeader>
           <UiCardTitle class="text-xl">
-            Sign Up
+            注册
           </UiCardTitle>
           <UiCardDescription>
-            Enter your email and password to create an account.
-            Already have an account?
+            输入邮箱和密码创建账户。
+            已有账户？
             <UiButton
               variant="link" class="px-0 text-muted-foreground"
               @click="$router.push('/auth/sign-in')"
             >
-              Sign In
+              登录
             </UiButton>
           </UiCardDescription>
         </UiCardHeader>
@@ -31,20 +31,20 @@ import TermsOfServiceButton from './components/terms-of-service-button.vue'
             <div class="grid grid-cols-2 gap-4">
               <div class="grid gap-2">
                 <UiLabel for="first-name">
-                  First name
+                  名字
                 </UiLabel>
                 <UiInput id="first-name" placeholder="Max" required />
               </div>
               <div class="grid gap-2">
                 <UiLabel for="last-name">
-                  Last name
+                  姓氏
                 </UiLabel>
                 <UiInput id="last-name" placeholder="Robinson" required />
               </div>
             </div>
             <div class="grid gap-2">
               <UiLabel for="email">
-                Email
+                邮箱
               </UiLabel>
               <UiInput
                 id="email"
@@ -55,21 +55,21 @@ import TermsOfServiceButton from './components/terms-of-service-button.vue'
             </div>
             <div class="grid gap-2">
               <UiLabel for="password">
-                Password
+                密码
               </UiLabel>
               <UiInput id="password" type="password" placeholder="******" />
             </div>
             <div class="grid gap-2">
               <UiLabel for="password">
-                Confirm Password
+                确认密码
               </UiLabel>
               <UiInput id="password" type="password" placeholder="******" />
             </div>
             <UiButton type="submit" class="w-full">
-              Create Account
+              创建账户
             </UiButton>
 
-            <UiSeparator label="Or continue with" />
+            <UiSeparator label="或使用以下方式继续" />
 
             <div class="flex flex-col items-center justify-between gap-4">
               <GitHubButton />
@@ -77,9 +77,9 @@ import TermsOfServiceButton from './components/terms-of-service-button.vue'
             </div>
 
             <UiCardDescription>
-              By creating an account, you agree to our
+              创建账户即表示您同意我们的
               <TermsOfServiceButton />
-              and
+              和
               <PrivacyPolicyButton />
             </UiCardDescription>
           </div>

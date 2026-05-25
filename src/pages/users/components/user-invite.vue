@@ -15,7 +15,7 @@ const isOpen = ref(false)
     <ModalTrigger as-child>
       <Button variant="outline">
         <MailPlusIcon />
-        Invite User
+        邀请用户
       </Button>
     </ModalTrigger>
 
@@ -24,11 +24,11 @@ const isOpen = ref(false)
         <ModalTitle as-child>
           <div class="flex items-center gap-2">
             <MailPlusIcon />
-            <span>Invite User</span>
+            <span>邀请用户</span>
           </div>
         </ModalTitle>
         <ModalDescription>
-          Invite new user to join your team by sending them an email invitation. Assign a role to define their access level.
+          通过邮件邀请新用户加入团队，并为其分配角色以定义访问权限。
         </ModalDescription>
       </ModalHeader>
 
@@ -37,7 +37,7 @@ const isOpen = ref(false)
       <ModalFooter v-if="!isDesktop" class="pt-2">
         <ModalClose as-child>
           <Button variant="outline">
-            Cancel
+            取消
           </Button>
         </ModalClose>
       </ModalFooter>

@@ -10,8 +10,8 @@ import tasks from './data/tasks.json'
 
 <template>
   <BasicPage
-    title="Tasks"
-    description="Tasks description"
+    title="任务管理"
+    description="管理系统任务"
     sticky
   >
     <template #actions>

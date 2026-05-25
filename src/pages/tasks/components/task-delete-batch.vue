@@ -15,7 +15,7 @@ const openModel = defineModel<boolean>('open', {
   default: false,
 })
 
-const CONFIRM_WORD = 'DELETE'
+const CONFIRM_WORD = '删除'
 
 const confirmValue = ref('')
 
@@ -23,19 +23,19 @@ const selectedRows = computed(() => table.getSelectedRowModel().rows)
 const selectedCount = computed(() => selectedRows.value.length || 0)
 function handleConfirm() {
   if (confirmValue.value !== CONFIRM_WORD) {
-    toast.error(`Please type "${CONFIRM_WORD}" to confirm deletion.`)
+    toast.error(`请输入 "${CONFIRM_WORD}" 以确认删除。`)
     return
   }
 
   openModel.value = false
 
   toast.promise(new Promise(resolve => setTimeout(resolve, 2000)), {
-    loading: 'Deleting tasks...',
+    loading: '正在删除任务...',
     success: () => {
       table.resetRowSelection()
-      return `Successfully deleted ${selectedRows.value.length} tasks.`
+      return `成功删除 ${selectedRows.value.length} 个任务。`
     },
-    error: 'Failed to delete tasks.',
+    error: '删除任务失败。',
   })
 }
 </script>
@@ -43,32 +43,32 @@ function handleConfirm() {
 <template>
   <ConfirmDialog
     v-model:open="openModel"
-    confirm-button-text="Delete"
+    confirm-button-text="删除"
     destructive
     :disabled="confirmValue.trim() !== CONFIRM_WORD"
     @confirm="handleConfirm"
   >
     <template #title>
-      Delete {{ selectedCount }} tasks?
+      删除 {{ selectedCount }} 个任务？
     </template>
     <template #description>
-      Are you sure you want to delete the selected tasks? <br>
-      This action cannot be undone.
+      确定要删除选中的任务吗？<br>
+      此操作不可撤销。
     </template>
 
     <template #default>
       <UiLabel class="my-4 flex flex-col items-start gap-1.5">
-        <span>Confirm by typing {{ CONFIRM_WORD }}:</span>
+        <span>请输入 "{{ CONFIRM_WORD }}" 以确认：</span>
         <UiInput
           v-model="confirmValue"
-          :placeholder="`Type &quot;${CONFIRM_WORD}&quot; to confirm.`"
+          :placeholder="`输入 &quot;${CONFIRM_WORD}&quot; 确认删除`"
         />
       </UiLabel>
 
       <UiAlert variant="destructive">
-        <UiAlertTitle>Warning!</UiAlertTitle>
+        <UiAlertTitle>警告！</UiAlertTitle>
         <UiAlertDescription>
-          Please be careful, this operation can not be rolled back.
+          请谨慎操作，此操作无法回滚。
         </UiAlertDescription>
       </UiAlert>
     </template>

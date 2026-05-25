@@ -11,7 +11,7 @@ import { ThumbsDownIcon } from '@lucide/vue'
         </UiButton>
       </UiTooltipTrigger>
       <UiTooltipContent>
-        <p>It's so bad</p>
+        <p>回答不好</p>
       </UiTooltipContent>
     </UiTooltip>
   </UiTooltipProvider>

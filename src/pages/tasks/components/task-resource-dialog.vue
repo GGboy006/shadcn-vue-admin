@@ -11,8 +11,8 @@ const props = defineProps<{
 defineEmits(['close'])
 
 const task = computed(() => props.task)
-const title = computed(() => task.value?.id ? `Edit Task` : 'New Task')
-const description = computed(() => task.value?.id ? `Edit task ${task.value.id}` : 'Create new task')
+const title = computed(() => task.value?.id ? `编辑任务` : '新建任务')
+const description = computed(() => task.value?.id ? `编辑任务 ${task.value.id}` : '创建新任务')
 </script>
 
 <template>

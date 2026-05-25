@@ -9,10 +9,10 @@ import AuthTitle from './components/auth-title.vue'
       <UiCard>
         <UiCardHeader>
           <UiCardTitle class="text-2xl">
-            Forgot Password
+            忘记密码
           </UiCardTitle>
           <UiCardDescription>
-            Enter your registered email and we will send you a link to reset your password.
+            请输入您注册的邮箱，我们将发送重置密码的链接给您。
           </UiCardDescription>
         </UiCardHeader>
         <UiCardContent class="grid gap-4">
@@ -29,12 +29,12 @@ import AuthTitle from './components/auth-title.vue'
           </UiButton>
 
           <div>
-            Don't have an account?
+            还没有账户？
             <UiButton
               variant="link" class="px-0 text-muted-foreground"
               @click="$router.push('/auth/sign-up')"
             >
-              Sign up.
+              立即注册
             </UiButton>
           </div>
         </UiCardFooter>

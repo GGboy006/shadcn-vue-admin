@@ -7,22 +7,22 @@ import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle }
 
 const components = [
   {
-    title: 'Copy',
-    description: 'Copy button component, supports custom styles and tooltip text.',
+    title: '复制',
+    description: '复制按钮组件，支持自定义样式和提示文本。',
     link: 'https://kit.prop.show/en/components/copy',
   },
   {
-    title: 'Full Screen Dialog',
+    title: '全屏对话框',
     description: '',
     link: 'https://kit.prop.show/en/components/full-screen-dialog',
   },
   {
-    title: 'Inline Tip',
-    description: 'Inline tip component, used to display different types of tip information.',
+    title: '行内提示',
+    description: '行内提示组件，用于显示不同类型的提示信息。',
     link: 'https://kit.prop.show/en/components/inline-tip',
   },
   {
-    title: 'Status Badge',
+    title: '状态徽章',
     description: '',
     link: 'https://kit.prop.show/en/components/status-badge',
   },
@@ -31,8 +31,8 @@ const components = [
 
 <template>
   <BasicPage
-    title="Prop Components"
-    description="A collection of extended components for shadcn-vue."
+    title="Prop 组件"
+    description="shadcn-vue 的扩展组件集合。"
     sticky
   >
     <div class="grid grid-cols-1 md:grid-cols-2 w-full gap-6">
@@ -51,7 +51,7 @@ const components = [
               rel="noopener noreferrer"
               class="flex items-center gap-2"
             >
-              Docs
+              文档
               <ArrowUpRightIcon />
             </a>
           </Button>
@@ -64,7 +64,7 @@ const components = [
             <BadgeCheckIcon class="size-5" />
           </ItemMedia>
           <ItemContent>
-            <ItemTitle>More components from kit.prop.show</ItemTitle>
+            <ItemTitle>更多组件来自 kit.prop.show</ItemTitle>
           </ItemContent>
           <ItemActions>
             <ChevronRightIcon class="size-4" />

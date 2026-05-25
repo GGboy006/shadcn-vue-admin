@@ -76,7 +76,7 @@ const table = useVueTable({
               :colspan="columns.length"
               class="h-24 text-center"
             >
-              No results.
+              暂无数据。
             </TableCell>
           </TableRow>
         </TableBody>

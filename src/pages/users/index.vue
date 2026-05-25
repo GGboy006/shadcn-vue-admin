@@ -21,15 +21,15 @@ function mockLoading() {
 
 <template>
   <BasicPage
-    title="Users"
-    description="Users description"
+    title="用户管理"
+    description="管理系统用户账号"
     sticky
   >
     <template #actions>
       <UserInvite />
       <UserCreate />
       <UiButton variant="outline" @click="mockLoading">
-        <LoaderIcon />Mock Loading
+        <LoaderIcon />模拟加载
       </UiButton>
     </template>
     <div class="overflow-x-auto">

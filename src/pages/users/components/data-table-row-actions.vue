@@ -49,11 +49,11 @@ async function handleSelect(command: TCommand) {
       </UiDropdownMenuTrigger>
       <UiDropdownMenuContent align="end" class="w-[160px]">
         <UiDropdownMenuItem @click.stop="handleSelect('edit')">
-          Edit
+          编辑
         </UiDropdownMenuItem>
 
         <UiDropdownMenuItem @click.stop="handleSelect('delete')">
-          Delete
+          删除
           <UiDropdownMenuShortcut>⌘⌫</UiDropdownMenuShortcut>
         </UiDropdownMenuItem>
       </UiDropdownMenuContent>

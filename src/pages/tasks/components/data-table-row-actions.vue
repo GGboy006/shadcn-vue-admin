@@ -52,26 +52,26 @@ async function handleSelect(command: TCommand) {
           class="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
         >
           <EllipsisIcon class="size-4" />
-          <span class="sr-only">Open menu</span>
+          <span class="sr-only">打开菜单</span>
         </UiButton>
       </UiDropdownMenuTrigger>
       <UiDropdownMenuContent align="end" class="w-[160px]">
         <UiDropdownMenuItem @select.stop="handleSelect('edit')">
-          <span>Edit</span>
+          <span>编辑</span>
           <UiDropdownMenuShortcut> <FilePenLineIcon class="size-4" /> </UiDropdownMenuShortcut>
         </UiDropdownMenuItem>
 
         <UiDropdownMenuItem disabled>
-          Make a copy
+          复制
         </UiDropdownMenuItem>
         <UiDropdownMenuItem disabled>
-          Favorite
+          收藏
         </UiDropdownMenuItem>
 
         <UiDropdownMenuSeparator />
 
         <UiDropdownMenuSub>
-          <UiDropdownMenuSubTrigger>Labels</UiDropdownMenuSubTrigger>
+          <UiDropdownMenuSubTrigger>标签</UiDropdownMenuSubTrigger>
           <UiDropdownMenuSubContent>
             <UiDropdownMenuRadioGroup v-model="taskLabel">
               <UiDropdownMenuRadioItem v-for="label in labels" :key="label.value" :value="label.value">
@@ -84,7 +84,7 @@ async function handleSelect(command: TCommand) {
         <UiDropdownMenuSeparator />
 
         <UiDropdownMenuItem @select.stop="handleSelect('delete')">
-          <span>Delete</span>
+          <span>删除</span>
           <UiDropdownMenuShortcut> <Trash2Icon class="size-4" /> </UiDropdownMenuShortcut>
         </UiDropdownMenuItem>
       </UiDropdownMenuContent>

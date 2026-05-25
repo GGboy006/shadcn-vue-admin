@@ -25,7 +25,7 @@ const { handleSubmit } = useForm({
 })
 
 const onSubmit = handleSubmit((values) => {
-  toast('You submitted the following values:', {
+  toast('提交的数据如下：', {
     description: h('pre', { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' }, h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))),
   })
 })
@@ -34,17 +34,17 @@ const onSubmit = handleSubmit((values) => {
 <template>
   <div>
     <h3 class="text-lg font-medium">
-      Notifications
+      通知设置
     </h3>
     <p class="text-sm text-muted-foreground">
-      Configure how you receive notifications.
+      配置您接收通知的方式。
     </p>
   </div>
   <Separator class="my-4" />
   <form class="space-y-8" @submit="onSubmit">
     <FormField v-slot="{ componentField }" type="radio" name="type">
       <FormItem class="space-y-3">
-        <FormLabel>Notify me about...</FormLabel>
+        <FormLabel>通知我关于...</FormLabel>
         <FormControl>
           <RadioGroup
             class="flex flex-col space-y-1"
@@ -55,7 +55,7 @@ const onSubmit = handleSubmit((values) => {
                 <RadioGroupItem value="all" />
               </FormControl>
               <FormLabel class="font-normal">
-                All new messages
+                所有新消息
               </FormLabel>
             </FormItem>
             <FormItem class="flex items-center  space-y-0">
@@ -63,7 +63,7 @@ const onSubmit = handleSubmit((values) => {
                 <RadioGroupItem value="mentions" />
               </FormControl>
               <FormLabel class="font-normal">
-                Direct messages and mentions
+                私信和提及
               </FormLabel>
             </FormItem>
             <FormItem class="flex items-center  space-y-0">
@@ -71,7 +71,7 @@ const onSubmit = handleSubmit((values) => {
                 <RadioGroupItem value="none" />
               </FormControl>
               <FormLabel class="font-normal">
-                Nothing
+                不通知
               </FormLabel>
             </FormItem>
           </RadioGroup>
@@ -82,17 +82,17 @@ const onSubmit = handleSubmit((values) => {
 
     <div>
       <h3 class="mb-4 text-lg font-medium">
-        Email Notifications
+        邮件通知
       </h3>
       <div class="space-y-4">
         <FormField v-slot="{ handleChange, value }" type="checkbox" name="communication_emails">
           <FormItem class="flex flex-row items-center justify-between p-4 border rounded-lg">
             <div class="space-y-0.5">
               <FormLabel class="text-base">
-                Communication emails
+                通信邮件
               </FormLabel>
               <FormDescription>
-                Receive emails about your account activity.
+                接收关于账户活动的邮件。
               </FormDescription>
             </div>
             <FormControl>
@@ -108,10 +108,10 @@ const onSubmit = handleSubmit((values) => {
           <FormItem class="flex flex-row items-center justify-between p-4 border rounded-lg">
             <div class="space-y-0.5">
               <FormLabel class="text-base">
-                Marketing emails
+                营销邮件
               </FormLabel>
               <FormDescription>
-                Receive emails about new products, features, and more.
+                接收关于新产品、功能等信息的邮件。
               </FormDescription>
             </div>
             <FormControl>
@@ -127,10 +127,10 @@ const onSubmit = handleSubmit((values) => {
           <FormItem class="flex flex-row items-center justify-between p-4 border rounded-lg">
             <div class="space-y-0.5">
               <FormLabel class="text-base">
-                Social emails
+                社交邮件
               </FormLabel>
               <FormDescription>
-                Receive emails for friend requests, follows, and more.
+                接收好友请求、关注等信息的邮件。
               </FormDescription>
             </div>
             <FormControl>
@@ -146,10 +146,10 @@ const onSubmit = handleSubmit((values) => {
           <FormItem class="flex flex-row items-center justify-between p-4 border rounded-lg">
             <div class="space-y-0.5">
               <FormLabel class="text-base">
-                Security emails
+                安全邮件
               </FormLabel>
               <FormDescription>
-                Receive emails about your account activity and security.
+                接收关于账户活动和安全的邮件。
               </FormDescription>
             </div>
             <FormControl>
@@ -173,13 +173,13 @@ const onSubmit = handleSubmit((values) => {
         </FormControl>
         <div class="space-y-1 leading-none">
           <FormLabel>
-            Use different settings for my mobile devices
+            为移动设备使用不同的设置
           </FormLabel>
           <FormDescription>
-            You can manage your mobile notifications in the
+            您可以在
             <a href="/examples/forms">
-              mobile settings
-            </a> page.
+              移动设置
+            </a> 页面管理移动通知。
           </FormDescription>
         </div>
       </FormItem>
@@ -187,7 +187,7 @@ const onSubmit = handleSubmit((values) => {
 
     <div class="flex justify-start">
       <Button type="submit">
-        Update notifications
+        更新通知设置
       </Button>
     </div>
   </form>

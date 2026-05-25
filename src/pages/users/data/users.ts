@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker'
 
+// 模拟用户数据
 export const users = Array.from({ length: 20 }, () => {
   const firstName = faker.person.firstName()
   const lastName = faker.person.lastName()

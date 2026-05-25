@@ -51,15 +51,15 @@ watch(appType, (newValue) => {
 
 <template>
   <BasicPage
-    title="Apps"
-    description="Apps description"
+    title="应用"
+    description="应用描述"
     sticky
   >
     <div class="flex items-end justify-between sm:items-center">
       <div class="flex flex-col gap-4 sm:flex-row">
         <UiInput
           v-model:model-value="searchTerm"
-          placeholder="Filter apps..."
+          placeholder="筛选应用..."
           class="h-9 w-40 lg:w-[250px]"
         />
 

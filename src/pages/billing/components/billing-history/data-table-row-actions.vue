@@ -32,7 +32,7 @@ async function handleSelect(command: TCommand) {
     isOpen.value = true
   }
   catch (e) {
-    console.error(`Failed to load component for "${command}"`, e)
+    console.error(`加载 "${command}" 组件失败`, e)
   }
 }
 </script>
@@ -46,13 +46,13 @@ async function handleSelect(command: TCommand) {
           class="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
         >
           <EllipsisIcon class="size-4" />
-          <span class="sr-only">Open menu</span>
+          <span class="sr-only">打开菜单</span>
         </UiButton>
       </UiDropdownMenuTrigger>
       <UiDropdownMenuContent>
         <UiDropdownMenuGroup>
           <UiDropdownMenuItem @select.stop="handleSelect('detail')">
-            <span>Detail</span>
+            <span>详情</span>
           </UiDropdownMenuItem>
         </UiDropdownMenuGroup>
       </UiDropdownMenuContent>

@@ -26,24 +26,24 @@ function handleRemove() {
   <div>
     <ModalHeader>
       <ModalTitle>
-        Delete this user: {{ user.username }} ?
+        删除用户: {{ user.username }} ?
       </ModalTitle>
 
       <ModalDescription>
-        You are about to delete a user with the ID {{ user.id }}. This action cannot be undone.
+        您即将删除 ID 为 {{ user.id }} 的用户，此操作不可撤销。
       </ModalDescription>
     </ModalHeader>
 
     <ModalFooter>
       <ModalClose as-child>
         <UiButton variant="outline">
-          Cancel
+          取消
         </UiButton>
       </ModalClose>
 
       <ModalClose as-child>
         <UiButton variant="destructive" @click="handleRemove">
-          Delete
+          删除
         </UiButton>
       </ModalClose>
     </ModalFooter>

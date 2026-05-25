@@ -21,7 +21,7 @@ interface Props {
         </UiButton>
       </UiTooltipTrigger>
       <UiTooltipContent>
-        <p>Copy</p>
+        <p>复制</p>
       </UiTooltipContent>
     </UiTooltip>
   </UiTooltipProvider>

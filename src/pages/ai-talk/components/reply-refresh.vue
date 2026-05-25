@@ -11,7 +11,7 @@ import { RefreshCcwIcon } from '@lucide/vue'
         </UiButton>
       </UiTooltipTrigger>
       <UiTooltipContent>
-        <p>refresh</p>
+        <p>重新生成</p>
       </UiTooltipContent>
     </UiTooltip>
   </UiTooltipProvider>

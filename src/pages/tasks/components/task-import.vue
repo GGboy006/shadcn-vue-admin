@@ -19,11 +19,11 @@ function onSubmit() {
   error.value = null
 
   if (!file.value) {
-    error.value = 'File is required'
+    error.value = '请选择文件'
     return
   }
 
-  toast('You submitted the following values:', {
+  toast('提交的数据如下：', {
     description: h('pre', { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' }, h('code', { class: 'text-white' }, JSON.stringify(file.value, null, 2))),
   })
   isOpen.value = false
@@ -34,7 +34,7 @@ function onSubmit() {
   <Modal v-model:open="isOpen">
     <ModalTrigger as-child>
       <UiButton variant="outline">
-        Import
+        导入
         <DownloadIcon />
       </UiButton>
     </ModalTrigger>
@@ -42,25 +42,25 @@ function onSubmit() {
     <ModalContent>
       <ModalHeader>
         <ModalTitle>
-          Import Tasks
+          导入任务
         </ModalTitle>
         <ModalDescription>
-          Import tasks quickly from a CSV file.
+          从 CSV 文件快速导入任务。
         </ModalDescription>
       </ModalHeader>
 
       <div class="grid w-full max-w-sm items-center gap-1.5">
-        <UiLabel>File</UiLabel>
+        <UiLabel>文件</UiLabel>
         <UiInput id="file" v-model="file" type="file" />
         <span v-if="error" class="text-destructive">{{ error }}</span>
       </div>
 
       <ModalFooter>
         <UiButton variant="secondary" @click="isOpen = false">
-          Cancel
+          取消
         </UiButton>
         <UiButton @click="onSubmit">
-          Import
+          导入
         </UiButton>
       </ModalFooter>
     </ModalContent>

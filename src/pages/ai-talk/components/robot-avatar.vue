@@ -4,7 +4,7 @@
 
 <template>
   <UiAvatar>
-    <UiAvatarImage src="/robot.png" alt="robot" />
-    <UiAvatarFallback>Robot</UiAvatarFallback>
+    <UiAvatarImage src="/robot.png" alt="机器人" />
+    <UiAvatarFallback>机器人</UiAvatarFallback>
   </UiAvatar>
 </template>

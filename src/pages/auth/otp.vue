@@ -15,10 +15,10 @@ function handleComplete(e: string[]) {
       <UiCard class="w-full max-w-sm">
         <UiCardHeader>
           <UiCardTitle class="text-2xl">
-            Two-Factor Authentication
+            双因素认证
           </UiCardTitle>
           <UiCardDescription>
-            Please enter the authentication code.We have sent the authentication code to your email.
+            请输入验证码。我们已将验证码发送到您的邮箱。
           </UiCardDescription>
         </UiCardHeader>
         <UiCardContent class="grid gap-4">
@@ -43,13 +43,13 @@ function handleComplete(e: string[]) {
         </UiCardContent>
         <UiCardFooter class="flex flex-col gap-2">
           <UiButton class="w-full" :disabled="value.length < 6">
-            Verify
+            验证
           </UiButton>
 
           <UiCardDescription>
-            Haven't received it?
+            没有收到？
             <UiButton variant="link" class="px-0 text-muted-foreground">
-              Resend a new code.
+              重新发送验证码。
             </UiButton>
           </UiCardDescription>
         </UiCardFooter>

@@ -5,6 +5,6 @@ import { Icon } from '@iconify/vue'
 <template>
   <UiButton variant="outline" class="w-full">
     <Icon icon="simple-icons:google" class="size-5 mr-2" />
-    Google
+    使用 Google 登录
   </UiButton>
 </template>

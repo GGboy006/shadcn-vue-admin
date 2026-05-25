@@ -12,7 +12,7 @@ const isOpen = ref(false)
   <Modal v-model:open="isOpen">
     <ModalTrigger as-child>
       <UiButton>
-        Create
+        新建任务
         <PlusIcon />
       </UiButton>
     </ModalTrigger>

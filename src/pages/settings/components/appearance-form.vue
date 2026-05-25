@@ -8,7 +8,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { appearanceValidator } from '../validators/appearance.validator'
 
 const KEY = 'appearance_config'
-const DESCRIPTION = 'Customize the appearance of the app. Automatically switch between day and night themes.'
+const DESCRIPTION = '自定义应用外观，自动切换日间和夜间主题。'
 const DEFAULT_APPEARANCE_CONFIG_VALUE = {
   theme: 'light',
   font: 'inter',
@@ -25,10 +25,10 @@ const { isGetting, isPending, onSubmit } = useSystemConfig({
 <template>
   <div>
     <h3 class="text-lg font-medium">
-      Appearance
+      外观
     </h3>
     <p class="text-sm text-muted-foreground">
-      Customize the appearance of the app. Automatically switch between day and night themes.
+      自定义应用外观，自动切换日间和夜间主题。
     </p>
   </div>
   <Separator class="my-4" />
@@ -36,18 +36,18 @@ const { isGetting, isPending, onSubmit } = useSystemConfig({
   <div v-if="isGetting">
     <Button variant="secondary" disabled size="sm">
       <Spinner />
-      Please wait
+      请稍候
     </Button>
   </div>
 
   <form v-if="!isGetting" class="space-y-8" @submit="onSubmit">
     <FormField v-slot="{ componentField }" name="font">
       <FormItem>
-        <FormLabel>Font</FormLabel>
+        <FormLabel>字体</FormLabel>
         <UiSelect v-bind="componentField">
           <UiFormControl>
             <UiSelectTrigger>
-              <UiSelectValue placeholder="Select a font" />
+              <UiSelectValue placeholder="选择字体" />
             </UiSelectTrigger>
           </UiFormControl>
           <UiSelectContent>
@@ -65,7 +65,7 @@ const { isGetting, isPending, onSubmit } = useSystemConfig({
           </UiSelectContent>
         </UiSelect>
         <FormDescription>
-          Set the font you want to use in the dashboard.
+          设置仪表盘中使用的字体。
         </FormDescription>
         <FormMessage />
       </FormItem>
@@ -73,9 +73,9 @@ const { isGetting, isPending, onSubmit } = useSystemConfig({
 
     <FormField v-slot="{ componentField }" type="radio" name="theme">
       <FormItem class="space-y-1">
-        <FormLabel>Theme</FormLabel>
+        <FormLabel>主题</FormLabel>
         <FormDescription>
-          Select the theme for the dashboard.
+          选择仪表盘的配色主题。
         </FormDescription>
         <FormMessage />
 
@@ -105,7 +105,7 @@ const { isGetting, isPending, onSubmit } = useSystemConfig({
                 </div>
               </div>
               <span class="block w-full p-2 font-normal text-center">
-                Light
+                浅色
               </span>
             </FormLabel>
           </FormItem>
@@ -131,7 +131,7 @@ const { isGetting, isPending, onSubmit } = useSystemConfig({
                 </div>
               </div>
               <span class="block w-full p-2 font-normal text-center">
-                Dark
+                深色
               </span>
             </FormLabel>
           </FormItem>
@@ -142,7 +142,7 @@ const { isGetting, isPending, onSubmit } = useSystemConfig({
     <div class="flex justify-start">
       <Button type="submit" :disabled="isPending">
         <Spinner v-if="isPending" size="sm" />
-        Update preferences
+        更新偏好
       </Button>
     </div>
   </form>

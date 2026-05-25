@@ -4,6 +4,6 @@
 
 <template>
   <div>
-    hello
+    你好
   </div>
 </template>

@@ -7,8 +7,8 @@ import BillingPlan from './components/billing-plan/index.vue'
 
 <template>
   <BasicPage
-    title="Plans & Billing"
-    description="Manage your plan and billing history here."
+    title="套餐与计费"
+    description="在此管理您的套餐和计费历史。"
   >
     <BillingPlan />
     <BillingHistory class="mt-2" />

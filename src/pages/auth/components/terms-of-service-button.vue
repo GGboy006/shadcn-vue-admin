@@ -3,6 +3,6 @@
 
 <template>
   <UiButton variant="link" class="px-0 font-normal underline text-muted-foreground">
-    Terms of Service
+    服务条款
   </UiButton>
 </template>

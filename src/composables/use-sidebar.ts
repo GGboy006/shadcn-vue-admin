@@ -4,67 +4,67 @@ import type { NavGroup } from '@/components/app-sidebar/types'
 
 export function useSidebar() {
   const settingsNavItems = [
-    { title: 'Profile', url: '/settings/', icon: UserIcon },
-    { title: 'Account', url: '/settings/account', icon: WrenchIcon },
-    { title: 'Appearance', url: '/settings/appearance', icon: PaletteIcon },
-    { title: 'Notifications', url: '/settings/notifications', icon: BellDotIcon },
-    { title: 'Display', url: '/settings/display', icon: PictureInPicture2Icon },
+    { title: '个人资料', url: '/settings/', icon: UserIcon },
+    { title: '账户', url: '/settings/account', icon: WrenchIcon },
+    { title: '外观', url: '/settings/appearance', icon: PaletteIcon },
+    { title: '通知', url: '/settings/notifications', icon: BellDotIcon },
+    { title: '显示', url: '/settings/display', icon: PictureInPicture2Icon },
   ]
 
   const navData = ref<NavGroup[]> ([
     {
-      title: 'General',
+      title: '通用',
       items: [
-        { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboardIcon },
-        { title: 'Tasks', url: '/tasks', icon: ListTodoIcon },
-        { title: 'Apps', url: '/apps', icon: BoxesIcon },
-        { title: 'Users', url: '/users', icon: UsersIcon },
-        { title: 'Ai Talk Example', url: '/ai-talk', icon: PodcastIcon },
+        { title: '仪表盘', url: '/dashboard', icon: LayoutDashboardIcon },
+        { title: '任务', url: '/tasks', icon: ListTodoIcon },
+        { title: '应用', url: '/apps', icon: BoxesIcon },
+        { title: '用户', url: '/users', icon: UsersIcon },
+        { title: 'AI 对话示例', url: '/ai-talk', icon: PodcastIcon },
       ],
     },
     {
-      title: 'Pages',
+      title: '页面',
       items: [
         {
-          title: 'Auth',
+          title: '认证',
           icon: SquareUserRoundIcon,
           items: [
-            { title: 'Sign In', url: '/auth/sign-in' },
-            { title: 'Sign In(2 Col)', url: '/auth/sign-in-2' },
-            { title: 'Sign Up', url: '/auth/sign-up' },
-            { title: 'Forgot Password', url: '/auth/forgot-password' },
-            { title: 'OTP', url: '/auth/otp' },
+            { title: '登录', url: '/auth/sign-in' },
+            { title: '登录(双栏)', url: '/auth/sign-in-2' },
+            { title: '注册', url: '/auth/sign-up' },
+            { title: '忘记密码', url: '/auth/forgot-password' },
+            { title: '验证码', url: '/auth/otp' },
           ],
         },
         {
-          title: 'Errors',
+          title: '错误',
           icon: BugIcon,
           items: [
-            { title: '401 | Unauthorized', url: '/errors/401' },
-            { title: '403 | Forbidden', url: '/errors/403' },
-            { title: '404 | Not Found', url: '/errors/404' },
-            { title: '500 | Internal Server Error', url: '/errors/500' },
-            { title: '503 | Maintenance Error', url: '/errors/503' },
+            { title: '401 | 未授权', url: '/errors/401' },
+            { title: '403 | 禁止访问', url: '/errors/403' },
+            { title: '404 | 页面不存在', url: '/errors/404' },
+            { title: '500 | 服务器内部错误', url: '/errors/500' },
+            { title: '503 | 维护中', url: '/errors/503' },
           ],
         },
       ],
     },
     {
-      title: 'Other',
+      title: '其他',
       items: [
-        { title: 'Settings', items: settingsNavItems, icon: SettingsIcon },
-        { title: 'Prop Components', url: '/prop-components', icon: ComponentIcon },
-        { title: 'Help Center', url: '/help-center', icon: BadgeHelpIcon },
-        { title: 'Outside Page(GitHub)', url: 'https://www.github.com/Whbbit1999/shadcn-vue-admin', icon: BirdIcon },
+        { title: '设置', items: settingsNavItems, icon: SettingsIcon },
+        { title: '组件属性', url: '/prop-components', icon: ComponentIcon },
+        { title: '帮助中心', url: '/help-center', icon: BadgeHelpIcon },
+        { title: '外部页面(GitHub)', url: 'https://www.github.com/Whbbit1999/shadcn-vue-admin', icon: BirdIcon },
       ],
     },
   ])
 
   const otherPages = ref<NavGroup[]>([
     {
-      title: 'Other',
+      title: '其他',
       items: [
-        { title: 'Plans & Pricing', icon: CreditCardIcon, url: '/billing' },
+        { title: '套餐与定价', icon: CreditCardIcon, url: '/billing' },
       ],
     },
   ])

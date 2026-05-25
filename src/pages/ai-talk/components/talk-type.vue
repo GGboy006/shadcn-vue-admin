@@ -3,11 +3,11 @@ import { RadioTowerIcon, SparklesIcon } from '@lucide/vue'
 
 const emit = defineEmits(['update:type'])
 
-const type = ref('deep-think')
+const type = ref('深度思考')
 
 const types = [
-  { type: 'deep-think', icon: SparklesIcon },
-  { type: 'online', icon: RadioTowerIcon },
+  { type: '深度思考', icon: SparklesIcon },
+  { type: '联网搜索', icon: RadioTowerIcon },
 ]
 
 watch(type, () => {

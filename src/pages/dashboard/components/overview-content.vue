@@ -8,7 +8,7 @@ import RecentSales from './recent-sales.vue'
     <UiCard>
       <UiCardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
         <UiCardTitle class="text-sm font-medium">
-          Total Revenue
+          总收入
         </UiCardTitle>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -28,14 +28,14 @@ import RecentSales from './recent-sales.vue'
           $45,231.89
         </div>
         <p class="text-xs text-muted-foreground">
-          +20.1% from last month
+          较上月增长 +20.1%
         </p>
       </UiCardContent>
     </UiCard>
     <UiCard>
       <UiCardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
         <UiCardTitle class="text-sm font-medium">
-          Subscriptions
+          订阅数
         </UiCardTitle>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -57,14 +57,14 @@ import RecentSales from './recent-sales.vue'
           +2350
         </div>
         <p class="text-xs text-muted-foreground">
-          +180.1% from last month
+          较上月增长 +180.1%
         </p>
       </UiCardContent>
     </UiCard>
     <UiCard>
       <UiCardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
         <UiCardTitle class="text-sm font-medium">
-          Sales
+          销售额
         </UiCardTitle>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -85,14 +85,14 @@ import RecentSales from './recent-sales.vue'
           +12,234
         </div>
         <p class="text-xs text-muted-foreground">
-          +19% from last month
+          较上月增长 +19%
         </p>
       </UiCardContent>
     </UiCard>
     <UiCard>
       <UiCardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
         <UiCardTitle class="text-sm font-medium">
-          Active Now
+          当前活跃
         </UiCardTitle>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -112,7 +112,7 @@ import RecentSales from './recent-sales.vue'
           +573
         </div>
         <p class="text-xs text-muted-foreground">
-          +201 since last hour
+          较上小时增加 +201
         </p>
       </UiCardContent>
     </UiCard>
@@ -122,9 +122,9 @@ import RecentSales from './recent-sales.vue'
     <OverviewChart class="col-span-1 lg:col-span-4" />
     <UiCard class="col-span-1 lg:col-span-3">
       <UiCardHeader>
-        <UiCardTitle>Recent Sales</UiCardTitle>
+        <UiCardTitle>最近销售</UiCardTitle>
         <UiCardDescription>
-          You made 265 sales this month.
+          本月共完成 265 笔销售。
         </UiCardDescription>
       </UiCardHeader>
       <UiCardContent>

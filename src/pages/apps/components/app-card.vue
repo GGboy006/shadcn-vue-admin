@@ -17,7 +17,7 @@ defineProps<{ app: IApp }>()
           :variant="app.connected ? 'secondary' : 'outline'"
           size="sm"
         >
-          {{ app.connected ? 'Connected' : 'Connect' }}
+          {{ app.connected ? '已连接' : '连接' }}
         </UiButton>
       </div>
     </UiCardHeader>

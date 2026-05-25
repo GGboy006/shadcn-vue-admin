@@ -3,6 +3,6 @@
 
 <template>
   <UiButton variant="link" class="px-0 font-normal underline text-muted-foreground">
-    Privacy Policy
+    隐私政策
   </UiButton>
 </template>

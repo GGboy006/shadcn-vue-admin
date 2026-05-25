@@ -6,8 +6,8 @@ const { settingsNavItems } = useSidebar()
 
 <template>
   <BasicPage
-    title="Settings"
-    description="Manage your store settings."
+    title="设置"
+    description="管理系统设置。"
   >
     <TwoColLayout>
       <template #aside>

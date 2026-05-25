@@ -25,7 +25,7 @@ const isFiltered = computed(() => props.table.getState().columnFilters.length > 
   <div class="flex items-center justify-between">
     <div class="flex items-center flex-1 space-x-2">
       <Input
-        placeholder="Filter users by username..."
+        placeholder="按用户名筛选..."
         :model-value="(table.getColumn('username')?.getFilterValue() as string) ?? ''"
         class="h-8 w-[150px] lg:w-[250px]"
         @input="table.getColumn('username')?.setFilterValue($event.target.value)"
@@ -33,13 +33,13 @@ const isFiltered = computed(() => props.table.getState().columnFilters.length > 
       <DataTableFacetedFilter
         v-if="table.getColumn('status')"
         :column="table.getColumn('status')"
-        title="Status"
+        title="状态"
         :options="callTypes"
       />
       <DataTableFacetedFilter
         v-if="table.getColumn('role')"
         :column="table.getColumn('role')"
-        title="Role"
+        title="角色"
         :options="userTypes"
       />
 
@@ -49,7 +49,7 @@ const isFiltered = computed(() => props.table.getState().columnFilters.length > 
         class="h-8 px-2 lg:px-3"
         @click="table.resetColumnFilters()"
       >
-        Reset
+        重置
         <XIcon class="size-4 ml-2" />
       </Button>
     </div>

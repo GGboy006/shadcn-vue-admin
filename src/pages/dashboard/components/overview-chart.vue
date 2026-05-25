@@ -127,11 +127,11 @@ const chartConfig = {
   //   label: 'Visitors',
   // },
   mobile: {
-    label: 'Mobile',
+    label: '移动端',
     color: 'var(--chart-2)',
   },
   desktop: {
-    label: 'Desktop',
+    label: '桌面端',
     color: 'var(--chart-1)',
   },
 } satisfies ChartConfig
@@ -186,9 +186,9 @@ const filterRange = computed(() => {
   <Card class="pt-0">
     <CardHeader class="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
       <div class="grid flex-1 gap-1">
-        <CardTitle>Area Chart - Interactive</CardTitle>
+        <CardTitle>面积图 - 交互式</CardTitle>
         <CardDescription>
-          Showing total visitors for the last 3 months
+          显示过去 3 个月的总访客数
         </CardDescription>
       </div>
       <Select v-model="timeRange">
@@ -196,17 +196,17 @@ const filterRange = computed(() => {
           class="hidden w-[160px] rounded-lg sm:ml-auto sm:flex"
           aria-label="Select a value"
         >
-          <SelectValue placeholder="Last 3 months" />
+          <SelectValue placeholder="最近 3 个月" />
         </SelectTrigger>
         <SelectContent class="rounded-xl">
           <SelectItem value="90d" class="rounded-lg">
-            Last 3 months
+            最近 3 个月
           </SelectItem>
           <SelectItem value="30d" class="rounded-lg">
-            Last 30 days
+            最近 30 天
           </SelectItem>
           <SelectItem value="7d" class="rounded-lg">
-            Last 7 days
+            最近 7 天
           </SelectItem>
         </SelectContent>
       </Select>
@@ -240,7 +240,7 @@ const filterRange = computed(() => {
             :num-ticks="6"
             :tick-format="(d: number, _index: number) => {
               const date = new Date(d)
-              return date.toLocaleDateString('en-US', {
+              return date.toLocaleDateString('zh-CN', {
                 month: 'short',
                 day: 'numeric',
               })
@@ -256,7 +256,7 @@ const filterRange = computed(() => {
           <ChartCrosshair
             :template="componentToString(chartConfig, ChartTooltipContent, {
               labelFormatter: (d) => {
-                return new Date(d).toLocaleDateString('en-US', {
+                return new Date(d).toLocaleDateString('zh-CN', {
                   month: 'short',
                   day: 'numeric',
                 })

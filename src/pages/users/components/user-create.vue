@@ -13,7 +13,7 @@ const isOpen = ref(false)
     <ModalTrigger as-child>
       <UiButton>
         <UserRoundPlusIcon />
-        Create User
+        新建用户
       </UiButton>
     </ModalTrigger>
 

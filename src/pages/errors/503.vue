@@ -6,8 +6,8 @@ import Error from '@/components/custom-error.vue'
   <div class="flex items-center justify-center h-screen">
     <Error
       :code="503"
-      subtitle="Service Unavailable"
-      error="The server is currently unable to handle the request due to a temporary overloading or maintenance of the server."
+      subtitle="服务不可用"
+      error="由于服务器临时过载或维护，服务器目前无法处理请求。"
     />
   </div>
 </template>

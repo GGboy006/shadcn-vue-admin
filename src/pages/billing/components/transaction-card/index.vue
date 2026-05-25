@@ -34,7 +34,7 @@ const currentState = computed(() => {
   <div class="w-full font-mono rounded-lg shadow-sm bg-background">
     <header class="relative p-5">
       <h1 class="text-lg">
-        Billing Card {{ cardNo }}
+        计费卡 {{ cardNo }}
       </h1>
       <div class="flex items-center gap-2 mt-1">
         <p class="text-stone-600">
@@ -54,7 +54,7 @@ const currentState = computed(() => {
     <div class="p-6 border-t ">
       <div class="">
         <h2 class="mb-2 text-xl font-extralight">
-          Last update
+          最后更新
         </h2>
         <div class="text-xl">
           {{ updatedAt }}
@@ -83,10 +83,10 @@ const currentState = computed(() => {
     <div class="p-6 border-t">
       <div class="text-stone-500 ">
         <h2 class="mt-6 text-xl font-extralight">
-          Notes
+          备注
         </h2>
         <p class="text-sm">
-          Invoice #{{ invoiceNo }}
+          发票 #{{ invoiceNo }}
         </p>
         <p class="text-sm">
           {{ description }}

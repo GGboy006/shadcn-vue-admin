@@ -5,6 +5,6 @@ import { Icon } from '@iconify/vue'
 <template>
   <UiButton variant="outline" class="w-full">
     <Icon icon="simple-icons:github" class="size-5 mr-2" />
-    GitHub
+    使用 GitHub 登录
   </UiButton>
 </template>

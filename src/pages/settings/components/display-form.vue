@@ -47,7 +47,7 @@ const { handleSubmit } = useForm({
 })
 
 const onSubmit = handleSubmit((values) => {
-  toast('You submitted the following values:', {
+  toast('提交的数据如下：', {
     description: h('pre', { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' }, h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))),
   })
 })
@@ -56,10 +56,10 @@ const onSubmit = handleSubmit((values) => {
 <template>
   <div>
     <h3 class="text-lg font-medium">
-      Display
+      显示设置
     </h3>
     <p class="text-sm text-muted-foreground">
-      Turn items on or off to control what's displayed in the app.
+      开启或关闭项目以控制应用中显示的内容。
     </p>
   </div>
   <Separator class="my-4" />
@@ -68,10 +68,10 @@ const onSubmit = handleSubmit((values) => {
       <FormItem>
         <div class="mb-4">
           <FormLabel class="text-base">
-            Sidebar
+            侧边栏
           </FormLabel>
           <FormDescription>
-            Select the items you want to display in the sidebar.
+            选择要在侧边栏中显示的项目。
           </FormDescription>
         </div>
 
@@ -98,7 +98,7 @@ const onSubmit = handleSubmit((values) => {
 
     <div class="flex justify-start mt-4">
       <Button type="submit">
-        Update display
+        更新显示
       </Button>
     </div>
   </form>

@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button'
 import OverviewContent from './components/overview-content.vue'
 
 const tabs = ref([
-  { name: 'Overview', value: 'overview' },
-  { name: 'Analytics', value: 'analytics', disabled: true },
-  { name: 'Reports', value: 'reports', disabled: true },
-  { name: 'Notifications', value: 'notifications', disabled: true },
+  { name: '概览', value: 'overview' },
+  { name: '分析', value: 'analytics', disabled: true },
+  { name: '报表', value: 'reports', disabled: true },
+  { name: '通知', value: 'notifications', disabled: true },
 ])
 
 const activeTab = ref(tabs.value[0].value)
@@ -18,8 +18,8 @@ const activeTab = ref(tabs.value[0].value)
 
 <template>
   <BasicPage
-    title="workspace"
-    description="workspace description"
+    title="工作台"
+    description="工作区概览"
     sticky
   >
     <template #actions>

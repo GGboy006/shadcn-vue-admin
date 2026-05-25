@@ -9,21 +9,21 @@ interface ISocialMediaAccount {
 }
 
 const socialMediaAccounts = ref<ISocialMediaAccount[]>([
-  { title: 'GitHub', desc: ' The source code of Shadcn UI is publicly available on GitHub.', url: 'https://github.com/Whbbit1999/shadcn-vue-admin' },
-  { title: 'Discord', desc: 'Join our Discord server to ask questions, share your projects, and get involved in the community.', url: '' },
+  { title: 'GitHub', desc: 'Shadcn UI 的源代码在 GitHub 上公开可用。', url: 'https://github.com/Whbbit1999/shadcn-vue-admin' },
+  { title: 'Discord', desc: '加入我们的 Discord 服务器，提问、分享您的项目并参与社区互动。', url: '' },
   { title: 'Bilibili', desc: '在哔哩哔哩上找到我们', url: 'https://space.bilibili.com/104376935' },
 ])
 </script>
 
 <template>
   <BasicPage
-    title="Help Center"
-    description="Help Center description"
+    title="帮助中心"
+    description="帮助中心描述"
   >
     <Alert>
-      <AlertTitle>Heads up!</AlertTitle>
+      <AlertTitle>注意！</AlertTitle>
       <AlertDescription>
-        You can find answers to your questions in our help center.
+        您可以在我们的帮助中心找到问题的答案。
       </AlertDescription>
     </Alert>
 

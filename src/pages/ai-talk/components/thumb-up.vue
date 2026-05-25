@@ -11,7 +11,7 @@ import { ThumbsUpIcon } from '@lucide/vue'
         </UiButton>
       </UiTooltipTrigger>
       <UiTooltipContent>
-        <p>Good Job</p>
+        <p>回答很好</p>
       </UiTooltipContent>
     </UiTooltip>
   </UiTooltipProvider>
