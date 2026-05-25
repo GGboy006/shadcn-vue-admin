@@ -27,7 +27,7 @@ stats.html
 *.sln
 *.sw?
 
-
+.history
 .env
 .env.local
 .env.development
