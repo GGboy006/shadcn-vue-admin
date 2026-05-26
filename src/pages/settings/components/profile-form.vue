@@ -143,9 +143,9 @@ const onSubmit = handleSubmit(async (formValues) => {
         <FormControl>
           <Input type="text" placeholder="请输入昵称" v-bind="componentField" />
         </FormControl>
-        <FormDescription>
+        <!-- <FormDescription>
           您的公开显示名称。
-        </FormDescription>
+        </FormDescription> -->
         <FormMessage />
       </FormItem>
     </FormField>
