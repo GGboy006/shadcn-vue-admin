@@ -28,6 +28,10 @@ export const useAuthStore = defineStore('user', () => {
     isLogin.value = false
   }
 
+  function getUserType(): number | undefined {
+    return userInfo.value?.userType
+  }
+
   return {
     isLogin,
     token,
@@ -35,6 +39,7 @@ export const useAuthStore = defineStore('user', () => {
     setToken,
     setUserInfo,
     clearAuth,
+    getUserType,
   }
 }, {
   persist: true,

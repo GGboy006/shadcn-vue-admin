@@ -93,6 +93,8 @@ declare global {
   const useThemeConfig: typeof import('../composables/use-theme-config')['useThemeConfig']
   const useThemeStore: typeof import('../stores/theme').useThemeStore
   const useUpload: typeof import('../composables/use-upload').useUpload
+  const useUserInfo: typeof import('../composables/use-user-info').useUserInfo
+  const useUserInfoStore: typeof import('../stores/user-info').useUserInfoStore
   const watch: typeof import('vue').watch
   const watchEffect: typeof import('vue').watchEffect
   const watchPostEffect: typeof import('vue').watchPostEffect
@@ -118,4 +120,7 @@ declare global {
   // @ts-ignore
   export type { NavigationMode } from '../stores/sidebar-config'
   import('../stores/sidebar-config')
+  // @ts-ignore
+  export type { BusinessStationMasterVO, BusinessMerchantVO } from '../stores/user-info'
+  import('../stores/user-info')
 }

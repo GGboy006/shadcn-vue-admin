@@ -1,0 +1,122 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://172.31.128.135:8202/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/station/myStationInfo": {
+      "get": {
+        "tags": [
+          "站长用户-管理"
+        ],
+        "summary": "获取当前登录站长的信息",
+        "operationId": "getMyStationInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBusinessStationMasterVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "BaseResponseBusinessStationMasterVO": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/components/schemas/BusinessStationMasterVO"
+        }
+      }
+    },
+    "BusinessStationMasterVO": {
+      "type": "object",
+      "properties": {
+        "stationId": {
+          "type": "integer",
+          "description": "站长ID",
+          "format": "int64",
+          "refType": null
+        },
+        "stationName": {
+          "type": "string",
+          "description": "站点/服务点名称",
+          "refType": null
+        },
+        "communityCode": {
+          "type": "string",
+          "description": "所属社区标识",
+          "refType": null
+        },
+        "communityName": {
+          "type": "string",
+          "description": "所属社区名称",
+          "refType": null
+        },
+        "stationLevel": {
+          "type": "integer",
+          "description": "站长等级：1=初级，2=中级，3=高级，4=金牌",
+          "format": "int32",
+          "refType": null
+        },
+        "serviceScope": {
+          "type": "array",
+          "description": "服务范围",
+          "items": {
+            "type": "string",
+            "description": "服务范围"
+          },
+          "refType": "string"
+        },
+        "address": {
+          "type": "string",
+          "description": "站点地址",
+          "refType": null
+        },
+        "contactPhone": {
+          "type": "string",
+          "description": "站长联系电话",
+          "refType": null
+        },
+        "emergencyContact": {
+          "type": "string",
+          "description": "紧急联系人电话",
+          "refType": null
+        },
+        "remark": {
+          "type": "string",
+          "description": "备注",
+          "refType": null
+        }
+      },
+      "description": "站长详情"
+    }
+  }
+}

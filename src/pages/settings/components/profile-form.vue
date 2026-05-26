@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
   FormControl,
@@ -102,17 +103,12 @@ const onSubmit = handleSubmit(async (formValues) => {
       <FormItem>
         <FormLabel>头像</FormLabel>
         <div class="flex items-center gap-4">
-          <div class="relative size-20 rounded-full overflow-hidden bg-muted">
-            <img
-              v-if="avatarUrl"
-              :src="avatarUrl"
-              alt="头像"
-              class="size-full object-cover"
-            >
-            <div v-else class="flex items-center justify-center size-full text-muted-foreground text-sm">
+          <Avatar class="size-20">
+            <AvatarImage :src="avatarUrl" alt="头像" />
+            <AvatarFallback class="text-sm text-muted-foreground">
               暂无头像
-            </div>
-          </div>
+            </AvatarFallback>
+          </Avatar>
           <div>
             <label
               class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border rounded-md cursor-pointer hover:bg-accent hover:text-accent-foreground"

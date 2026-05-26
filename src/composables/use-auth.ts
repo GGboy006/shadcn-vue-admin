@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/auth'
+import { useUserInfoStore } from '@/stores/user-info'
 
 import { useApiFetch } from './use-fetch'
 
@@ -6,6 +7,7 @@ export function useAuth() {
   const router = useRouter()
 
   const authStore = useAuthStore()
+  const userInfoStore = useUserInfoStore()
   const loading = ref(false)
   const { apiFetch } = useApiFetch()
 
@@ -18,6 +20,7 @@ export function useAuth() {
     }
     finally {
       authStore.clearAuth()
+      userInfoStore.clearUserInfo()
       router.push({ path: '/auth/sign-in' })
     }
   }
@@ -36,6 +39,17 @@ export function useAuth() {
 
       authStore.setToken(res.data.token)
       authStore.setUserInfo(res.data.user)
+
+      // 根据用户类型获取详细信息
+      const userType = res.data.user?.userType
+      if (userType === 3) {
+        const stationRes = await apiFetch('/station/myStationInfo')
+        userInfoStore.setStationInfo(stationRes.data)
+      }
+      else if (userType === 4 || userType === 5) {
+        const merchantRes = await apiFetch('/merchant/myMerchantInfo')
+        userInfoStore.setMerchantInfo(merchantRes.data)
+      }
 
       const redirect = router.currentRoute.value.query.redirect as string
       if (!redirect || redirect.startsWith('//')) {
