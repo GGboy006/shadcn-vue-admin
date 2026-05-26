@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BadgeCheckIcon, BellIcon, ChevronsUpDownIcon, CreditCardIcon, LogOutIcon, SparklesIcon, UserRoundCogIcon } from '@lucide/vue'
+import { ChevronsUpDownIcon, LogOutIcon, UserRoundCogIcon } from '@lucide/vue'
 import { storeToRefs } from 'pinia'
 
 import { useSidebar } from '@/components/ui/sidebar'
@@ -53,7 +53,7 @@ const { isMobile, open } = useSidebar()
             </div>
           </UiDropdownMenuLabel>
 
-          <UiDropdownMenuSeparator />
+          <!-- <UiDropdownMenuSeparator />
           <UiDropdownMenuGroup>
             <UiDropdownMenuItem @click="$router.push('/billing/')">
               <SparklesIcon />
@@ -67,22 +67,22 @@ const { isMobile, open } = useSidebar()
               <CreditCardIcon />
               Billing
             </UiDropdownMenuItem>
-          </UiDropdownMenuGroup>
+          </UiDropdownMenuGroup> -->
 
           <UiDropdownMenuSeparator />
           <UiDropdownMenuGroup>
             <UiDropdownMenuItem @click="$router.push('/settings/')">
               <UserRoundCogIcon />
-              Profile
+              个人资料
             </UiDropdownMenuItem>
-            <UiDropdownMenuItem @click="$router.push('/settings/account')">
+            <!-- <UiDropdownMenuItem @click="$router.push('/settings/account')">
               <BadgeCheckIcon />
-              Account
-            </UiDropdownMenuItem>
-            <UiDropdownMenuItem @click="$router.push('/settings/notifications')">
+              站长信息
+            </UiDropdownMenuItem> -->
+            <!-- <UiDropdownMenuItem @click="$router.push('/settings/notifications')">
               <BellIcon />
-              Notifications
-            </UiDropdownMenuItem>
+              通知
+            </UiDropdownMenuItem> -->
           </UiDropdownMenuGroup>
 
           <UiDropdownMenuSeparator />
