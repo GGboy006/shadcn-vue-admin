@@ -20,6 +20,7 @@ export default antfu({
   ignores: [
     '**/build/**',
     '**/components/ui/**',
+    '**/*.md',
   ],
   settings: {
     'import/core-modules': ['vue-router/auto-routes'],
