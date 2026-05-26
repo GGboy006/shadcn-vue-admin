@@ -9,9 +9,17 @@ export function useAuth() {
   const loading = ref(false)
   const { apiFetch } = useApiFetch()
 
-  function logout() {
-    authStore.clearAuth()
-    router.push({ path: '/auth/sign-in' })
+  async function logout() {
+    try {
+      await apiFetch('/login/logout', { method: 'POST' })
+    }
+    catch {
+      // 后端接口失败也要继续清前端
+    }
+    finally {
+      authStore.clearAuth()
+      router.push({ path: '/auth/sign-in' })
+    }
   }
 
   function toHome() {
