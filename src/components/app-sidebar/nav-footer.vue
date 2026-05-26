@@ -22,7 +22,7 @@ const { isMobile, open } = useSidebar()
             <UiAvatar class="size-8 rounded-lg">
               <UiAvatarImage :src="userInfo?.avatar || ''" :alt="userInfo?.nickname || ''" />
               <UiAvatarFallback class="rounded-lg">
-                {{ userInfo?.nickname?.slice(0, 2) || '用户' }}
+                {{ userInfo?.nickname?.slice(0, 1) || '用户' }}
               </UiAvatarFallback>
             </UiAvatar>
             <div class="grid flex-1 text-sm leading-tight text-left">

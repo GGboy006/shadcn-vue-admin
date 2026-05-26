@@ -12,4 +12,5 @@ import SettingsLayout from './components/settings-layout.vue'
 <route lang="yaml">
 meta:
   roles: [3]
+  title: '站长信息'
 </route>

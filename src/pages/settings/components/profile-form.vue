@@ -105,8 +105,8 @@ const onSubmit = handleSubmit(async (formValues) => {
         <div class="flex items-center gap-4">
           <Avatar class="size-20">
             <AvatarImage :src="avatarUrl" alt="头像" />
-            <AvatarFallback class="text-sm text-muted-foreground">
-              暂无头像
+            <AvatarFallback class="text-lg text-muted-foreground">
+              {{ userInfo?.nickname?.slice(0, 1) || '用户' }}
             </AvatarFallback>
           </Avatar>
           <div>
