@@ -1,11 +1,19 @@
 <script setup lang="ts">
-import { XIcon } from '@lucide/vue'
+import { PencilIcon } from '@lucide/vue'
 import { toTypedSchema } from '@vee-validate/zod'
-import { FieldArray, useForm } from 'vee-validate'
+import { storeToRefs } from 'pinia'
+import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 
 import { Button } from '@/components/ui/button'
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -16,30 +24,65 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
-import { Textarea } from '@/components/ui/textarea'
-import { cn } from '@/lib/utils'
+import { useApiFetch } from '@/composables/use-fetch'
+import { useUpload } from '@/composables/use-upload'
+import { useAuthStore } from '@/stores/auth'
 
 import { profileValidator } from '../validators/profile.validator'
 
-const verifiedEmails = ref(['m@example.com', 'm@google.com', 'm@support.com'])
+const authStore = useAuthStore()
+const { userInfo } = storeToRefs(authStore)
+const { upload, loading: uploadLoading } = useUpload()
+const { apiFetch } = useApiFetch()
 
 const profileFormSchema = toTypedSchema(profileValidator)
 
-const { handleSubmit, resetForm } = useForm({
+const { handleSubmit, setFieldValue, values } = useForm({
   validationSchema: profileFormSchema,
   initialValues: {
-    bio: 'I own a computer.',
-    urls: [
-      { value: 'https://shadcn.com' },
-      { value: 'http://twitter.com/shadcn' },
-    ],
+    nickname: userInfo.value?.nickname || '',
+    phone: userInfo.value?.phone || '',
+    gender: userInfo.value?.gender ?? 0,
+    avatar: userInfo.value?.avatar || '',
   },
 })
 
-const onSubmit = handleSubmit((values) => {
-  toast('提交的数据如下：', {
-    description: h('pre', { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' }, h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))),
+const avatarUrl = computed(() => values.avatar || userInfo.value?.avatar || '')
+
+async function handleAvatarChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file)
+    return
+
+  try {
+    const url = await upload(file)
+    setFieldValue('avatar', url)
+    if (userInfo.value) {
+      authStore.setUserInfo({ ...userInfo.value, avatar: url })
+    }
+    toast.success('头像上传成功')
+  }
+  catch {
+    // 错误已在 useUpload 中 toast
+  }
+  finally {
+    target.value = ''
+  }
+}
+
+const onSubmit = handleSubmit(async (formValues) => {
+  const res = await apiFetch('/login/current', {
+    method: 'PUT',
+    body: {
+      nickname: formValues.nickname,
+      avatar: formValues.avatar,
+      gender: formValues.gender,
+    },
   })
+
+  authStore.setUserInfo(res.data)
+  toast.success('个人资料更新成功')
 })
 </script>
 
@@ -49,109 +92,112 @@ const onSubmit = handleSubmit((values) => {
       个人资料
     </h3>
     <p class="text-sm text-muted-foreground">
-      这是其他人在网站上看到您的信息。
+      管理您的个人信息和头像。
     </p>
   </div>
   <Separator orientation="horizontal" class="my-4" />
   <form class="space-y-8" @submit="onSubmit">
-    <FormField v-slot="{ componentField }" name="username">
+    <!-- 头像 -->
+    <FormField name="avatar">
       <FormItem>
-        <FormLabel>用户名</FormLabel>
+        <FormLabel>头像</FormLabel>
+        <div class="flex items-center gap-4">
+          <div class="relative size-20 rounded-full overflow-hidden bg-muted">
+            <img
+              v-if="avatarUrl"
+              :src="avatarUrl"
+              alt="头像"
+              class="size-full object-cover"
+            >
+            <div v-else class="flex items-center justify-center size-full text-muted-foreground text-sm">
+              暂无头像
+            </div>
+          </div>
+          <div>
+            <label
+              class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border rounded-md cursor-pointer hover:bg-accent hover:text-accent-foreground"
+            >
+              <PencilIcon class="size-4" />
+              {{ uploadLoading ? '上传中...' : '更换头像' }}
+              <input
+                type="file"
+                accept="image/*"
+                class="sr-only"
+                :disabled="uploadLoading"
+                @change="handleAvatarChange"
+              >
+            </label>
+            <FormDescription class="mt-2">
+              支持 JPG、PNG、WebP 格式，最大 10MB。
+            </FormDescription>
+          </div>
+        </div>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+
+    <!-- 昵称 -->
+    <FormField v-slot="{ componentField }" name="nickname">
+      <FormItem>
+        <FormLabel>昵称</FormLabel>
         <FormControl>
-          <Input type="text" placeholder="输入用户名" v-bind="componentField" />
+          <Input type="text" placeholder="请输入昵称" v-bind="componentField" />
         </FormControl>
         <FormDescription>
-          这是您的公开显示名称，可以是真实姓名或昵称。每30天只能修改一次。
+          您的公开显示名称。
         </FormDescription>
         <FormMessage />
       </FormItem>
     </FormField>
 
-    <FormField v-slot="{ componentField }" name="email">
+    <!-- 手机号 -->
+    <FormField v-slot="{ componentField }" name="phone">
       <FormItem>
-        <FormLabel>邮箱</FormLabel>
+        <FormLabel>手机号</FormLabel>
+        <FormControl>
+          <Input type="tel" v-bind="componentField" disabled />
+        </FormControl>
+        <FormDescription>
+          手机号不可修改，如需更换请联系管理员。
+        </FormDescription>
+        <FormMessage />
+      </FormItem>
+    </FormField>
 
-        <Select v-bind="componentField">
+    <!-- 性别 -->
+    <FormField v-slot="{ componentField }" name="gender">
+      <FormItem>
+        <FormLabel>性别</FormLabel>
+        <Select v-bind="componentField" @update:model-value="(v) => setFieldValue('gender', Number(v))">
           <FormControl>
             <SelectTrigger>
-              <SelectValue placeholder="选择邮箱" />
+              <SelectValue placeholder="选择性别" />
             </SelectTrigger>
           </FormControl>
           <SelectContent>
             <SelectGroup>
-              <SelectItem v-for="email in verifiedEmails" :key="email" :value="email">
-                {{ email }}
+              <SelectItem :value="0">
+                未知
+              </SelectItem>
+              <SelectItem :value="1">
+                男
+              </SelectItem>
+              <SelectItem :value="2">
+                女
               </SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
         <FormDescription>
-          您可以在邮箱设置中管理已验证的邮箱地址。
+          选择您的性别。
         </FormDescription>
         <FormMessage />
       </FormItem>
     </FormField>
 
-    <FormField v-slot="{ componentField }" name="bio">
-      <FormItem>
-        <FormLabel>个人简介</FormLabel>
-        <FormControl>
-          <Textarea placeholder="简单介绍一下您自己" v-bind="componentField" />
-        </FormControl>
-        <FormDescription>
-          您可以 <span>@提及</span> 其他用户和组织以链接到他们。
-        </FormDescription>
-        <FormMessage />
-      </FormItem>
-    </FormField>
-
-    <div>
-      <FieldArray v-slot="{ fields, push, remove }" name="urls">
-        <div v-for="(field, index) in fields" :key="`urls-${field.key}`" class="mb-2">
-          <FormField v-slot="{ componentField }" :name="`urls[${index}].value`">
-            <FormItem>
-              <FormLabel :class="cn(index !== 0 && 'sr-only')">
-                网址
-              </FormLabel>
-              <FormDescription :class="cn(index !== 0 && 'sr-only')">
-                添加您的网站、博客或社交媒体主页链接。
-              </FormDescription>
-              <div class="relative flex items-center">
-                <FormControl>
-                  <Input type="url" v-bind="componentField" />
-                </FormControl>
-                <button type="button" class="absolute py-2 pe-3 end-0 text-muted-foreground" @click="remove(index)">
-                  <XIcon class="w-3" />
-                </button>
-              </div>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-        </div>
-
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          class="w-20 mt-2 text-xs"
-          @click="push({ value: '' })"
-        >
-          添加网址
-        </Button>
-      </FieldArray>
-    </div>
-
-    <div class="flex justify-start gap-2">
+    <div class="flex justify-start">
       <Button type="submit">
         更新资料
-      </Button>
-
-      <Button
-        type="button"
-        variant="outline"
-        @click="resetForm"
-      >
-        重置表单
       </Button>
     </div>
   </form>

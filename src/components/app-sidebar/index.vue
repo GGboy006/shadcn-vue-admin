@@ -16,7 +16,7 @@ import TeamSwitcher from './team-switcher.vue'
     </UiSidebarContent>
 
     <UiSidebarFooter>
-      <NavFooter :user="sidebarData.user" />
+      <NavFooter />
     </UiSidebarFooter>
 
     <UiSidebarRail />

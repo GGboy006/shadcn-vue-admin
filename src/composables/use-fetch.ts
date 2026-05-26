@@ -30,7 +30,7 @@ const apiFetch = ofetch.create({
         authStore.clearAuth()
         toast.error('登录已过期，请重新登录')
         window.location.href = '/auth/sign-in'
-        return
+        throw new Error('登录已过期')
       }
       toast.error(body.msg || '请求失败')
       throw new Error(body.msg || '请求失败')

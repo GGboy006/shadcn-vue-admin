@@ -92,6 +92,7 @@ declare global {
   const useTemplateRef: typeof import('vue').useTemplateRef
   const useThemeConfig: typeof import('../composables/use-theme-config')['useThemeConfig']
   const useThemeStore: typeof import('../stores/theme').useThemeStore
+  const useUpload: typeof import('../composables/use-upload').useUpload
   const watch: typeof import('vue').watch
   const watchEffect: typeof import('vue').watchEffect
   const watchPostEffect: typeof import('vue').watchPostEffect
@@ -102,6 +103,9 @@ declare global {
   // @ts-ignore
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, ShallowRef, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
+  // @ts-ignore
+  export type { UploadOptions } from '../composables/use-upload'
+  import('../composables/use-upload')
   // @ts-ignore
   export type { ApiStatus } from '../constants/api-status'
   import('../constants/api-status')

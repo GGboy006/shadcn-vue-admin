@@ -1,29 +1,17 @@
 import { z } from 'zod'
 
 export const profileValidator = z.object({
-  username: z
+  nickname: z
     .string()
-    .min(2, {
-      error: 'Username must be at least 2 characters.',
-    })
-    .max(30, {
-      error: 'Username must not be longer than 30 characters.',
-    }),
-  email: z
-    .email({
-      error: 'Please select an email to display.',
-    }),
-  bio: z
+    .min(1, '昵称不能为空')
+    .max(30, '昵称不能超过30个字符'),
+  phone: z
     .string()
-    .max(160, { error: 'Bio must not be longer than 160 characters.' })
-    .min(4, { error: 'Bio must be at least 2 characters.' }),
-  urls: z
-    .array(
-      z.object({
-        value: z.url({ error: 'Please enter a valid URL.' }),
-      }),
-    )
-    .optional(),
+    .regex(/^1[3-9]\d{9}$/, '请输入有效的手机号'),
+  gender: z.coerce.number().refine(val => [0, 1, 2].includes(val), {
+    message: '请选择有效的性别',
+  }),
+  avatar: z.string().url('头像地址格式不正确').optional().or(z.literal('')),
 })
 
 export type ProfileValidator = z.infer<typeof profileValidator>

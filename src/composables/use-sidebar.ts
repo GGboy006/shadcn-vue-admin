@@ -1,11 +1,11 @@
-import { BadgeHelpIcon, BellDotIcon, BirdIcon, BoxesIcon, BugIcon, ComponentIcon, CreditCardIcon, LayoutDashboardIcon, ListTodoIcon, PaletteIcon, PictureInPicture2Icon, PodcastIcon, SettingsIcon, SquareUserRoundIcon, UserIcon, UsersIcon, WrenchIcon } from '@lucide/vue'
+import { BadgeHelpIcon, BellDotIcon, BirdIcon, BoxesIcon, BugIcon, ComponentIcon, CreditCardIcon, LayoutDashboardIcon, ListTodoIcon, PaletteIcon, PictureInPicture2Icon, PodcastIcon, SettingsIcon, SquareUserRoundIcon, UserIcon, UsersIcon } from '@lucide/vue'
 
 import type { NavGroup } from '@/components/app-sidebar/types'
 
 export function useSidebar() {
   const settingsNavItems = [
     { title: '个人资料', url: '/settings/', icon: UserIcon },
-    { title: '账户', url: '/settings/account', icon: WrenchIcon },
+    // { title: '账户', url: '/settings/account', icon: WrenchIcon }, 暂时注释掉这个菜单（目前个人资料就可以覆盖需求）
     { title: '外观', url: '/settings/appearance', icon: PaletteIcon },
     { title: '通知', url: '/settings/notifications', icon: BellDotIcon },
     { title: '显示', url: '/settings/display', icon: PictureInPicture2Icon },

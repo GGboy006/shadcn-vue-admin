@@ -26,17 +26,15 @@ export function useAuth() {
         body: { phone, password },
       })
 
-      if (res.code === 0 && res.data) {
-        authStore.setToken(res.data.token)
-        authStore.setUserInfo(res.data.user)
+      authStore.setToken(res.data.token)
+      authStore.setUserInfo(res.data.user)
 
-        const redirect = router.currentRoute.value.query.redirect as string
-        if (!redirect || redirect.startsWith('//')) {
-          toHome()
-        }
-        else {
-          router.push(redirect)
-        }
+      const redirect = router.currentRoute.value.query.redirect as string
+      if (!redirect || redirect.startsWith('//')) {
+        toHome()
+      }
+      else {
+        router.push(redirect)
       }
     }
     finally {
