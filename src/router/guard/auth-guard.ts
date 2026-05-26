@@ -32,5 +32,12 @@ export function setupAuthGuard(router: Router) {
         query: { redirect: to.fullPath },
       }
     }
+
+    // 角色权限判断：页面需要特定角色，但用户没有
+    const userType = authStore.userInfo?.userType
+    const requiredRoles = to.meta.roles as number[] | undefined
+    if (requiredRoles && (!userType || !requiredRoles.includes(userType))) {
+      return { path: '/errors/403' }
+    }
   })
 }

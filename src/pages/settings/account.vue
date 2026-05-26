@@ -8,3 +8,8 @@ import SettingsLayout from './components/settings-layout.vue'
     <AccountForm />
   </SettingsLayout>
 </template>
+
+<route lang="yaml">
+meta:
+  roles: [3]
+</route>

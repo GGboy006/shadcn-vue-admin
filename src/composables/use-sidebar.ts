@@ -1,4 +1,4 @@
-import { BadgeHelpIcon, BellDotIcon, BirdIcon, BoxesIcon, BugIcon, ComponentIcon, CreditCardIcon, LayoutDashboardIcon, ListTodoIcon, PaletteIcon, PictureInPicture2Icon, PodcastIcon, SettingsIcon, SquareUserRoundIcon, UserIcon, UsersIcon, WrenchIcon } from '@lucide/vue'
+import { BadgeHelpIcon, BirdIcon, BoxesIcon, BugIcon, ComponentIcon, CreditCardIcon, LayoutDashboardIcon, ListTodoIcon, PodcastIcon, SettingsIcon, SquareUserRoundIcon, UserIcon, UsersIcon, WrenchIcon } from '@lucide/vue'
 
 import type { NavGroup } from '@/components/app-sidebar/types'
 
@@ -9,9 +9,9 @@ export function useSidebar() {
   const allSettingsNavItems = [
     { title: '个人资料', url: '/settings/', icon: UserIcon },
     { title: '站长信息', url: '/settings/account', icon: WrenchIcon, roles: [3] },
-    { title: '外观', url: '/settings/appearance', icon: PaletteIcon },
-    { title: '通知', url: '/settings/notifications', icon: BellDotIcon },
-    { title: '显示', url: '/settings/display', icon: PictureInPicture2Icon },
+    // { title: '外观', url: '/settings/appearance', icon: PaletteIcon },
+    // { title: '通知', url: '/settings/notifications', icon: BellDotIcon },
+    // { title: '显示', url: '/settings/display', icon: PictureInPicture2Icon },
   ]
 
   const settingsNavItems = allSettingsNavItems.filter((item) => {
