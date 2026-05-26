@@ -5,29 +5,30 @@ import { storeToRefs } from 'pinia'
 import pinia from '@/plugins/pinia/setup'
 import { useAuthStore } from '@/stores/auth'
 
+/** 不需要登录就能访问的页面 */
+const WHITE_LIST = ['/auth/sign-in', '/auth/sign-up', '/errors/403', '/errors/404', '/errors/401', '/errors/500', '/errors/503']
+
 export function setupAuthGuard(router: Router) {
   router.beforeEach((to, from) => {
     const authStore = useAuthStore(pinia)
     const { isLogin } = storeToRefs(authStore)
 
-    const authPaths = ['/auth/sign-in', '/auth/sign-up']
-    const isAuthPage = authPaths.includes(to.path)
-    const isFromAuthPage = authPaths.includes(from.path)
+    const isAuthPage = to.path.startsWith('/auth')
+    const isFromAuthPage = from.path.startsWith('/auth')
+    const isWhiteList = WHITE_LIST.includes(to.path)
 
-    // If logged in, redirect from auth pages to the previous non-auth page (if valid), otherwise redirect to home
+    // 已登录用户访问登录页 → 重定向到首页或之前页面
     if (isLogin.value && isAuthPage) {
-      // Check if from route is valid (has path, is different from target, and is not an auth page)
       if (from.path && from.path !== to.path && !isFromAuthPage) {
         return from
       }
-      // Fallback: redirect to home on first visit or invalid/unsafe source (including other auth pages)
-      return { path: '/' }
+      return { path: '/dashboard' }
     }
 
-    // If page requires auth but user is not logged in, redirect to sign-in page
-    if (to.meta.auth && !isLogin.value && !isAuthPage) {
+    // 未登录用户访问非白名单页面 → 重定向到登录页
+    if (!isLogin.value && !isAuthPage && !isWhiteList) {
       return {
-        name: '/auth/sign-in',
+        path: '/auth/sign-in',
         query: { redirect: to.fullPath },
       }
     }

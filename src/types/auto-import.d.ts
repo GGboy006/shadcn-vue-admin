@@ -8,6 +8,8 @@ export {}
 declare global {
   const API_BASE_URL: typeof import('../constants/app-config').API_BASE_URL
   const API_TIMEOUT: typeof import('../constants/app-config').API_TIMEOUT
+  const ApiStatus: typeof import('../constants/api-status').ApiStatus
+  const ApiStatusMessage: typeof import('../constants/api-status').ApiStatusMessage
   const CONTENT_LAYOUTS: typeof import('../constants/themes').CONTENT_LAYOUTS
   const DEFAULT_PAGE_SIZE: typeof import('../constants/pagination').DEFAULT_PAGE_SIZE
   const EffectScope: typeof import('vue').EffectScope
@@ -34,6 +36,8 @@ declare global {
   const isReadonly: typeof import('vue').isReadonly
   const isRef: typeof import('vue').isRef
   const isShallow: typeof import('vue').isShallow
+  const isSuccess: typeof import('../constants/api-status').isSuccess
+  const isUnauthorized: typeof import('../constants/api-status').isUnauthorized
   const logout: typeof import('../composables/use-auth')['logout']
   const markRaw: typeof import('vue').markRaw
   const nextTick: typeof import('vue').nextTick
@@ -99,8 +103,14 @@ declare global {
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, ShallowRef, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
   // @ts-ignore
+  export type { ApiStatus } from '../constants/api-status'
+  import('../constants/api-status')
+  // @ts-ignore
   export type { Theme, Radius, ContentLayout } from '../constants/themes'
   import('../constants/themes')
+  // @ts-ignore
+  export type { LoginUserVO } from '../stores/auth'
+  import('../stores/auth')
   // @ts-ignore
   export type { NavigationMode } from '../stores/sidebar-config'
   import('../stores/sidebar-config')

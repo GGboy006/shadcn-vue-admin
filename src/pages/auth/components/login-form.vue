@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { useAuth } from '@/composables/use-auth'
 
-import GitHubButton from './github-button.vue'
-import GoogleButton from './google-button.vue'
 import PrivacyPolicyButton from './privacy-policy-button.vue'
 import TermsOfServiceButton from './terms-of-service-button.vue'
-import ToForgotPasswordLink from './to-forgot-password-link.vue'
 
 const { login, loading } = useAuth()
+
+const phone = ref('')
+const password = ref('')
 </script>
 
 <template>
@@ -17,44 +17,40 @@ const { login, loading } = useAuth()
         登录
       </UiCardTitle>
       <UiCardDescription>
-        输入邮箱和密码登录您的账户。
-        还没有账户？
-        <UiButton
-          variant="link" class="px-0 text-muted-foreground"
-          @click="$router.push('/auth/sign-up')"
-        >
-          立即注册
-        </UiButton>
+        输入手机号和密码登录您的账户。
       </UiCardDescription>
     </UiCardHeader>
     <UiCardContent class="grid gap-4">
       <div class="grid gap-2">
-        <UiLabel for="email">
-          {{ $t('email') }}
+        <UiLabel for="phone">
+          手机号
         </UiLabel>
-        <UiInput id="email" type="email" placeholder="m@example.com" required />
+        <UiInput id="phone" v-model="phone" type="tel" placeholder="请输入手机号" required />
       </div>
       <div class="grid gap-2">
         <div class="flex items-center justify-between">
           <UiLabel for="password">
-            {{ $t('password') }}
+            密码
           </UiLabel>
-          <ToForgotPasswordLink />
+          <!-- 暂时没有忘记密码的逻辑 -->
+          <!-- <ToForgotPasswordLink /> -->
         </div>
-        <UiInput id="password" type="password" required placeholder="*********" />
+        <UiInput id="password" v-model="password" type="password" required placeholder="请输入密码" />
       </div>
 
-      <UiButton class="w-full" @click="login">
+      <UiButton class="w-full" :disabled="loading" @click="login(phone, password)">
         <UiSpinner v-if="loading" class="mr-2" />
         {{ $t('login') }}
       </UiButton>
 
-      <UiSeparator label="或使用以下方式登录" />
+      <!-- 现在还没有快捷登录 -->
 
-      <div class="flex flex-col items-center justify-between gap-4">
+      <!-- <UiSeparator label="或使用以下方式登录" /> -->
+
+      <!-- <div class="flex flex-col items-center justify-between gap-4">
         <GitHubButton />
         <GoogleButton />
-      </div>
+      </div> -->
 
       <UiCardDescription>
         点击登录即表示您同意我们的

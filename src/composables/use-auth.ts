@@ -1,17 +1,16 @@
-import { storeToRefs } from 'pinia'
-
 import { useAuthStore } from '@/stores/auth'
+
+import { useApiFetch } from './use-fetch'
 
 export function useAuth() {
   const router = useRouter()
 
   const authStore = useAuthStore()
-  const { isLogin } = storeToRefs(authStore)
   const loading = ref(false)
+  const { apiFetch } = useApiFetch()
 
   function logout() {
-    isLogin.value = false
-
+    authStore.clearAuth()
     router.push({ path: '/auth/sign-in' })
   }
 
@@ -19,19 +18,29 @@ export function useAuth() {
     router.push({ path: '/dashboard' })
   }
 
-  async function login() {
+  async function login(phone: string, password: string) {
     loading.value = true
-    await new Promise(resolve => setTimeout(resolve, 10))
-    // mock login
-    isLogin.value = true
-    loading.value = false
+    try {
+      const res = await apiFetch('/login/password', {
+        method: 'POST',
+        body: { phone, password },
+      })
 
-    const redirect = router.currentRoute.value.query.redirect as string
-    if (!redirect || redirect.startsWith('//')) {
-      toHome()
+      if (res.code === 0 && res.data) {
+        authStore.setToken(res.data.token)
+        authStore.setUserInfo(res.data.user)
+
+        const redirect = router.currentRoute.value.query.redirect as string
+        if (!redirect || redirect.startsWith('//')) {
+          toHome()
+        }
+        else {
+          router.push(redirect)
+        }
+      }
     }
-    else {
-      router.push(redirect)
+    finally {
+      loading.value = false
     }
   }
 
