@@ -16,6 +16,8 @@ export interface ISkillListQuery {
   name?: string
   /** 技能类型：1=扣子(Coze)，2=Agent，3=AI AgentSkill */
   type?: SkillType
+  /** 输入类型：1=文本，2=图片，3=音频，4=混合 */
+  inputType?: string
   /** 页码 */
   pageNum: number
   /** 每页数量 */
@@ -74,6 +76,15 @@ export const skillTypeOptions = [
   { label: '扣子(Coze)', value: '1' },
   { label: 'Agent', value: '2' },
   { label: 'AI AgentSkill', value: '3' },
+] as const
+
+/** 输入类型筛选选项（前端过滤） */
+export const inputTypeFilterOptions = [
+  { label: '全部', value: 'all' },
+  { label: '文本输入', value: '1' },
+  { label: '图片输入', value: '2' },
+  { label: '音频输入', value: '3' },
+  { label: '混合输入', value: '4' },
 ] as const
 
 /** 技能列表响应 */

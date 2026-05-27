@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { skillTypeOptions, useGetSkillListQuery } from '@/services/api/skill.api'
+import { inputTypeFilterOptions, useGetSkillListQuery } from '@/services/api/skill.api'
 
 import AppCard from './components/app-card.vue'
 
@@ -27,7 +27,7 @@ const query = ref<ISkillListQuery>({
 })
 
 const searchTerm = ref('')
-const skillType = ref('all')
+const inputTypeFilter = ref('all')
 const sort = ref<TSort>('asc')
 
 // 搜索防抖
@@ -43,12 +43,12 @@ watch(searchTerm, () => {
   throttledSearch()
 })
 
-// 类型筛选
-watch(skillType, (newValue) => {
+// 输入类型筛选
+watch(inputTypeFilter, (newValue) => {
   query.value = {
     ...query.value,
     pageNum: 1,
-    type: newValue === 'all' ? undefined : newValue as ISkillListQuery['type'],
+    inputType: newValue === 'all' ? undefined : newValue,
   }
 })
 
@@ -65,6 +65,7 @@ watch(sort, (newValue) => {
 const { data: skillListData, isLoading } = useGetSkillListQuery(query)
 
 const skillList = computed(() => skillListData.value?.data?.list || [])
+
 const total = computed(() => skillListData.value?.data?.total || 0)
 const pageSize = computed(() => query.value.pageSize)
 const totalPages = computed(() => Math.ceil(total.value / pageSize.value) || 1)
@@ -91,13 +92,13 @@ function goToPage(page: number) {
           placeholder="搜索技能名称..."
           class="h-9 w-full sm:w-52"
         />
-        <Select v-model="skillType">
+        <Select v-model="inputTypeFilter">
           <SelectTrigger class="h-9 w-full sm:w-40">
             <SelectValue placeholder="全部类型" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem
-              v-for="option in skillTypeOptions"
+              v-for="option in inputTypeFilterOptions"
               :key="option.value"
               :value="option.value"
             >
