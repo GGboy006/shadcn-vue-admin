@@ -1,0 +1,218 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://172.31.128.135:8202/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/skill/list": {
+      "get": {
+        "tags": [
+          "AI工具管理"
+        ],
+        "summary": "技能列表",
+        "operationId": "pageMySkills",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "技能名称（模糊）",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "技能名称（模糊）"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "技能类型：1=扣子(Coze)，2=Agent，3=AI AgentSkill",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "技能类型：1=扣子(Coze)，2=Agent，3=AI AgentSkill"
+            }
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "页码(不能为空)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "页码(不能为空)",
+              "example": 1
+            },
+            "example": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "每页数量(不能为空)",
+            "required": true,
+            "schema": {
+              "maximum": 200,
+              "type": "string",
+              "description": "每页数量(不能为空)",
+              "example": 10
+            },
+            "example": 10
+          },
+          {
+            "name": "searchCount",
+            "in": "query",
+            "description": "是否查询总条数",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "是否查询总条数"
+            }
+          },
+          {
+            "name": "sortItemList",
+            "in": "query",
+            "description": "排序字段集合",
+            "required": false,
+            "schema": {
+              "maxLength": 10,
+              "minLength": 0,
+              "type": "string",
+              "description": "排序字段集合"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponsePageResultMySkillVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "BaseResponsePageResultMySkillVO": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/components/schemas/PageResultMySkillVO"
+        }
+      }
+    },
+    "PageResultMySkillVO": {
+      "type": "object",
+      "properties": {
+        "pageNum": {
+          "type": "integer",
+          "description": "当前页",
+          "format": "int64",
+          "refType": null
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "每页的数量",
+          "format": "int64",
+          "refType": null
+        },
+        "total": {
+          "type": "integer",
+          "description": "总记录数",
+          "format": "int64",
+          "refType": null
+        },
+        "pages": {
+          "type": "integer",
+          "description": "总页数",
+          "format": "int64",
+          "refType": null
+        },
+        "list": {
+          "type": "array",
+          "description": "结果集",
+          "items": {
+            "$ref": "#/components/schemas/MySkillVO"
+          },
+          "refType": "MySkillVO"
+        },
+        "emptyFlag": {
+          "type": "boolean",
+          "description": "是否为空",
+          "refType": null
+        }
+      }
+    },
+    "MySkillVO": {
+      "type": "object",
+      "properties": {
+        "skillId": {
+          "type": "integer",
+          "description": "技能ID",
+          "format": "int64",
+          "refType": null
+        },
+        "name": {
+          "type": "string",
+          "description": "技能名称",
+          "refType": null
+        },
+        "icon": {
+          "type": "string",
+          "description": "技能图标URL",
+          "refType": null
+        },
+        "description": {
+          "type": "string",
+          "description": "技能描述",
+          "refType": null
+        },
+        "inputType": {
+          "type": "integer",
+          "description": "输入类型：1=文本，2=图片，3=音频，4=混合",
+          "format": "int32",
+          "refType": null
+        },
+        "tags": {
+          "type": "array",
+          "description": "能力标签",
+          "items": {
+            "type": "string",
+            "description": "能力标签"
+          },
+          "refType": "string"
+        },
+        "tagColor": {
+          "type": "string",
+          "description": "标签颜色",
+          "refType": null
+        }
+      },
+      "description": "我的技能"
+    }
+  }
+}
