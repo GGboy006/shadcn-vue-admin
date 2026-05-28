@@ -64,10 +64,10 @@ export interface IPageResult<T> {
 
 /** inputType 映射配置 */
 export const inputTypeConfig: Record<InputType, { label: string, variant: 'info' | 'success' | 'warning' | 'gold' }> = {
-  1: { label: '文本输入', variant: 'info' },
-  2: { label: '图片输入', variant: 'success' },
-  3: { label: '音频输入', variant: 'warning' },
-  4: { label: '混合输入', variant: 'gold' },
+  1: { label: '文本生成', variant: 'info' },
+  2: { label: '图片生成', variant: 'success' },
+  3: { label: '音频合成', variant: 'warning' },
+  4: { label: '混合制作', variant: 'gold' },
 }
 
 /** 技能类型筛选选项 */
@@ -81,10 +81,10 @@ export const skillTypeOptions = [
 /** 输入类型筛选选项（前端过滤） */
 export const inputTypeFilterOptions = [
   { label: '全部', value: 'all' },
-  { label: '文本输入', value: '1' },
-  { label: '图片输入', value: '2' },
-  { label: '音频输入', value: '3' },
-  { label: '混合输入', value: '4' },
+  { label: '文本生成', value: '1' },
+  { label: '图片生成', value: '2' },
+  { label: '音频合成', value: '3' },
+  { label: '混合制作', value: '4' },
 ] as const
 
 /** 技能列表响应 */
