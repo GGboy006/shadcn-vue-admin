@@ -73,7 +73,7 @@ function handleAssign() {
       </UiDropdownMenuContent>
     </UiDropdownMenu>
 
-    <ModalContent>
+    <ModalContent class="w-5xl!">
       <component
         :is="showComponent"
         :merchant="merchant"

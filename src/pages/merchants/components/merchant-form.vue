@@ -48,10 +48,12 @@ const initialValues = reactive<MerchantValidator>({
 })
 
 const merchantFormSchema = toTypedSchema(merchantValidator)
-const { handleSubmit } = useForm({
+const { handleSubmit, values: formValues } = useForm({
   validationSchema: merchantFormSchema,
   initialValues,
 })
+
+const currentType = computed(() => Number(formValues.type) as 1 | 2)
 
 const { mutate: createMutate, isPending: isCreating } = useCreateMerchantMutation()
 const { mutate: updateMutate, isPending: isUpdating } = useUpdateMerchantMutation()
@@ -108,51 +110,17 @@ const onSubmit = handleSubmit((values) => {
 <template>
   <div class="max-h-[500px] overflow-y-auto">
     <form class="space-y-5" @submit="onSubmit">
-      <FormField v-slot="{ componentField }" name="merchantName">
-        <FormItem>
-          <FormLabel>商户/物业名称</FormLabel>
-          <FormControl>
-            <Input type="text" v-bind="componentField" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <FormField v-slot="{ componentField }" name="nickname">
-        <FormItem>
-          <FormLabel>昵称</FormLabel>
-          <FormControl>
-            <Input type="text" v-bind="componentField" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <FormField v-slot="{ componentField }" name="phone">
-        <FormItem>
-          <FormLabel>手机号</FormLabel>
-          <FormControl>
-            <Input type="text" v-bind="componentField" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <FormField v-slot="{ componentField }" name="password">
-        <FormItem>
-          <FormLabel>{{ passwordLabel }}</FormLabel>
-          <FormControl>
-            <Input type="password" v-bind="componentField" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
+      <!-- 类型：编辑时只读，新增时可选 -->
       <FormField v-slot="{ componentField }" name="type">
         <FormItem>
           <FormLabel>类型</FormLabel>
           <FormControl>
-            <Select v-bind="componentField">
+            <template v-if="isEdit">
+              <div class="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm items-center">
+                {{ types.find(t => t.value === merchant?.type)?.label }}
+              </div>
+            </template>
+            <Select v-else v-bind="componentField">
               <FormControl>
                 <SelectTrigger class="w-full">
                   <SelectValue placeholder="选择类型" />
@@ -171,38 +139,109 @@ const onSubmit = handleSubmit((values) => {
         </FormItem>
       </FormField>
 
-      <FormField v-slot="{ componentField }" name="contactPhone">
-        <FormItem>
-          <FormLabel>联系电话</FormLabel>
-          <FormControl>
-            <Input type="text" v-bind="componentField" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
+      <!-- 基本信息 -->
+      <div class="space-y-4">
+        <div class="text-sm font-medium text-muted-foreground">
+          基本信息
+        </div>
 
-      <FormField v-slot="{ componentField }" name="status">
-        <FormItem>
-          <FormLabel>状态</FormLabel>
-          <FormControl>
-            <Select v-bind="componentField">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
+          <!-- 占满整行 -->
+          <FormField v-slot="{ componentField }" name="merchantName">
+            <FormItem class="col-span-full lg:col-span-2">
+              <FormLabel>商户/物业名称</FormLabel>
               <FormControl>
-                <SelectTrigger class="w-full">
-                  <SelectValue placeholder="选择状态" />
-                </SelectTrigger>
+                <Input type="text" v-bind="componentField" />
               </FormControl>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem v-for="s in statusList" :key="s.value" :value="s.value">
-                    {{ s.label }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <!-- 一行三列 -->
+          <FormField v-slot="{ componentField }" name="nickname">
+            <FormItem>
+              <FormLabel>昵称</FormLabel>
+              <FormControl>
+                <Input type="text" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="phone">
+            <FormItem>
+              <FormLabel>手机号</FormLabel>
+              <FormControl>
+                <Input type="text" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="contactPhone">
+            <FormItem>
+              <FormLabel>联系电话</FormLabel>
+              <FormControl>
+                <Input type="text" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <!-- 一行两列 -->
+          <FormField v-slot="{ componentField }" name="password">
+            <FormItem class="md:col-span-2">
+              <FormLabel>{{ passwordLabel }}</FormLabel>
+              <FormControl>
+                <Input type="password" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="status">
+            <FormItem>
+              <FormLabel>状态</FormLabel>
+              <FormControl>
+                <Select v-bind="componentField">
+                  <FormControl>
+                    <SelectTrigger class="w-full">
+                      <SelectValue placeholder="选择状态" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem v-for="s in statusList" :key="s.value" :value="s.value">
+                        {{ s.label }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+      </div>
+
+      <!-- 类型专属信息 -->
+      <div class="space-y-5">
+        <div class="text-sm font-medium text-muted-foreground">
+          {{ currentType === 1 ? '商户信息' : '物业信息' }}
+        </div>
+
+        <template v-if="currentType === 1">
+          <div class="rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
+            商户专属字段区域（待添加：店铺Logo、轮播图、营业状态、营业时间、结算周期等）
+          </div>
+        </template>
+
+        <template v-else>
+          <div class="rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
+            物业专属字段区域（待添加：外部链接、地址等）
+          </div>
+        </template>
+      </div>
 
       <Button type="submit" class="w-full" :disabled="isSubmitting">
         {{ isSubmitting ? '保存中...' : '保存' }}
