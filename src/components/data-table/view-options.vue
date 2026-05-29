@@ -10,10 +10,7 @@ interface DataTableViewOptionsProps {
 const props = defineProps<DataTableViewOptionsProps>()
 
 const columns = computed(() => props.table.getAllColumns()
-  .filter(
-    column =>
-      typeof column.accessorFn !== 'undefined' && column.getCanHide(),
-  ))
+  .filter(column => column.getCanHide()))
 
 function resetColumnVisible() {
   columns.value.forEach(column => column.toggleVisibility(true))

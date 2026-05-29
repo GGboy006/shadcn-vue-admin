@@ -202,6 +202,20 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/merchants/': RouteRecordInfo<
+      '/merchants/',
+      '/merchants',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/merchants/[merchantId]': RouteRecordInfo<
+      '/merchants/[merchantId]',
+      '/merchants/:merchantId',
+      { merchantId: ParamValue<true> },
+      { merchantId: ParamValue<false> },
+      | never
+    >,
     '/prop-components/': RouteRecordInfo<
       '/prop-components/',
       '/prop-components',
@@ -418,6 +432,18 @@ declare module 'vue-router/auto-routes' {
     'src/pages/marketing/hello.vue': {
       routes:
         | '/marketing/hello'
+      views:
+        | never
+    }
+    'src/pages/merchants/index.vue': {
+      routes:
+        | '/merchants/'
+      views:
+        | never
+    }
+    'src/pages/merchants/[merchantId].vue': {
+      routes:
+        | '/merchants/[merchantId]'
       views:
         | never
     }

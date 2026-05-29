@@ -1,0 +1,223 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://172.31.128.135:8202/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/station/merchant/{merchantId}": {
+      "get": {
+        "tags": [
+          "站长用户-管理"
+        ],
+        "summary": "商户/物业-详情",
+        "operationId": "getMerchantDetail",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "in": "path",
+            "description": "商户ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBusinessMerchantVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "BaseResponseBusinessMerchantVO": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/components/schemas/BusinessMerchantVO"
+        }
+      }
+    },
+    "BusinessMerchantVO": {
+      "type": "object",
+      "properties": {
+        "merchantId": {
+          "type": "integer",
+          "description": "商户ID",
+          "format": "int64",
+          "refType": null
+        },
+        "nickname": {
+          "type": "string",
+          "description": "昵称",
+          "refType": null
+        },
+        "phone": {
+          "type": "string",
+          "description": "手机号",
+          "refType": null
+        },
+        "avatar": {
+          "type": "string",
+          "description": "头像",
+          "refType": null
+        },
+        "gender": {
+          "type": "integer",
+          "description": "性别：0=未知，1=男，2=女",
+          "format": "int32",
+          "refType": null
+        },
+        "userStatus": {
+          "type": "integer",
+          "description": "用户状态：1=正常，2=禁用",
+          "format": "int32",
+          "refType": null
+        },
+        "lastLoginTime": {
+          "type": "string",
+          "description": "最后登录时间",
+          "format": "date-time",
+          "refType": null
+        },
+        "merchantCode": {
+          "type": "string",
+          "description": "商户编号",
+          "refType": null
+        },
+        "merchantName": {
+          "type": "string",
+          "description": "商户/物业名称",
+          "refType": null
+        },
+        "categoryCode": {
+          "type": "string",
+          "description": "分类标识",
+          "refType": null
+        },
+        "logo": {
+          "type": "string",
+          "description": "店铺Logo",
+          "refType": null
+        },
+        "bannerImages": {
+          "type": "string",
+          "description": "店铺轮播图JSON",
+          "refType": null
+        },
+        "stationUserId": {
+          "type": "integer",
+          "description": "所属小区站长用户ID",
+          "format": "int64",
+          "refType": null
+        },
+        "type": {
+          "type": "integer",
+          "description": "类型：1=商户，2=物业",
+          "format": "int32",
+          "refType": null
+        },
+        "contactName": {
+          "type": "string",
+          "description": "联系人",
+          "refType": null
+        },
+        "contactPhone": {
+          "type": "string",
+          "description": "联系电话",
+          "refType": null
+        },
+        "address": {
+          "type": "string",
+          "description": "详细地址",
+          "refType": null
+        },
+        "externalUrl": {
+          "type": "string",
+          "description": "外部链接（物业使用）",
+          "refType": null
+        },
+        "signDate": {
+          "type": "string",
+          "description": "签约日期",
+          "format": "date",
+          "refType": null
+        },
+        "signFee": {
+          "type": "number",
+          "description": "签约费用",
+          "refType": null
+        },
+        "businessStatus": {
+          "type": "integer",
+          "description": "营业状态：1=营业中，2=休息中，3=已打烊，4=暂停营业",
+          "format": "int32",
+          "refType": null
+        },
+        "businessHours": {
+          "type": "string",
+          "description": "营业时间",
+          "refType": null
+        },
+        "minDeliveryAmount": {
+          "type": "number",
+          "description": "起送金额（商户使用）",
+          "refType": null
+        },
+        "deliveryFee": {
+          "type": "number",
+          "description": "配送费（商户使用）",
+          "refType": null
+        },
+        "settlementCycle": {
+          "type": "integer",
+          "description": "结算周期：1=T+1，2=T+7，3=T+30",
+          "format": "int32",
+          "refType": null
+        },
+        "status": {
+          "type": "integer",
+          "description": "状态：1=启用，2=禁用",
+          "format": "int32",
+          "refType": null
+        },
+        "remark": {
+          "type": "string",
+          "description": "备注",
+          "refType": null
+        }
+      },
+      "description": "商户/物业详情"
+    }
+  }
+}

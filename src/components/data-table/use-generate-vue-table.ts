@@ -7,10 +7,10 @@ import { valueUpdater } from '@/lib/utils'
 
 import type { DataTableProps } from './types'
 
-export function useGenerateVueTable<T>(props: DataTableProps<T>) {
+export function useGenerateVueTable<T>(props: DataTableProps<T>, options?: { initialColumnVisibility?: VisibilityState }) {
   const sorting = ref<SortingState>([])
   const columnFilters = ref<ColumnFiltersState>([])
-  const columnVisibility = ref<VisibilityState>({})
+  const columnVisibility = ref<VisibilityState>(options?.initialColumnVisibility ?? props.initialColumnVisibility ?? {})
   const columnPinning = ref<ColumnPinningState>({ left: [], right: [] })
   const rowSelection = ref({})
   const pagination = ref<PaginationState>({

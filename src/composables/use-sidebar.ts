@@ -27,7 +27,7 @@ export function useSidebar() {
         { title: '仪表盘', url: '/dashboard', icon: LayoutDashboardIcon },
         // { title: '任务', url: '/tasks', icon: ListTodoIcon },
         { title: 'AI工具管理', url: '/apps', icon: BoxesIcon },
-        { title: '商户/物业管理', url: '/users', icon: UsersIcon },
+        { title: '商户/物业管理', url: '/merchants', icon: UsersIcon },
         { title: 'AI 对话示例', url: '/ai-talk', icon: PodcastIcon },
       ],
     },

@@ -16,7 +16,7 @@ export interface BusinessStationMasterVO {
 
 /** 商户/物业信息 */
 export interface BusinessMerchantVO {
-  merchantId: number
+  merchantId: string
   nickname: string
   phone: string
   avatar: string
@@ -28,7 +28,7 @@ export interface BusinessMerchantVO {
   categoryCode: string
   logo: string
   bannerImages: string
-  stationUserId: number
+  stationUserId: string
   type: number
   contactName: string
   contactPhone: string
