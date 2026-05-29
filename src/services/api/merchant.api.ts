@@ -4,8 +4,8 @@ import { useApiFetch } from '@/composables/use-fetch'
 
 import type { IResponse } from '../types/response.type'
 
-/** 商户/物业类型：1=商户，2=物业 */
-export type MerchantType = 1 | 2
+/** 商户/物业类型：1=商户，2=物业，4=商户，5=物业，6=居委会，7=居民 */
+export type MerchantType = 1 | 2 | 4 | 5 | 6 | 7
 
 /** 状态：1=启用，2=禁用 */
 export type MerchantStatus = 1 | 2
@@ -23,9 +23,13 @@ export type BusinessStatus = 1 | 2 | 3 | 4
 export type SettlementCycle = 1 | 2 | 3
 
 /** 类型映射配置 */
-export const merchantTypeConfig: Record<MerchantType, { label: string, variant: 'info' | 'success' }> = {
+export const merchantTypeConfig: Record<MerchantType, { label: string, variant: 'info' | 'success' | 'warning' | 'default' }> = {
   1: { label: '商户', variant: 'info' },
   2: { label: '物业', variant: 'success' },
+  4: { label: '商户', variant: 'info' },
+  5: { label: '物业', variant: 'success' },
+  6: { label: '居委会', variant: 'warning' },
+  7: { label: '居民', variant: 'default' },
 }
 
 /** 状态映射配置 */
@@ -61,6 +65,8 @@ export const merchantTypeOptions = [
   { label: '全部', value: 'all' },
   { label: '商户', value: '1' },
   { label: '物业', value: '2' },
+  { label: '居委会', value: '6' },
+  { label: '居民', value: '7' },
 ] as const
 
 /** 状态筛选选项 */
@@ -74,10 +80,10 @@ export const merchantStatusOptions = [
 export interface IMerchantListQuery {
   /** 名称（模糊搜索） */
   merchantName?: string
-  /** 类型：1=商户，2=物业 */
+  /** 类型：4=商户，5=物业，6=居委会，7=居民 */
   type?: string
-  /** 状态：1=启用，2=禁用 */
-  status?: string
+  /** 签约状态：1=已签约，2=未签约 */
+  signStatus?: string
   /** 页码 */
   pageNum: number
   /** 每页数量 */
@@ -110,9 +116,9 @@ export interface IMerchant {
   merchantName: string
   /** 分类标识 */
   categoryCode: string
-  /** 店铺Logo */
+  /** Logo */
   logo: string
-  /** 店铺轮播图JSON */
+  /** 轮播图JSON（如：["url1","url2"]） */
   bannerImages: string
   /** 所属小区站长用户ID */
   stationUserId: number
@@ -124,21 +130,21 @@ export interface IMerchant {
   contactPhone: string
   /** 详细地址 */
   address: string
-  /** 外部链接（物业使用） */
+  /** 外部链接（物业） */
   externalUrl: string
   /** 签约日期 */
   signDate: string
   /** 签约费用 */
   signFee: number
-  /** 营业状态：1=营业中，2=休息中，3=已打烊，4=暂停营业 */
+  /** 营业状态：1=营业中，2=休息中，3=已打烊，4=暂停营业（商户） */
   businessStatus: BusinessStatus
-  /** 营业时间 */
+  /** 营业时间（商户） */
   businessHours: string
   /** 起送金额（商户使用） */
   minDeliveryAmount: number
   /** 配送费（商户使用） */
   deliveryFee: number
-  /** 结算周期：1=T+1，2=T+7，3=T+30 */
+  /** 结算周期：1=T+1，2=T+7，3=T+30（商户） */
   settlementCycle: SettlementCycle
   /** 状态：1=启用，2=禁用 */
   status: MerchantStatus
@@ -178,9 +184,9 @@ export interface IMerchantAddDTO {
   merchantName: string
   /** 分类标识 */
   categoryCode?: string
-  /** 店铺Logo */
+  /** logo */
   logo?: string
-  /** 店铺轮播图JSON */
+  /** 轮播图JSON（如：["url1","url2"]） */
   bannerImages?: string[]
   /** 类型：1=商户，2=物业 */
   type: MerchantType
@@ -190,17 +196,17 @@ export interface IMerchantAddDTO {
   contactPhone?: string
   /** 详细地址 */
   address?: string
-  /** 外部链接（物业使用） */
+  /** 外部链接（物业） */
   externalUrl?: string
   /** 签约日期 */
   signDate?: string
   /** 签约费用 */
   signFee?: number
-  /** 营业状态：1=营业中，2=休息中，3=已打烊，4=暂停营业 */
+  /** 营业状态：1=营业中，2=休息中，3=已打烊，4=暂停营业（商户） */
   businessStatus?: BusinessStatus
-  /** 营业时间 */
+  /** 营业时间（商户） */
   businessHours?: string
-  /** 结算周期：1=T+1，2=T+7，3=T+30 */
+  /** 结算周期：1=T+1，2=T+7，3=T+30（商户） */
   settlementCycle?: SettlementCycle
   /** 备注 */
   remark?: string
@@ -226,9 +232,9 @@ export interface IMerchantUpdateDTO {
   merchantName?: string
   /** 分类标识 */
   categoryCode?: string
-  /** 店铺Logo */
+  /** logo */
   logo?: string
-  /** 店铺轮播图JSON */
+  /** 轮播图JSON（如：["url1","url2"]） */
   bannerImages?: string[]
   /** 类型：1=商户，2=物业 */
   type: MerchantType
@@ -238,17 +244,17 @@ export interface IMerchantUpdateDTO {
   contactPhone?: string
   /** 详细地址 */
   address?: string
-  /** 外部链接（物业使用） */
+  /** 外部链接（物业） */
   externalUrl?: string
   /** 签约日期 */
   signDate?: string
   /** 签约费用 */
   signFee?: number
-  /** 营业状态：1=营业中，2=休息中，3=已打烊，4=暂停营业 */
+  /** 营业状态：1=营业中，2=休息中，3=已打烊，4=暂停营业（商户） */
   businessStatus?: BusinessStatus
-  /** 营业时间 */
+  /** 营业时间（商户） */
   businessHours?: string
-  /** 结算周期：1=T+1，2=T+7，3=T+30 */
+  /** 结算周期：1=T+1，2=T+7，3=T+30（商户） */
   settlementCycle?: SettlementCycle
   /** 备注 */
   remark?: string

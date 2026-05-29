@@ -5,10 +5,13 @@ import { toast } from 'vue-sonner'
 
 import type { IMerchantAddDTO, IMerchantUpdateDTO } from '@/services/api/merchant.api'
 
+import { DatePicker } from '@/components/prop-ui/date-picker'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { useUpload } from '@/composables/use-upload'
 import { useCreateMerchantMutation, useUpdateMerchantMutation } from '@/services/api/merchant.api'
 
 import type { Merchant } from '../data/schema'
@@ -29,6 +32,18 @@ const types = [
   { value: 2, label: '物业' },
 ] as const
 
+const genders = [
+  { value: 0, label: '未知' },
+  { value: 1, label: '男' },
+  { value: 2, label: '女' },
+] as const
+
+const settlementCycles = [
+  { value: 1, label: 'T+1' },
+  { value: 2, label: 'T+7' },
+  { value: 3, label: 'T+30' },
+] as const
+
 const statusList = [
   { value: 1, label: '启用' },
   { value: 2, label: '禁用' },
@@ -37,21 +52,52 @@ const statusList = [
 const isEdit = computed(() => !!merchant?.merchantId)
 const passwordLabel = computed(() => isEdit.value ? '登录密码（留空则不修改）' : '登录密码')
 
+const { upload } = useUpload()
+
 const initialValues = reactive<MerchantValidator>({
   merchantName: merchant?.merchantName || '',
   nickname: merchant?.nickname || merchant?.merchantName || '',
-  phone: merchant?.phone || merchant?.contactPhone || '',
+  phone: merchant?.phone || '',
   password: '',
   type: merchant?.type || 1,
+  gender: merchant?.gender ?? 0,
+  avatar: merchant?.avatar || '',
+  logo: merchant?.logo || '',
+  contactName: merchant?.contactName || '',
   contactPhone: merchant?.contactPhone || '',
+  address: merchant?.address || '',
+  externalUrl: merchant?.externalUrl || '',
+  signDate: merchant?.signDate || '',
+  signFee: merchant?.signFee || 0,
+  businessHours: merchant?.businessHours || '',
+  settlementCycle: merchant?.settlementCycle || 1,
+  remark: merchant?.remark || '',
   status: merchant?.status || 1,
 })
 
 const merchantFormSchema = toTypedSchema(merchantValidator)
-const { handleSubmit, values: formValues } = useForm({
+const { handleSubmit, values: formValues, setFieldValue } = useForm({
   validationSchema: merchantFormSchema,
   initialValues,
 })
+
+async function handleFileUpload(event: Event, field: 'avatar' | 'logo') {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file)
+    return
+
+  try {
+    const url = await upload(file)
+    setFieldValue(field, url)
+  }
+  catch {
+    // error handled by useUpload
+  }
+  finally {
+    target.value = ''
+  }
+}
 
 const currentType = computed(() => Number(formValues.type) as 1 | 2)
 
@@ -60,21 +106,50 @@ const { mutate: updateMutate, isPending: isUpdating } = useUpdateMerchantMutatio
 
 const isSubmitting = computed(() => isCreating.value || isUpdating.value)
 
-const onSubmit = handleSubmit((values) => {
+function buildPayload(values: MerchantValidator): IMerchantAddDTO | IMerchantUpdateDTO {
+  const basePayload = {
+    merchantName: values.merchantName,
+    nickname: values.nickname,
+    phone: values.phone,
+    type: values.type as 1 | 2,
+    gender: values.gender as 0 | 1 | 2,
+    avatar: values.avatar || undefined,
+    logo: values.logo || undefined,
+    contactName: values.contactName || undefined,
+    contactPhone: values.contactPhone || undefined,
+    address: values.address || undefined,
+    externalUrl: values.externalUrl || undefined,
+    signDate: values.signDate || undefined,
+    signFee: values.signFee || undefined,
+    businessHours: values.businessHours || undefined,
+    settlementCycle: values.settlementCycle as 1 | 2 | 3,
+    remark: values.remark || undefined,
+    status: values.status as 1 | 2,
+  }
+
   if (isEdit.value && merchant) {
     const payload: IMerchantUpdateDTO = {
       merchantId: merchant.merchantId,
-      type: values.type as 1 | 2,
-      merchantName: values.merchantName,
-      nickname: values.nickname,
-      phone: values.phone,
-      contactPhone: values.contactPhone,
-      status: values.status as 1 | 2,
+      ...basePayload,
     }
     if (values.password) {
       payload.password = values.password
     }
-    updateMutate(payload, {
+    return payload
+  }
+
+  const payload: IMerchantAddDTO = {
+    ...basePayload,
+    password: values.password!,
+  }
+  return payload
+}
+
+const onSubmit = handleSubmit((values) => {
+  const payload = buildPayload(values)
+
+  if (isEdit.value && merchant) {
+    updateMutate(payload as IMerchantUpdateDTO, {
       onSuccess: () => {
         toast.success('更新成功')
         emits('close')
@@ -85,16 +160,7 @@ const onSubmit = handleSubmit((values) => {
     })
   }
   else {
-    const payload: IMerchantAddDTO = {
-      nickname: values.nickname,
-      phone: values.phone,
-      password: values.password!,
-      merchantName: values.merchantName,
-      type: values.type as 1 | 2,
-      contactPhone: values.contactPhone,
-      status: values.status as 1 | 2,
-    }
-    createMutate(payload, {
+    createMutate(payload as IMerchantAddDTO, {
       onSuccess: () => {
         toast.success('创建成功')
         emits('close')
@@ -108,8 +174,8 @@ const onSubmit = handleSubmit((values) => {
 </script>
 
 <template>
-  <div class="max-h-[500px] overflow-y-auto">
-    <form class="space-y-5" @submit="onSubmit">
+  <div class="max-h-[600px] overflow-y-auto">
+    <form class="space-y-6" @submit="onSubmit">
       <!-- 类型：编辑时只读，新增时可选 -->
       <FormField v-slot="{ componentField }" name="type">
         <FormItem>
@@ -145,11 +211,12 @@ const onSubmit = handleSubmit((values) => {
           基本信息
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
-          <!-- 占满整行 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
           <FormField v-slot="{ componentField }" name="merchantName">
-            <FormItem class="col-span-full lg:col-span-2">
-              <FormLabel>商户/物业名称</FormLabel>
+            <FormItem class="col-span-full md:col-span-2">
+              <FormLabel required>
+                商户/物业名称
+              </FormLabel>
               <FormControl>
                 <Input type="text" v-bind="componentField" />
               </FormControl>
@@ -157,12 +224,47 @@ const onSubmit = handleSubmit((values) => {
             </FormItem>
           </FormField>
 
-          <!-- 一行三列 -->
           <FormField v-slot="{ componentField }" name="nickname">
             <FormItem>
-              <FormLabel>昵称</FormLabel>
+              <FormLabel required>
+                昵称
+              </FormLabel>
               <FormControl>
                 <Input type="text" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField name="avatar">
+            <FormItem>
+              <FormLabel>头像</FormLabel>
+              <FormControl>
+                <div class="flex items-center gap-3">
+                  <img
+                    v-if="formValues.avatar"
+                    :src="formValues.avatar"
+                    alt="头像"
+                    class="h-10 w-10 rounded-full object-cover border"
+                  >
+                  <div
+                    v-else
+                    class="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-xs text-muted-foreground"
+                  >
+                    无
+                  </div>
+                  <label
+                    class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium transition-colors border rounded-md cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                  >
+                    <span>上传</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      class="sr-only"
+                      @change="(e: Event) => handleFileUpload(e, 'avatar')"
+                    >
+                  </label>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -170,7 +272,9 @@ const onSubmit = handleSubmit((values) => {
 
           <FormField v-slot="{ componentField }" name="phone">
             <FormItem>
-              <FormLabel>手机号</FormLabel>
+              <FormLabel required>
+                手机号
+              </FormLabel>
               <FormControl>
                 <Input type="text" v-bind="componentField" />
               </FormControl>
@@ -178,22 +282,36 @@ const onSubmit = handleSubmit((values) => {
             </FormItem>
           </FormField>
 
-          <FormField v-slot="{ componentField }" name="contactPhone">
-            <FormItem>
-              <FormLabel>联系电话</FormLabel>
-              <FormControl>
-                <Input type="text" v-bind="componentField" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-
-          <!-- 一行两列 -->
           <FormField v-slot="{ componentField }" name="password">
-            <FormItem class="md:col-span-2">
-              <FormLabel>{{ passwordLabel }}</FormLabel>
+            <FormItem>
+              <FormLabel :required="!isEdit">
+                {{ passwordLabel }}
+              </FormLabel>
               <FormControl>
                 <Input type="password" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="gender">
+            <FormItem>
+              <FormLabel>性别</FormLabel>
+              <FormControl>
+                <Select v-bind="componentField">
+                  <FormControl>
+                    <SelectTrigger class="w-full">
+                      <SelectValue placeholder="选择性别" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem v-for="g in genders" :key="g.value" :value="g.value">
+                        {{ g.label }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -224,23 +342,185 @@ const onSubmit = handleSubmit((values) => {
         </div>
       </div>
 
-      <!-- 类型专属信息 -->
-      <div class="space-y-5">
+      <!-- 联系信息 -->
+      <div class="space-y-4">
         <div class="text-sm font-medium text-muted-foreground">
-          {{ currentType === 1 ? '商户信息' : '物业信息' }}
+          联系信息
         </div>
 
-        <template v-if="currentType === 1">
-          <div class="rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
-            商户专属字段区域（待添加：店铺Logo、轮播图、营业状态、营业时间、结算周期等）
-          </div>
-        </template>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <FormField v-slot="{ componentField }" name="contactName">
+            <FormItem>
+              <FormLabel>联系人</FormLabel>
+              <FormControl>
+                <Input type="text" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
 
-        <template v-else>
-          <div class="rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
-            物业专属字段区域（待添加：外部链接、地址等）
+          <FormField v-slot="{ componentField }" name="contactPhone">
+            <FormItem>
+              <FormLabel>联系电话</FormLabel>
+              <FormControl>
+                <Input type="text" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="address">
+            <FormItem class="col-span-full md:col-span-2">
+              <FormLabel>详细地址</FormLabel>
+              <FormControl>
+                <Input type="text" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+      </div>
+
+      <!-- 签约信息 -->
+      <div class="space-y-4">
+        <div class="text-sm font-medium text-muted-foreground">
+          签约信息
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <FormField v-slot="{ componentField }" name="signDate">
+            <FormItem>
+              <FormLabel>签约日期</FormLabel>
+              <FormControl>
+                <DatePicker v-bind="componentField" placeholder="选择签约日期" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="signFee">
+            <FormItem>
+              <FormLabel>签约费用</FormLabel>
+              <FormControl>
+                <Input type="number" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+      </div>
+
+      <!-- 商户专属 -->
+      <template v-if="currentType === 1">
+        <div class="space-y-4">
+          <div class="text-sm font-medium text-muted-foreground">
+            商户信息
           </div>
-        </template>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+            <FormField name="logo">
+              <FormItem>
+                <FormLabel>Logo</FormLabel>
+                <FormControl>
+                  <div class="flex items-center gap-3">
+                    <img
+                      v-if="formValues.logo"
+                      :src="formValues.logo"
+                      alt="Logo"
+                      class="h-10 w-10 rounded object-cover border"
+                    >
+                    <div
+                      v-else
+                      class="h-10 w-10 rounded bg-muted flex items-center justify-center text-xs text-muted-foreground"
+                    >
+                      无
+                    </div>
+                    <label
+                      class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium transition-colors border rounded-md cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                    >
+                      <span>上传</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        class="sr-only"
+                        @change="(e: Event) => handleFileUpload(e, 'logo')"
+                      >
+                    </label>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+
+            <FormField v-slot="{ componentField }" name="businessHours">
+              <FormItem>
+                <FormLabel>营业时间</FormLabel>
+                <FormControl>
+                  <Input type="text" v-bind="componentField" placeholder="如：09:00-22:00" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+
+            <FormField v-slot="{ componentField }" name="settlementCycle">
+              <FormItem>
+                <FormLabel>结算周期</FormLabel>
+                <FormControl>
+                  <Select v-bind="componentField">
+                    <FormControl>
+                      <SelectTrigger class="w-full">
+                        <SelectValue placeholder="选择结算周期" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem v-for="c in settlementCycles" :key="c.value" :value="c.value">
+                          {{ c.label }}
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </div>
+        </div>
+      </template>
+
+      <!-- 物业专属 -->
+      <template v-if="currentType === 2">
+        <div class="space-y-4">
+          <div class="text-sm font-medium text-muted-foreground">
+            物业信息
+          </div>
+
+          <FormField v-slot="{ componentField }" name="externalUrl">
+            <FormItem>
+              <FormLabel>外部链接</FormLabel>
+              <FormControl>
+                <Input type="text" v-bind="componentField" placeholder="外部链接URL" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+      </template>
+
+      <!-- 备注 -->
+      <div class="space-y-4">
+        <div class="text-sm font-medium text-muted-foreground">
+          备注
+        </div>
+
+        <FormField v-slot="{ componentField }" name="remark">
+          <FormItem>
+            <FormControl>
+              <Textarea v-bind="componentField" placeholder="请输入备注" rows="3" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
       </div>
 
       <Button type="submit" class="w-full" :disabled="isSubmitting">

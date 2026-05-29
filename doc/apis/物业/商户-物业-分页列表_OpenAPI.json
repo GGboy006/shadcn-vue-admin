@@ -36,21 +36,21 @@
           {
             "name": "type",
             "in": "query",
-            "description": "类型：1=商户，2=物业",
+            "description": "类型：4=商户，5=物业，6=居委会，7=居民",
             "required": false,
             "schema": {
               "type": "string",
-              "description": "类型：1=商户，2=物业"
+              "description": "类型：4=商户，5=物业，6=居委会，7=居民"
             }
           },
           {
-            "name": "status",
+            "name": "signStatus",
             "in": "query",
-            "description": "状态：1=启用，2=禁用",
+            "description": "签约状态：1=已签约，2=未签约",
             "required": false,
             "schema": {
               "type": "string",
-              "description": "状态：1=启用，2=禁用"
+              "description": "签约状态：1=已签约，2=未签约"
             }
           },
           {
@@ -107,7 +107,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponsePageResultBusinessMerchantVO"
+                  "$ref": "#/components/schemas/BaseResponsePageResultBusinessMerchantListVO"
                 }
               }
             }
@@ -117,7 +117,7 @@
     }
   },
   "components": {
-    "BaseResponsePageResultBusinessMerchantVO": {
+    "BaseResponsePageResultBusinessMerchantListVO": {
       "type": "object",
       "properties": {
         "code": {
@@ -131,11 +131,11 @@
           "type": "string"
         },
         "data": {
-          "$ref": "#/components/schemas/PageResultBusinessMerchantVO"
+          "$ref": "#/components/schemas/PageResultBusinessMerchantListVO"
         }
       }
     },
-    "PageResultBusinessMerchantVO": {
+    "PageResultBusinessMerchantListVO": {
       "type": "object",
       "properties": {
         "pageNum": {
@@ -166,9 +166,9 @@
           "type": "array",
           "description": "结果集",
           "items": {
-            "$ref": "#/components/schemas/BusinessMerchantVO"
+            "$ref": "#/components/schemas/BusinessMerchantListVO"
           },
-          "refType": "BusinessMerchantVO"
+          "refType": "BusinessMerchantListVO"
         },
         "emptyFlag": {
           "type": "boolean",
@@ -177,7 +177,7 @@
         }
       }
     },
-    "BusinessMerchantVO": {
+    "BusinessMerchantListVO": {
       "type": "object",
       "properties": {
         "merchantId": {
@@ -196,29 +196,6 @@
           "description": "手机号",
           "refType": null
         },
-        "avatar": {
-          "type": "string",
-          "description": "头像",
-          "refType": null
-        },
-        "gender": {
-          "type": "integer",
-          "description": "性别：0=未知，1=男，2=女",
-          "format": "int32",
-          "refType": null
-        },
-        "userStatus": {
-          "type": "integer",
-          "description": "用户状态：1=正常，2=禁用",
-          "format": "int32",
-          "refType": null
-        },
-        "lastLoginTime": {
-          "type": "string",
-          "description": "最后登录时间",
-          "format": "date-time",
-          "refType": null
-        },
         "merchantCode": {
           "type": "string",
           "description": "商户编号",
@@ -229,19 +206,9 @@
           "description": "商户/物业名称",
           "refType": null
         },
-        "categoryCode": {
-          "type": "string",
-          "description": "分类标识",
-          "refType": null
-        },
         "logo": {
           "type": "string",
-          "description": "店铺Logo",
-          "refType": null
-        },
-        "bannerImages": {
-          "type": "string",
-          "description": "店铺轮播图JSON",
+          "description": "Logo",
           "refType": null
         },
         "stationUserId": {
@@ -266,16 +233,6 @@
           "description": "联系电话",
           "refType": null
         },
-        "address": {
-          "type": "string",
-          "description": "详细地址",
-          "refType": null
-        },
-        "externalUrl": {
-          "type": "string",
-          "description": "外部链接（物业使用）",
-          "refType": null
-        },
         "signDate": {
           "type": "string",
           "description": "签约日期",
@@ -298,35 +255,14 @@
           "description": "营业时间",
           "refType": null
         },
-        "minDeliveryAmount": {
-          "type": "number",
-          "description": "起送金额（商户使用）",
-          "refType": null
-        },
-        "deliveryFee": {
-          "type": "number",
-          "description": "配送费（商户使用）",
-          "refType": null
-        },
-        "settlementCycle": {
-          "type": "integer",
-          "description": "结算周期：1=T+1，2=T+7，3=T+30",
-          "format": "int32",
-          "refType": null
-        },
         "status": {
           "type": "integer",
           "description": "状态：1=启用，2=禁用",
           "format": "int32",
           "refType": null
-        },
-        "remark": {
-          "type": "string",
-          "description": "备注",
-          "refType": null
         }
       },
-      "description": "商户/物业详情"
+      "description": "商户/物业列表"
     }
   }
 }

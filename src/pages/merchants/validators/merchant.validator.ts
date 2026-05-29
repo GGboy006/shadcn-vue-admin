@@ -7,9 +7,20 @@ export const merchantValidator = z.object({
   nickname: z.string().min(1, '昵称不能为空'),
   phone: z.string().min(1, '手机号不能为空'),
   password: z.string().min(6, '密码至少6位').optional().or(z.literal('')),
-  type: z.number().min(1).max(2),
-  contactPhone: z.string().min(1, '联系电话不能为空'),
-  status: z.number().min(1).max(2),
+  type: z.number().min(1),
+  gender: z.number().optional().or(z.literal(0)),
+  avatar: z.string().optional().or(z.literal('')),
+  logo: z.string().optional().or(z.literal('')),
+  contactName: z.string().optional().or(z.literal('')),
+  contactPhone: z.string().optional().or(z.literal('')),
+  address: z.string().optional().or(z.literal('')),
+  externalUrl: z.string().optional().or(z.literal('')),
+  signDate: z.string().optional().or(z.literal('')),
+  signFee: z.number().optional().or(z.literal(0)),
+  businessHours: z.string().optional().or(z.literal('')),
+  settlementCycle: z.number().optional(),
+  remark: z.string().optional().or(z.literal('')),
+  status: z.number().optional(),
 }).refine((data) => {
   // 新建时（没有 merchantId）password 必填
   if (!data.merchantId && !data.password) {

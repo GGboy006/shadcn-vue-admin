@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import { Label } from '@/components/ui/label'
 import { useFormField } from "./useFormField"
 
-const props = defineProps<LabelProps & { class?: HTMLAttributes["class"] }>()
+const props = defineProps<LabelProps & { class?: HTMLAttributes["class"], required?: boolean }>()
 
 const { error, formItemId } = useFormField()
 </script>
@@ -21,5 +21,6 @@ const { error, formItemId } = useFormField()
     :for="formItemId"
   >
     <slot />
+    <span v-if="props.required" class="text-destructive ml-0.5">*</span>
   </Label>
 </template>

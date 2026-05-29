@@ -92,22 +92,17 @@
           "description": "商户/物业名称",
           "refType": null
         },
-        "categoryCode": {
-          "type": "string",
-          "description": "分类标识",
-          "refType": null
-        },
         "logo": {
           "type": "string",
-          "description": "店铺Logo",
+          "description": "logo",
           "refType": null
         },
         "bannerImages": {
           "type": "array",
-          "description": "店铺轮播图JSON（如：[\"url1\",\"url2\"]）",
+          "description": "轮播图JSON（如：[\"url1\",\"url2\"]）",
           "items": {
             "type": "string",
-            "description": "店铺轮播图JSON（如：[\"url1\",\"url2\"]）"
+            "description": "轮播图JSON（如：[\"url1\",\"url2\"]）"
           },
           "refType": "string"
         },
@@ -134,7 +129,7 @@
         },
         "externalUrl": {
           "type": "string",
-          "description": "外部链接（物业使用）",
+          "description": "外部链接（物业）",
           "refType": null
         },
         "signDate": {
@@ -150,18 +145,18 @@
         },
         "businessStatus": {
           "type": "integer",
-          "description": "营业状态：1=营业中，2=休息中，3=已打烊，4=暂停营业",
+          "description": "营业状态：1=营业中，2=休息中，3=已打烊，4=暂停营业（商户）",
           "format": "int32",
           "refType": null
         },
         "businessHours": {
           "type": "string",
-          "description": "营业时间",
+          "description": "营业时间（商户）",
           "refType": null
         },
         "settlementCycle": {
           "type": "integer",
-          "description": "结算周期：1=T+1，2=T+7，3=T+30",
+          "description": "结算周期：1=T+1，2=T+7，3=T+30（商户）",
           "format": "int32",
           "refType": null
         },
