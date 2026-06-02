@@ -4,7 +4,7 @@ import { toast } from 'vue-sonner'
 
 import { ModalClose, ModalDescription, ModalFooter, ModalHeader, ModalTitle } from '@/components/prop-ui/modal'
 import { Button } from '@/components/ui/button'
-import { useDeleteMerchantMutation } from '@/services/api/merchant.api'
+import { merchantTypeConfig, useDeleteMerchantMutation } from '@/services/api/merchant.api'
 
 import type { Merchant } from '../data/schema'
 
@@ -35,11 +35,11 @@ function handleRemove() {
   <div>
     <ModalHeader>
       <ModalTitle>
-        删除{{ merchant.type === 1 ? '商户' : '物业' }}: {{ merchant.merchantName }} ?
+        删除{{ merchantTypeConfig[merchant.type]?.label || '商户/物业' }}: {{ merchant.merchantName }} ?
       </ModalTitle>
 
       <ModalDescription>
-        您即将删除 ID 为 {{ merchant.merchantId }} 的{{ merchant.type === 1 ? '商户' : '物业' }}，此操作不可撤销。
+        您即将删除 ID 为 {{ merchant.merchantId }} 的{{ merchantTypeConfig[merchant.type]?.label || '商户/物业' }}，此操作不可撤销。
       </ModalDescription>
     </ModalHeader>
 

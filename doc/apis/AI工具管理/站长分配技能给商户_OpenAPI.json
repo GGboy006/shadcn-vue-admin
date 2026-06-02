@@ -1,0 +1,96 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://172.31.128.135:8202/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/skill/assign-merchant": {
+      "post": {
+        "tags": [
+          "AI工具管理"
+        ],
+        "summary": "站长分配技能给商户",
+        "operationId": "assignSkillToMerchant",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkillAssignMerchantDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "SkillAssignMerchantDTO": {
+      "required": [
+        "merchantId",
+        "skillIds"
+      ],
+      "type": "object",
+      "properties": {
+        "skillIds": {
+          "type": "array",
+          "description": "技能ID集合",
+          "items": {
+            "type": "integer",
+            "description": "技能ID集合",
+            "format": "int64"
+          },
+          "refType": "integer"
+        },
+        "merchantId": {
+          "type": "integer",
+          "description": "被分配站长ID",
+          "format": "int64",
+          "refType": null
+        }
+      },
+      "description": "站长分配技能给商户参数"
+    },
+    "BaseResponseBoolean": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

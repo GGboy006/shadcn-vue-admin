@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { DateValue } from '@internationalized/date'
+
 import { CalendarDate } from '@internationalized/date'
 import { CalendarIcon } from '@lucide/vue'
 import dayjs from 'dayjs'
@@ -20,7 +22,7 @@ const selectedDate = computed(() => {
   return new CalendarDate(year, month, day)
 })
 
-function handleSelect(date: CalendarDate | undefined) {
+function handleSelect(date: DateValue | undefined) {
   if (!date) {
     modelValue.value = undefined
     return

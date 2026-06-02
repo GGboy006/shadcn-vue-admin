@@ -35,7 +35,7 @@ defineProps<{
 
       <!-- 左下角分类标签 -->
       <Badge
-        :variant="inputTypeConfig[app.inputType]?.variant || 'default'"
+        variant="secondary"
         class="absolute text-xs bottom-2 left-2"
       >
         {{ inputTypeConfig[app.inputType]?.label || '未知' }}

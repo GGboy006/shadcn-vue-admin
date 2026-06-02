@@ -28,8 +28,9 @@ const emits = defineEmits<{
 }>()
 
 const types = [
-  { value: 1, label: '商户' },
-  { value: 2, label: '物业' },
+  { value: 4, label: '商户' },
+  { value: 5, label: '物业' },
+  { value: 6, label: '居委会' },
 ] as const
 
 const genders = [
@@ -59,7 +60,7 @@ const initialValues = reactive<MerchantValidator>({
   nickname: merchant?.nickname || merchant?.merchantName || '',
   phone: merchant?.phone || '',
   password: '',
-  type: merchant?.type || 1,
+  type: merchant?.type || 4,
   gender: merchant?.gender ?? 0,
   avatar: merchant?.avatar || '',
   logo: merchant?.logo || '',
@@ -99,7 +100,7 @@ async function handleFileUpload(event: Event, field: 'avatar' | 'logo') {
   }
 }
 
-const currentType = computed(() => Number(formValues.type) as 1 | 2)
+const currentType = computed(() => Number(formValues.type) as 4 | 5 | 6)
 
 const { mutate: createMutate, isPending: isCreating } = useCreateMerchantMutation()
 const { mutate: updateMutate, isPending: isUpdating } = useUpdateMerchantMutation()
@@ -111,7 +112,7 @@ function buildPayload(values: MerchantValidator): IMerchantAddDTO | IMerchantUpd
     merchantName: values.merchantName,
     nickname: values.nickname,
     phone: values.phone,
-    type: values.type as 1 | 2,
+    type: values.type as 4 | 5 | 6,
     gender: values.gender as 0 | 1 | 2,
     avatar: values.avatar || undefined,
     logo: values.logo || undefined,
@@ -411,7 +412,7 @@ const onSubmit = handleSubmit((values) => {
       </div>
 
       <!-- 商户专属 -->
-      <template v-if="currentType === 1">
+      <template v-if="currentType === 4">
         <div class="space-y-4">
           <div class="text-sm font-medium text-muted-foreground">
             商户信息
@@ -489,7 +490,7 @@ const onSubmit = handleSubmit((values) => {
       </template>
 
       <!-- 物业专属 -->
-      <template v-if="currentType === 2">
+      <template v-if="currentType === 5">
         <div class="space-y-4">
           <div class="text-sm font-medium text-muted-foreground">
             物业信息

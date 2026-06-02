@@ -1,34 +1,46 @@
-import { useQuery } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import { useApiFetch } from '@/composables/use-fetch'
 
 import type { IResponse } from '../types/response.type'
 
-/** 技能类型：1=扣子(Coze)，2=Agent，3=AI AgentSkill */
-export type SkillType = '1' | '2' | '3'
-
 /** 输入类型：1=文本，2=图片，3=音频，4=混合 */
-export type InputType = 1 | 2 | 3 | 4
+export type SkillInputType = 1 | 2 | 3 | 4
 
-/** 技能列表查询参数 */
-export interface ISkillListQuery {
-  /** 技能名称（模糊搜索） */
-  name?: string
-  /** 技能类型：1=扣子(Coze)，2=Agent，3=AI AgentSkill */
-  type?: SkillType
-  /** 输入类型：1=文本，2=图片，3=音频，4=混合 */
-  inputType?: string
-  /** 页码 */
-  pageNum: number
-  /** 每页数量 */
-  pageSize: number
-  /** 是否查询总条数 */
-  searchCount?: string
-  /** 排序字段集合 */
-  sortItemList?: string
+/** 工具模式：1=单次对话，2=流程式向导 */
+export type SkillToolMode = 1 | 2
+
+/** 分配状态：1=生效中，2=暂停，3=过期 */
+export type SkillAssignStatus = 1 | 2 | 3
+
+/** 输入类型映射配置 */
+export const skillInputTypeConfig: Record<SkillInputType, { label: string, icon: string }> = {
+  1: { label: '文本生成', icon: 'FileText' },
+  2: { label: '图像生成', icon: 'Image' },
+  3: { label: '语音合成', icon: 'Mic' },
+  4: { label: '混合', icon: 'Layers' },
 }
 
-/** 技能详情 */
+// 兼容旧代码的别名导出
+/** @deprecated 使用 skillInputTypeConfig */
+export const inputTypeConfig = skillInputTypeConfig
+/** @deprecated 使用 skillInputTypeConfig */
+export const inputTypeFilterOptions = [
+  { label: '全部', value: 'all' },
+  { label: '文本生成', value: '1' },
+  { label: '图像生成', value: '2' },
+  { label: '语音合成', value: '3' },
+  { label: '混合', value: '4' },
+] as const
+
+/** 分配状态映射配置 */
+export const skillAssignStatusConfig: Record<SkillAssignStatus, { label: string, variant: 'default' | 'secondary' | 'destructive' }> = {
+  1: { label: '已分配', variant: 'default' },
+  2: { label: '暂停', variant: 'secondary' },
+  3: { label: '过期', variant: 'destructive' },
+}
+
+/** 技能 VO */
 export interface ISkill {
   /** 技能ID */
   skillId: number
@@ -39,11 +51,19 @@ export interface ISkill {
   /** 技能描述 */
   description: string
   /** 输入类型：1=文本，2=图片，3=音频，4=混合 */
-  inputType: InputType
+  inputType: SkillInputType
   /** 能力标签 */
   tags: string[]
-  /** 标签颜色 */
-  tagColor: string
+  /** 工具模式：1=单次对话，2=流程式向导 */
+  toolMode: SkillToolMode
+}
+
+/** 分配技能 VO */
+export interface IAssignSkill extends ISkill {
+  /** 分配状态：1=生效中，2=暂停，3=过期 */
+  assignStatus: SkillAssignStatus
+  /** 是否已选中 */
+  checked: boolean
 }
 
 /** 分页结果 */
@@ -62,36 +82,60 @@ export interface IPageResult<T> {
   emptyFlag: boolean
 }
 
-/** inputType 映射配置 */
-export const inputTypeConfig: Record<InputType, { label: string, variant: 'info' | 'success' | 'warning' | 'gold' }> = {
-  1: { label: '文本生成', variant: 'info' },
-  2: { label: '图片生成', variant: 'success' },
-  3: { label: '音频合成', variant: 'warning' },
-  4: { label: '混合制作', variant: 'gold' },
+/** 技能列表查询参数（兼容旧代码） */
+export interface ISkillListQuery {
+  /** 技能名称（模糊搜索） */
+  name?: string
+  /** 技能类型 */
+  type?: string
+  /** 输入类型：1=文本，2=图片，3=音频，4=混合 */
+  inputType?: string
+  /** 页码 */
+  pageNum: number
+  /** 每页数量 */
+  pageSize: number
+  /** 是否查询总条数 */
+  searchCount?: string
+  /** 排序字段集合 */
+  sortItemList?: string
 }
 
-/** 技能类型筛选选项 */
-export const skillTypeOptions = [
-  { label: '全部', value: 'all' },
-  { label: '扣子(Coze)', value: '1' },
-  { label: 'Agent', value: '2' },
-  { label: 'AI AgentSkill', value: '3' },
-] as const
+/** 商户技能列表查询参数 */
+export interface IMerchantSkillListQuery {
+  /** 商户/物业ID */
+  merchantId: string
+  /** 技能名称（模糊） */
+  name?: string
+  /** 输入类型：1=文本，2=图片，3=音频，4=混合 */
+  inputType?: string
+  /** 页码 */
+  pageNum: number
+  /** 每页数量 */
+  pageSize: number
+  /** 是否查询总条数 */
+  searchCount?: string
+  /** 排序字段集合 */
+  sortItemList?: string
+}
 
-/** 输入类型筛选选项（前端过滤） */
-export const inputTypeFilterOptions = [
-  { label: '全部', value: 'all' },
-  { label: '文本生成', value: '1' },
-  { label: '图片生成', value: '2' },
-  { label: '音频合成', value: '3' },
-  { label: '混合制作', value: '4' },
-] as const
+/** 分配技能给商户 DTO */
+export interface ISkillAssignMerchantDTO {
+  /** 被分配商户ID */
+  merchantId: string
+  /** 技能ID集合 */
+  skillIds: number[]
+}
 
 /** 技能列表响应 */
 export type ISkillListResponse = IResponse<IPageResult<ISkill>>
 
-/** 获取技能列表 */
-export function useGetSkillListQuery(query: Ref<ISkillListQuery>) {
+/** 商户技能列表响应 */
+export type IMerchantSkillListResponse = IResponse<IPageResult<IAssignSkill>>
+
+// ==================== API 封装 ====================
+
+/** 获取技能分页列表 */
+export function useGetSkillListQuery(query: Ref<ISkillListQuery | IMerchantSkillListQuery>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<ISkillListResponse, Error>({
@@ -101,5 +145,36 @@ export function useGetSkillListQuery(query: Ref<ISkillListQuery>) {
       query: query.value,
     }),
     retry: false,
+  })
+}
+
+/** 获取商户/物业的技能列表（含分配状态） */
+export function useGetMerchantSkillListQuery(query: Ref<IMerchantSkillListQuery>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<IMerchantSkillListResponse, Error>({
+    queryKey: ['merchantSkillList', query],
+    queryFn: async () => await apiFetch<IMerchantSkillListResponse>('/skill/merchant-list', {
+      method: 'get',
+      query: query.value,
+    }),
+    retry: false,
+  })
+}
+
+/** 分配技能给商户 */
+export function useAssignSkillToMerchantMutation() {
+  const { apiFetch } = useApiFetch()
+  const queryClient = useQueryClient()
+
+  return useMutation<IResponse<boolean>, Error, ISkillAssignMerchantDTO>({
+    mutationKey: ['assignSkillToMerchant'],
+    mutationFn: async data => await apiFetch<IResponse<boolean>>('/skill/assign-merchant', {
+      method: 'post',
+      body: data,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchantSkillList'] })
+    },
   })
 }

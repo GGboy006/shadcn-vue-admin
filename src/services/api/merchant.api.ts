@@ -4,8 +4,8 @@ import { useApiFetch } from '@/composables/use-fetch'
 
 import type { IResponse } from '../types/response.type'
 
-/** 商户/物业类型：1=商户，2=物业，4=商户，5=物业，6=居委会，7=居民 */
-export type MerchantType = 1 | 2 | 4 | 5 | 6 | 7
+/** 商户/物业类型：4=商户，5=物业，6=居委会 */
+export type MerchantType = 4 | 5 | 6
 
 /** 状态：1=启用，2=禁用 */
 export type MerchantStatus = 1 | 2
@@ -24,12 +24,9 @@ export type SettlementCycle = 1 | 2 | 3
 
 /** 类型映射配置 */
 export const merchantTypeConfig: Record<MerchantType, { label: string, variant: 'info' | 'success' | 'warning' | 'default' }> = {
-  1: { label: '商户', variant: 'info' },
-  2: { label: '物业', variant: 'success' },
   4: { label: '商户', variant: 'info' },
   5: { label: '物业', variant: 'success' },
   6: { label: '居委会', variant: 'warning' },
-  7: { label: '居民', variant: 'default' },
 }
 
 /** 状态映射配置 */
@@ -63,10 +60,9 @@ export const settlementCycleConfig: Record<SettlementCycle, string> = {
 /** 类型筛选选项 */
 export const merchantTypeOptions = [
   { label: '全部', value: 'all' },
-  { label: '商户', value: '1' },
-  { label: '物业', value: '2' },
+  { label: '商户', value: '4' },
+  { label: '物业', value: '5' },
   { label: '居委会', value: '6' },
-  { label: '居民', value: '7' },
 ] as const
 
 /** 状态筛选选项 */
@@ -80,10 +76,12 @@ export const merchantStatusOptions = [
 export interface IMerchantListQuery {
   /** 名称（模糊搜索） */
   merchantName?: string
-  /** 类型：4=商户，5=物业，6=居委会，7=居民 */
+  /** 类型：4=商户，5=物业，6=居委会 */
   type?: string
   /** 签约状态：1=已签约，2=未签约 */
   signStatus?: string
+  /** 状态：1=启用，2=禁用 */
+  status?: string
   /** 页码 */
   pageNum: number
   /** 每页数量 */
@@ -122,7 +120,7 @@ export interface IMerchant {
   bannerImages: string
   /** 所属小区站长用户ID */
   stationUserId: number
-  /** 类型：1=商户，2=物业 */
+  /** 类型：4=商户，5=物业，6=居委会 */
   type: MerchantType
   /** 联系人 */
   contactName: string
@@ -188,7 +186,7 @@ export interface IMerchantAddDTO {
   logo?: string
   /** 轮播图JSON（如：["url1","url2"]） */
   bannerImages?: string[]
-  /** 类型：1=商户，2=物业 */
+  /** 类型：4=商户，5=物业，6=居委会 */
   type: MerchantType
   /** 联系人 */
   contactName?: string
@@ -236,7 +234,7 @@ export interface IMerchantUpdateDTO {
   logo?: string
   /** 轮播图JSON（如：["url1","url2"]） */
   bannerImages?: string[]
-  /** 类型：1=商户，2=物业 */
+  /** 类型：4=商户，5=物业，6=居委会 */
   type: MerchantType
   /** 联系人 */
   contactName?: string

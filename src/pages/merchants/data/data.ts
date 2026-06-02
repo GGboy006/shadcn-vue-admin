@@ -6,6 +6,7 @@ export const callTypes: (FacetedFilterOption & { style?: string })[] = [
 ]
 
 export const userTypes: FacetedFilterOption[] = [
-  { value: '1', label: '商户' },
-  { value: '2', label: '物业' },
+  { value: '4', label: '商户' },
+  { value: '5', label: '物业' },
+  { value: '6', label: '居委会' },
 ]

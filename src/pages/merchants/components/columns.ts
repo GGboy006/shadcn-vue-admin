@@ -15,9 +15,10 @@ export const merchantStatusConfig: Record<number, { label: string, style: string
   2: { label: '禁用', style: 'bg-red-100/30 text-red-900 dark:text-red-200 border-red-200' },
 }
 
-export const merchantTypeConfig: Record<number, { label: string, variant: 'info' | 'success' }> = {
-  1: { label: '商户', variant: 'info' },
-  2: { label: '物业', variant: 'success' },
+export const merchantTypeConfig: Record<number, { label: string, variant: 'info' | 'success' | 'warning' }> = {
+  4: { label: '商户', variant: 'info' },
+  5: { label: '物业', variant: 'success' },
+  6: { label: '居委会', variant: 'warning' },
 }
 
 export const businessStatusConfig: Record<number, { label: string, variant: 'info' | 'warning' | 'secondary' | 'destructive' }> = {

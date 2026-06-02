@@ -1,7 +1,9 @@
 <script lang="ts" setup>
+import type { MerchantType } from '@/services/api/merchant.api'
+
 import { ModalDescription, ModalHeader, ModalTitle } from '@/components/prop-ui/modal'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useGetMerchantDetailQuery } from '@/services/api/merchant.api'
+import { merchantTypeConfig, useGetMerchantDetailQuery } from '@/services/api/merchant.api'
 
 import type { Merchant } from '../data/schema'
 
@@ -31,7 +33,8 @@ const typeLabel = computed(() => {
   const type = merchantDetail.value?.type ?? props.merchant?.type
   if (!type)
     return '商户/物业'
-  return type === 1 ? '商户' : '物业'
+  const config = merchantTypeConfig[type as MerchantType]
+  return config?.label || '商户/物业'
 })
 
 const title = computed(() =>
