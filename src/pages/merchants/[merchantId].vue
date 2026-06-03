@@ -260,7 +260,7 @@ function formatDate(dateStr: string | undefined): string {
         <Card
           v-for="skill in skillList"
           :key="skill.skillId"
-          class="cursor-pointer transition-all duration-200 hover:shadow-md"
+          class="cursor-pointer transition-all duration-200 hover:shadow-md p-2"
           :class="[
             isSkillSelected(skill)
               ? 'ring-2 ring-primary border-primary bg-primary/5'
@@ -268,11 +268,11 @@ function formatDate(dateStr: string | undefined): string {
           ]"
           @click="toggleSkill(skill)"
         >
-          <CardContent class="p-4">
+          <CardContent class="p-2">
             <div class="flex items-center gap-4">
               <!-- Checkbox -->
               <Checkbox
-                :checked="isSkillSelected(skill)"
+                :model-value="isSkillSelected(skill)"
                 class="pointer-events-none"
                 @click.stop
               />
