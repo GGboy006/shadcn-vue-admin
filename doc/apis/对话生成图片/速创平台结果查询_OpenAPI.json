@@ -1,0 +1,206 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://172.31.128.135:8202/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/aiImage/quicklyCreate/{id}": {
+      "get": {
+        "tags": [
+          "AI图像生成"
+        ],
+        "summary": "速创平台结果查询",
+        "description": "根据本地记录ID查询生成状态和结果，同时同步速创API最新状态。status: 0-生成中 1-成功 2-失败",
+        "operationId": "quicklyCreateGetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "图片生成记录ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseAIImageGenerationVO对象"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "BaseResponseAIImageGenerationVO对象": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/components/schemas/AIImageGenerationVO对象"
+        }
+      }
+    },
+    "AIImageGenerationVO对象": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "主键",
+          "format": "int64",
+          "refType": null
+        },
+        "chatId": {
+          "type": "integer",
+          "description": "会话ID",
+          "format": "int64",
+          "refType": null
+        },
+        "userId": {
+          "type": "integer",
+          "description": "调用用户 ID",
+          "format": "int64",
+          "refType": null
+        },
+        "provider": {
+          "type": "string",
+          "description": "平台标识，如 openai",
+          "refType": null
+        },
+        "model": {
+          "type": "string",
+          "description": "模型名称",
+          "refType": null
+        },
+        "prompt": {
+          "type": "string",
+          "description": "提示词",
+          "refType": null
+        },
+        "size": {
+          "type": "string",
+          "description": "图片尺寸",
+          "refType": null
+        },
+        "quality": {
+          "type": "string",
+          "description": "图片质量",
+          "refType": null
+        },
+        "background": {
+          "type": "string",
+          "description": "背景类型",
+          "refType": null
+        },
+        "outputFormat": {
+          "type": "string",
+          "description": "输出格式",
+          "refType": null
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "OSS 图片地址",
+          "refType": null
+        },
+        "referenceImageUrl": {
+          "type": "array",
+          "description": "参考图片URL（图生图时使用）",
+          "items": {
+            "type": "string",
+            "description": "参考图片URL（图生图时使用）"
+          },
+          "refType": "string"
+        },
+        "status": {
+          "type": "integer",
+          "description": "生成状态：0-生成中 1-成功 2-失败",
+          "format": "int32",
+          "refType": null
+        },
+        "inputTokens": {
+          "type": "integer",
+          "description": "输入 token 数",
+          "format": "int64",
+          "refType": null
+        },
+        "outputTokens": {
+          "type": "integer",
+          "description": "输出 token 数",
+          "format": "int64",
+          "refType": null
+        },
+        "totalTokens": {
+          "type": "integer",
+          "description": "总 token 数",
+          "format": "int64",
+          "refType": null
+        },
+        "inputTextTokens": {
+          "type": "integer",
+          "description": "输入文本 token 数",
+          "format": "int64",
+          "refType": null
+        },
+        "inputImageTokens": {
+          "type": "integer",
+          "description": "输入图片 token 数",
+          "format": "int64",
+          "refType": null
+        },
+        "outputTextTokens": {
+          "type": "integer",
+          "description": "输出文本 token 数",
+          "format": "int64",
+          "refType": null
+        },
+        "outputImageTokens": {
+          "type": "integer",
+          "description": "输出图片 token 数",
+          "format": "int64",
+          "refType": null
+        },
+        "created": {
+          "type": "integer",
+          "description": "OpenAI 返回的创建时间戳",
+          "format": "int64",
+          "refType": null
+        },
+        "taskId": {
+          "type": "string",
+          "description": "外部平台任务ID（如速创taskId）",
+          "refType": null
+        }
+      },
+      "description": "AI图片信息"
+    }
+  }
+}

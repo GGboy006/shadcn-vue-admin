@@ -1,0 +1,247 @@
+{
+  "code": 0,
+  "level": null,
+  "msg": "success",
+  "data": {
+    "skillId": "2059531175008096233",
+    "name": "节日海报",
+    "icon": "https://citymedia.oss-cn-wulanchabu.aliyuncs.com/residential-station-manager/20260520/1779259995226.png",
+    "description": "AI餐饮生成海报信息",
+    "inputType": 2,
+    "tags": null,
+    "assignStatus": null,
+    "toolMode": 2,
+    "flows": [
+      {
+        "flowId": "1",
+        "skillId": "2059531175008096233",
+        "stepCode": "scene",
+        "stepName": "营销场景",
+        "stepOrder": 1,
+        "actionType": 1,
+        "description": "嗨！我是活动策划师小策。你想做什么类型的营销？我来帮你规划！",
+        "promptTemplate": "用户选择了【${scene}】场景",
+        "stepConfig": {
+          "title": "你想做什么类型的设计？",
+          "layout": "list",
+          "fields": [
+            {
+              "field": "scene",
+              "label": "营销场景",
+              "layout": "list",
+              "required": true,
+              "inputType": 1,
+              "dataSourceType": 1,
+              "dataSourceConfig": [
+                {
+                  "desc": "春节/端午/中秋等节日营销",
+                  "icon": "\uD83C\uDF89",
+                  "label": "节日海报",
+                  "value": "festival"
+                },
+                {
+                  "desc": "早安图/营业时间/天气问候",
+                  "icon": "☀️",
+                  "label": "日常营业",
+                  "value": "daily"
+                },
+                {
+                  "desc": "新品上市/季节限定/招牌推荐",
+                  "icon": "\uD83C\uDD95",
+                  "label": "上新推广",
+                  "value": "new"
+                },
+                {
+                  "desc": "满减/折扣/会员日/充值送",
+                  "icon": "\uD83C\uDF81",
+                  "label": "促销活动",
+                  "value": "promo"
+                },
+                {
+                  "desc": "顾客好评/食材溯源/厨师故事",
+                  "icon": "❤️",
+                  "label": "口碑传播",
+                  "value": "review"
+                }
+              ]
+            }
+          ]
+        },
+        "nextStepCode": "content",
+        "branchRule": null,
+        "isRequired": 1,
+        "status": 1,
+        "createTime": "2026-05-27 17:06:38",
+        "updateTime": "2026-05-27 17:06:53"
+      },
+      {
+        "flowId": "2",
+        "skillId": "2059531175008096233",
+        "stepCode": "content",
+        "stepName": "展示内容",
+        "stepOrder": 2,
+        "actionType": 1,
+        "description": "文案交给我！选好你想突出的菜品，我来帮你写最吸睛的文案~",
+        "promptTemplate": "展示内容：菜品=${goods}，促销=${promo}，时间=${time}",
+        "stepConfig": {
+          "title": "选择要展示的内容",
+          "layout": "grouped",
+          "fields": [
+            {
+              "field": "dishes",
+              "label": "选择菜品",
+              "layout": "grid",
+              "required": true,
+              "inputType": 1,
+              "dataSourceType": 4,
+              "dataSourceConfig": {
+                "builtin": "merchant_goods"
+              }
+            },
+            {
+              "field": "promo",
+              "label": "促销信息",
+              "layout": "list",
+              "required": false,
+              "inputType": 1,
+              "dataSourceType": 4,
+              "dataSourceConfig": {
+                "builtin": "merchant_promo_rules"
+              }
+            },
+            {
+              "field": "time",
+              "label": "时间信息",
+              "layout": "list",
+              "required": true,
+              "inputType": 1,
+              "dataSourceType": 1,
+              "dataSourceConfig": [
+                {
+                  "label": "立即开始",
+                  "value": "now"
+                },
+                {
+                  "label": "本周有效",
+                  "value": "week"
+                },
+                {
+                  "label": "本月有效",
+                  "value": "month"
+                },
+                {
+                  "label": "自定义日期",
+                  "value": "custom"
+                }
+              ]
+            }
+          ]
+        },
+        "nextStepCode": "template",
+        "branchRule": null,
+        "isRequired": 1,
+        "status": 1,
+        "createTime": "2026-05-27 17:06:38",
+        "updateTime": "2026-06-03 15:29:01"
+      },
+      {
+        "flowId": "3",
+        "skillId": "2059531175008096233",
+        "stepCode": "template",
+        "stepName": "视觉风格",
+        "stepOrder": 3,
+        "actionType": 1,
+        "description": "视觉设计是我的专长！选一个你喜欢的风格，我来帮你搭配最完美的配色和排版",
+        "promptTemplate": "视觉风格：${style}",
+        "stepConfig": {
+          "title": "选择你喜欢的风格",
+          "layout": "grid",
+          "fields": [
+            {
+              "field": "style",
+              "label": "视觉风格",
+              "layout": "grid",
+              "required": true,
+              "inputType": 1,
+              "dataSourceType": 1,
+              "dataSourceConfig": [
+                {
+                  "desc": "适合节日/店庆",
+                  "label": "喜庆红金风",
+                  "value": "red_gold",
+                  "preview": "https://citymedia.oss-cn-wulanchabu.aliyuncs.com/residential-station-manager/artificial/pre-built/red-gold.jpg"
+                },
+                {
+                  "desc": "适合日常/健康",
+                  "label": "清新自然风",
+                  "value": "fresh",
+                  "preview": "https://citymedia.oss-cn-wulanchabu.aliyuncs.com/residential-station-manager/artificial/pre-built/fresh.jpg"
+                },
+                {
+                  "desc": "适合高端菜品",
+                  "label": "高端黑金风",
+                  "value": "black_gold",
+                  "preview": "https://citymedia.oss-cn-wulanchabu.aliyuncs.com/residential-station-manager/artificial/pre-built/black-gold.jpg"
+                },
+                {
+                  "desc": "适合家常菜",
+                  "label": "温暖家常风",
+                  "value": "home",
+                  "preview": "https://citymedia.oss-cn-wulanchabu.aliyuncs.com/residential-station-manager/artificial/pre-built/home.jpg"
+                }
+              ]
+            }
+          ]
+        },
+        "nextStepCode": "render",
+        "branchRule": null,
+        "isRequired": 1,
+        "status": 1,
+        "createTime": "2026-05-27 17:06:38",
+        "updateTime": "2026-05-27 17:06:53"
+      },
+      {
+        "flowId": "4",
+        "skillId": "2059531175008096233",
+        "stepCode": "render",
+        "stepName": "生成海报",
+        "stepOrder": 4,
+        "actionType": 2,
+        "description": "正在为您生成海报，请稍候...",
+        "promptTemplate": "",
+        "stepConfig": {
+          "title": null,
+          "layout": null,
+          "fields": null
+        },
+        "nextStepCode": "completed",
+        "branchRule": null,
+        "isRequired": 1,
+        "status": 1,
+        "createTime": "2026-05-27 17:06:38",
+        "updateTime": "2026-06-03 13:41:36"
+      },
+      {
+        "flowId": "5",
+        "skillId": "2059531175008096233",
+        "stepCode": "completed",
+        "stepName": "完成",
+        "stepOrder": 5,
+        "actionType": 4,
+        "description": "设计完成！这张海报视觉效果是否满意？如需调整请直接告诉我，比如\"换个风格\"或\"文案再霸气一点\"。",
+        "promptTemplate": null,
+        "stepConfig": {
+          "title": null,
+          "layout": null,
+          "fields": null
+        },
+        "nextStepCode": null,
+        "branchRule": null,
+        "isRequired": 0,
+        "status": 1,
+        "createTime": "2026-05-27 17:06:38",
+        "updateTime": "2026-05-27 17:06:53"
+      }
+    ]
+  }
+}

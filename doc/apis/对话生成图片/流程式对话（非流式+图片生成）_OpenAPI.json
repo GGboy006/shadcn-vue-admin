@@ -1,0 +1,240 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://172.31.128.135:8202/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/agentScopeChat/flow/completion": {
+      "post": {
+        "tags": [
+          "AgentScope对话"
+        ],
+        "summary": "流程式对话（非流式+图片生成）",
+        "operationId": "flowCompletion",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowCompletionForm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseFlowCompletionVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "FlowCompletionForm": {
+      "required": [
+        "skillId",
+        "steps"
+      ],
+      "type": "object",
+      "properties": {
+        "skillId": {
+          "type": "integer",
+          "description": "技能ID",
+          "format": "int64",
+          "refType": null
+        },
+        "chatId": {
+          "type": "integer",
+          "description": "会话ID（首次为空，后端创建后返回）",
+          "format": "int64",
+          "refType": null
+        },
+        "steps": {
+          "type": "array",
+          "description": "所有步骤的选择数据（仅包含 actionType=1 的用户选择步骤）",
+          "items": {
+            "$ref": "#/components/schemas/FlowStepForm"
+          },
+          "refType": "FlowStepForm"
+        }
+      },
+      "description": "流程式对话表单"
+    },
+    "BaseResponseFlowCompletionVO": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/components/schemas/FlowCompletionVO"
+        }
+      }
+    },
+    "FlowStepForm": {
+      "type": "object",
+      "properties": {
+        "flowId": {
+          "type": "integer",
+          "description": "流程ID",
+          "format": "int64",
+          "refType": null
+        },
+        "stepCode": {
+          "type": "string",
+          "description": "步骤编码",
+          "refType": null
+        },
+        "stepName": {
+          "type": "string",
+          "description": "步骤名称",
+          "refType": null
+        },
+        "fieldValues": {
+          "type": "array",
+          "description": "该步骤的所有字段选择",
+          "items": {
+            "$ref": "#/components/schemas/FlowFieldValue"
+          },
+          "refType": "FlowFieldValue"
+        }
+      },
+      "description": "流程步骤表单"
+    },
+    "FlowFieldValue": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "字段名（如 scene, dishes, style）",
+          "refType": null
+        },
+        "label": {
+          "type": "string",
+          "description": "字段标签（如 \"营销场景\", \"选择菜品\"）",
+          "refType": null
+        },
+        "value": {
+          "type": "object",
+          "description": "选中的值（单选为 string，多选为 string[]）",
+          "refType": "object"
+        },
+        "selectedOptions": {
+          "type": "array",
+          "description": "选中的选项完整信息",
+          "items": {
+            "$ref": "#/components/schemas/SelectedOption"
+          },
+          "refType": "SelectedOption"
+        }
+      },
+      "description": "流程步骤字段值"
+    },
+    "SelectedOption": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "选项值",
+          "refType": null
+        },
+        "label": {
+          "type": "string",
+          "description": "选项显示名称",
+          "refType": null
+        },
+        "desc": {
+          "type": "string",
+          "description": "描述文案",
+          "refType": null
+        },
+        "icon": {
+          "type": "string",
+          "description": "图标/Emoji",
+          "refType": null
+        },
+        "preview": {
+          "type": "string",
+          "description": "预览图URL",
+          "refType": null
+        },
+        "salePrice": {
+          "type": "number",
+          "description": "金额（动态数据源-商品用）",
+          "format": "double",
+          "refType": null
+        },
+        "content": {
+          "type": "string",
+          "description": "内容（动态数据源用）",
+          "refType": null
+        }
+      },
+      "description": "选中选项详情"
+    },
+    "FlowCompletionVO": {
+      "type": "object",
+      "properties": {
+        "chatId": {
+          "type": "integer",
+          "description": "会话ID",
+          "format": "int64",
+          "refType": null
+        },
+        "aiContent": {
+          "type": "string",
+          "description": "AI文本回复内容",
+          "refType": null
+        },
+        "imageGenerationId": {
+          "type": "integer",
+          "description": "图片生成记录ID",
+          "format": "int64",
+          "refType": null
+        },
+        "imageStatus": {
+          "type": "integer",
+          "description": "图片生成状态：0-生成中 1-成功 2-失败",
+          "format": "int32",
+          "refType": null
+        },
+        "userMessageId": {
+          "type": "string",
+          "description": "用户消息ID",
+          "refType": null
+        },
+        "aiMessageId": {
+          "type": "string",
+          "description": "AI消息ID",
+          "refType": null
+        }
+      },
+      "description": "流程式对话结果VO"
+    }
+  }
+}

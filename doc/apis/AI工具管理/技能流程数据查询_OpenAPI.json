@@ -1,0 +1,123 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://172.31.128.135:8202/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/skill/flow/data-search": {
+      "get": {
+        "tags": [
+          "AI工具管理"
+        ],
+        "summary": "技能流程数据查询",
+        "operationId": "getDataSearch",
+        "parameters": [
+          {
+            "name": "dataSourceBuiltin",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "merchantCode",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListSkillFlowDataVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "BaseResponseListSkillFlowDataVO": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/SkillFlowDataVO"
+          }
+        }
+      }
+    },
+    "SkillFlowDataVO": {
+      "type": "object",
+      "properties": {
+        "merchantCode": {
+          "type": "string",
+          "description": "商户标识",
+          "refType": null
+        },
+        "uniqueCode": {
+          "type": "string",
+          "description": "标识",
+          "refType": null
+        },
+        "name": {
+          "type": "string",
+          "description": "名称",
+          "refType": null
+        },
+        "poster": {
+          "type": "string",
+          "description": "封面图",
+          "refType": null
+        },
+        "describes": {
+          "type": "string",
+          "description": "简介",
+          "refType": null
+        },
+        "salePrice": {
+          "type": "number",
+          "description": "金额",
+          "format": "double",
+          "refType": null
+        },
+        "content": {
+          "type": "string",
+          "description": "内容",
+          "refType": null
+        }
+      },
+      "description": "AI技能流程节点详情"
+    }
+  }
+}

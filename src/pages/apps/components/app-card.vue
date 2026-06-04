@@ -7,13 +7,19 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { inputTypeConfig } from '@/services/api/skill.api'
 
-defineProps<{
+const props = defineProps<{
   app: ISkill
 }>()
+
+const router = useRouter()
+
+function handleClick() {
+  router.push(`/apps/${props.app.skillId}`)
+}
 </script>
 
 <template>
-  <Card class="group gap-1 sm:gap-2 overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 pt-0 pb-2">
+  <Card class="group gap-1 sm:gap-2 overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 pt-0 pb-2 cursor-pointer" @click="handleClick">
     <!-- 封面图区域 -->
     <div class="relative aspect-[2/1] sm:aspect-[16/10] overflow-hidden bg-muted">
       <img

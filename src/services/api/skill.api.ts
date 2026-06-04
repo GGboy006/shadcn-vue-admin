@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
+import type { IAIImageGeneration, IChatForm, IFlowCompletionVO, IQuicklyCreateRequest, ISkillDetail, ISkillFlowDataVO, IWizardSubmitForm } from '@/pages/apps/types/wizard.types'
+
 import { useApiFetch } from '@/composables/use-fetch'
 
 import type { IResponse } from '../types/response.type'
@@ -176,5 +178,122 @@ export function useAssignSkillToMerchantMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['merchantSkillList'] })
     },
+  })
+}
+
+// ==================== 向导页面 API ====================
+
+/** 技能详情响应 */
+export type ISkillDetailResponse = IResponse<ISkillDetail>
+
+/** 获取技能详情（含流程节点） */
+export function useGetSkillDetailQuery(skillId: Ref<string>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<ISkillDetailResponse, Error>({
+    queryKey: ['skillDetail', skillId],
+    queryFn: async () => await apiFetch<ISkillDetailResponse>(`/skill/detail/${skillId.value}`),
+    retry: false,
+    refetchOnMount: 'always',
+  })
+}
+
+/** 图片生成响应 */
+export type IAIImageGenerationResponse = IResponse<IAIImageGeneration>
+
+/** 提交速创平台图片生成 */
+export function useCreateImageGenerationMutation() {
+  const { apiFetch } = useApiFetch()
+
+  return useMutation<IAIImageGenerationResponse, Error, IQuicklyCreateRequest>({
+    mutationKey: ['createImageGeneration'],
+    mutationFn: async data => await apiFetch<IAIImageGenerationResponse>('/aiImage/quicklyCreate/generations', {
+      method: 'post',
+      body: data,
+    }),
+  })
+}
+
+/** 查询速创平台生成结果 */
+export function useGetImageGenerationResultQuery(
+  id: Ref<number | null>,
+  status?: Ref<0 | 1 | 2 | null>,
+) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<IAIImageGenerationResponse, Error>({
+    queryKey: ['imageGenerationResult', id],
+    queryFn: async () => await apiFetch<IAIImageGenerationResponse>(`/aiImage/quicklyCreate/${id.value}`),
+    enabled: computed(() => id.value !== null && status?.value !== 1 && status?.value !== 2),
+    refetchInterval: computed(() => {
+      // 只有状态为生成中（0 或 null）时才轮询
+      if (id.value === null || status?.value === 1 || status?.value === 2)
+        return false
+      return 3000
+    }),
+    retry: false,
+  })
+}
+
+/** 技能流程数据查询响应 */
+export type ISkillFlowDataResponse = IResponse<ISkillFlowDataVO[]>
+
+/** 技能流程数据查询参数 */
+export interface ISkillFlowDataQuery {
+  /** 内置数据源标识 */
+  dataSourceBuiltin: string
+  /** 商户编码 */
+  merchantCode: string
+}
+
+/** 获取技能流程动态数据（dataSourceType=4 时使用） */
+export function useGetSkillFlowDataQuery(query: Ref<ISkillFlowDataQuery | null>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<ISkillFlowDataResponse, Error>({
+    queryKey: ['skillFlowData', query],
+    queryFn: async () => {
+      if (!query.value)
+        throw new Error('Query params is null')
+      return await apiFetch<ISkillFlowDataResponse>('/skill/flow/data-search', {
+        method: 'get',
+        query: query.value,
+      })
+    },
+    enabled: computed(() => query.value !== null),
+    retry: false,
+  })
+}
+
+/** 流式对话：发送消息并获取 SSE 流 */
+export async function sendChatStream(
+  data: IChatForm,
+  onMessage: (chunk: string) => void,
+  onComplete: () => void,
+  onError: (error: Error) => void,
+) {
+  const { apiFetchStream } = useApiFetch()
+
+  await apiFetchStream('/web/agentScopeChat/chat/stream/completion', {
+    body: JSON.stringify(data),
+    onMessage,
+    onComplete,
+    onError,
+  })
+}
+
+/** 流程式对话响应 */
+export type IFlowCompletionResponse = IResponse<IFlowCompletionVO>
+
+/** 流程式对话（非流式）：提交向导表单，返回 aiContent + imageGenerationId + imageStatus */
+export function useFlowCompletionMutation() {
+  const { apiFetch } = useApiFetch()
+
+  return useMutation<IFlowCompletionResponse, Error, IWizardSubmitForm>({
+    mutationKey: ['flowCompletion'],
+    mutationFn: async data => await apiFetch<IFlowCompletionResponse>('/agentScopeChat/flow/completion', {
+      method: 'post',
+      body: data,
+    }),
   })
 }
