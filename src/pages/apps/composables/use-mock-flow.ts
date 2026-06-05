@@ -90,7 +90,7 @@ export async function mockFlowCompletion(_data: IWizardSubmitForm): Promise<{ co
 
 /**
  * Mock 图片生成结果查询接口
- * 前 2 次返回生成中，第 3 次返回已完成
+ * 前 10 次返回生成中，第 11 次返回已完成
  * 模拟网络延迟 300ms
  */
 export async function mockImageGenerationQuery(_id: number | null): Promise<{ code: number, message: string, data: IAIImageGeneration }> {
@@ -98,8 +98,8 @@ export async function mockImageGenerationQuery(_id: number | null): Promise<{ co
 
   mockPollCount++
 
-  // 前 2 次返回生成中，第 3 次返回完成
-  if (mockPollCount < 3) {
+  // 前 10 次返回生成中，第 11 次返回完成（约 33 秒总时长）
+  if (mockPollCount < 11) {
     return { ...MOCK_IMAGE_GENERATING }
   }
 

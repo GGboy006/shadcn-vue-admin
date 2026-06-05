@@ -200,6 +200,7 @@ const isCompletionStep = computed(() => {
         <GenerationLoading
           v-else-if="isGenerationStep && wizard.isGenerating.value"
           :step-name="wizard.currentFlow.value.stepName"
+          :streaming-content="wizard.aiContent.value"
         />
 
         <!-- 生成失败 -->
