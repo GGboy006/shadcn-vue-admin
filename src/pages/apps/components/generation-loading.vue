@@ -1,13 +1,52 @@
 <script setup lang="ts">
-import { SparklesIcon } from '@lucide/vue'
+import { SparklesIcon, TimerIcon } from '@lucide/vue'
+import { onUnmounted, ref, watch } from 'vue'
 
 interface Props {
   stepName?: string
   streamingContent?: string
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   stepName: '生成中',
+})
+
+const timerDisplay = ref('00:00')
+const timerSeconds = ref(0)
+let timerInterval: ReturnType<typeof setInterval> | null = null
+
+function formatTime(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
+function startTimer() {
+  if (timerInterval)
+    return
+  timerSeconds.value = 0
+  timerDisplay.value = '00:00'
+  timerInterval = setInterval(() => {
+    timerSeconds.value++
+    timerDisplay.value = formatTime(timerSeconds.value)
+  }, 1000)
+}
+
+function stopTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval)
+    timerInterval = null
+  }
+}
+
+watch(() => props.streamingContent, (newVal, oldVal) => {
+  if (!oldVal && newVal) {
+    startTimer()
+  }
+}, { immediate: true })
+
+onUnmounted(() => {
+  stopTimer()
 })
 </script>
 
@@ -37,6 +76,15 @@ withDefaults(defineProps<Props>(), {
       class="max-w-md w-full rounded-lg bg-muted p-4 text-xs text-muted-foreground line-clamp-4"
     >
       {{ streamingContent }}
+    </div>
+
+    <!-- 计时器 -->
+    <div
+      v-if="timerSeconds > 0"
+      class="mt-4 flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-mono font-medium text-primary"
+    >
+      <TimerIcon class="size-4" />
+      <span>{{ timerDisplay }}</span>
     </div>
 
     <!-- 加载条 -->

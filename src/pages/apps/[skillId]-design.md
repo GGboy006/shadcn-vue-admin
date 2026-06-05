@@ -99,31 +99,69 @@ interface IStepField {
 }
 ```
 
-#### 2.1.2 开始问答（流式对话）
+#### 2.1.2 流程式对话（非流式）
 ```
-POST /agentScopeChat/chat/stream/completion
+POST /agentScopeChat/flow/completion
 Content-Type: application/json
 
 {
-  "chatId": null,        // 首次为空，后端创建新会话
-  "content": "...",      // 用户消息内容（JSON字符串）
-  "messageType": "text",
-  "files": []            // 附件列表
+  "skillId": "123",           // 技能ID
+  "chatId": null,             // 首次为空，后端创建新会话
+  "steps": [                  // 所有步骤的用户选择数据
+    {
+      "flowId": 1,
+      "stepCode": "scene",
+      "stepName": "营销场景",
+      "fieldValues": [
+        {
+          "field": "scene",
+          "label": "营销场景",
+          "value": "promotion",
+          "selectedOptions": [
+            { "value": "promotion", "label": "促销活动" }
+          ]
+        }
+      ]
+    }
+  ]
 }
 ```
-**响应**: `text/event-stream`（SSE 流式返回）
+**响应**: `BaseResponse<FlowCompletionVO>`
 
-#### 2.1.3 速创平台图片生成
+**FlowCompletionVO**:
+```typescript
+interface IFlowCompletionVO {
+  /** 会话ID */
+  chatId: number
+  /** AI文本回复内容 */
+  aiContent: string
+  /** 图片生成记录ID */
+  imageGenerationId: number
+  /** 图片生成状态：0-生成中 1-成功 2-失败 */
+  imageStatus: 0 | 1 | 2
+  /** 用户消息ID */
+  userMessageId: string
+  /** AI消息ID */
+  aiMessageId: string
+}
+```
+
+**说明**: 前端提交完整表单给后端，后端生成优化 prompt 并启动图片生成，返回 `aiContent` + `imageGenerationId` + `imageStatus`。`aiContent` 用于前端打字机效果展示。
+
+#### 2.1.3 速创平台图片生成（后端已集成）
+
+> **注意**: 图片生成功能已由后端在 `/agentScopeChat/flow/completion` 中自动触发，前端**无需**单独调用此接口。前端只需使用返回的 `imageGenerationId` 轮询查询结果。
+
 ```
 POST /aiImage/quicklyCreate/generations
 Content-Type: application/json
 
 {
-  "chatId": 123,         // 会话ID（从问答接口获取）
-  "prompt": "...",       // AI优化后的提示词
-  "model": "",           // 为空使用默认模型
-  "size": "auto",        // 图片比例
-  "urls": []             // 参考图片URL（可选）
+  "chatId": 123,
+  "prompt": "...",
+  "model": "",
+  "size": "auto",
+  "urls": []
 }
 ```
 **响应**: `BaseResponse<AIImageGenerationVO>`
@@ -213,25 +251,21 @@ GET /skill/detail/{skillId} ──→ 获取技能详情 + 流程节点
 渲染第三步（template）：展示 AI 话术 + 风格预览卡片
     │
     ▼
-用户选择 "喜庆红金风" → 点击生成
+用户选择 "喜庆红金风" → 进入 AI 生成步骤
     │
     ▼
-渲染第四步（render）：展示 Loading + "正在生成..."
+渲染第四步（render）：展示 aiContent 打字机效果 + "生成中..."
     │
-    ├──→ POST /agentScopeChat/chat/stream/completion
-    │      发送用户所有选择（JSON格式）
-    │      ←── SSE 流式返回 AI 优化后的 prompt
+    ├──→ POST /agentScopeChat/flow/completion
+    │      提交完整向导表单（skillId + chatId + steps）
+    │      ←── 返回 { aiContent, imageGenerationId, imageStatus }
     │
-    ├──→ POST /aiImage/quicklyCreate/generations
-    │      传递 chatId + prompt
-    │      ←── 返回 { id, status: 0 }
-    │
-    ├──→ 轮询 GET /aiImage/quicklyCreate/{id}
+    ├──→ 轮询 GET /aiImage/quicklyCreate/{imageGenerationId}
     │      每 3 秒查询一次
     │      ←── status: 0（继续轮询）/ 1（成功）/ 2（失败）
     │
     ▼
-渲染第五步（completed）：展示生成结果图片
+渲染第五步（completed）：自动跳转，展示生成结果图片
     │
     ▼
 用户可：重新生成 / 下载图片 / 返回修改
@@ -328,6 +362,7 @@ interface WizardState {
   
   // 用户数据收集
   userChoices: Record<string, any>   // { scene: 'festival', dishes: 'xxx', ... }
+  stepForms: IWizardStepForm[]       // 提交给后端的完整表单数据
   
   // AI 生成状态
   chatId: number | null              // 会话ID
@@ -337,9 +372,9 @@ interface WizardState {
   generationStatus: 0 | 1 | 2 | null // 生成状态
   generationError: string | null     // 生成错误信息
   
-  // 流式对话
-  streamingContent: string           // 流式返回的内容
-  isStreaming: boolean               // 是否流式输出中
+  // AI 生成内容（非流式，使用打字机效果展示）
+  aiContent: string                  // AI 文本回复内容
+  isProcessing: boolean              // 是否处理中
 }
 ```
 
@@ -351,8 +386,8 @@ function initWizard(skillId: string)
 // 进入指定步骤
 function goToStep(stepCode: string)
 
-// 用户做出选择
-function makeChoice(field: string, value: any)
+// 用户做出选择（同时记录完整选项信息到 stepForms）
+function makeChoice(field: string, value: string, option?: IChoiceOption)
 
 // 点击下一步
 function handleNext()
@@ -360,10 +395,10 @@ function handleNext()
 // 点击上一步（可选）
 function handleBack()
 
-// 触发 AI 生成流程
-async function triggerGeneration()
+// 流程式对话：自动调用，获取 aiContent 和图片生成任务ID
+async function streamPrompt()
 
-// 轮询生成结果
+// 图片生成查询：轮询检查生成状态（后端已集成图片生成）
 async function pollGenerationResult(id: number)
 
 // 重新生成
@@ -386,6 +421,22 @@ interface Props {
 - 气泡使用圆角卡片，背景色与页面形成对比
 - 支持打字机效果（逐字显示文案）
 - 头像使用技能 icon， fallback 为默认 AI 图标
+
+#### 4.2.2a TypewriterText（打字机效果文本）
+
+**职责**: 将 `aiContent` 以打字机效果逐字展示在 AI 生成步骤中
+
+**使用方式**:
+```typescript
+// 在 [skillId].vue 中使用
+const { displayText: typewriterText, isTyping: isTypewriterTyping } = useTypewriter(wizard.aiContent, 30)
+```
+
+**设计要点**:
+- 监听 `aiContent` 变化，自动开始打字
+- 30ms/字 的打字速度
+- 打字过程中显示闪烁光标 `▍`
+- 打字完成后光标消失
 
 #### 4.2.3 ChoiceGrid / ChoiceList（选项组件）
 
@@ -420,6 +471,7 @@ interface ChoiceOption {
 - 动态 Loading 动画（如：图片轮廓逐渐填充效果）
 - 文案："正在为您生成海报..." / "AI 正在构思创意..."
 - 可选：展示当前步骤的摘要信息（已选择的参数）
+- **注意**: 当前实现中，AI 生成步骤主要展示 `aiContent` 的打字机效果 + "生成中..." 按钮状态，Loading 动画作为辅助
 
 #### 4.2.5 ResultPreview（结果预览）
 
@@ -443,8 +495,15 @@ interface ChoiceOption {
 | 1=用户选择 | 2=多选 | `ChoiceGrid` 或 `ChoiceList` | 点击选择多项 |
 | 1=用户选择 | 3=文本输入 | `TextInput` | 输入文本 |
 | 1=用户选择 | 4=图片上传 | `ImageUpload` | 上传图片 |
-| 2=AI生成 | 5=无 | `GenerationLoading` → `ResultPreview` | 自动执行，展示结果 |
+| 2=AI生成 | 5=无 | `TypewriterText` + `GenerationLoading` → 自动跳转 `ResultPreview` | 自动执行，展示打字机效果，轮询成功后自动跳转 |
 | 4=确认/结束 | 5=无 | `ResultPreview` | 查看结果，操作按钮 |
+
+**AI 生成步骤（actionType=2）交互流程**:
+1. 用户进入 AI 生成步骤，自动触发 `streamPrompt()`
+2. 展示 `aiContent` 打字机效果 + "生成中..." 按钮
+3. 后端异步生成图片，前端轮询查询状态
+4. 检测到 `status === 1`（成功），自动调用 `goToNextStep()` 跳转完成页面
+5. 用户无需点击"查看效果"，全程自动完成
 
 ### 5.2 布局类型映射
 
@@ -582,84 +641,110 @@ interface ChoiceOption {
 
 ## 7. Prompt 模板处理
 
-### 7.1 占位符替换
+### 7.1 Prompt 生成职责转移
 
-`promptTemplate` 中包含 `${fieldName}` 占位符，需用用户选择替换：
+> **重要变更**: Prompt 生成已由后端接管。前端只需提交完整表单数据，后端根据 `stepForms` 自动生成优化后的 prompt 并触发图片生成。
+
+前端提交的数据结构：
+```typescript
+interface IWizardSubmitForm {
+  skillId: string
+  chatId: number | null
+  steps: IWizardStepForm[]
+}
+
+interface IWizardStepForm {
+  flowId: number
+  stepCode: string
+  stepName: string
+  fieldValues: IWizardFieldValue[]
+}
+
+interface IWizardFieldValue {
+  field: string
+  label: string
+  value: string | string[]
+  selectedOptions: ISelectedOption[]
+}
+```
+
+### 7.2 表单数据收集
+
+用户每做出一个选择，`makeChoice` 同时更新：
+1. `userChoices` — 简化的键值对，用于步骤验证和分支判断
+2. `stepForms` — 完整的表单结构，用于提交给后端
 
 **示例**:
-```
-promptTemplate: "用户选择了【${scene}】场景"
+```typescript
+// 用户选择 "促销活动"
+makeChoice('scene', 'promotion', { value: 'promotion', label: '促销活动' })
 
-userChoices: { scene: "festival" }
-
-替换后: "用户选择了【festival】场景"
-```
-
-### 7.2 多字段替换
-
-```
-promptTemplate: "展示内容：菜品=${dishes}，促销=${promo}，时间=${time}"
-
-替换后: "展示内容：菜品=宫保鸡丁，促销=满100减20，时间=本周有效"
+// userChoices 变为 { scene: 'promotion' }
+// stepForms 中当前步骤的 fieldValues 添加完整选项信息
 ```
 
-### 7.3 生成步骤的 Prompt 组装
+### 7.3 后端返回 aiContent
 
-render 步骤的 `promptTemplate` 是最终发送给 AI 的完整提示词：
-
+后端返回的 `aiContent` 是 AI 生成的文本内容，前端用打字机效果展示：
 ```
-请根据以下信息生成一张高质量餐饮营销海报：
-【营销场景】${scene}
-【展示菜品】${dishes}
-【促销信息】${promo}
-【生效时间】${time}
-【视觉风格】${style}
+请根据以下信息生成宣传图片：
 
-要求：
-1. 海报文案吸睛，突出菜品特色和促销力度
-2. 配色和排版严格符合【${style}】风格定位
-3. 整体构图适合朋友圈/门店展示
-4. 文案简短有力，不超过30字主标题
+【营销场景】
+营销场景：促销活动（满减/折扣/会员日/充值送）
+
+【展示内容】
+选择菜品：红烧牛肉面（¥30 · 红烧牛肉面）
+促销信息：满50减20（一次消费50减20元）
+时间信息：立即开始
+
+【视觉风格】
+视觉风格：高端黑金风（适合高端菜品）
+
+【生成海报】
 ```
-
-**替换后作为 `content` 发送到 `/agentScopeChat/chat/stream/completion`**
 
 ---
 
 ## 8. 流式对话处理
 
-### 8.1 SSE 连接
+### 8.1 非流式对话处理
 
 ```typescript
-// 创建 EventSource 连接
-const eventSource = new EventSource('/agentScopeChat/chat/stream/completion')
+// 调用流程式对话接口（非流式）
+const result = await mockFlowCompletion(submitForm)
+// 或真实接口：await flowCompletion(submitForm)
 
-// 或使用 fetch + ReadableStream
-const response = await fetch('/agentScopeChat/chat/stream/completion', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    chatId: null,
-    content: JSON.stringify(userChoices),
-    messageType: 'text',
-    files: []
-  })
-})
-
-// 读取流
-const reader = response.body?.getReader()
-while (true) {
-  const { done, value } = await reader!.read()
-  if (done) break
-  // 解析 SSE 数据，累加到 streamingContent
+if (result.code === 0 && result.data) {
+  chatId.value = result.data.chatId
+  aiContent.value = result.data.aiContent
+  
+  // 后端已启动图片生成，保存任务ID用于轮询
+  if (result.data.imageGenerationId > 0) {
+    generationId.value = result.data.imageGenerationId
+  }
+  
+  // 如果图片已经生成成功（同步返回）
+  if (result.data.imageStatus === 1) {
+    generationStatus.value = 1
+    isGenerating.value = false
+  }
+  // 如果图片生成失败
+  else if (result.data.imageStatus === 2) {
+    generationStatus.value = 2
+    generationError.value = '图片生成失败'
+    isGenerating.value = false
+  }
+  // imageStatus === 0 继续轮询
 }
 ```
 
-### 8.2 流式内容处理
+### 8.2 aiContent 打字机效果展示
 
-- 实时展示 AI 返回的内容（打字机效果）
-- 流结束后，提取完整的优化后 prompt
-- 使用 prompt 调用图片生成接口
+- 后端一次性返回完整 `aiContent`
+- 前端使用 `useTypewriter` composable 逐字展示
+- 打字速度：30ms/字
+- 打字过程中显示闪烁光标 `▍`
+- 打字完成后光标消失，保持显示完整文本
 
 ---
 
@@ -668,34 +753,44 @@ while (true) {
 ### 9.1 轮询逻辑
 
 ```typescript
-async function pollGenerationResult(id: number) {
-  const maxAttempts = 60  // 最多轮询 60 次
-  const interval = 3000   // 每 3 秒一次
+// 使用 TanStack Query 轮询（真实接口模式）
+const { data: generationResult } = useGetImageGenerationResultQuery(pollId, generationStatus)
+
+// 或使用 setInterval 手动轮询（Mock 模式）
+let pollTimer: ReturnType<typeof setInterval> | null = null
+
+watch(generationId, (id) => {
+  // 清除旧定时器
+  if (pollTimer) {
+    clearInterval(pollTimer)
+    pollTimer = null
+  }
   
-  for (let i = 0; i < maxAttempts; i++) {
-    await delay(interval)
-    
-    const result = await apiFetch(`/aiImage/quicklyCreate/${id}`)
+  if (!id || generationStatus.value === 1 || generationStatus.value === 2)
+    return
+  
+  // 启动轮询（3秒间隔）
+  pollTimer = setInterval(async () => {
+    const result = await mockImageGenerationQuery(id)
+    // 或真实接口：await apiFetch(`/aiImage/quicklyCreate/${id}`)
     
     if (result.data.status === 1) {
-      // 生成成功
-      generatedImageUrl.value = result.data.imageUrl
+      // 生成成功，自动跳转完成页面
       generationStatus.value = 1
-      goToStep('completed')
-      return
+      generatedImageUrl.value = result.data.imageUrl
+      isGenerating.value = false
+      if (pollTimer) clearInterval(pollTimer)
+      goToNextStep()  // 自动跳转
     } else if (result.data.status === 2) {
       // 生成失败
       generationStatus.value = 2
-      generationError.value = '生成失败，请重试'
-      return
+      generationError.value = '图片生成失败'
+      isGenerating.value = false
+      if (pollTimer) clearInterval(pollTimer)
     }
     // status === 0 继续轮询
-  }
-  
-  // 超时
-  generationStatus.value = 2
-  generationError.value = '生成超时，请重试'
-}
+  }, 3000)
+})
 ```
 
 ### 9.2 状态展示
@@ -830,10 +925,10 @@ if (saved) {
 > **实现注意**：Vue Query 的 `useQuery` 必须在 `setup()` 顶层调用，禁止在 `computed()` / `watch()` 回调中动态创建。因此 `use-wizard.ts` 在 `setup()` 顶层预创建所有已知 builtin 的查询（`merchant_goods`、`merchant_promo_rules`），通过 `ref` 控制查询激活。如需支持新的 builtin 类型，需在 `use-wizard.ts` 中添加对应的预创建查询。
 
 ### Phase 3: AI 生成流程
-8. 封装 `POST /agentScopeChat/chat/stream/completion` 接口
-9. 实现 SSE 流式读取
-10. 封装 `POST /aiImage/quicklyCreate/generations` 接口
-11. 实现轮询逻辑
+8. 封装 `POST /agentScopeChat/flow/completion` 接口（非流式）
+9. 实现 `aiContent` 打字机效果展示（`useTypewriter` composable）
+10. 实现轮询查询逻辑（`useGetImageGenerationResultQuery` 或手动轮询）
+11. 实现轮询成功后自动跳转完成页面
 
 ### Phase 4: 结果展示
 12. 实现 ResultPreview 组件
@@ -865,7 +960,9 @@ src/pages/apps/
 │   └── step-indicator.vue           # 步骤指示器
 ├── composables/
 │   ├── use-wizard.ts                # 向导逻辑组合式函数
-│   └── use-skill-flow-data.ts       # 技能流程动态数据获取
+│   ├── use-skill-flow-data.ts       # 技能流程动态数据获取
+│   ├── use-typewriter.ts            # 打字机效果（aiContent 展示）
+│   └── use-mock-flow.ts             # Mock 数据（本地静态返回）
 └── types/
     └── wizard.types.ts              # 向导相关类型定义
 ```
@@ -885,14 +982,15 @@ export interface IWizardState {
   currentStepCode: string
   completedStepCodes: string[]
   userChoices: Record<string, any>
+  stepForms: IWizardStepForm[]       // 提交给后端的完整表单数据
   chatId: number | null
   isGenerating: boolean
   generationId: number | null
   generatedImageUrl: string | null
   generationStatus: 0 | 1 | 2 | null
   generationError: string | null
-  streamingContent: string
-  isStreaming: boolean
+  aiContent: string                  // AI 文本回复内容
+  isProcessing: boolean              // 是否处理中
 }
 
 /** 选项数据 */
@@ -906,57 +1004,81 @@ export interface IChoiceOption {
 
 /** 步骤配置 */
 export interface IStepConfig {
-  /** 步骤整体布局：single=单字段 grouped=多字段组 list/grid=兼容旧格式 none=无选择 */
   layout: 'single' | 'grouped' | 'list' | 'grid' | 'none'
-  /** 步骤标题 */
   title: string
-  /** 字段配置数组 */
   fields: IStepField[]
 }
 
 /** 步骤字段 */
 export interface IStepField {
-  /** 字段名（存入选项结果的key，如 scene/dishes/style） */
   field: string
-  /** 字段显示标签 */
   label: string
-  /** 输入类型：1=单选 2=多选 3=文本 4=图片上传 */
   inputType: number
-  /** 是否必填 */
   required: boolean
-  /** 选项渲染方式：list=垂直列表 grid=网格卡片 */
   layout: 'list' | 'grid'
-  /** 数据来源：0=无 1=静态JSON 4=内置数据源 */
   dataSourceType: 0 | 1 | 4
-  /** 具体数据配置：静态数组 或 {builtin, limit} 对象 */
   dataSourceConfig: IChoiceOption[] | { builtin: string, limit?: number, show_fields?: string[] }
 }
 
 /** 分支规则 */
 export interface IBranchRule {
   field: string
-  conditions: {
-    value: string
-    nextStep: string
-  }[]
+  conditions: { value: string, nextStep: string }[]
 }
 
 /** 技能流程动态数据 VO */
 export interface ISkillFlowDataVO {
-  /** 商户标识 */
   merchantCode: string
-  /** 唯一标识（作为选项 value） */
   uniqueCode: string
-  /** 名称（作为选项 label） */
   name: string
-  /** 封面图URL（作为选项 preview） */
   poster: string
-  /** 简介（作为选项 desc） */
   describes: string
-  /** 金额 */
   salePrice: number
-  /** 内容 */
   content: string
+}
+
+/** 流程式对话结果 VO */
+export interface IFlowCompletionVO {
+  chatId: number
+  aiContent: string
+  imageGenerationId: number
+  imageStatus: 0 | 1 | 2
+  userMessageId: string
+  aiMessageId: string
+}
+
+/** 提交给后端的完整向导表单 */
+export interface IWizardSubmitForm {
+  skillId: string
+  chatId: number | null
+  steps: IWizardStepForm[]
+}
+
+/** 单个步骤的表单数据 */
+export interface IWizardStepForm {
+  flowId: number
+  stepCode: string
+  stepName: string
+  fieldValues: IWizardFieldValue[]
+}
+
+/** 字段选择值 */
+export interface IWizardFieldValue {
+  field: string
+  label: string
+  value: string | string[]
+  selectedOptions: ISelectedOption[]
+}
+
+/** 选中选项的完整信息 */
+export interface ISelectedOption {
+  value: string
+  label: string
+  desc?: string
+  icon?: string
+  preview?: string
+  salePrice?: number
+  content?: string
 }
 ```
 
@@ -966,9 +1088,11 @@ export interface ISkillFlowDataVO {
 
 1. **skillId 类型**: 保持字符串类型，与路由参数一致
 2. **数据结构变更**: flow 级别使用 `stepConfig`（对象），field 级别使用 `dataSourceConfig`，不再需要将 JSON 字符串解析为对象
-3. **SSE 兼容性**: 流式对话使用 SSE，需处理连接中断和重连
-4. **内存泄漏**: 组件卸载时清理 EventSource 和轮询定时器
+3. **接口变更**: 已废弃 SSE 流式接口 `/agentScopeChat/chat/stream/completion`，改用非流式接口 `/agentScopeChat/flow/completion`
+4. **内存泄漏**: 组件卸载时清理轮询定时器（`pollTimer`）
 5. **图片加载**: 生成结果图片可能较大，使用懒加载和加载占位符
 6. **并发控制**: 防止用户快速点击「下一步」导致状态混乱
 7. **多字段验证**: `isCurrentStepValid` 需检查所有必填字段是否都已选择
 8. **动态数据源**: `dataSourceType=4` 时，使用 `useSkillFlowData` 组合式函数获取数据，需传入当前登录用户的 `merchantCode`
+9. **Mock 模式**: 当前使用 `use-mock-flow.ts` 本地静态 Mock 数据，切回真实接口时需恢复 `useFlowCompletionMutation` 和 `useGetImageGenerationResultQuery`
+10. **自动跳转**: 轮询检测到 `status === 1` 时自动调用 `goToNextStep()`，用户无需点击"查看效果"
