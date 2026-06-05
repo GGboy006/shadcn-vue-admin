@@ -131,7 +131,7 @@ export function useWizard(skillId: Ref<string>) {
   const stepForms = ref<IWizardStepForm[]>([])
 
   // AI 生成状态
-  const chatId = ref<number | null>(null)
+  const chatId = ref<string | null>(null)
   const isGenerating = ref(false)
   const generationId = ref<number | null>(null)
   const generatedImageUrl = ref<string | null>(null)

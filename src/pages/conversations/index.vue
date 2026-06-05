@@ -37,12 +37,12 @@ const list = computed(() => conversationData.value?.data?.list ?? [])
 const total = computed(() => conversationData.value?.data?.total ?? 0)
 const pages = computed(() => conversationData.value?.data?.pages ?? 0)
 
-const status = ref<string>('')
+const status = ref<string>('all')
 const searchTitle = ref('')
 
 // 状态筛选
 watch(status, (val) => {
-  query.value.status = val || undefined
+  query.value.status = val === 'all' ? undefined : val
   query.value.pageNum = 1
 })
 
@@ -61,7 +61,7 @@ function goToPage(page: number) {
 }
 
 function handleReset() {
-  status.value = ''
+  status.value = 'all'
   searchTitle.value = ''
   query.value = {
     pageNum: 1,
@@ -95,7 +95,7 @@ function formatDate(dateStr: string) {
             <SelectValue placeholder="全部状态" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">
+            <SelectItem value="all">
               全部状态
             </SelectItem>
             <SelectItem value="1">

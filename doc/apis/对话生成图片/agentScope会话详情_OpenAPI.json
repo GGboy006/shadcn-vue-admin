@@ -1,0 +1,673 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://172.31.128.135:8202/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/agentScopeChat/conversation/{chatId}": {
+      "get": {
+        "tags": [
+          "AgentScope对话"
+        ],
+        "summary": "agentScope会话详情",
+        "operationId": "getConversationDetail",
+        "parameters": [
+          {
+            "name": "chatId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseAgentScopeConversationDetailVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "BaseResponseAgentScopeConversationDetailVO": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/components/schemas/AgentScopeConversationDetailVO"
+        }
+      }
+    },
+    "AgentScopeConversationDetailVO": {
+      "type": "object",
+      "properties": {
+        "chatId": {
+          "type": "integer",
+          "description": "会话ID",
+          "format": "int64",
+          "refType": null
+        },
+        "title": {
+          "type": "string",
+          "description": "会话标题",
+          "refType": null
+        },
+        "userId": {
+          "type": "integer",
+          "description": "用户ID",
+          "format": "int64",
+          "refType": null
+        },
+        "type": {
+          "type": "integer",
+          "description": "用户ID",
+          "format": "int32",
+          "refType": null
+        },
+        "orgCode": {
+          "type": "string",
+          "description": "小区站长ID",
+          "refType": null
+        },
+        "serviceMode": {
+          "type": "integer",
+          "description": "服务模式：0-AI托管 1-人工接管 2-待人工介入",
+          "format": "int32",
+          "refType": null
+        },
+        "operatorId": {
+          "type": "integer",
+          "description": "当前接管人ID",
+          "format": "int64",
+          "refType": null
+        },
+        "operatorName": {
+          "type": "string",
+          "description": "当前接管人名称",
+          "refType": null
+        },
+        "userTag": {
+          "type": "integer",
+          "description": "用户标签：3-站长 4-商户 5-物业 6-居委会 7-居民",
+          "format": "int32",
+          "refType": null
+        },
+        "takeoverTime": {
+          "type": "string",
+          "description": "接管时间",
+          "format": "date-time",
+          "refType": null
+        },
+        "returnToAiTime": {
+          "type": "string",
+          "description": "切回AI时间",
+          "format": "date-time",
+          "refType": null
+        },
+        "pendingCount": {
+          "type": "integer",
+          "description": "待处理消息数（人工模式下站长未读）",
+          "format": "int32",
+          "refType": null
+        },
+        "lastMessageTime": {
+          "type": "string",
+          "description": "最后消息时间",
+          "format": "date-time",
+          "refType": null
+        },
+        "lastMessagePreview": {
+          "type": "string",
+          "description": "最后消息预览",
+          "refType": null
+        },
+        "messages": {
+          "type": "array",
+          "description": "消息列表",
+          "items": {
+            "$ref": "#/components/schemas/ResidentialMessageVO"
+          },
+          "refType": "ResidentialMessageVO"
+        },
+        "artifacts": {
+          "type": "array",
+          "description": "创作产物列表",
+          "items": {
+            "$ref": "#/components/schemas/ResidentialArtifactVO"
+          },
+          "refType": "ResidentialArtifactVO"
+        }
+      },
+      "description": "会话详情VO"
+    },
+    "ResidentialMessageVO": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "消息ID",
+          "refType": null
+        },
+        "chatId": {
+          "type": "integer",
+          "description": "会话ID",
+          "format": "int64",
+          "refType": null
+        },
+        "role": {
+          "type": "string",
+          "description": "消息角色：user/assistant",
+          "refType": null
+        },
+        "content": {
+          "type": "string",
+          "description": "消息内容（兼容旧版，建议使用parts）",
+          "refType": null
+        },
+        "finalContent": {
+          "type": "string",
+          "description": "最终完整内容",
+          "refType": null
+        },
+        "parts": {
+          "type": "array",
+          "description": "消息部分列表（AI回复的结构化内容）",
+          "items": {
+            "$ref": "#/components/schemas/MessagePartVO"
+          },
+          "refType": "MessagePartVO"
+        },
+        "attachments": {
+          "type": "array",
+          "description": "附件文件列表",
+          "items": {
+            "$ref": "#/components/schemas/FileAttachmentVO"
+          },
+          "refType": "FileAttachmentVO"
+        },
+        "createTime": {
+          "type": "string",
+          "description": "创建时间",
+          "format": "date-time",
+          "refType": null
+        },
+        "reasoningSegments": {
+          "type": "array",
+          "description": "分段思考内容列表",
+          "items": {
+            "$ref": "#/components/schemas/ReasoningSegmentVO"
+          },
+          "refType": "ReasoningSegmentVO"
+        },
+        "toolCalls": {
+          "type": "array",
+          "description": "关联的工具调用列表（兼容旧版）",
+          "items": {
+            "$ref": "#/components/schemas/ToolCallVO"
+          },
+          "refType": "ToolCallVO"
+        },
+        "formPayload": {
+          "type": "string",
+          "description": "表单交互组件数据（兼容旧版）",
+          "refType": null
+        },
+        "steps": {
+          "type": "array",
+          "description": "所有步骤的选择数据（仅包含 actionType=1 的用户选择步骤）",
+          "items": {
+            "$ref": "#/components/schemas/FlowStepForm"
+          },
+          "refType": "FlowStepForm"
+        },
+        "imageGenerationId": {
+          "type": "integer",
+          "description": "关联的图片生成记录ID（ai_image_generation.id）",
+          "format": "int64",
+          "refType": null
+        }
+      },
+      "description": "消息详情VO"
+    },
+    "MessagePartVO": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "部分类型：reasoning(思考过程)/text(文本内容)/tool_call(工具调用)/artifact(创作产物)",
+          "refType": null
+        },
+        "content": {
+          "type": "string",
+          "description": "内容文本",
+          "refType": null
+        },
+        "duration": {
+          "type": "integer",
+          "description": "耗时（毫秒）",
+          "format": "int64",
+          "refType": null
+        },
+        "toolCall": {
+          "$ref": "#/components/schemas/ToolCallVO",
+          "refType": "ToolCallVO"
+        },
+        "artifact": {
+          "$ref": "#/components/schemas/ArtifactPartVO",
+          "refType": "ArtifactPartVO"
+        }
+      },
+      "description": "消息部分"
+    },
+    "ToolCallVO": {
+      "type": "object",
+      "properties": {
+        "toolCallId": {
+          "type": "string",
+          "description": "工具调用ID",
+          "refType": null
+        },
+        "toolName": {
+          "type": "string",
+          "description": "工具名称（优先返回toolDisplayName，为空时返回toolName）",
+          "refType": null
+        },
+        "display": {
+          "$ref": "#/components/schemas/ToolCallDisplayVO",
+          "refType": "ToolCallDisplayVO"
+        },
+        "arguments": {
+          "type": "string",
+          "description": "工具参数（JSON格式）",
+          "refType": null
+        },
+        "result": {
+          "type": "string",
+          "description": "工具调用结果（JSON格式）",
+          "refType": null
+        },
+        "status": {
+          "type": "string",
+          "description": "调用状态：pending/running/completed/failed",
+          "refType": null
+        },
+        "error": {
+          "type": "string",
+          "description": "错误信息",
+          "refType": null
+        },
+        "duration": {
+          "type": "integer",
+          "description": "耗时（毫秒）",
+          "format": "int64",
+          "refType": null
+        }
+      },
+      "description": "工具调用详情"
+    },
+    "ToolCallDisplayVO": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "展示类型：tool/artifact",
+          "refType": null
+        },
+        "mode": {
+          "type": "string",
+          "description": "展示模式：hidden/inline",
+          "refType": null
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "是否前端可见",
+          "refType": null
+        },
+        "displayId": {
+          "type": "string",
+          "description": "展示ID",
+          "refType": null
+        }
+      },
+      "description": "工具调用展示信息"
+    },
+    "ArtifactPartVO": {
+      "type": "object",
+      "properties": {
+        "artifactId": {
+          "type": "string",
+          "description": "产物ID",
+          "refType": null
+        },
+        "displayId": {
+          "type": "string",
+          "description": "展示ID",
+          "refType": null
+        },
+        "artifactType": {
+          "type": "string",
+          "description": "产物类型：file/form",
+          "refType": null
+        },
+        "status": {
+          "type": "string",
+          "description": "产物状态",
+          "refType": null
+        },
+        "title": {
+          "type": "string",
+          "description": "标题",
+          "refType": null
+        },
+        "summary": {
+          "type": "string",
+          "description": "摘要",
+          "refType": null
+        },
+        "fileUrl": {
+          "type": "string",
+          "description": "文件URL",
+          "refType": null
+        },
+        "fileName": {
+          "type": "string",
+          "description": "文件名",
+          "refType": null
+        },
+        "format": {
+          "type": "string",
+          "description": "格式",
+          "refType": null
+        },
+        "payload": {
+          "type": "string",
+          "description": "产物详情数据（原始JSON，包含fields等）",
+          "refType": null
+        }
+      },
+      "description": "产物部分"
+    },
+    "FileAttachmentVO": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "type": "integer",
+          "description": "文件ID",
+          "format": "int64",
+          "refType": null
+        },
+        "fileName": {
+          "type": "string",
+          "description": "文件名",
+          "refType": null
+        },
+        "fileType": {
+          "type": "string",
+          "description": "文件类型",
+          "refType": null
+        },
+        "fileSize": {
+          "type": "integer",
+          "description": "文件大小（字节）",
+          "format": "int64",
+          "refType": null
+        },
+        "fileUrl": {
+          "type": "string",
+          "description": "文件预览URL",
+          "refType": null
+        }
+      },
+      "description": "文件附件详情"
+    },
+    "ReasoningSegmentVO": {
+      "type": "object",
+      "properties": {
+        "messageId": {
+          "type": "string",
+          "description": "消息ID",
+          "refType": null
+        },
+        "content": {
+          "type": "string",
+          "description": "思考内容",
+          "refType": null
+        },
+        "duration": {
+          "type": "integer",
+          "description": "耗时（毫秒）",
+          "format": "int64",
+          "refType": null
+        }
+      },
+      "description": "思考片段"
+    },
+    "FlowStepForm": {
+      "type": "object",
+      "properties": {
+        "flowId": {
+          "type": "integer",
+          "description": "流程ID",
+          "format": "int64",
+          "refType": null
+        },
+        "stepCode": {
+          "type": "string",
+          "description": "步骤编码",
+          "refType": null
+        },
+        "stepName": {
+          "type": "string",
+          "description": "步骤名称",
+          "refType": null
+        },
+        "fieldValues": {
+          "type": "array",
+          "description": "该步骤的所有字段选择",
+          "items": {
+            "$ref": "#/components/schemas/FlowFieldValue"
+          },
+          "refType": "FlowFieldValue"
+        }
+      },
+      "description": "流程步骤表单"
+    },
+    "FlowFieldValue": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "字段名（如 scene, dishes, style）",
+          "refType": null
+        },
+        "label": {
+          "type": "string",
+          "description": "字段标签（如 \"营销场景\", \"选择菜品\"）",
+          "refType": null
+        },
+        "value": {
+          "type": "object",
+          "description": "选中的值（单选为 string，多选为 string[]）",
+          "refType": "object"
+        },
+        "selectedOptions": {
+          "type": "array",
+          "description": "选中的选项完整信息",
+          "items": {
+            "$ref": "#/components/schemas/SelectedOption"
+          },
+          "refType": "SelectedOption"
+        }
+      },
+      "description": "流程步骤字段值"
+    },
+    "SelectedOption": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "选项值",
+          "refType": null
+        },
+        "label": {
+          "type": "string",
+          "description": "选项显示名称",
+          "refType": null
+        },
+        "desc": {
+          "type": "string",
+          "description": "描述文案",
+          "refType": null
+        },
+        "icon": {
+          "type": "string",
+          "description": "图标/Emoji",
+          "refType": null
+        },
+        "preview": {
+          "type": "string",
+          "description": "预览图URL",
+          "refType": null
+        },
+        "salePrice": {
+          "type": "number",
+          "description": "金额（动态数据源-商品用）",
+          "format": "double",
+          "refType": null
+        },
+        "content": {
+          "type": "string",
+          "description": "内容（动态数据源用）",
+          "refType": null
+        }
+      },
+      "description": "选中选项详情"
+    },
+    "ResidentialArtifactVO": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "产物ID（MongoDB）",
+          "refType": null
+        },
+        "chatId": {
+          "type": "integer",
+          "description": "关联会话ID",
+          "format": "int64",
+          "refType": null
+        },
+        "artifactId": {
+          "type": "string",
+          "description": "产物ID（来自SDK）",
+          "refType": null
+        },
+        "displayId": {
+          "type": "string",
+          "description": "展示ID",
+          "refType": null
+        },
+        "artifactType": {
+          "type": "string",
+          "description": "产物类型",
+          "refType": null
+        },
+        "status": {
+          "type": "string",
+          "description": "产物状态",
+          "refType": null
+        },
+        "title": {
+          "type": "string",
+          "description": "产物标题",
+          "refType": null
+        },
+        "summary": {
+          "type": "string",
+          "description": "产物摘要",
+          "refType": null
+        },
+        "format": {
+          "type": "string",
+          "description": "文件格式",
+          "refType": null
+        },
+        "fileUrl": {
+          "type": "string",
+          "description": "文件URL",
+          "refType": null
+        },
+        "fileName": {
+          "type": "string",
+          "description": "文件名",
+          "refType": null
+        },
+        "sources": {
+          "type": "array",
+          "description": "产物来源列表",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactSourceVO"
+          },
+          "refType": "ArtifactSourceVO"
+        },
+        "createTime": {
+          "type": "string",
+          "description": "创建时间",
+          "format": "date-time",
+          "refType": null
+        }
+      },
+      "description": "创作产物VO"
+    },
+    "ArtifactSourceVO": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "文件URL",
+          "refType": null
+        },
+        "fileName": {
+          "type": "string",
+          "description": "文件名",
+          "refType": null
+        },
+        "format": {
+          "type": "string",
+          "description": "文件格式",
+          "refType": null
+        }
+      },
+      "description": "产物来源"
+    }
+  }
+}

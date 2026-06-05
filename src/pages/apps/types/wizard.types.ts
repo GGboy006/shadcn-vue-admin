@@ -116,7 +116,7 @@ export interface IAIImageGeneration {
   /** 主键 */
   id: number
   /** 会话ID */
-  chatId: number
+  chatId: string
   /** 调用用户 ID */
   userId: number
   /** 平台标识 */
@@ -154,7 +154,7 @@ export interface IAIImageGeneration {
 /** 流式对话表单 */
 export interface IChatForm {
   /** 会话ID（为空则新建会话） */
-  chatId: number | null
+  chatId: string | null
   /** 消息内容 */
   content: string
   /** 消息类型 */
@@ -166,7 +166,7 @@ export interface IChatForm {
 /** 流程式对话结果 VO */
 export interface IFlowCompletionVO {
   /** 会话ID */
-  chatId: number
+  chatId: string
   /** AI文本回复内容 */
   aiContent: string
   /** 图片生成记录ID */
@@ -182,7 +182,7 @@ export interface IFlowCompletionVO {
 /** 图片生成请求 */
 export interface IQuicklyCreateRequest {
   /** 会话ID */
-  chatId: number
+  chatId: string
   /** 模型名称 */
   model?: string
   /** 图片生成提示词 */
@@ -229,7 +229,7 @@ export interface IWizardState {
   currentStepCode: string
   completedStepCodes: string[]
   userChoices: Record<string, any>
-  chatId: number | null
+  chatId: string | null
   isGenerating: boolean
   generationId: number | null
   generatedImageUrl: string | null
@@ -246,7 +246,7 @@ export interface IWizardSubmitForm {
   /** 技能ID */
   skillId: string
   /** 会话ID（首次为空） */
-  chatId: number | null
+  chatId: string | null
   /** 所有步骤的选择数据 */
   steps: IWizardStepForm[]
 }

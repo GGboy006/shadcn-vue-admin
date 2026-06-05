@@ -11,7 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
-
+doc/Kimi_Agent_人工接管功能
 stats.html
 
 # Editor directories and files

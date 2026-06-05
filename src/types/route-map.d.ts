@@ -134,6 +134,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/conversations/[chatId]': RouteRecordInfo<
+      '/conversations/[chatId]',
+      '/conversations/:chatId',
+      { chatId: ParamValue<true> },
+      { chatId: ParamValue<false> },
+      | never
+    >,
     '/dashboard/': RouteRecordInfo<
       '/dashboard/',
       '/dashboard',
@@ -386,6 +393,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/conversations/index.vue': {
       routes:
         | '/conversations/'
+      views:
+        | never
+    }
+    'src/pages/conversations/[chatId].vue': {
+      routes:
+        | '/conversations/[chatId]'
       views:
         | never
     }
