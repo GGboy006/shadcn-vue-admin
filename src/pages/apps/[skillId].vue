@@ -9,6 +9,7 @@ import type { IChoiceOption } from './types/wizard.types'
 import AiChatBubble from './components/ai-chat-bubble.vue'
 import ChoiceGrid from './components/choice-grid.vue'
 import ChoiceList from './components/choice-list.vue'
+import GenerationConfirm from './components/generation-confirm.vue'
 import GenerationLoading from './components/generation-loading.vue'
 import ResultPreview from './components/result-preview.vue'
 import StepIndicator from './components/step-indicator.vue'
@@ -41,12 +42,6 @@ async function handleNext() {
   if (!flow)
     return
 
-  // AI 生成步骤：调用图片生成并进入下一步
-  if (flow.actionType === 2) {
-    await wizard.generateImage()
-    return
-  }
-
   // 确认/结束步骤
   if (flow.actionType === 4) {
     // 流程结束，可重置或返回
@@ -55,6 +50,11 @@ async function handleNext() {
   }
 
   wizard.goToNextStep()
+}
+
+// 处理生成按钮点击
+async function handleGenerate() {
+  await wizard.streamPrompt()
 }
 
 // 处理返回
@@ -175,6 +175,14 @@ const isCompletionStep = computed(() => {
           </div>
         </div>
 
+        <!-- AI 生成步骤 - 确认页（未开始生成时） -->
+        <GenerationConfirm
+          v-else-if="isGenerationStep && !wizard.isProcessing.value && !wizard.isGenerating.value && wizard.generationStatus.value !== 1 && wizard.generationStatus.value !== 2"
+          :step-name="wizard.currentFlow.value.stepName"
+          :step-forms="wizard.stepForms.value"
+          @generate="handleGenerate"
+        />
+
         <!-- AI 生成步骤 - 处理中/展示 aiContent 打字机效果 -->
         <div
           v-else-if="isGenerationStep && (wizard.isProcessing.value || isTypewriterTyping)"
@@ -183,16 +191,6 @@ const isCompletionStep = computed(() => {
           <div class="rounded-lg bg-muted/50 p-4 text-sm text-foreground leading-relaxed min-h-[120px]">
             {{ typewriterText }}
             <span v-if="isTypewriterTyping" class="animate-pulse">▍</span>
-          </div>
-        </div>
-
-        <!-- AI 生成步骤 - 处理完成，等待图片生成 -->
-        <div
-          v-else-if="isGenerationStep && !wizard.isProcessing.value && !wizard.isGenerating.value && wizard.generationStatus.value !== 2"
-          class="py-6"
-        >
-          <div class="rounded-lg bg-muted/50 p-4 text-sm text-foreground leading-relaxed min-h-[120px]">
-            {{ typewriterText || wizard.currentFlow.value?.description }}
           </div>
         </div>
 
@@ -234,34 +232,39 @@ const isCompletionStep = computed(() => {
 
         <!-- 操作按钮区 -->
         <div
-          v-if="isUserChoiceStep || isGenerationStep"
+          v-if="isUserChoiceStep"
           class="flex items-center justify-between pt-4"
         >
           <Button
             variant="ghost"
-            :disabled="wizard.currentStepIndex.value === 0 || wizard.isGenerating.value"
+            :disabled="wizard.currentStepIndex.value === 0"
             @click="handleBack"
           >
             上一步
           </Button>
 
-          <!-- AI 生成步骤：生成中时显示加载状态，不可点击 -->
-          <Button
-            v-if="isGenerationStep"
-            :disabled="wizard.isGenerating.value || wizard.isProcessing.value"
-          >
-            <span v-if="wizard.isGenerating.value || wizard.isProcessing.value" class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-            {{ wizard.isGenerating.value || wizard.isProcessing.value ? '生成中...' : '下一步' }}
-          </Button>
-
           <!-- 普通选择步骤 -->
           <Button
-            v-else
             :disabled="!wizard.isCurrentStepValid.value"
             @click="handleNext"
           >
             下一步
           </Button>
+        </div>
+
+        <!-- AI 生成步骤 - 确认页时的上一步按钮 -->
+        <div
+          v-if="isGenerationStep && !wizard.isProcessing.value && !wizard.isGenerating.value && wizard.generationStatus.value !== 1 && wizard.generationStatus.value !== 2"
+          class="flex items-center justify-between pt-4"
+        >
+          <Button
+            variant="ghost"
+            :disabled="wizard.currentStepIndex.value === 0"
+            @click="handleBack"
+          >
+            上一步
+          </Button>
+          <div />
         </div>
       </div>
 

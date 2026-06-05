@@ -13,6 +13,7 @@ defineProps<Props>()
 const emit = defineEmits<{
   regenerate: []
   download: []
+  contact: []
 }>()
 
 function handleDownload() {
@@ -47,11 +48,18 @@ function handleRegenerate() {
       </Button>
     </div>
 
-    <!-- Prompt 展示（可选） -->
-    <div v-if="prompt" class="mt-4 max-w-md w-full">
-      <p class="text-xs text-muted-foreground text-center line-clamp-2">
-        {{ prompt }}
-      </p>
+    <!-- 联系站长人工设计 -->
+    <div class="mt-4 max-w-md w-full">
+      <div
+        class="flex items-center gap-2 px-4 py-3 rounded-lg bg-primary/5 border border-primary/10 cursor-pointer hover:bg-primary/10 transition-colors"
+        @click="$emit('contact')"
+      >
+        <svg class="size-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+        <span class="text-sm text-muted-foreground">对效果不满意？</span>
+        <span class="text-sm font-medium text-primary">点击联系站长人工设计</span>
+      </div>
     </div>
   </div>
 </template>

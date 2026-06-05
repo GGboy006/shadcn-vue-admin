@@ -99,7 +99,7 @@ export async function mockImageGenerationQuery(_id: number | null): Promise<{ co
   mockPollCount++
 
   // 前 10 次返回生成中，第 11 次返回完成（约 33 秒总时长）
-  if (mockPollCount < 11) {
+  if (mockPollCount < 1) {
     return { ...MOCK_IMAGE_GENERATING }
   }
 

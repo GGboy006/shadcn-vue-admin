@@ -457,9 +457,11 @@ export function useWizard(skillId: Ref<string>) {
     initStepForm(flow)
 
     // 当进入 actionType === 2 的步骤且未触发过对话时，自动开始
+    // 注意：现在改为用户手动点击生成按钮后触发，这里不再自动调用
+    // 保留 processedStepCodes 用于防止重复触发
     if (flow.actionType === 2 && !processedStepCodes.value.has(flow.stepCode)) {
       processedStepCodes.value.add(flow.stepCode)
-      streamPrompt()
+      // streamPrompt() // 移除自动调用，改为用户手动触发
     }
   })
 
@@ -523,7 +525,7 @@ export function useWizard(skillId: Ref<string>) {
     }, 3000)
   })
 
-  // 重新生成
+  // 重新生成：回到生成步骤的确认页，让用户手动点击生成
   function handleRegenerate() {
     generationId.value = null
     generatedImageUrl.value = null
@@ -531,7 +533,29 @@ export function useWizard(skillId: Ref<string>) {
     generationError.value = null
     aiContent.value = ''
     isProcessing.value = false
-    streamPrompt()
+    isGenerating.value = false
+    // 从已完成列表中移除完成页和生成步骤，回到生成步骤确认页
+    const currentCode = currentFlow.value?.stepCode
+    if (currentCode) {
+      completedStepCodes.value = completedStepCodes.value.filter(
+        code => code !== currentCode,
+      )
+    }
+    // 找到当前的上一步（生成步骤）
+    const prevIndex = currentStepIndex.value - 1
+    if (prevIndex >= 0) {
+      const prevFlow = flows.value[prevIndex]
+      if (prevFlow) {
+        currentStepCode.value = prevFlow.stepCode
+        currentStepIndex.value = prevIndex
+        // 也从已完成列表中移除生成步骤
+        completedStepCodes.value = completedStepCodes.value.filter(
+          code => code !== prevFlow.stepCode,
+        )
+        // 重置 processedStepCodes，允许再次触发
+        processedStepCodes.value.delete(prevFlow.stepCode)
+      }
+    }
   }
 
   // 重置向导
