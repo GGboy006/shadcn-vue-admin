@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/vue-query'
 
+import type { IWizardStepForm } from '@/pages/apps/types/wizard.types'
+
 import { useApiFetch } from '@/composables/use-fetch'
 
 import type { IResponse } from '../types/response.type'
@@ -194,6 +196,8 @@ export interface IChatMessage {
   reasoningSegments: IReasoningSegment[]
   /** 关联的图片生成记录ID */
   imageGenerationId: number
+  /** 流程步骤数据（用户选择记录） */
+  steps: IWizardStepForm[] | null
 }
 
 /** 创作产物 VO */

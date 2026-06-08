@@ -45,6 +45,13 @@ declare module 'vue-router/auto-routes' {
       { path: ParamValue<false> },
       | never
     >,
+    '/admin/chat-workbench': RouteRecordInfo<
+      '/admin/chat-workbench',
+      '/admin/chat-workbench',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/ai-talk/': RouteRecordInfo<
       '/ai-talk/',
       '/ai-talk',
@@ -315,6 +322,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/[...path].vue': {
       routes:
         | '/[...path]'
+      views:
+        | never
+    }
+    'src/pages/admin/chat-workbench.vue': {
+      routes:
+        | '/admin/chat-workbench'
       views:
         | never
     }

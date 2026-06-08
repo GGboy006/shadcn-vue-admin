@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useCookies } from '@vueuse/integrations/useCookies'
 import { storeToRefs } from 'pinia'
+import { useRoute } from 'vue-router'
 
 import AppSidebar from '@/components/app-sidebar/index.vue'
 import CommandMenuPanel from '@/components/command-menu-panel/index.vue'
@@ -14,12 +15,21 @@ import { useThemeStore } from '@/stores/theme'
 const defaultOpen = useCookies([SIDEBAR_COOKIE_NAME])
 const themeStore = useThemeStore()
 const { contentLayout } = storeToRefs(themeStore)
+const route = useRoute()
+
+const isFixedLayout = computed(() => route.meta.layout === 'fixed')
 </script>
 
 <template>
   <UiSidebarProvider :default-open="defaultOpen.get(SIDEBAR_COOKIE_NAME)">
     <AppSidebar />
-    <UiSidebarInset class="w-full max-w-full peer-data-[state=collapsed]:w-[calc(100%-var(--sidebar-width-icon)-1rem)] peer-data-[state=expanded]:w-[calc(100%-var(--sidebar-width))]">
+    <UiSidebarInset
+      :class="cn(
+        'w-full max-w-full',
+        isFixedLayout && 'h-screen flex flex-col',
+        'peer-data-[state=collapsed]:w-[calc(100%-var(--sidebar-width-icon)-1rem)] peer-data-[state=expanded]:w-[calc(100%-var(--sidebar-width))]',
+      )"
+    >
       <header
         class="flex items-center gap-3 sm:gap-4 h-16 p-4 shrink-0 transition-[width,height] ease-linear"
       >
@@ -36,7 +46,8 @@ const { contentLayout } = storeToRefs(themeStore)
 
       <main
         :class="cn(
-          'p-4 grow',
+          'p-4',
+          isFixedLayout ? 'flex-1 overflow-hidden' : 'grow',
           contentLayout === 'centered' ? 'container mx-auto ' : '',
         )"
       >
