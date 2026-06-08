@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeftIcon, DownloadIcon, Loader2Icon, MessageSquareIcon, MoreVerticalIcon, PaperclipIcon, SendIcon } from '@lucide/vue'
+import { ArrowLeftIcon, DownloadIcon, Loader2Icon, MessageSquareIcon, MoreVerticalIcon, SendIcon } from '@lucide/vue'
 import dayjs from 'dayjs'
 
 import type { IChatMessage } from '@/services/api/conversation.api'
@@ -321,11 +321,12 @@ watch(() => messages.value.length, () => {
     <!-- 输入框 -->
     <div class="sticky bottom-0 z-10 border-t bg-background p-4">
       <div class="flex items-end gap-2 rounded-lg border border-input bg-card px-3 py-2 focus-within:ring-1 focus-within:ring-ring">
-        <div class="flex items-center gap-1 pb-1">
+        <!-- 附件按钮展示没有开发 -->
+        <!-- <div class="flex items-center gap-1 pb-1">
           <Button variant="ghost" size="icon" class="size-8 rounded-md">
             <PaperclipIcon class="size-4 text-muted-foreground" />
           </Button>
-        </div>
+        </div> -->
 
         <textarea
           v-model="inputText"
