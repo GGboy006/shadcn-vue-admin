@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  ArrowLeftIcon,
   DownloadIcon,
   Loader2Icon,
   MessageSquareIcon,
@@ -78,8 +79,11 @@ const conversationList = computed<IConversation[]>(() => {
   return listData.value?.pages.flatMap(page => page.data?.list ?? []) ?? []
 })
 
-// 选中的会话
+// 选中的会话（桌面端始终控制右侧详情内容）
 const selectedChatId = ref<string>('')
+
+// 移动端选中状态（控制详情页是否覆盖显示）
+const mobileSelectedChatId = ref<string>('')
 
 // 默认选中第一个
 watch(conversationList, (list) => {
@@ -90,6 +94,11 @@ watch(conversationList, (list) => {
 
 function handleSelectConversation(chatId: string) {
   selectedChatId.value = chatId
+  mobileSelectedChatId.value = chatId
+}
+
+function handleBackToList() {
+  mobileSelectedChatId.value = ''
 }
 
 // 列表滚动触底加载
@@ -237,9 +246,15 @@ watch(() => messages.value.length, () => {
 </script>
 
 <template>
-  <div class="flex h-full -m-4 overflow-hidden">
+  <div class="relative flex h-full -m-4 overflow-hidden">
     <!-- 左侧会话列表 -->
-    <div class="w-80 flex flex-col border-r bg-card shrink-0 h-full">
+    <div
+      :class="cn(
+        'absolute inset-0 z-10 flex flex-col border-r bg-card h-full w-full',
+        'sm:static sm:w-80 sm:shrink-0',
+        mobileSelectedChatId && 'hidden sm:flex',
+      )"
+    >
       <!-- 时钟 -->
       <div class="p-3 pb-0 flex justify-center">
         <DigitalClock format="HH:mm:ss" :show-period="true" />
@@ -369,7 +384,13 @@ watch(() => messages.value.length, () => {
     </div>
 
     <!-- 右侧对话详情 -->
-    <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+    <div
+      :class="cn(
+        'absolute inset-0 z-20 flex flex-col min-w-0 h-full overflow-hidden bg-background',
+        'sm:static sm:flex-1',
+        !mobileSelectedChatId && 'hidden sm:flex',
+      )"
+    >
       <!-- 未选中状态 -->
       <template v-if="!selectedChatId">
         <div class="flex flex-col items-center justify-center flex-1 text-muted-foreground">
@@ -388,6 +409,15 @@ watch(() => messages.value.length, () => {
         <!-- 顶部信息栏 -->
         <div class="flex items-center justify-between border-b bg-background px-4 py-3 shrink-0">
           <div class="flex items-center gap-3">
+            <!-- 移动端返回按钮 -->
+            <Button
+              variant="ghost"
+              size="icon"
+              class="sm:hidden -ml-2 size-8"
+              @click="handleBackToList"
+            >
+              <ArrowLeftIcon class="size-5" />
+            </Button>
             <template v-if="conversation">
               <Avatar class="size-9">
                 <AvatarImage src="/robot.png" alt="AI" />
@@ -463,7 +493,7 @@ watch(() => messages.value.length, () => {
                   v-for="msg in group"
                   :key="msg.id"
                   :class="cn(
-                    'flex w-fit max-w-[80%] gap-2',
+                    'flex w-fit max-w-[85%] sm:max-w-[75%] gap-2',
                     msg.role === 'user' ? 'mr-auto' : 'ml-auto flex-row-reverse',
                   )"
                 >
@@ -480,10 +510,10 @@ watch(() => messages.value.length, () => {
                   </Avatar>
 
                   <!-- 消息内容 -->
-                  <div class="flex flex-col">
+                  <div class="flex flex-col min-w-0 overflow-hidden">
                     <div
                       :class="cn(
-                        'rounded-2xl px-4 py-2.5 text-sm',
+                        'rounded-2xl px-4 py-2.5 text-sm min-w-0',
                         msg.role === 'user'
                           ? 'bg-muted rounded-tl-sm'
                           : 'bg-primary text-primary-foreground rounded-tr-sm',
@@ -491,7 +521,7 @@ watch(() => messages.value.length, () => {
                     >
                       <!-- 步骤配置卡片（优先渲染 steps） -->
                       <template v-if="msg.steps && msg.steps.length > 0">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 sm:gap-x-6 gap-y-3">
                           <div
                             v-for="step in msg.steps.filter(s => s.fieldValues.some(fv => fv.value !== undefined && fv.value !== '' && fv.value !== null))"
                             :key="step.stepCode"
@@ -500,7 +530,7 @@ watch(() => messages.value.length, () => {
                             <div
                               v-for="fv in step.fieldValues.filter(f => f.value !== undefined && f.value !== '' && f.value !== null)"
                               :key="fv.field"
-                              class="flex items-center gap-2 text-sm"
+                              class="flex items-center gap-2 text-sm min-w-0"
                             >
                               <span
                                 v-if="fv.selectedOptions?.[0]?.icon"
@@ -514,8 +544,8 @@ watch(() => messages.value.length, () => {
                               >
                                 ✓
                               </span>
-                              <span class="text-muted-foreground">{{ fv.label }}</span>
-                              <span class="font-medium">{{ fv.selectedOptions?.[0]?.label || fv.value }}</span>
+                              <span class="text-muted-foreground truncate">{{ fv.label }}</span>
+                              <span class="font-medium truncate">{{ fv.selectedOptions?.[0]?.label || fv.value }}</span>
                             </div>
                           </div>
                         </div>
@@ -539,7 +569,7 @@ watch(() => messages.value.length, () => {
 
                         <!-- 生成成功：展示图片 -->
                         <template v-else-if="getImageStatus(msg.imageGenerationId).status === 1">
-                          <div class="max-w-[240px]">
+                          <div class="max-w-[200px] sm:max-w-[240px]">
                             <AspectRatio
                               :ratio="parseAspectRatio(getImageStatus(msg.imageGenerationId).size)"
                               class="bg-muted rounded-lg overflow-hidden"
@@ -552,11 +582,11 @@ watch(() => messages.value.length, () => {
                               >
                             </AspectRatio>
                           </div>
-                          <div class="flex gap-2 max-w-[240px]">
+                          <div class="flex flex-wrap gap-2">
                             <Button
                               variant="secondary"
                               size="sm"
-                              class="flex-1"
+                              class="flex-1 min-w-[120px]"
                               @click="handleRegenerate(msg)"
                             >
                               <SparklesIcon class="size-4 mr-1" />
@@ -565,7 +595,7 @@ watch(() => messages.value.length, () => {
                             <Button
                               variant="secondary"
                               size="sm"
-                              class="flex-1"
+                              class="flex-1 min-w-[120px]"
                               @click="downloadImage(getImageStatus(msg.imageGenerationId).imageUrl || '', msg.id)"
                             >
                               <DownloadIcon class="size-4 mr-1" />
@@ -601,7 +631,7 @@ watch(() => messages.value.length, () => {
         </ScrollArea>
 
         <!-- 输入框 -->
-        <div class="border-t bg-background p-4 shrink-0">
+        <div class="border-t bg-background p-3 sm:p-4 shrink-0">
           <div class="flex items-end gap-2 rounded-lg border border-input bg-card px-3 py-2 focus-within:ring-1 focus-within:ring-ring">
             <textarea
               v-model="inputText"
