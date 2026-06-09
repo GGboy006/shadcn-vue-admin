@@ -1,5 +1,4 @@
 import { useGetSkillFlowDataQuery } from '@/services/api/skill.api'
-import { useUserInfoStore } from '@/stores/user-info'
 
 import type { IChoiceOption, ISkillFlowDataVO, IStepField } from '../types/wizard.types'
 
@@ -59,9 +58,7 @@ export function getBuiltinConfig(field: IStepField): { builtin: string, limit?: 
  * const { options, isLoading, isError, refetch } = useSkillFlowData(field)
  * ```
  */
-export function useSkillFlowData(field: IStepField | null) {
-  const userInfoStore = useUserInfoStore()
-
+export function useSkillFlowData(field: IStepField | null, merchantCode?: string) {
   // 构建查询参数
   const queryParams = computed(() => {
     if (!field || !isDynamicDataSource(field))
@@ -71,7 +68,6 @@ export function useSkillFlowData(field: IStepField | null) {
     if (!builtinConfig)
       return null
 
-    const merchantCode = userInfoStore.merchantInfo?.merchantCode
     if (!merchantCode)
       return null
 
@@ -117,21 +113,19 @@ export function useSkillFlowData(field: IStepField | null) {
  *
  * 使用场景：在 setup() 顶层预创建查询，避免在 watch/computed 中调用 composable
  */
-export function useSkillFlowDataByBuiltin(builtin: Ref<string | null>) {
-  const userInfoStore = useUserInfoStore()
-
+export function useSkillFlowDataByBuiltin(builtin: Ref<string | null>, merchantCode?: Ref<string | undefined>) {
   // 构建查询参数
   const queryParams = computed(() => {
     if (!builtin.value)
       return null
 
-    const merchantCode = userInfoStore.merchantInfo?.merchantCode
-    if (!merchantCode)
+    const code = merchantCode?.value
+    if (!code)
       return null
 
     return {
       dataSourceBuiltin: builtin.value,
-      merchantCode,
+      merchantCode: code,
     }
   })
 

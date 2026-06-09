@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { ArrowLeftIcon } from '@lucide/vue'
+import { ArrowLeftIcon, SendIcon, StoreIcon } from '@lucide/vue'
+import { toast } from 'vue-sonner'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useApiFetch } from '@/composables/use-fetch'
+import { useGetSkillMerchantsQuery } from '@/services/api/skill.api'
+import { useAuthStore } from '@/stores/auth'
+import { useStationRegenerateStore } from '@/stores/station-regenerate'
 
 import type { IChoiceOption } from './types/wizard.types'
 
@@ -19,6 +24,7 @@ import { useWizard } from './composables/use-wizard'
 const route = useRoute()
 const router = useRouter()
 const skillId = computed(() => (route.params as Record<string, string>).skillId)
+const authStore = useAuthStore()
 
 // 向导状态管理
 const wizard = useWizard(skillId)
@@ -26,9 +32,69 @@ const wizard = useWizard(skillId)
 // 打字机效果（用于展示 aiContent）
 const { displayText: typewriterText, isTyping: isTypewriterTyping } = useTypewriter(wizard.aiContent, 10)
 
-// 页面挂载时强制重置向导状态（确保离开再进入时重新初始化）
+// 是否站长重新生成模式
+const isStationRegenerateMode = computed(() => route.query.mode === 'station_regenerate')
+
+// 是否站长直接创建模式（从工具列表进入，需要选择商户）
+const isStationDirectMode = computed(() => {
+  return authStore.getUserType() === 3 && !isStationRegenerateMode.value
+})
+
+// 站长模式：原始会话ID（用于发送消息，不用于生成）
+const stationChatId = ref<string | null>(null)
+
+// ==================== 站长选择商户 ====================
+
+// 查询已分配该技能的商户列表
+const { data: merchantsData, isLoading: isMerchantsLoading } = useGetSkillMerchantsQuery(skillId)
+const merchantList = computed(() => merchantsData.value?.data || [])
+
+// 是否显示商户选择弹窗
+const showMerchantSelect = ref(false)
+
+// 选中的商户
+const selectedMerchant = ref<{ merchantCode: string, merchantName: string } | null>(null)
+
+// 选择商户
+function selectMerchant(merchant: { merchantCode: string, merchantName: string }) {
+  selectedMerchant.value = merchant
+  wizard.setStationMerchantCode(merchant.merchantCode)
+  showMerchantSelect.value = false
+}
+
+// 页面挂载时处理初始化
 onMounted(() => {
-  wizard.resetWizard()
+  if (isStationRegenerateMode.value) {
+    // 站长重新生成模式：从 store 获取数据并预填充
+    const stationStore = useStationRegenerateStore()
+    const data = stationStore.getRegenerateData()
+
+    if (data) {
+      const { chatId, merchantCode, steps } = data
+      // 保存原始 chatId，用于后续发送消息
+      stationChatId.value = chatId
+      // 等待技能详情加载完成后初始化
+      let unwatch: (() => void) | null = null
+      unwatch = watch(() => wizard.skillDetail.value, (detail) => {
+        if (detail && detail.flows.length > 0) {
+          wizard.initWithStationData({ chatId, merchantCode, steps })
+          unwatch?.()
+        }
+      }, { immediate: true })
+    }
+    else {
+      toast.error('数据已过期，请重新操作')
+    }
+  }
+  else if (isStationDirectMode.value) {
+    // 站长直接创建模式：显示商户选择弹窗
+    showMerchantSelect.value = true
+    wizard.resetWizard()
+  }
+  else {
+    // 普通模式：重置向导
+    wizard.resetWizard()
+  }
 })
 
 // 处理选择
@@ -73,6 +139,53 @@ function handleDownload() {
   }
 }
 
+// ==================== 站长专属功能 ====================
+
+const { apiFetch } = useApiFetch()
+
+/** 发送给商户 */
+const stationSendInput = ref('')
+const isSending = ref(false)
+
+async function handleSendToMerchant() {
+  if (!stationSendInput.value.trim() || !stationChatId.value)
+    return
+
+  isSending.value = true
+
+  try {
+    // 1. 先调用站长接管会话
+    await apiFetch('/aiCommon/stationTakeover', {
+      method: 'post',
+      params: {
+        chatId: stationChatId.value,
+      },
+    })
+
+    // 2. 发送消息（携带图片生成ID）
+    await apiFetch('/aiCommon/sendManualTakeoverMessage', {
+      method: 'post',
+      params: {
+        chatId: stationChatId.value,
+        content: stationSendInput.value,
+        imageGenerationId: wizard.generationId.value ?? undefined,
+      },
+    })
+
+    toast.success('发送成功')
+    stationSendInput.value = ''
+
+    // 返回聊天工作台
+    router.push('/admin/chat-workbench')
+  }
+  catch {
+    toast.error('发送失败')
+  }
+  finally {
+    isSending.value = false
+  }
+}
+
 // 步骤名称列表
 const stepNames = computed(() => {
   return wizard.flows.value.map(f => f.stepName)
@@ -109,8 +222,15 @@ const isCompletionStep = computed(() => {
           {{ wizard.skillDetail.value?.name || 'AI 工具' }}
         </h1>
 
-        <!-- 占位 -->
-        <div class="w-16" />
+        <!-- 站长模式：已选商户 -->
+        <div
+          v-if="selectedMerchant"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs"
+        >
+          <StoreIcon class="size-3.5" />
+          <span class="truncate max-w-[120px]">{{ selectedMerchant.merchantName }}</span>
+        </div>
+        <div v-else class="w-16" />
       </div>
 
       <!-- 步骤指示器 -->
@@ -178,8 +298,10 @@ const isCompletionStep = computed(() => {
         <!-- AI 生成步骤 - 确认页（未开始生成时） -->
         <GenerationConfirm
           v-else-if="isGenerationStep && !wizard.isProcessing.value && !wizard.isGenerating.value && wizard.generationStatus.value !== 1 && wizard.generationStatus.value !== 2"
+          v-model="wizard.stationModifyPrompt.value"
           :step-name="wizard.currentFlow.value.stepName"
           :step-forms="wizard.stepForms.value"
+          :is-station-mode="wizard.isStationMode.value"
           @generate="handleGenerate"
         />
 
@@ -215,20 +337,57 @@ const isCompletionStep = computed(() => {
         </div>
 
         <!-- 完成步骤 - 结果展示 -->
-        <ResultPreview
-          v-else-if="isCompletionStep && wizard.generatedImageUrl.value"
-          :image-url="wizard.generatedImageUrl.value"
-          :prompt="wizard.aiContent.value"
-          @regenerate="wizard.handleRegenerate()"
-          @download="handleDownload"
-        />
+        <template v-else-if="isCompletionStep">
+          <!-- 结果图片（普通模式 或 站长生成后） -->
+          <ResultPreview
+            v-if="wizard.generatedImageUrl.value"
+            :image-url="wizard.generatedImageUrl.value"
+            :prompt="wizard.aiContent.value"
+            :tag="wizard.isStationMode.value ? '站长生成' : undefined"
+            @regenerate="wizard.handleRegenerate()"
+            @download="handleDownload"
+          />
 
-        <!-- 完成步骤 - 无结果 -->
-        <div v-else-if="isCompletionStep" class="text-center py-8">
-          <p class="text-muted-foreground">
-            {{ wizard.currentFlow.value.description }}
-          </p>
-        </div>
+          <!-- 完成步骤 - 无结果 -->
+          <div v-else class="text-center py-8">
+            <p class="text-muted-foreground">
+              {{ wizard.currentFlow.value.description }}
+            </p>
+          </div>
+
+          <!-- 站长专属：发送给商户 -->
+          <div
+            v-if="wizard.isStationMode.value && wizard.generationStatus.value === 1 && wizard.generatedImageUrl.value"
+            class="rounded-xl border bg-card p-4 mt-4"
+          >
+            <label class="text-sm font-medium mb-2 block">
+              发送给商户
+            </label>
+            <textarea
+              v-model="stationSendInput"
+              placeholder="请输入要发送给商户的消息..."
+              rows="2"
+              class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            <div class="flex gap-2 mt-3">
+              <Button
+                variant="outline"
+                class="flex-1"
+                @click="router.push('/admin/chat-workbench')"
+              >
+                返回工作台
+              </Button>
+              <Button
+                class="flex-1"
+                :disabled="!stationSendInput.trim() || isSending"
+                @click="handleSendToMerchant"
+              >
+                <SendIcon class="size-4 mr-2" />
+                {{ isSending ? '发送中...' : '发送给商户' }}
+              </Button>
+            </div>
+          </div>
+        </template>
 
         <!-- 操作按钮区 -->
         <div
@@ -273,6 +432,90 @@ const isCompletionStep = computed(() => {
         <p class="text-muted-foreground">
           暂无流程数据
         </p>
+      </div>
+    </div>
+
+    <!-- 站长选择商户弹窗 -->
+    <div
+      v-if="showMerchantSelect"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      @click.self="showMerchantSelect = false"
+    >
+      <div class="w-full max-w-md mx-4 bg-background rounded-xl border shadow-lg p-6">
+        <div class="flex items-center gap-2 mb-4">
+          <StoreIcon class="size-5 text-primary" />
+          <h2 class="text-lg font-semibold">
+            选择商户
+          </h2>
+        </div>
+        <p class="text-sm text-muted-foreground mb-4">
+          请选择要使用此工具的商户，以便获取该商户的商品和促销数据
+        </p>
+
+        <!-- 加载中 -->
+        <div v-if="isMerchantsLoading" class="space-y-3">
+          <Skeleton v-for="i in 3" :key="i" class="h-16 w-full" />
+        </div>
+
+        <!-- 商户列表 -->
+        <div v-else-if="merchantList.length > 0" class="space-y-2 max-h-80 overflow-y-auto">
+          <div
+            v-for="merchant in merchantList"
+            :key="merchant.merchantId"
+            class="flex items-center gap-3 p-3 rounded-lg border cursor-pointer hover:bg-accent transition-colors"
+            :class="{ 'border-primary bg-primary/5': selectedMerchant?.merchantCode === merchant.merchantCode }"
+            @click="selectMerchant(merchant)"
+          >
+            <img
+              v-if="merchant.logo"
+              :src="merchant.logo"
+              class="w-10 h-10 rounded-full object-cover"
+              alt="logo"
+            >
+            <div v-else class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <StoreIcon class="size-5 text-primary" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium truncate">
+                {{ merchant.merchantName }}
+              </p>
+              <p class="text-xs text-muted-foreground">
+                {{ merchant.contactName }} {{ merchant.contactPhone }}
+              </p>
+            </div>
+            <div
+              v-if="selectedMerchant?.merchantCode === merchant.merchantCode"
+              class="w-5 h-5 rounded-full bg-primary flex items-center justify-center"
+            >
+              <svg class="size-3 text-primary-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- 无数据 -->
+        <div v-else class="text-center py-8 text-muted-foreground">
+          <p>暂无已分配该技能的商户</p>
+        </div>
+
+        <!-- 底部按钮 -->
+        <div class="flex gap-3 mt-4 pt-4 border-t">
+          <Button
+            variant="outline"
+            class="flex-1"
+            @click="showMerchantSelect = false"
+          >
+            取消
+          </Button>
+          <Button
+            class="flex-1"
+            :disabled="!selectedMerchant"
+            @click="showMerchantSelect = false"
+          >
+            确认选择
+          </Button>
+        </div>
       </div>
     </div>
   </div>

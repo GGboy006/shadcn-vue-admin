@@ -249,12 +249,14 @@ export interface IWizardSubmitForm {
   chatId: string | null
   /** 所有步骤的选择数据 */
   steps: IWizardStepForm[]
+  /** 站长修改意见（可选） */
+  modifyPrompt?: string
 }
 
 /** 单个步骤的表单数据 */
 export interface IWizardStepForm {
   /** 流程节点ID（数据库主键） */
-  flowId: number
+  flowId: string
   /** 步骤编码（业务标识） */
   stepCode: string
   /** 步骤名称 */

@@ -1,0 +1,161 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://172.31.128.135:8202/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/skill/{skillId}/merchants": {
+      "get": {
+        "tags": [
+          "AI工具管理"
+        ],
+        "summary": "站长查询已分配该技能的商户/物业/居委会列表",
+        "operationId": "listMerchantsBySkill",
+        "parameters": [
+          {
+            "name": "skillId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListBusinessMerchantListVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "BaseResponseListBusinessMerchantListVO": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BusinessMerchantListVO"
+          }
+        }
+      }
+    },
+    "BusinessMerchantListVO": {
+      "type": "object",
+      "properties": {
+        "merchantId": {
+          "type": "integer",
+          "description": "商户ID",
+          "format": "int64",
+          "refType": null
+        },
+        "nickname": {
+          "type": "string",
+          "description": "昵称",
+          "refType": null
+        },
+        "phone": {
+          "type": "string",
+          "description": "手机号",
+          "refType": null
+        },
+        "merchantCode": {
+          "type": "string",
+          "description": "商户编号",
+          "refType": null
+        },
+        "merchantName": {
+          "type": "string",
+          "description": "商户/物业/居委会名称",
+          "refType": null
+        },
+        "logo": {
+          "type": "string",
+          "description": "Logo",
+          "refType": null
+        },
+        "stationUserId": {
+          "type": "integer",
+          "description": "所属小区站长用户ID",
+          "format": "int64",
+          "refType": null
+        },
+        "type": {
+          "type": "integer",
+          "description": "类型：4=商户，5=物业，6=居委会",
+          "format": "int32",
+          "refType": null
+        },
+        "contactName": {
+          "type": "string",
+          "description": "联系人",
+          "refType": null
+        },
+        "contactPhone": {
+          "type": "string",
+          "description": "联系电话",
+          "refType": null
+        },
+        "signDate": {
+          "type": "string",
+          "description": "签约日期",
+          "format": "date",
+          "refType": null
+        },
+        "signFee": {
+          "type": "number",
+          "description": "签约费用",
+          "refType": null
+        },
+        "businessStatus": {
+          "type": "integer",
+          "description": "营业状态：1=营业中，2=休息中，3=已打烊，4=暂停营业",
+          "format": "int32",
+          "refType": null
+        },
+        "businessHours": {
+          "type": "string",
+          "description": "营业时间",
+          "refType": null
+        },
+        "status": {
+          "type": "integer",
+          "description": "状态：1=启用，2=禁用",
+          "format": "int32",
+          "refType": null
+        }
+      },
+      "description": "商户/物业/居委会列表"
+    }
+  }
+}

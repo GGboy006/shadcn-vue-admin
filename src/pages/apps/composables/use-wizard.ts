@@ -3,8 +3,9 @@ import { toast } from 'vue-sonner'
 import {
   useGetSkillDetailQuery,
 } from '@/services/api/skill.api'
+import { useUserInfoStore } from '@/stores/user-info'
 
-import type { IChoiceOption, ISkillFlow, IStepConfig, IStepField, IWizardStepForm } from '../types/wizard.types'
+import type { IChoiceOption, ISkillFlow, IStepConfig, IStepField, IWizardStepForm, IWizardSubmitForm } from '../types/wizard.types'
 
 import { mockFlowCompletion, mockImageGenerationQuery } from './use-mock-flow'
 import { useSkillFlowDataByBuiltin } from './use-skill-flow-data'
@@ -176,11 +177,24 @@ export function useWizard(skillId: Ref<string>) {
     dynamicDataMap.value = { ...dynamicDataMap.value, [builtin]: options }
   }
 
+  // 站长模式下传入的商户编码
+  const stationMerchantCode = ref<string | undefined>(undefined)
+
+  // 当前使用的商户编码（站长模式下传入商户的 merchantCode，商户模式下从 userInfoStore 获取）
+  const userInfoStore = useUserInfoStore()
+  const currentMerchantCode = computed(() => {
+    // 优先使用站长模式传入的商户编码
+    if (stationMerchantCode.value)
+      return stationMerchantCode.value
+    // 否则使用当前登录商户的编码
+    return userInfoStore.merchantInfo?.merchantCode
+  })
+
   // 预定义所有可能的 builtin 查询（在 setup 顶层创建，避免在 watch/computed 中调用 composable）
   const builtinGoods = ref<string | null>(null)
   const builtinPromo = ref<string | null>(null)
-  const queryGoods = useSkillFlowDataByBuiltin(builtinGoods)
-  const queryPromo = useSkillFlowDataByBuiltin(builtinPromo)
+  const queryGoods = useSkillFlowDataByBuiltin(builtinGoods, currentMerchantCode)
+  const queryPromo = useSkillFlowDataByBuiltin(builtinPromo, currentMerchantCode)
 
   // 当 flows 加载完成后，激活对应的 builtin 查询
   watch(flows, (newFlows) => {
@@ -287,7 +301,7 @@ export function useWizard(skillId: Ref<string>) {
       return
 
     const stepForm: IWizardStepForm = {
-      flowId: flow.flowId,
+      flowId: String(flow.flowId),
       stepCode: flow.stepCode,
       stepName: flow.stepName,
       fieldValues: [],
@@ -360,6 +374,135 @@ export function useWizard(skillId: Ref<string>) {
     }
   }
 
+  // ==================== 站长重新生成模式 ====================
+
+  /** 是否处于站长重新生成模式 */
+  const isStationMode = ref(false)
+
+  /** 站长修改意见 */
+  const stationModifyPrompt = ref('')
+
+  /**
+   * 使用站长数据初始化向导
+   * @param params 站长重新生成参数
+   */
+  function initWithStationData(params: {
+    chatId: string
+    /** 商户编码（站长模式下用于获取商户的动态数据） */
+    merchantCode?: string
+    steps: IWizardStepForm[]
+  }) {
+    if (!skillDetail.value || skillDetail.value.flows.length === 0)
+      return
+
+    const { steps, merchantCode } = params
+
+    // 设置站长模式
+    isStationMode.value = true
+    stationModifyPrompt.value = ''
+
+    // 站长模式下，chatId 不用于生成（避免消息直接进入会话）
+    // 原始 chatId 由调用方保存，仅用于后续发送消息
+    chatId.value = null
+
+    // 站长模式：设置当前使用的商户编码，用于动态数据查询
+    if (merchantCode) {
+      stationMerchantCode.value = merchantCode
+    }
+
+    // 设置已完成步骤
+    completedStepCodes.value = steps.map(s => s.stepCode)
+
+    // 重建用户选择
+    const choices: Record<string, any> = {}
+    steps.forEach((step) => {
+      step.fieldValues.forEach((fv) => {
+        choices[fv.field] = fv.value
+      })
+    })
+    userChoices.value = choices
+
+    // 初始化所有步骤的表单结构（使用当前 dynamicDataMap 解析动态数据）
+    skillDetail.value.flows.forEach((flow) => {
+      initStepForm(flow)
+    })
+
+    // 设置步骤表单（用新初始化的结构替换，保留用户选择值）
+    stepForms.value = steps.map((step) => {
+      const initialized = stepForms.value.find(s => s.stepCode === step.stepCode)
+      if (!initialized)
+        return step
+
+      // 合并：保留初始化后的结构（含 selectedOptions），但用传入的值覆盖
+      return {
+        ...initialized,
+        fieldValues: initialized.fieldValues.map((fv) => {
+          const incoming = step.fieldValues.find(f => f.field === fv.field)
+          if (!incoming)
+            return fv
+
+          // 如果 dynamicDataMap 已有数据，从选项中查找匹配的 label/icon
+          const flow = skillDetail.value!.flows.find(f => f.stepCode === step.stepCode)
+          const fieldConfig = flow?.stepConfig?.fields?.find(f => f.field === fv.field)
+          let selectedOptions = incoming.selectedOptions
+
+          if (fieldConfig && dynamicDataMap.value) {
+            const ds = parseFieldDataSource(fieldConfig)
+            if (ds.isDynamic && ds.builtin) {
+              const options = dynamicDataMap.value[ds.builtin]
+              if (options && options.length > 0) {
+                const matched = options.find(o => o.value === incoming.value)
+                if (matched) {
+                  selectedOptions = [matched]
+                }
+              }
+            }
+          }
+
+          return {
+            ...fv,
+            value: incoming.value,
+            selectedOptions,
+          }
+        }),
+      }
+    })
+
+    // 跳转到生成步骤（actionType=2 的最后一个步骤，通常是 render）
+    // 站长可以在此查看商户原图、输入修改意见、重新生成
+    const generationFlows = skillDetail.value.flows.filter(f => f.actionType === 2)
+    if (generationFlows.length > 0) {
+      const lastGenFlow = generationFlows[generationFlows.length - 1]
+      currentStepCode.value = lastGenFlow.stepCode
+      currentStepIndex.value = skillDetail.value.flows.findIndex(
+        f => f.stepCode === lastGenFlow.stepCode,
+      )
+    }
+    else {
+      // 如果没有生成步骤，跳到最后一个
+      const lastFlow = skillDetail.value.flows[skillDetail.value.flows.length - 1]
+      currentStepCode.value = lastFlow.stepCode
+      currentStepIndex.value = skillDetail.value.flows.length - 1
+    }
+
+    // 重置生成状态，让站长可以重新生成
+    generationStatus.value = null
+    isGenerating.value = false
+    isProcessing.value = false
+  }
+
+  /** 设置站长模式下使用的商户编码 */
+  function setStationMerchantCode(code: string) {
+    stationMerchantCode.value = code
+  }
+
+  /** 重置站长模式 */
+  function resetStationMode() {
+    isStationMode.value = false
+    stationModifyPrompt.value = ''
+    stationMerchantCode.value = undefined
+  }
+
   // 流程式对话：自动调用，获取 aiContent 和图片生成任务ID（使用本地 Mock）
   async function streamPrompt() {
     if (!currentFlow.value || !skillDetail.value)
@@ -372,13 +515,16 @@ export function useWizard(skillId: Ref<string>) {
 
     try {
       // 组装提交表单（仅包含已完成的用户选择步骤）
-      const submitForm = {
+      const submitForm: IWizardSubmitForm = {
         skillId: skillId.value,
-        chatId: chatId.value,
+        // 站长模式下不传 chatId，避免消息直接进入原会话
+        chatId: isStationMode.value ? null : chatId.value,
         steps: stepForms.value.filter(s =>
           completedStepCodes.value.includes(s.stepCode)
           || s.stepCode === currentFlow.value?.stepCode,
         ),
+        // 站长模式下携带修改意见
+        modifyPrompt: isStationMode.value ? stationModifyPrompt.value : undefined,
       }
 
       // 调用本地 Mock 接口获取 aiContent 和图片生成任务ID
@@ -632,6 +778,13 @@ export function useWizard(skillId: Ref<string>) {
     streamPrompt,
     generateImage,
     handleRegenerate,
+
+    // 站长模式
+    isStationMode,
+    stationModifyPrompt,
+    initWithStationData,
+    setStationMerchantCode,
+    resetStationMode,
 
     // 重置
     resetWizard,

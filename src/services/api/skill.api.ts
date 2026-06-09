@@ -68,6 +68,40 @@ export interface IAssignSkill extends ISkill {
   checked: boolean
 }
 
+/** 商户列表 VO（站长查询已分配技能的商户） */
+export interface ISkillMerchantVO {
+  /** 商户ID */
+  merchantId: number
+  /** 昵称 */
+  nickname: string
+  /** 手机号 */
+  phone: string
+  /** 商户编号 */
+  merchantCode: string
+  /** 商户/物业/居委会名称 */
+  merchantName: string
+  /** Logo */
+  logo: string
+  /** 所属小区站长用户ID */
+  stationUserId: number
+  /** 类型：4=商户，5=物业，6=居委会 */
+  type: number
+  /** 联系人 */
+  contactName: string
+  /** 联系电话 */
+  contactPhone: string
+  /** 签约日期 */
+  signDate: string
+  /** 签约费用 */
+  signFee: number
+  /** 营业状态：1=营业中，2=休息中，3=已打烊，4=暂停营业 */
+  businessStatus: number
+  /** 营业时间 */
+  businessHours: string
+  /** 状态：1=启用，2=禁用 */
+  status: number
+}
+
 /** 分页结果 */
 export interface IPageResult<T> {
   /** 当前页 */
@@ -261,6 +295,21 @@ export function useGetSkillFlowDataQuery(query: Ref<ISkillFlowDataQuery | null>)
       })
     },
     enabled: computed(() => query.value !== null),
+    retry: false,
+  })
+}
+
+/** 技能商户列表响应 */
+export type ISkillMerchantListResponse = IResponse<ISkillMerchantVO[]>
+
+/** 查询已分配该技能的商户/物业/居委会列表 */
+export function useGetSkillMerchantsQuery(skillId: Ref<string>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<ISkillMerchantListResponse, Error>({
+    queryKey: ['skillMerchants', skillId],
+    queryFn: async () => await apiFetch<ISkillMerchantListResponse>(`/skill/${skillId.value}/merchants`),
+    enabled: computed(() => !!skillId.value),
     retry: false,
   })
 }

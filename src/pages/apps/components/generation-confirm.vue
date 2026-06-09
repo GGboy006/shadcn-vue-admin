@@ -2,24 +2,34 @@
 import { SparklesIcon } from '@lucide/vue'
 
 import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 
 import type { IWizardStepForm } from '../types/wizard.types'
 
 interface Props {
   stepName?: string
   stepForms: IWizardStepForm[]
+  isStationMode?: boolean
+  modelValue?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   stepName: 'AI生成海报',
+  isStationMode: false,
+  modelValue: '',
 })
 
 const emit = defineEmits<{
-  generate: []
+  'generate': []
+  'update:modelValue': [value: string]
 }>()
 
 function handleGenerate() {
   emit('generate')
+}
+
+function handleInput(e: Event) {
+  emit('update:modelValue', (e.target as HTMLTextAreaElement).value)
 }
 
 // 过滤出有实际选择的步骤
@@ -82,6 +92,22 @@ const selectedSteps = computed(() => {
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- 站长修改意见输入框 -->
+    <div
+      v-if="isStationMode"
+      class="mb-4"
+    >
+      <label class="text-sm font-medium text-muted-foreground mb-2 block">
+        修改意见（可选）
+      </label>
+      <Textarea
+        :value="modelValue"
+        placeholder="请输入对海报的修改意见，如不输入则按当前配置直接生成..."
+        class="min-h-[80px] resize-none"
+        @input="handleInput"
+      />
     </div>
 
     <!-- 生成按钮 -->

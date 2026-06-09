@@ -83,6 +83,8 @@ export interface IConversation {
   userId: number
   /** 类型 */
   type: number
+  /** 技能ID */
+  skillId: string
   /** 小区站长ID */
   orgCode: string
   /** 服务模式：0-AI托管 1-人工接管 2-待人工介入 */
@@ -93,6 +95,8 @@ export interface IConversation {
   operatorName: string
   /** 用户标签：3-站长 4-商户 5-物业 6-居委会 7-居民 */
   userTag: UserTag
+  /** 商户编码（用于获取商户的动态数据） */
+  merchantCode: string
   /** 接管时间 */
   takeoverTime: string
   /** 切回AI时间 */
@@ -238,6 +242,8 @@ export interface IConversationDetail {
   userId: number
   /** 类型 */
   type: number
+  /** 技能ID */
+  skillId: string
   /** 小区站长ID */
   orgCode: string
   /** 服务模式：0-AI托管 1-人工接管 2-待人工介入 */
@@ -248,6 +254,8 @@ export interface IConversationDetail {
   operatorName: string
   /** 用户标签：3-站长 4-商户 5-物业 6-居委会 7-居民 */
   userTag: UserTag
+  /** 商户编码（用于获取商户的动态数据） */
+  merchantCode: string
   /** 接管时间 */
   takeoverTime: string
   /** 切回AI时间 */

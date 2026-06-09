@@ -87,6 +87,7 @@ declare global {
   const useSidebarConfigStore: typeof import('../stores/sidebar-config').useSidebarConfigStore
   const useSidebarNavigation: typeof import('../composables/use-sidebar-navigation').useSidebarNavigation
   const useSlots: typeof import('vue').useSlots
+  const useStationRegenerateStore: typeof import('../stores/station-regenerate').useStationRegenerateStore
   const useSystemConfig: typeof import('../composables/use-system-config').useSystemConfig
   const useSystemTheme: typeof import('../composables/use-system-theme').useSystemTheme
   const useTemplateRef: typeof import('vue').useTemplateRef

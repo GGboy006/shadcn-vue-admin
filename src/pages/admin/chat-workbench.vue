@@ -34,6 +34,9 @@ import {
   useGetImageGenerationQuery,
   userTagConfig,
 } from '@/services/api/conversation.api'
+import { useStationRegenerateStore } from '@/stores/station-regenerate'
+
+const router = useRouter()
 
 // ==================== 左侧会话列表 ====================
 
@@ -167,8 +170,28 @@ function handleKeydown(e: KeyboardEvent) {
   }
 }
 
-function handleRegenerate(_msg: IChatMessage) {
-  // TODO: 基于此方案重新生成
+function handleRegenerate(msg: IChatMessage) {
+  // 从当前会话详情获取 skillId
+  const skillId = conversation.value?.skillId
+  const chatId = msg.chatId
+  const steps = msg.steps
+  const merchantCode = conversation.value?.orgCode
+
+  if (!skillId || !chatId || !steps || steps.length === 0) {
+    return
+  }
+
+  // 将数据存入 store，避免 URL 过长
+  const stationStore = useStationRegenerateStore()
+  stationStore.setRegenerateData({ chatId, merchantCode: merchantCode || '', steps })
+
+  // 跳转到技能页面，仅携带模式标记
+  router.push({
+    path: `/apps/${skillId}`,
+    query: {
+      mode: 'station_regenerate',
+    },
+  })
 }
 
 function getInitials(name: string) {
@@ -520,7 +543,7 @@ watch(() => messages.value.length, () => {
                       )"
                     >
                       <!-- 步骤配置卡片（优先渲染 steps） -->
-                      <template v-if="msg.steps && msg.steps.length > 0">
+                      <template v-if="msg.steps && msg.steps.length > 0 && !msg.imageGenerationId">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 sm:gap-x-6 gap-y-3">
                           <div
                             v-for="step in msg.steps.filter(s => s.fieldValues.some(fv => fv.value !== undefined && fv.value !== '' && fv.value !== null))"
