@@ -36,5 +36,8 @@ export default antfu({
       }],
     },
   },
+  rules: {
+    'no-console': ['warn', { allow: ['warn', 'error', 'log'] }],
+  },
   ...pluginQuery.configs['flat/recommended'],
 })

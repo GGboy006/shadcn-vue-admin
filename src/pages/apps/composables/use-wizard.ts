@@ -1,13 +1,14 @@
 import { toast } from 'vue-sonner'
 
 import {
+  useFlowCompletionMutation,
+  useGetImageGenerationResultQuery,
   useGetSkillDetailQuery,
 } from '@/services/api/skill.api'
 import { useUserInfoStore } from '@/stores/user-info'
 
 import type { IChoiceOption, ISkillFlow, IStepConfig, IStepField, IWizardStepForm, IWizardSubmitForm } from '../types/wizard.types'
 
-import { mockFlowCompletion, mockImageGenerationQuery } from './use-mock-flow'
 import { useSkillFlowDataByBuiltin } from './use-skill-flow-data'
 
 /** 解析字段数据源配置 */
@@ -503,7 +504,9 @@ export function useWizard(skillId: Ref<string>) {
     stationMerchantCode.value = undefined
   }
 
-  // 流程式对话：自动调用，获取 aiContent 和图片生成任务ID（使用本地 Mock）
+  // 流程式对话：自动调用，获取 aiContent 和图片生成任务ID
+  const flowCompletionMutation = useFlowCompletionMutation()
+
   async function streamPrompt() {
     if (!currentFlow.value || !skillDetail.value)
       return
@@ -526,9 +529,8 @@ export function useWizard(skillId: Ref<string>) {
         // 站长模式下携带修改意见
         modifyPrompt: isStationMode.value ? stationModifyPrompt.value : undefined,
       }
-
-      // 调用本地 Mock 接口获取 aiContent 和图片生成任务ID
-      const result = await mockFlowCompletion(submitForm)
+      // 调用真实接口获取 aiContent 和图片生成任务ID
+      const result = await flowCompletionMutation.mutateAsync(submitForm)
 
       if (result.code === 0 && result.data) {
         chatId.value = result.data.chatId
@@ -611,64 +613,39 @@ export function useWizard(skillId: Ref<string>) {
     }
   })
 
-  // 轮询查询生成结果（使用本地 Mock）
-  let pollTimer: ReturnType<typeof setInterval> | null = null
+  // 轮询查询生成结果
+  const imageGenerationResultQuery = useGetImageGenerationResultQuery(generationId, generationStatus)
 
-  watch(generationId, (id) => {
-    // 清除旧定时器
-    if (pollTimer) {
-      clearInterval(pollTimer)
-      pollTimer = null
-    }
-
-    if (!id || generationStatus.value === 1 || generationStatus.value === 2)
+  // 监听查询结果变化，更新生成状态
+  watch(() => imageGenerationResultQuery.data.value, (data) => {
+    if (!data || !data.data)
       return
 
-    // 启动 Mock 轮询（3秒间隔）
-    pollTimer = setInterval(async () => {
-      if (generationStatus.value === 1 || generationStatus.value === 2) {
-        if (pollTimer) {
-          clearInterval(pollTimer)
-          pollTimer = null
-        }
-        return
-      }
+    const result = data.data
 
-      try {
-        const result = await mockImageGenerationQuery(id)
+    if (result.status === 1) {
+      // 生成成功
+      generationStatus.value = 1
+      generatedImageUrl.value = result.imageUrl
+      isGenerating.value = false
+      // 自动生成完成，自动进入下一步（完成页面）
+      goToNextStep()
+    }
+    else if (result.status === 2) {
+      // 生成失败
+      generationStatus.value = 2
+      generationError.value = '图片生成失败'
+      isGenerating.value = false
+      toast.error('图片生成失败')
+    }
+    // status === 0 继续轮询（由 useQuery 自动处理）
+  })
 
-        if (result.code === 0 && result.data) {
-          if (result.data.status === 1) {
-            // 生成成功
-            generationStatus.value = 1
-            generatedImageUrl.value = result.data.imageUrl
-            isGenerating.value = false
-            // 清除定时器
-            if (pollTimer) {
-              clearInterval(pollTimer)
-              pollTimer = null
-            }
-            // 自动生成完成，自动进入下一步（完成页面）
-            goToNextStep()
-          }
-          else if (result.data.status === 2) {
-            // 生成失败
-            generationStatus.value = 2
-            generationError.value = '图片生成失败'
-            isGenerating.value = false
-            toast.error('图片生成失败')
-            if (pollTimer) {
-              clearInterval(pollTimer)
-              pollTimer = null
-            }
-          }
-          // status === 0 继续轮询
-        }
-      }
-      catch {
-        // 轮询出错，继续下一次
-      }
-    }, 3000)
+  // 监听查询错误
+  watch(() => imageGenerationResultQuery.error.value, (error) => {
+    if (error) {
+      console.error('图片生成查询失败:', error)
+    }
   })
 
   // 重新生成：回到生成步骤的确认页，让用户手动点击生成

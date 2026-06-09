@@ -7,10 +7,6 @@ import { useAuthStore } from '@/stores/auth'
 interface Props {
   imageUrl: string
   prompt?: string
-  /** 图片标签：原图/站长生成 */
-  tag?: string
-  /** 标签颜色 */
-  tagVariant?: 'default' | 'secondary' | 'destructive' | 'outline'
 }
 
 defineProps<Props>()
@@ -39,19 +35,6 @@ function handleRegenerate() {
   <div class="flex flex-col items-center">
     <!-- 结果图片 -->
     <div class="relative w-full max-w-md rounded-xl overflow-hidden shadow-lg">
-      <!-- 图片标签 -->
-      <div
-        v-if="tag"
-        class="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-md text-xs font-medium"
-        :class="{
-          'bg-primary text-primary-foreground': tagVariant === 'default' || !tagVariant,
-          'bg-secondary text-secondary-foreground': tagVariant === 'secondary',
-          'bg-destructive text-destructive-foreground': tagVariant === 'destructive',
-          'bg-background border text-foreground': tagVariant === 'outline',
-        }"
-      >
-        {{ tag }}
-      </div>
       <img
         :src="imageUrl"
         alt="生成结果"

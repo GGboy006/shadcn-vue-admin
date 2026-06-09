@@ -151,18 +151,26 @@ async function handleSendToMerchant() {
   if (!stationSendInput.value.trim() || !stationChatId.value)
     return
 
+  // 打印参数检查
+  console.log('发送给商户参数:', {
+    chatId: stationChatId.value,
+    content: stationSendInput.value,
+    imageGenerationId: wizard.generationId.value ?? undefined,
+  })
+
   isSending.value = true
 
   try {
-    // 1. 先调用站长接管会话
-    await apiFetch('/aiCommon/stationTakeover', {
-      method: 'post',
-      params: {
-        chatId: stationChatId.value,
-      },
-    })
+    // 后端会自动判断发消息即介入，无需手动调用接管接口
+    // // 1. 先调用站长接管会话
+    // await apiFetch('/aiCommon/stationTakeover', {
+    //   method: 'post',
+    //   params: {
+    //     chatId: stationChatId.value,
+    //   },
+    // })
 
-    // 2. 发送消息（携带图片生成ID）
+    // 发送消息（携带图片生成ID）
     await apiFetch('/aiCommon/sendManualTakeoverMessage', {
       method: 'post',
       params: {
