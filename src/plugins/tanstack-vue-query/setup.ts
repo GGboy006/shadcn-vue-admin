@@ -5,7 +5,9 @@ import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5,
+      staleTime: 0,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: false,
     },
   },
 })
