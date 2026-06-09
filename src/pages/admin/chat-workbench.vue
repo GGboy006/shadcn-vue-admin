@@ -68,7 +68,7 @@ function useGetAdminConversationListQuery(status: Ref<string>) {
   })
 }
 
-const listStatus = ref('all')
+const listStatus = ref('1')
 
 const {
   data: listData,
@@ -287,11 +287,11 @@ watch(() => messages.value.length, () => {
       <div class="p-3 border-b">
         <Tabs v-model="listStatus" class="w-full">
           <TabsList class="grid w-full grid-cols-3">
-            <TabsTrigger value="all">
-              全部
-            </TabsTrigger>
             <TabsTrigger value="1">
               待介入
+            </TabsTrigger>
+            <TabsTrigger value="all">
+              全部
             </TabsTrigger>
             <TabsTrigger value="2">
               已完成
