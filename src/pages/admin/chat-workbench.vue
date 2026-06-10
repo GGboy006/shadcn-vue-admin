@@ -8,8 +8,9 @@ import {
   SendIcon,
   SparklesIcon,
 } from '@lucide/vue'
-import { useInfiniteQuery } from '@tanstack/vue-query'
+import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
+import { toast } from 'vue-sonner'
 
 import type { IChatMessage, IConversation, IConversationListQuery } from '@/services/api/conversation.api'
 import type { IResponse } from '@/services/types/response.type'
@@ -155,12 +156,39 @@ const groupedMessages = computed(() => {
 })
 
 const inputText = ref('')
+const isSending = ref(false)
+const queryClient = useQueryClient()
 
-function handleSend() {
-  if (!inputText.value.trim())
+async function handleSend() {
+  if (!inputText.value.trim() || !selectedChatId.value)
     return
-  // TODO: 站长发送消息接口
-  inputText.value = ''
+
+  isSending.value = true
+
+  try {
+    await apiFetch('/aiCommon/sendManualTakeoverMessage', {
+      method: 'post',
+      params: {
+        chatId: selectedChatId.value,
+        content: inputText.value,
+      },
+    })
+
+    inputText.value = ''
+    // 刷新会话详情以显示新消息
+    // 通过 invalidateQueries 触发重新获取
+    queryClient.invalidateQueries({ queryKey: ['conversationDetail', selectedChatId.value] })
+    // 发送后滚动到底部
+    console.log('[handleSend] 调用 scrollToBottom')
+    scrollToBottom()
+  }
+  catch (error) {
+    console.error('发送消息失败:', error)
+    toast.error('发送失败')
+  }
+  finally {
+    isSending.value = false
+  }
 }
 
 function handleKeydown(e: KeyboardEvent) {
@@ -258,14 +286,10 @@ function downloadImage(url: string, msgId: string) {
 
 // 滚动到底部
 const scrollAreaRef = ref<InstanceType<typeof ScrollArea>>()
-watch(() => messages.value.length, () => {
-  nextTick(() => {
-    const viewport = scrollAreaRef.value?.$el?.querySelector('[data-radix-scroll-area-viewport]')
-    if (viewport) {
-      viewport.scrollTop = viewport.scrollHeight
-    }
-  })
-})
+function scrollToBottom() {
+  scrollAreaRef.value?.scrollToBottom()
+}
+watch(() => messages.value.length, scrollToBottom)
 </script>
 
 <template>
@@ -592,7 +616,7 @@ watch(() => messages.value.length, () => {
 
                         <!-- 生成成功：展示图片 -->
                         <template v-else-if="getImageStatus(msg.imageGenerationId).status === 1">
-                          <div class="max-w-[200px] sm:max-w-[240px]">
+                          <div class="w-50">
                             <AspectRatio
                               :ratio="parseAspectRatio(getImageStatus(msg.imageGenerationId).size)"
                               class="bg-muted rounded-lg overflow-hidden"
@@ -607,6 +631,7 @@ watch(() => messages.value.length, () => {
                           </div>
                           <div class="flex flex-wrap gap-2">
                             <Button
+                              v-if="msg.steps && msg.steps.length > 0"
                               variant="secondary"
                               size="sm"
                               class="flex-1 min-w-[120px]"
