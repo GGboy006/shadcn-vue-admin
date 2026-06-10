@@ -13,10 +13,36 @@ import ScrollBar from "./ScrollBar.vue"
 const props = defineProps<ScrollAreaRootProps & { class?: HTMLAttributes["class"] }>()
 
 const delegatedProps = reactiveOmit(props, "class")
+
+const rootRef = ref<InstanceType<typeof ScrollAreaRoot> | null>(null)
+
+function scrollToBottom() {
+  nextTick(() => {
+    const viewport = rootRef.value?.$el?.querySelector('[data-slot="scroll-area-viewport"]')
+    if (viewport) {
+      viewport.scrollTop = viewport.scrollHeight
+    }
+  })
+}
+
+function scrollToTop() {
+  nextTick(() => {
+    const viewport = rootRef.value?.$el?.querySelector('[data-slot="scroll-area-viewport"]')
+    if (viewport) {
+      viewport.scrollTop = 0
+    }
+  })
+}
+
+defineExpose({
+  scrollToBottom,
+  scrollToTop,
+})
 </script>
 
 <template>
   <ScrollAreaRoot
+    ref="rootRef"
     data-slot="scroll-area"
     v-bind="delegatedProps"
     :class="cn('relative', props.class)"
