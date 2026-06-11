@@ -5,7 +5,7 @@ import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useApiFetch } from '@/composables/use-fetch'
-import { useGetSkillMerchantsQuery } from '@/services/api/skill.api'
+import { useGetSkillMerchantsQuery, useManualTakeoverMutation } from '@/services/api/skill.api'
 import { useAuthStore } from '@/stores/auth'
 import { useStationRegenerateStore } from '@/stores/station-regenerate'
 
@@ -136,6 +136,26 @@ function handleDownload() {
     link.download = `ai-generated-${Date.now()}.png`
     link.target = '_blank'
     link.click()
+  }
+}
+
+// 商户发起人工接管
+const manualTakeoverMutation = useManualTakeoverMutation()
+
+// 联系站长人工设计
+async function handleContact() {
+  if (!wizard.chatId.value) {
+    toast.error('暂无会话信息')
+    return
+  }
+
+  try {
+    await manualTakeoverMutation.mutateAsync({ chatId: wizard.chatId.value })
+    toast.success('已发起人工接管')
+    router.push(`/conversations/${wizard.chatId.value}`)
+  }
+  catch {
+    toast.error('发起人工接管失败')
   }
 }
 
@@ -354,6 +374,7 @@ const isCompletionStep = computed(() => {
             :tag="wizard.isStationMode.value ? '站长生成' : undefined"
             @regenerate="wizard.handleRegenerate()"
             @download="handleDownload"
+            @contact="handleContact"
           />
 
           <!-- 完成步骤 - 无结果 -->

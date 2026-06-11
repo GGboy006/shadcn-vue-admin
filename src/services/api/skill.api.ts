@@ -346,3 +346,16 @@ export function useFlowCompletionMutation() {
     }),
   })
 }
+
+/** 商户发起人工接管 */
+export function useManualTakeoverMutation() {
+  const { apiFetch } = useApiFetch()
+
+  return useMutation<IResponse<boolean>, Error, { chatId: string }>({
+    mutationKey: ['manualTakeover'],
+    mutationFn: async data => await apiFetch<IResponse<boolean>>('/aiCommon/manualTakeover', {
+      method: 'post',
+      params: data,
+    }),
+  })
+}
