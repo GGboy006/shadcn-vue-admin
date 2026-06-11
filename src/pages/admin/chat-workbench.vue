@@ -176,11 +176,8 @@ async function handleSend() {
 
     inputText.value = ''
     // 刷新会话详情以显示新消息
-    // 通过 invalidateQueries 触发重新获取
+    // flex-col-reverse 模式下新消息自动出现在底部，无需手动滚动
     queryClient.invalidateQueries({ queryKey: ['conversationDetail', selectedChatId.value] })
-    // 发送后滚动到底部
-    console.log('[handleSend] 调用 scrollToBottom')
-    scrollToBottom()
   }
   catch (error) {
     console.error('发送消息失败:', error)
@@ -284,12 +281,7 @@ function downloadImage(url: string, msgId: string) {
   document.body.removeChild(link)
 }
 
-// 滚动到底部
-const scrollAreaRef = ref<InstanceType<typeof ScrollArea>>()
-function scrollToBottom() {
-  scrollAreaRef.value?.scrollToBottom()
-}
-watch(() => messages.value.length, scrollToBottom)
+// flex-col-reverse 模式下，新消息自然排列在底部，无需手动滚动控制
 </script>
 
 <template>
@@ -506,10 +498,10 @@ watch(() => messages.value.length, scrollToBottom)
         </div>
 
         <!-- 消息区域 -->
-        <ScrollArea ref="scrollAreaRef" class="flex-1 px-4 min-h-0">
-          <div class="flex flex-col gap-4 py-4">
+        <div class="relative flex flex-1 flex-col overflow-y-hidden px-4">
+          <div class="flex grow flex-col-reverse justify-start gap-4 overflow-y-auto py-4 pe-4">
             <template v-if="messages.length === 0">
-              <div class="flex h-full flex-col items-center justify-center space-y-4 py-20">
+              <div class="flex flex-1 flex-col items-center justify-center space-y-4 py-20">
                 <div class="flex size-16 items-center justify-center rounded-full border-2 border-border">
                   <MessageSquareIcon class="size-8" />
                 </div>
@@ -525,31 +517,26 @@ watch(() => messages.value.length, scrollToBottom)
             </template>
 
             <template v-else>
-              <div
-                v-for="(group, date) in groupedMessages"
-                :key="date"
-                class="flex flex-col gap-3"
-              >
-                <!-- 日期分隔 -->
-                <div class="text-center text-xs text-muted-foreground py-2">
-                  {{ date }}
-                </div>
-
-                <!-- 消息列表 -->
+              <template v-for="(group, date) in groupedMessages" :key="date">
+                <!-- 消息列表（先渲染，DOM 顺序靠前） -->
                 <div
                   v-for="msg in group"
                   :key="msg.id"
                   :class="cn(
-                    'flex w-fit max-w-[85%] sm:max-w-[75%] gap-2',
+                    'flex w-fit max-w-[85%] sm:max-w-[75%] gap-2 shrink-0',
                     msg.role === 'user' ? 'mr-auto' : 'ml-auto flex-row-reverse',
                   )"
                 >
                   <!-- 头像 -->
+                  <!-- 数据映射用户问题 user
+答案回复 assistant
+站长信息 station_master
+商户信息 station_merchant -->
                   <Avatar v-if="msg.role === 'assistant'" class="mt-1 size-8 shrink-0">
                     <AvatarImage src="/robot.png" alt="AI" />
                     <AvatarFallback>AI</AvatarFallback>
                   </Avatar>
-                  <Avatar v-else-if="msg.role === 'station_merchant'" class="mt-1 size-8 shrink-0">
+                  <Avatar v-else-if="msg.role === 'station_master'" class="mt-1 size-8 shrink-0">
                     <AvatarFallback>{{ getInitials('站长') }}</AvatarFallback>
                   </Avatar>
                   <Avatar v-else class="mt-1 size-8 shrink-0">
@@ -673,10 +660,15 @@ watch(() => messages.value.length, scrollToBottom)
                     </span>
                   </div>
                 </div>
-              </div>
+
+                <!-- 日期分隔线（后渲染，flex-col-reverse 后显示在消息组上方） -->
+                <div class="text-center text-xs text-muted-foreground py-2 shrink-0">
+                  {{ date }}
+                </div>
+              </template>
             </template>
           </div>
-        </ScrollArea>
+        </div>
 
         <!-- 输入框 -->
         <div class="border-t bg-background p-3 sm:p-4 shrink-0">

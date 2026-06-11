@@ -16,22 +16,27 @@ const delegatedProps = reactiveOmit(props, "class")
 
 const rootRef = ref<InstanceType<typeof ScrollAreaRoot> | null>(null)
 
-function scrollToBottom() {
-  nextTick(() => {
-    const viewport = rootRef.value?.$el?.querySelector('[data-slot="scroll-area-viewport"]')
-    if (viewport) {
-      viewport.scrollTop = viewport.scrollHeight
-    }
-  })
+function scrollToBottom(behavior: ScrollBehavior = 'auto') {
+  // 使用 ScrollAreaRoot 暴露的 viewport 属性获取可滚动元素
+  const viewport = rootRef.value?.viewport
+	console.log('viewport',viewport);
+	
+  if (viewport) {
+    viewport.scrollTo({
+      top: viewport.scrollHeight,
+      behavior,
+    })
+  }
 }
 
-function scrollToTop() {
-  nextTick(() => {
-    const viewport = rootRef.value?.$el?.querySelector('[data-slot="scroll-area-viewport"]')
-    if (viewport) {
-      viewport.scrollTop = 0
-    }
-  })
+function scrollToTop(behavior: ScrollBehavior = 'auto') {
+  const viewport = rootRef.value?.viewport
+  if (viewport) {
+    viewport.scrollTo({
+      top: 0,
+      behavior,
+    })
+  }
 }
 
 defineExpose({
