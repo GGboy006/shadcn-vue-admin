@@ -1,21 +1,24 @@
 <script setup lang="ts">
-import { ArrowLeftIcon, DownloadIcon, Loader2Icon, MessageSquareIcon, MoreVerticalIcon, SendIcon } from '@lucide/vue'
-import dayjs from 'dayjs'
+import { ArrowLeftIcon, MoreVerticalIcon, SendIcon } from '@lucide/vue'
+import { useQueryClient } from '@tanstack/vue-query'
+import { toast } from 'vue-sonner'
 
 import type { IChatMessage } from '@/services/api/conversation.api'
 
-import { AspectRatio } from '@/components/ui/aspect-ratio'
+import ChatMessageList from '@/components/chat/ChatMessageList.vue'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
-import { cn } from '@/lib/utils'
-import { useGetConversationDetailQuery, useGetImageGenerationQuery } from '@/services/api/conversation.api'
+import { useApiFetch } from '@/composables/use-fetch'
+import { useGetConversationDetailQuery } from '@/services/api/conversation.api'
 
 const route = useRoute<'/conversations/[chatId]'>()
 const router = useRouter()
 const chatId = computed(() => String(route.params.chatId))
+
+const { apiFetch } = useApiFetch()
+const queryClient = useQueryClient()
 
 // 获取会话详情（包含消息历史）
 const { data: detailData, isLoading: _isLoadingDetail } = useGetConversationDetailQuery(chatId)
@@ -28,28 +31,41 @@ const messages = computed<IChatMessage[]>(() => {
   return conversation.value?.messages ?? []
 })
 
-// 按日期分组消息
-const groupedMessages = computed(() => {
-  const groups: Record<string, IChatMessage[]> = {}
-  messages.value.forEach((msg) => {
-    const date = dayjs(msg.createTime).format('YYYY年MM月DD日')
-    if (!groups[date]) {
-      groups[date] = []
-    }
-    groups[date].push(msg)
-  })
-  return groups
-})
+// 返回列表
+function goBack() {
+  router.push('/conversations')
+}
 
 // 输入框
 const inputText = ref('')
+const isSending = ref(false)
 
-function handleSend() {
-  if (!inputText.value.trim())
+async function handleSend() {
+  if (!inputText.value.trim() || !chatId.value)
     return
 
-  // TODO: 调用发送消息接口
-  inputText.value = ''
+  isSending.value = true
+
+  try {
+    await apiFetch('/aiCommon/sendManualTakeoverMessage', {
+      method: 'post',
+      params: {
+        chatId: chatId.value,
+        content: inputText.value,
+      },
+    })
+
+    inputText.value = ''
+    // 刷新会话详情以显示新消息
+    queryClient.invalidateQueries({ queryKey: ['conversationDetail', chatId.value] })
+  }
+  catch (error) {
+    console.error('发送消息失败:', error)
+    toast.error('发送失败')
+  }
+  finally {
+    isSending.value = false
+  }
 }
 
 function handleKeydown(e: KeyboardEvent) {
@@ -58,89 +74,6 @@ function handleKeydown(e: KeyboardEvent) {
     handleSend()
   }
 }
-
-// 获取头像首字母
-function getInitials(name: string) {
-  if (!name)
-    return '?'
-  return name.slice(0, 2).toUpperCase()
-}
-
-// 返回列表
-function goBack() {
-  router.push('/conversations')
-}
-
-// 图片生成结果缓存：key=imageGenerationId, value=query result
-const imageGenerationMap = new Map<number, ReturnType<typeof useGetImageGenerationQuery>>()
-
-/** 获取或创建图片生成查询 */
-function getImageGenerationQuery(imageGenerationId: number | undefined) {
-  if (!imageGenerationId || imageGenerationId <= 0)
-    return null
-  if (!imageGenerationMap.has(imageGenerationId)) {
-    const idRef = ref(imageGenerationId)
-    const query = useGetImageGenerationQuery(idRef)
-    imageGenerationMap.set(imageGenerationId, query)
-  }
-  return imageGenerationMap.get(imageGenerationId)!
-}
-
-/** 解析 size 字符串为比例数字，如 "1024x1024" -> 1, "1024x768" -> 1.33 */
-function parseAspectRatio(size: string | undefined): number {
-  if (!size)
-    return 9 / 16
-  const match = size.match(/(\d+)\s*[x:*×]\s*(\d+)/i)
-  if (match) {
-    const w = Number.parseInt(match[1], 10)
-    const h = Number.parseInt(match[2], 10)
-    if (h > 0)
-      return w / h
-  }
-  return 9 / 16
-}
-
-/** 获取图片生成状态 */
-function getImageStatus(imageGenerationId: number | undefined): {
-  imageUrl: string | undefined
-  status: 0 | 1 | 2 | undefined
-  isLoading: boolean
-  size: string | undefined
-} {
-  const query = getImageGenerationQuery(imageGenerationId)
-  if (!query)
-    return { imageUrl: undefined, status: undefined, isLoading: false, size: undefined }
-  return {
-    imageUrl: query.data.value?.data?.imageUrl,
-    status: query.data.value?.data?.status,
-    isLoading: query.isLoading.value,
-    size: query.data.value?.data?.size,
-  }
-}
-
-// 下载图片
-function downloadImage(url: string, msgId: string) {
-  if (!url)
-    return
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `image-${msgId}.png`
-  link.target = '_blank'
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-}
-
-// 滚动到底部
-const scrollAreaRef = ref<InstanceType<typeof ScrollArea>>()
-watch(() => messages.value.length, () => {
-  nextTick(() => {
-    const viewport = scrollAreaRef.value?.$el?.querySelector('[data-radix-scroll-area-viewport]')
-    if (viewport) {
-      viewport.scrollTop = viewport.scrollHeight
-    }
-  })
-})
 </script>
 
 <template>
@@ -195,128 +128,12 @@ watch(() => messages.value.length, () => {
     </div>
 
     <!-- 消息区域 -->
-    <ScrollArea ref="scrollAreaRef" class="px-4">
-      <div class="flex flex-col gap-4 py-4">
-        <template v-if="messages.length === 0">
-          <div class="flex h-full flex-col items-center justify-center space-y-4 py-20">
-            <div class="flex size-16 items-center justify-center rounded-full border-2 border-border">
-              <MessageSquareIcon class="size-8" />
-            </div>
-            <div class="space-y-2 text-center">
-              <h1 class="text-xl font-semibold">
-                开始对话
-              </h1>
-              <p class="text-sm text-muted-foreground">
-                发送消息开始与AI助手对话
-              </p>
-            </div>
-          </div>
-        </template>
-
-        <template v-else>
-          <div
-            v-for="(group, date) in groupedMessages"
-            :key="date"
-            class="flex flex-col gap-3"
-          >
-            <!-- 日期分隔 -->
-            <div class="text-center text-xs text-muted-foreground py-2">
-              {{ date }}
-            </div>
-
-            <!-- 消息列表 -->
-            <div
-              v-for="msg in group"
-              :key="msg.id"
-              :class="cn(
-                'flex w-fit max-w-[80%] gap-2',
-                msg.role === 'user' ? 'ml-auto flex-row-reverse' : 'mr-auto',
-              )"
-            >
-              <!-- 头像 -->
-              <Avatar v-if="msg.role === 'assistant'" class="mt-1 size-8 shrink-0">
-                <AvatarImage src="/robot.png" alt="AI" />
-                <AvatarFallback>AI</AvatarFallback>
-              </Avatar>
-              <Avatar v-else class="mt-1 size-8 shrink-0">
-                <AvatarFallback>{{ getInitials('用户') }}</AvatarFallback>
-              </Avatar>
-
-              <!-- 消息内容 -->
-              <div class="flex flex-col">
-                <div
-                  :class="cn(
-                    'rounded-2xl px-4 py-2.5 text-sm',
-                    msg.role === 'user'
-                      ? 'bg-primary text-primary-foreground rounded-tr-sm'
-                      : 'bg-muted rounded-tl-sm',
-                  )"
-                >
-                  <!-- 文本内容 -->
-                  <p>{{ msg.content || msg.finalContent }}</p>
-
-                  <!-- 图片生成消息：通过 imageGenerationId 查询图片URL -->
-                  <div v-if="msg.imageGenerationId" class="mt-2 space-y-2">
-                    <!-- 生成中状态 -->
-                    <div
-                      v-if="getImageStatus(msg.imageGenerationId).status === 0 || getImageStatus(msg.imageGenerationId).isLoading"
-                      class="flex items-center gap-2 text-xs text-muted-foreground"
-                    >
-                      <Loader2Icon class="size-4 animate-spin" />
-                      <span>图片生成中...</span>
-                    </div>
-
-                    <!-- 生成成功：展示图片 -->
-                    <template v-else-if="getImageStatus(msg.imageGenerationId).status === 1">
-                      <div class="max-w-[320px]">
-                        <AspectRatio
-                          :ratio="parseAspectRatio(getImageStatus(msg.imageGenerationId).size)"
-                          class="bg-muted rounded-lg overflow-hidden"
-                        >
-                          <img
-                            :src="getImageStatus(msg.imageGenerationId).imageUrl"
-                            alt="生成的图片"
-                            class="h-full w-full object-cover"
-                            @error="($event.target as HTMLImageElement).style.display = 'none'"
-                          >
-                        </AspectRatio>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        class="w-full max-w-[320px]"
-                        @click="downloadImage(getImageStatus(msg.imageGenerationId).imageUrl || '', msg.id)"
-                      >
-                        <DownloadIcon class="size-4 mr-1" />
-                        下载图片
-                      </Button>
-                    </template>
-
-                    <!-- 生成失败 -->
-                    <div
-                      v-else-if="getImageStatus(msg.imageGenerationId).status === 2"
-                      class="text-xs text-destructive"
-                    >
-                      图片生成失败
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 时间 -->
-                <span
-                  :class="cn(
-                    'mt-1 text-xs text-muted-foreground',
-                    msg.role === 'user' ? 'text-right' : 'text-left',
-                  )"
-                >
-                  {{ dayjs(msg.createTime).format('HH:mm') }}
-                </span>
-              </div>
-            </div>
-          </div>
-        </template>
-      </div>
-    </ScrollArea>
+    <ChatMessageList
+      show-steps
+      :messages="messages"
+      user-position="right"
+      empty-text="发送消息开始与AI助手对话"
+    />
 
     <!-- 输入框 -->
     <div class="sticky bottom-0 z-10 border-t bg-background p-4">
@@ -340,7 +157,8 @@ watch(() => messages.value.length, () => {
           variant="default"
           size="icon"
           class="size-8 rounded-full shrink-0"
-          :disabled="!inputText.trim()"
+          :disabled="!inputText.trim() || isSending"
+          :loading="isSending"
           @click="handleSend"
         >
           <SendIcon class="size-4" />
