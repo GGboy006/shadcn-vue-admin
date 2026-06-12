@@ -73,6 +73,13 @@ declare module 'vue-router/auto-routes' {
       { skillId: ParamValue<false> },
       | never
     >,
+    '/apps/stream': RouteRecordInfo<
+      '/apps/stream',
+      '/apps/stream',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/auth': RouteRecordInfo<
       '/auth',
       '/auth',
@@ -346,6 +353,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/apps/[skillId].vue': {
       routes:
         | '/apps/[skillId]'
+      views:
+        | never
+    }
+    'src/pages/apps/stream.vue': {
+      routes:
+        | '/apps/stream'
       views:
         | never
     }

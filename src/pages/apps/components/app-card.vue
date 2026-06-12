@@ -14,7 +14,13 @@ const props = defineProps<{
 const router = useRouter()
 
 function handleClick() {
-  router.push(`/apps/${props.app.skillId}`)
+  if (props.app.type === 3) {
+    router.push(`/apps/${props.app.skillId}`)
+  }
+  else {
+    // type 1/2 用 thirdId 调用详情接口，skillId 用于创建会话
+    router.push(`/apps/stream?skillId=${props.app.skillId}&thirdId=${props.app.thirdId}&type=${props.app.type}`)
+  }
 }
 </script>
 

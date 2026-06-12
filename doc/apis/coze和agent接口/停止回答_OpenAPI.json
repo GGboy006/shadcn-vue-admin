@@ -1,0 +1,72 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://172.31.128.135:8202/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/aiChat/chat/stream/cancelCompletion": {
+      "post": {
+        "tags": [
+          "AI对话"
+        ],
+        "summary": "停止回答",
+        "operationId": "cancelCompletion",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentCancelChatReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "AgentCancelChatReq": {
+      "required": [
+        "aiProvider",
+        "chatId"
+      ],
+      "type": "object",
+      "properties": {
+        "aiProvider": {
+          "type": "integer",
+          "format": "int32",
+          "refType": null
+        },
+        "chatId": {
+          "type": "string",
+          "refType": null
+        },
+        "conversationId": {
+          "type": "string",
+          "refType": null
+        },
+        "agentId": {
+          "type": "integer",
+          "format": "int64",
+          "refType": null
+        }
+      }
+    }
+  }
+}

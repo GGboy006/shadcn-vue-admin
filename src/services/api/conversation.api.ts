@@ -85,6 +85,8 @@ export interface IConversation {
   type: number
   /** 技能ID */
   skillId: string
+  /** 第三方平台ID：type 1/2 时用于调用详情接口 */
+  thirdId: string
   /** 小区站长ID */
   orgCode: string
   /** 服务模式：0-AI托管 1-人工接管 2-待人工介入 */
@@ -202,6 +204,8 @@ export interface IChatMessage {
   imageGenerationId: number
   /** 流程步骤数据（用户选择记录） */
   steps: IWizardStepForm[] | null
+  /** 流式对话消息ID：用于关联同一轮对话的 user 和 assistant 消息 */
+  contentId?: string
 }
 
 /** 创作产物 VO */

@@ -1,0 +1,344 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://172.31.128.135:8202/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/aiChat/chat/stream/completion": {
+      "post": {
+        "tags": [
+          "AI对话"
+        ],
+        "summary": "开始问答",
+        "operationId": "completion",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatCompletionDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LoongAIChatResponseChatResp"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "ChatCompletionDTO": {
+      "required": [
+        "aiChatMessages",
+        "chatId"
+      ],
+      "type": "object",
+      "properties": {
+        "chatId": {
+          "type": "integer",
+          "description": "问答标识",
+          "format": "int64",
+          "refType": null
+        },
+        "aiChatType": {
+          "type": "integer",
+          "description": "问答类型",
+          "format": "int32",
+          "refType": null
+        },
+        "shortcutCommand": {
+          "$ref": "#/components/schemas/ShortcutCommand",
+          "refType": "ShortcutCommand"
+        },
+        "aiChatMessages": {
+          "type": "array",
+          "description": "问答消息",
+          "items": {
+            "$ref": "#/components/schemas/ChatMessageDTO"
+          },
+          "refType": "ChatMessageDTO"
+        },
+        "pptTaskId": {
+          "type": "string",
+          "description": "ppt任务id",
+          "refType": null
+        },
+        "agentVisionId": {
+          "type": "integer",
+          "description": "智能体中台可视化关系唯一标识（防止关系被修改，找不到之前的生成内容）",
+          "format": "int64",
+          "refType": null
+        }
+      }
+    },
+    "LoongAIChatResponseChatResp": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "string",
+          "description": "事件类型"
+        },
+        "data": {
+          "$ref": "#/components/schemas/ChatResp"
+        }
+      }
+    },
+    "ShortcutCommand": {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "type": "string",
+          "refType": null
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObjectString"
+            }
+          },
+          "refType": "ObjectString"
+        }
+      },
+      "description": "快捷指令"
+    },
+    "ObjectString": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "refType": null
+        },
+        "text": {
+          "type": "string",
+          "refType": null
+        },
+        "file_id": {
+          "type": "string",
+          "refType": null
+        },
+        "file_url": {
+          "type": "string",
+          "refType": null
+        }
+      }
+    },
+    "ChatMessageDTO": {
+      "required": [
+        "content",
+        "role"
+      ],
+      "type": "object",
+      "properties": {
+        "contentId": {
+          "type": "string",
+          "description": "对话内容标识",
+          "refType": null
+        },
+        "skillId": {
+          "type": "integer",
+          "description": "工具ID",
+          "format": "int64",
+          "refType": null
+        },
+        "role": {
+          "type": "string",
+          "description": "角色",
+          "refType": null
+        },
+        "content": {
+          "type": "string",
+          "description": "请求内容",
+          "refType": null
+        },
+        "contentType": {
+          "type": "string",
+          "description": "请求内容类型",
+          "refType": null
+        },
+        "type": {
+          "type": "string",
+          "description": "类型",
+          "refType": null
+        },
+        "showContent": {
+          "type": "string",
+          "description": "展示内容",
+          "refType": null
+        },
+        "reasoningContent": {
+          "type": "string",
+          "description": "推理内容",
+          "refType": null
+        },
+        "reasoningDuration": {
+          "type": "integer",
+          "description": "推理时长（秒）",
+          "format": "int64",
+          "refType": null
+        },
+        "enableKnowledgeFlag": {
+          "type": "boolean",
+          "description": "是否启用知识库问答",
+          "refType": null
+        },
+        "paragraphIds": {
+          "type": "array",
+          "description": "关联向量化段落标识",
+          "items": {
+            "type": "string",
+            "description": "关联向量化段落标识"
+          },
+          "refType": "string"
+        },
+        "fileRefs": {
+          "type": "array",
+          "description": "文件集合",
+          "items": {
+            "$ref": "#/components/schemas/AIChatFileReq对象"
+          },
+          "refType": "AIChatFileReq对象"
+        },
+        "systemPrompt": {
+          "type": "string",
+          "description": "应用prompt",
+          "refType": null
+        }
+      },
+      "description": "问答消息"
+    },
+    "AIChatFileReq对象": {
+      "type": "object",
+      "properties": {
+        "chatFileId": {
+          "type": "integer",
+          "description": "智能问答文件Id",
+          "format": "int64",
+          "refType": null
+        }
+      },
+      "description": "文件入参"
+    },
+    "ChatResp": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "refType": null
+        },
+        "conversationId": {
+          "type": "string",
+          "refType": null
+        },
+        "role": {
+          "type": "string",
+          "refType": null
+        },
+        "reasoningFlag": {
+          "type": "boolean",
+          "refType": null
+        },
+        "reasoningContent": {
+          "type": "string",
+          "refType": null
+        },
+        "reasoningDuration": {
+          "type": "integer",
+          "format": "int64",
+          "refType": null
+        },
+        "content": {
+          "type": "string",
+          "refType": null
+        },
+        "type": {
+          "type": "string",
+          "refType": null
+        },
+        "fullFlag": {
+          "type": "boolean",
+          "refType": null
+        },
+        "finishReason": {
+          "type": "string",
+          "refType": null
+        },
+        "usage": {
+          "$ref": "#/components/schemas/Usage",
+          "refType": "Usage"
+        },
+        "mcpUsage": {
+          "$ref": "#/components/schemas/McpUsage",
+          "refType": "McpUsage"
+        }
+      },
+      "description": "返回数据"
+    },
+    "Usage": {
+      "type": "object",
+      "properties": {
+        "promptTokens": {
+          "type": "integer",
+          "format": "int64",
+          "refType": null
+        },
+        "generationTokens": {
+          "type": "integer",
+          "format": "int64",
+          "refType": null
+        },
+        "totalTokens": {
+          "type": "integer",
+          "format": "int64",
+          "refType": null
+        }
+      }
+    },
+    "McpUsage": {
+      "type": "object",
+      "properties": {
+        "tool": {
+          "type": "string",
+          "description": "工具名称",
+          "refType": null
+        },
+        "keywords": {
+          "type": "string",
+          "description": "关键字",
+          "refType": null
+        },
+        "content": {
+          "type": "string",
+          "description": "响应内容",
+          "refType": null
+        }
+      },
+      "description": "工具调用"
+    }
+  }
+}

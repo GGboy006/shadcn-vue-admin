@@ -21,6 +21,7 @@ declare global {
   const THEME_PRIMARY_COLORS: typeof import('../constants/themes').THEME_PRIMARY_COLORS
   const computed: typeof import('vue').computed
   const createApp: typeof import('vue').createApp
+  const createStreamUrl: typeof import('../composables/use-text-stream').createStreamUrl
   const customRef: typeof import('vue').customRef
   const defineAsyncComponent: typeof import('vue').defineAsyncComponent
   const defineComponent: typeof import('vue').defineComponent
@@ -91,6 +92,7 @@ declare global {
   const useSystemConfig: typeof import('../composables/use-system-config').useSystemConfig
   const useSystemTheme: typeof import('../composables/use-system-theme').useSystemTheme
   const useTemplateRef: typeof import('vue').useTemplateRef
+  const useTextStream: typeof import('../composables/use-text-stream').useTextStream
   const useThemeConfig: typeof import('../composables/use-theme-config')['useThemeConfig']
   const useThemeStore: typeof import('../stores/theme').useThemeStore
   const useUpload: typeof import('../composables/use-upload').useUpload
@@ -106,6 +108,9 @@ declare global {
   // @ts-ignore
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, ShallowRef, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
+  // @ts-ignore
+  export type { TextStreamEvent, TextStreamOptions } from '../composables/use-text-stream'
+  import('../composables/use-text-stream')
   // @ts-ignore
   export type { UploadOptions } from '../composables/use-upload'
   import('../composables/use-upload')

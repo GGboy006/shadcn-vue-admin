@@ -1,0 +1,274 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://172.31.128.135:8202/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/aiCommon/messageList": {
+      "get": {
+        "tags": [
+          "AI公用"
+        ],
+        "summary": "消息列表（Coze对话和Agent对话使用）",
+        "operationId": "messageList",
+        "parameters": [
+          {
+            "name": "chatId",
+            "in": "query",
+            "description": "会话标识",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "会话标识"
+            }
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "description": "对话名称",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "对话名称"
+            }
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "页码(不能为空)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "页码(不能为空)",
+              "example": 1
+            },
+            "example": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "每页数量(不能为空)",
+            "required": true,
+            "schema": {
+              "maximum": 200,
+              "type": "string",
+              "description": "每页数量(不能为空)",
+              "example": 10
+            },
+            "example": 10
+          },
+          {
+            "name": "searchCount",
+            "in": "query",
+            "description": "是否查询总条数",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "是否查询总条数"
+            }
+          },
+          {
+            "name": "sortItemList",
+            "in": "query",
+            "description": "排序字段集合",
+            "required": false,
+            "schema": {
+              "maxLength": 10,
+              "minLength": 0,
+              "type": "string",
+              "description": "排序字段集合"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponsePageResultResidentialAIChatContentVO对象"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "BaseResponsePageResultResidentialAIChatContentVO对象": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/components/schemas/PageResultResidentialAIChatContentVO对象"
+        }
+      }
+    },
+    "PageResultResidentialAIChatContentVO对象": {
+      "type": "object",
+      "properties": {
+        "pageNum": {
+          "type": "integer",
+          "description": "当前页",
+          "format": "int64",
+          "refType": null
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "每页的数量",
+          "format": "int64",
+          "refType": null
+        },
+        "total": {
+          "type": "integer",
+          "description": "总记录数",
+          "format": "int64",
+          "refType": null
+        },
+        "pages": {
+          "type": "integer",
+          "description": "总页数",
+          "format": "int64",
+          "refType": null
+        },
+        "list": {
+          "type": "array",
+          "description": "结果集",
+          "items": {
+            "$ref": "#/components/schemas/ResidentialAIChatContentVO对象"
+          },
+          "refType": "ResidentialAIChatContentVO对象"
+        },
+        "emptyFlag": {
+          "type": "boolean",
+          "description": "是否为空",
+          "refType": null
+        }
+      }
+    },
+    "ResidentialAIChatContentVO对象": {
+      "type": "object",
+      "properties": {
+        "chatId": {
+          "type": "integer",
+          "description": "会话标识",
+          "format": "int64",
+          "refType": null
+        },
+        "role": {
+          "type": "string",
+          "description": "角色",
+          "refType": null
+        },
+        "contentId": {
+          "$ref": "#/components/schemas/ObjectId",
+          "refType": "ObjectId"
+        },
+        "content": {
+          "type": "string",
+          "description": "回复内容",
+          "refType": null
+        },
+        "contentType": {
+          "type": "string",
+          "description": "内容类型",
+          "refType": null
+        },
+        "showContent": {
+          "type": "string",
+          "description": "展示内容",
+          "refType": null
+        },
+        "reasoningContent": {
+          "type": "string",
+          "description": "推理内容",
+          "refType": null
+        },
+        "reasoningDuration": {
+          "type": "integer",
+          "description": "推理时长（秒）",
+          "format": "int64",
+          "refType": null
+        },
+        "keywords": {
+          "type": "string",
+          "description": "关键词",
+          "refType": null
+        },
+        "type": {
+          "type": "integer",
+          "description": "类型：1:提问;2:回答",
+          "format": "int32",
+          "refType": null
+        },
+        "senderId": {
+          "type": "integer",
+          "description": "发送者标识;用户标识1：OpenAI-GPT3.5; 2：OpenAI-GPT4 3：文心一言",
+          "format": "int64",
+          "refType": null
+        },
+        "receiverId": {
+          "type": "integer",
+          "description": "接收者标识;用户标识1：OpenAI-GPT3.5; 2：OpenAI-GPT4 3：文心一言",
+          "format": "int64",
+          "refType": null
+        },
+        "createTime": {
+          "type": "string",
+          "description": "会话创建时间",
+          "format": "date-time",
+          "refType": null
+        },
+        "agentId": {
+          "type": "integer",
+          "description": "应用id",
+          "format": "int64",
+          "refType": null
+        },
+        "systemPrompt": {
+          "type": "string",
+          "description": "应用prompt",
+          "refType": null
+        }
+      },
+      "description": "智能问答内容记录vo"
+    },
+    "ObjectId": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "integer",
+          "format": "int32",
+          "refType": null
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "refType": null
+        }
+      },
+      "description": "对话内容标识"
+    }
+  }
+}

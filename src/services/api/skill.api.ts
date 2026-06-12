@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
-import type { IAIImageGeneration, IChatForm, IFlowCompletionVO, IQuicklyCreateRequest, ISkillDetail, ISkillFlowDataVO, IWizardSubmitForm } from '@/pages/apps/types/wizard.types'
+import type { IAIImageGeneration, IFlowCompletionVO, IQuicklyCreateRequest, ISkillDetail, ISkillFlowDataVO, IWizardSubmitForm } from '@/pages/apps/types/wizard.types'
 
 import { useApiFetch } from '@/composables/use-fetch'
 
@@ -58,6 +58,10 @@ export interface ISkill {
   tags: string[]
   /** 工具模式：1=单次对话，2=流程式向导 */
   toolMode: SkillToolMode
+  /** 类型：1=扣子(Coze)，2=Agent，3=AI AgentSkill */
+  type: number
+  /** 第三方平台ID：type 1/2 时用于调用详情接口 */
+  thirdId: string
 }
 
 /** 分配技能 VO */
@@ -314,23 +318,6 @@ export function useGetSkillMerchantsQuery(skillId: Ref<string>) {
   })
 }
 
-/** 流式对话：发送消息并获取 SSE 流 */
-export async function sendChatStream(
-  data: IChatForm,
-  onMessage: (chunk: string) => void,
-  onComplete: () => void,
-  onError: (error: Error) => void,
-) {
-  const { apiFetchStream } = useApiFetch()
-
-  await apiFetchStream('/web/agentScopeChat/chat/stream/completion', {
-    body: JSON.stringify(data),
-    onMessage,
-    onComplete,
-    onError,
-  })
-}
-
 /** 流程式对话响应 */
 export type IFlowCompletionResponse = IResponse<IFlowCompletionVO>
 
@@ -345,6 +332,298 @@ export function useFlowCompletionMutation() {
       body: data,
     }),
   })
+}
+
+// ==================== 流式对话 API（Type 1/2）====================
+
+/** 创建会话响应 */
+export interface ICreateConversationResponse {
+  chatId: number
+  type: number
+  conversationId: string
+}
+
+/** 创建会话 */
+export function useCreateConversationMutation() {
+  const { apiFetch } = useApiFetch()
+
+  return useMutation<IResponse<ICreateConversationResponse>, Error, {
+    skillId: string
+    role: string
+    content: string
+    contentType?: string
+    type?: string
+  }>({
+    mutationKey: ['createConversation'],
+    mutationFn: async params => await apiFetch<IResponse<ICreateConversationResponse>>('/aiCommon/createConversation', {
+      method: 'get',
+      query: params,
+    }),
+  })
+}
+
+/** Coze 智能体详情响应 */
+export type ICozeDetailResponse = IResponse<CozeBotDetailResp>
+
+/** Coze 智能体详情 */
+export function useGetCozeDetailQuery(botId: Ref<string>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<ICozeDetailResponse, Error>({
+    queryKey: ['cozeDetail', botId],
+    queryFn: async () => await apiFetch<ICozeDetailResponse>('/aiCommon/cozeOnlineInfo', {
+      method: 'get',
+      query: { botId: botId.value },
+    }),
+    enabled: computed(() => !!botId.value),
+    retry: false,
+  })
+}
+
+/** Agent 详情响应 */
+export type IAgentDetailResponse = IResponse<AgentDetailResp>
+
+/** Agent 详情 */
+export function useGetAgentDetailQuery(agentId: Ref<string>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<IAgentDetailResponse, Error>({
+    queryKey: ['agentDetail', agentId],
+    queryFn: async () => await apiFetch<IAgentDetailResponse>(`/aiCommon/agent/detail/${agentId.value}`),
+    enabled: computed(() => !!agentId.value),
+    retry: false,
+  })
+}
+
+/** 消息列表查询参数 */
+export interface IMessageListQuery {
+  chatId: string
+  pageNum: number
+  pageSize: number
+  searchCount?: boolean
+}
+
+/** 流式对话消息 */
+export interface IStreamChatMessage {
+  chatId: number
+  role: string
+  content: string
+  contentType?: string
+  showContent?: string
+  reasoningContent?: string
+  reasoningDuration?: number
+  keywords?: string
+  type: number
+  senderId?: number
+  receiverId?: number
+  createTime: string
+  agentId?: number
+  systemPrompt?: string
+  /** 流式消息ID，用于关联同一轮对话 */
+  contentId?: string | number
+}
+
+/** 消息列表响应 */
+export type IMessageListResponse = IResponse<IPageResult<IStreamChatMessage>>
+
+/** 消息列表 */
+export function useGetMessageListQuery(query: Ref<IMessageListQuery | null>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<IMessageListResponse, Error>({
+    queryKey: computed(() => ['messageList', query.value]),
+    queryFn: async () => {
+      if (!query.value)
+        throw new Error('Query is null')
+      return await apiFetch<IMessageListResponse>('/aiCommon/messageList', {
+        method: 'get',
+        query: query.value,
+      })
+    },
+    enabled: computed(() => query.value !== null),
+    retry: false,
+  })
+}
+
+// ==================== Coze / Agent 类型定义 ====================
+
+/** Coze 智能体详情 */
+export interface CozeBotDetailResp {
+  botID: string
+  name: string
+  description: string
+  iconURL: string
+  promptInfo?: { prompt: string }
+  onboardingInfo?: {
+    prologue: string
+    suggestedQuestions: string[]
+  }
+  botMode: number
+  pluginInfoList?: PluginInfo[]
+  modelInfo?: ModelInfo
+  knowledge?: Knowledge
+  shortcutCommands?: ShortcutCommandInfo[]
+  workflowInfoList?: WorkflowInfo[]
+  backGroundImageInfo?: BackGroundImageInfo
+  cityQuickCommands?: CityQuickCommand[]
+  cityCozeBotInfo?: CityCozeBotInfo
+}
+
+export interface PluginInfo {
+  pluginID: string
+  name: string
+  description: string
+  iconURL: string
+  apiInfoList?: PluginAPIInfo[]
+}
+
+export interface PluginAPIInfo {
+  apiID: string
+  name: string
+  description: string
+}
+
+export interface ModelInfo {
+  modelID: string
+  modelName: string
+  responseFormat: string
+  maxTokens: number
+  contextRound: number
+}
+
+export interface Knowledge {
+  knowledgeInfos?: KnowledgeInfo[]
+}
+
+export interface KnowledgeInfo {
+  id: string
+  name: string
+}
+
+export interface ShortcutCommandInfo {
+  id: string
+  name: string
+  command: string
+  agentId: string
+  description: string
+  queryTemplate: string
+  iconUrl: string
+  components?: Component[]
+  tool?: Tool
+}
+
+export interface Component {
+  name: string
+  description: string
+  type: string
+  toolParameter: string
+  defaultValue: string
+  options: string[]
+  isHide: boolean
+}
+
+export interface Tool {
+  name: string
+  type: string
+}
+
+export interface WorkflowInfo {
+  id: string
+  name: string
+  iconUrl: string
+  description: string
+}
+
+export interface BackGroundImageInfo {
+  webBackgroundImage?: BackgroundImageDetail
+  mobileBackgroundImage?: BackgroundImageDetail
+}
+
+export interface BackgroundImageDetail {
+  imageUrl: string
+  themeColor: string
+  canvasPosition?: CanvasPosition
+  gradientPosition?: GradientPosition
+}
+
+export interface CanvasPosition {
+  top: number
+  left: number
+  width: number
+  height: number
+}
+
+export interface GradientPosition {
+  left: number
+  right: number
+}
+
+export interface CityQuickCommand {
+  uniqueCode: string
+  icon: string
+  name: string
+  description: string
+  aiVerbalTrick: string
+  aiPhone: string
+  type: number
+  triggerType: number
+  content: string
+  contentType: string
+}
+
+export interface CityCozeBotInfo {
+  loginType: number
+  poster: string
+  welcomePoster: string
+  topPoster: string
+  aiLibrarianPoster: string
+  aiLibrarian: string
+  questionNumber: number
+  voiceId: string
+}
+
+/** Agent 详情 */
+export interface AgentDetailResp {
+  agentId: string
+  aiProvider: number
+  model: string
+  type: number
+  name: string
+  description: string
+  icon: string
+  greeting: string
+  systemPrompt: string
+  thirdId: string
+  promptGuideList: string[] | null
+  promptTemplateList: AgentPromptTemplate[]
+  /** Agent MCP 方法名，流式对话时传给后端 */
+  mcpMethod?: string
+  /** 可视化能力列表 */
+  agentVisionList?: AgentVision[]
+  enableAudioFlag: boolean
+  voiceId: string
+  agentKey: string | null
+  runtimeType: string | null
+  cozeBotInfo?: CozeBotDetailResp
+}
+
+export interface AgentPromptTemplate {
+  agentPromptTemplateId: string
+  templateName: string
+  templateDesc: string
+  templateForm: string
+  subtitle: string
+}
+
+/** Agent 可视化能力 */
+export interface AgentVision {
+  id: string
+  name: string
+  visionAliasName: string
+  visionType: 1 | 2 | 3
+  visionAgentId: string
+  visionContent?: string
+  done?: boolean
 }
 
 /** 商户发起人工接管 */

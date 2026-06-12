@@ -93,25 +93,31 @@ async function apiFetchStream(
       }
 
       const chunk = decoder.decode(value, { stream: true })
-      // 解析 SSE 格式: data: {...}
       const lines = chunk.split('\n')
+
       for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const dataStr = line.slice(6).trim()
+        const trimmed = line.trim()
+        if (!trimmed)
+          continue
+
+        // 标准 SSE 格式: data:{...} 或 data: {...}
+        if (trimmed.startsWith('data:')) {
+          const dataStr = trimmed.slice(5).trim()
           if (dataStr && dataStr !== '[DONE]') {
-            try {
-              const parsed = JSON.parse(dataStr)
-              // 根据实际 SSE 格式提取内容
-              const content = parsed.content || parsed.choices?.[0]?.delta?.content || parsed.text || ''
-              if (content) {
-                options.onMessage(content)
-              }
-            }
-            catch {
-              // 非 JSON 数据，直接作为文本
-              options.onMessage(dataStr)
-            }
+            options.onMessage(dataStr)
           }
+          continue
+        }
+
+        // JSON 格式 SSE: {"event":"[DATA]","data":{...}}
+        try {
+          const parsed = JSON.parse(trimmed)
+          if (parsed.event !== undefined && parsed.data !== undefined) {
+            options.onMessage(trimmed)
+          }
+        }
+        catch {
+          // 非 JSON，忽略
         }
       }
     }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { DownloadIcon, Loader2Icon, MessageSquareIcon, SparklesIcon } from '@lucide/vue'
 import dayjs from 'dayjs'
+import { useSlots } from 'vue'
 
 import type { IChatMessage } from '@/services/api/conversation.api'
 
@@ -35,6 +36,9 @@ const emit = defineEmits<{
   /** 点击下载图片 */
   downloadImage: [url: string, msgId: string]
 }>()
+
+const slots = useSlots()
+const hasHeaderSlot = computed(() => !!slots.header)
 
 // ==================== 消息分组 ====================
 
@@ -175,7 +179,7 @@ function isLeftSide(msg: IChatMessage) {
 <template>
   <div class="relative flex flex-1 flex-col overflow-y-hidden px-4">
     <div class="flex grow flex-col-reverse justify-start gap-4 overflow-y-auto py-4 pe-4">
-      <template v-if="messages.length === 0">
+      <template v-if="messages.length === 0 && !hasHeaderSlot">
         <div class="flex flex-1 flex-col items-center justify-center space-y-4 py-20">
           <div class="flex size-16 items-center justify-center rounded-full border-2 border-border">
             <MessageSquareIcon class="size-8" />
@@ -221,7 +225,7 @@ function isLeftSide(msg: IChatMessage) {
             <div class="flex flex-col min-w-0 overflow-hidden">
               <!-- 文本+图片消息气泡：有 steps 的 user 消息不渲染气泡，由步骤卡片替代 -->
               <div
-                v-if="(msg.content || msg.finalContent || msg.imageGenerationId) && !(msg.role === 'user' && msg.steps && msg.steps.length > 0)"
+                v-if="(msg.content || msg.finalContent || msg.imageGenerationId || msg.role === 'assistant') && !(msg.role === 'user' && msg.steps && msg.steps.length > 0)"
                 :class="cn(
                   'rounded-2xl px-4 py-2.5 text-sm min-w-0',
                   getBubbleClass(msg),
@@ -230,6 +234,12 @@ function isLeftSide(msg: IChatMessage) {
                 <p v-if="msg.content || msg.finalContent">
                   {{ msg.content || msg.finalContent }}
                 </p>
+                <!-- 流式对话占位：AI 消息内容为空时展示加载动画 -->
+                <div v-else-if="msg.role === 'assistant'" class="flex items-center gap-1.5 py-1">
+                  <span class="size-1.5 rounded-full bg-current animate-bounce" style="animation-delay: 0ms" />
+                  <span class="size-1.5 rounded-full bg-current animate-bounce" style="animation-delay: 150ms" />
+                  <span class="size-1.5 rounded-full bg-current animate-bounce" style="animation-delay: 300ms" />
+                </div>
 
                 <!-- 图片生成消息 -->
                 <div v-if="msg.imageGenerationId" class="mt-2 space-y-2">
@@ -343,6 +353,9 @@ function isLeftSide(msg: IChatMessage) {
           </div>
         </template>
       </template>
+
+      <!-- 顶部插槽：由于 flex-col-reverse，DOM 末尾的内容显示在视觉顶部 -->
+      <slot name="header" />
     </div>
   </div>
 </template>

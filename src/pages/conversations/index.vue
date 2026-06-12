@@ -2,7 +2,7 @@
 import { ChevronLeftIcon, ChevronRightIcon, MessageSquareIcon } from '@lucide/vue'
 import { useDebounceFn } from '@vueuse/core'
 
-import type { IConversationListQuery } from '@/services/api/conversation.api'
+import type { IConversation, IConversationListQuery } from '@/services/api/conversation.api'
 
 import { BasicPage } from '@/components/global-layout'
 import { Badge } from '@/components/ui/badge'
@@ -24,6 +24,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { serviceModeConfig, useGetConversationListQuery, userTagConfig } from '@/services/api/conversation.api'
+
+const router = useRouter()
 
 // 查询参数
 const query = ref<IConversationListQuery>({
@@ -73,6 +75,19 @@ function formatDate(dateStr: string) {
   if (!dateStr)
     return '-'
   return new Date(dateStr).toLocaleString('zh-CN')
+}
+
+/**
+ * 查看会话详情
+ * type 1/2 跳转到流式对话页，type 3 跳转到原有会话详情
+ */
+function handleViewDetail(item: IConversation) {
+  if (item.type === 1 || item.type === 2) {
+    router.push(`/apps/stream?chatId=${item.chatId}&skillId=${item.skillId}&thirdId=${item.thirdId}&type=${item.type}`)
+  }
+  else {
+    router.push(`/conversations/${item.chatId}`)
+  }
 }
 </script>
 
@@ -162,7 +177,7 @@ function formatDate(dateStr: string) {
                 <span class="text-sm text-muted-foreground">{{ formatDate(item.lastMessageTime) }}</span>
               </TableCell>
               <TableCell class="text-right">
-                <Button variant="ghost" size="sm" @click="$router.push(`/conversations/${item.chatId}`)">
+                <Button variant="ghost" size="sm" @click="handleViewDetail(item)">
                   查看详情
                 </Button>
               </TableCell>

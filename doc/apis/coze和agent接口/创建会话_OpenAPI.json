@@ -1,0 +1,215 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://172.31.128.135:8202/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/aiCommon/createConversation": {
+      "get": {
+        "tags": [
+          "AI公用"
+        ],
+        "summary": "创建会话",
+        "operationId": "createConversation",
+        "parameters": [
+          {
+            "name": "contentId",
+            "in": "query",
+            "description": "对话内容标识",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "对话内容标识"
+            }
+          },
+          {
+            "name": "skillId",
+            "in": "query",
+            "description": "工具ID",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "工具ID"
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "description": "角色",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "角色"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "description": "请求内容",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "请求内容"
+            }
+          },
+          {
+            "name": "contentType",
+            "in": "query",
+            "description": "请求内容类型",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "请求内容类型"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "类型",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "类型"
+            }
+          },
+          {
+            "name": "showContent",
+            "in": "query",
+            "description": "展示内容",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "展示内容"
+            }
+          },
+          {
+            "name": "reasoningContent",
+            "in": "query",
+            "description": "推理内容",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "推理内容"
+            }
+          },
+          {
+            "name": "reasoningDuration",
+            "in": "query",
+            "description": "推理时长（秒）",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "推理时长（秒）"
+            }
+          },
+          {
+            "name": "enableKnowledgeFlag",
+            "in": "query",
+            "description": "是否启用知识库问答",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "是否启用知识库问答"
+            }
+          },
+          {
+            "name": "paragraphIds",
+            "in": "query",
+            "description": "关联向量化段落标识",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "关联向量化段落标识"
+            }
+          },
+          {
+            "name": "fileRefs",
+            "in": "query",
+            "description": "文件集合",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "文件集合"
+            }
+          },
+          {
+            "name": "systemPrompt",
+            "in": "query",
+            "description": "应用prompt",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "应用prompt"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseAiChatVO对象"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "BaseResponseAiChatVO对象": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/components/schemas/AiChatVO对象"
+        }
+      }
+    },
+    "AiChatVO对象": {
+      "type": "object",
+      "properties": {
+        "chatId": {
+          "type": "integer",
+          "description": "平台对话标识",
+          "format": "int64",
+          "refType": null
+        },
+        "type": {
+          "type": "integer",
+          "description": "类型：1=扣子(Coze)，2=Agent，3=AI AgentSkill",
+          "format": "int32",
+          "refType": null
+        },
+        "conversationId": {
+          "type": "string",
+          "description": "对话标识",
+          "refType": null
+        }
+      },
+      "description": "智能问答"
+    }
+  }
+}

@@ -163,6 +163,39 @@ export interface IChatForm {
   files?: { fileId: string, fileType: string }[]
 }
 
+/** 流式对话消息 DTO */
+export interface ChatMessageDTO {
+  contentId?: string
+  skillId?: string
+  role: string
+  content: string
+  contentType?: string
+  type?: string
+  showContent?: string
+  reasoningContent?: string
+  reasoningDuration?: number
+  enableKnowledgeFlag?: boolean
+  paragraphIds?: string[]
+  fileRefs?: { chatFileId?: number }[]
+  systemPrompt?: string
+}
+
+/** 快捷指令 */
+export interface ShortcutCommand {
+  commandId?: string
+  parameters?: Record<string, { type?: string, text?: string, file_id?: string, file_url?: string }[]>
+}
+
+/** 流式对话请求 DTO */
+export interface ChatCompletionDTO {
+  chatId: string
+  aiChatType?: number
+  shortcutCommand?: ShortcutCommand
+  aiChatMessages: ChatMessageDTO[]
+  pptTaskId?: string
+  agentVisionId?: number
+}
+
 /** 流程式对话结果 VO */
 export interface IFlowCompletionVO {
   /** 会话ID */
