@@ -1,11 +1,19 @@
 <script setup lang="ts">
-import { MessageSquareIcon } from '@lucide/vue'
+import { ClipboardCheckIcon, ClipboardIcon, MessageSquareIcon } from '@lucide/vue'
+import { useClipboard } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { computed, useSlots } from 'vue'
 
 import type { IChatMessage } from '@/services/api/conversation.api'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 
 import StreamMarkdownContent from './StreamMarkdownContent.vue'
@@ -25,6 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const slots = useSlots()
 const hasHeaderSlot = computed(() => !!slots.header)
+const { copy, copied } = useClipboard()
 
 /** 最后一条 AI 消息的索引 */
 const lastAssistantIndex = computed(() => {
@@ -36,6 +45,13 @@ const lastAssistantIndex = computed(() => {
   }
   return lastIndex
 })
+
+/** 复制消息内容 */
+function copyMessageContent(content: string) {
+  if (!content)
+    return
+  copy(content)
+}
 
 // ==================== 消息辅助函数 ====================
 
@@ -137,6 +153,31 @@ function formatTime(time: string) {
             >
               {{ formatTime(msg.createTime) }}
             </span>
+
+            <!-- AI 消息工具栏 -->
+            <div
+              v-if="!isUser(msg)"
+              class="flex items-center gap-2 mt-2"
+            >
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      class="size-7"
+                      @click="copyMessageContent(msg.content || msg.finalContent)"
+                    >
+                      <ClipboardIcon v-if="!copied" class="size-4" />
+                      <ClipboardCheckIcon v-else class="size-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>复制</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
         </div>
       </template>

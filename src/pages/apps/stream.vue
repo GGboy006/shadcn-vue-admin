@@ -13,6 +13,7 @@ import {
 } from '@/services/api/skill.api'
 
 import AgentPromptTemplateForm from './components/AgentPromptTemplateForm.vue'
+import AgentVisionDrawer from './components/AgentVisionDrawer.vue'
 import { useChatStream } from './composables/use-chat-stream'
 
 const route = useRoute()
@@ -121,6 +122,49 @@ function handleTemplateSubmit(content: string) {
   })
 }
 
+// ==================== Agent 可视化输出 ====================
+
+/** 是否显示可视化抽屉 */
+const isVisionDrawerOpen = ref(false)
+
+/** Agent 可视化能力列表 */
+const agentVisionList = computed(() => {
+  if (skillType.value !== 2)
+    return []
+  return agentDetail.value?.data?.agentVisionList ?? []
+})
+
+/** 最后一条用户消息的内容 */
+const lastUserContent = computed(() => {
+  for (let i = messages.value.length - 1; i >= 0; i--) {
+    if (messages.value[i]?.role === 'user') {
+      return messages.value[i]?.content || messages.value[i]?.finalContent || ''
+    }
+  }
+  return ''
+})
+
+/** 最后一条用户消息的 contentId */
+const lastUserContentId = computed(() => {
+  for (let i = messages.value.length - 1; i >= 0; i--) {
+    if (messages.value[i]?.role === 'user') {
+      return messages.value[i]?.contentId
+    }
+  }
+  return undefined
+})
+
+/** 主对话流完成后自动打开可视化抽屉 */
+watch(isStreaming, (streaming) => {
+  if (!streaming
+    && skillType.value === 2
+    && agentVisionList.value.length > 0
+    && messages.value.length > 0
+    && lastUserContent.value) {
+    isVisionDrawerOpen.value = true
+  }
+})
+
 // ==================== 输入框 ====================
 
 const inputText = ref('')
@@ -202,127 +246,141 @@ function handleQuickCommand(command: CityQuickCommand) {
 
     <!-- 内容区 -->
     <template v-else>
-      <!-- 消息列表：始终显示，欢迎区通过 header 插槽放在顶部 -->
-      <StreamChatMessageList
-        :messages="displayMessages"
-        :streaming="isStreaming"
-        empty-text=""
-      >
-        <template #header>
-          <!-- Agent 表单模板：有模板且无消息时展示 -->
-          <AgentPromptTemplateForm
-            v-if="skillType === 2 && hasPromptTemplate && messages.length === 0 && firstPromptTemplate"
-            :template="firstPromptTemplate"
-            @submit="handleTemplateSubmit"
-          />
-
-          <!-- 欢迎区 -->
-          <div
-            v-else
-            class="flex flex-col items-center justify-center px-4 py-8"
+      <div class="flex flex-1 overflow-hidden">
+        <!-- 聊天区 -->
+        <div class="flex flex-1 flex-col overflow-hidden">
+          <!-- 消息列表：始终显示，欢迎区通过 header 插槽放在顶部 -->
+          <StreamChatMessageList
+            :messages="displayMessages"
+            :streaming="isStreaming"
+            empty-text=""
           >
-            <!-- 头像 -->
-            <Avatar class="size-16 mb-4">
-              <AvatarImage :src="skillIcon" :alt="skillName" />
-              <AvatarFallback class="text-2xl">
-                AI
-              </AvatarFallback>
-            </Avatar>
+            <template #header>
+              <!-- Agent 表单模板：有模板且无消息时展示 -->
+              <AgentPromptTemplateForm
+                v-if="skillType === 2 && hasPromptTemplate && messages.length === 0 && firstPromptTemplate"
+                :template="firstPromptTemplate"
+                @submit="handleTemplateSubmit"
+              />
 
-            <!-- 名称 -->
-            <h2 class="text-lg font-semibold mb-2">
-              {{ skillName }}
-            </h2>
+              <!-- 欢迎区 -->
+              <div
+                v-else
+                class="flex flex-col items-center justify-center px-4 py-8"
+              >
+                <!-- 头像 -->
+                <Avatar class="size-16 mb-4">
+                  <AvatarImage :src="skillIcon" :alt="skillName" />
+                  <AvatarFallback class="text-2xl">
+                    AI
+                  </AvatarFallback>
+                </Avatar>
 
-            <!-- 开场白 -->
-            <p v-if="prologue" class="text-sm text-muted-foreground text-center max-w-md mb-6">
-              {{ prologue }}
-            </p>
+                <!-- 名称 -->
+                <h2 class="text-lg font-semibold mb-2">
+                  {{ skillName }}
+                </h2>
 
-            <!-- 推荐问题 -->
-            <div v-if="suggestedQuestions.length > 0" class="w-full max-w-md space-y-2">
-              <p class="text-xs text-muted-foreground text-center mb-3">
-                推荐问题
-              </p>
-              <div class="flex flex-wrap gap-2 justify-center">
-                <Button
-                  v-for="question in suggestedQuestions"
-                  :key="question"
-                  variant="outline"
-                  size="sm"
-                  class="text-xs"
-                  @click="handleSelectQuestion(question)"
-                >
-                  {{ question }}
-                </Button>
+                <!-- 开场白 -->
+                <p v-if="prologue" class="text-sm text-muted-foreground text-center max-w-md mb-6">
+                  {{ prologue }}
+                </p>
+
+                <!-- 推荐问题 -->
+                <div v-if="suggestedQuestions.length > 0" class="w-full max-w-md space-y-2">
+                  <p class="text-xs text-muted-foreground text-center mb-3">
+                    推荐问题
+                  </p>
+                  <div class="flex flex-wrap gap-2 justify-center">
+                    <Button
+                      v-for="question in suggestedQuestions"
+                      :key="question"
+                      variant="outline"
+                      size="sm"
+                      class="text-xs"
+                      @click="handleSelectQuestion(question)"
+                    >
+                      {{ question }}
+                    </Button>
+                  </div>
+                </div>
+
+                <!-- 快捷指令 -->
+                <div v-if="quickCommands.length > 0" class="w-full max-w-md mt-6 space-y-2">
+                  <p class="text-xs text-muted-foreground text-center mb-3">
+                    快捷指令
+                  </p>
+                  <div class="flex flex-wrap gap-2 justify-center">
+                    <Button
+                      v-for="cmd in quickCommands"
+                      :key="cmd.uniqueCode"
+                      variant="secondary"
+                      size="sm"
+                      class="text-xs"
+                      @click="handleQuickCommand(cmd)"
+                    >
+                      <span v-if="cmd.icon" class="mr-1">{{ cmd.icon }}</span>
+                      {{ cmd.name }}
+                    </Button>
+                  </div>
+                </div>
               </div>
+            </template>
+          </StreamChatMessageList>
+
+          <!-- 底部输入区 -->
+          <div class="border-t bg-background p-3 sm:p-4 shrink-0">
+            <!-- 推理中提示 -->
+            <div
+              v-if="isReasoning"
+              class="flex items-center gap-2 text-xs text-muted-foreground mb-2 px-1"
+            >
+              <Loader2Icon class="size-3 animate-spin" />
+              <span>正在思考...</span>
             </div>
 
-            <!-- 快捷指令 -->
-            <div v-if="quickCommands.length > 0" class="w-full max-w-md mt-6 space-y-2">
-              <p class="text-xs text-muted-foreground text-center mb-3">
-                快捷指令
-              </p>
-              <div class="flex flex-wrap gap-2 justify-center">
-                <Button
-                  v-for="cmd in quickCommands"
-                  :key="cmd.uniqueCode"
-                  variant="secondary"
-                  size="sm"
-                  class="text-xs"
-                  @click="handleQuickCommand(cmd)"
-                >
-                  <span v-if="cmd.icon" class="mr-1">{{ cmd.icon }}</span>
-                  {{ cmd.name }}
-                </Button>
-              </div>
+            <div class="flex items-end gap-2 rounded-lg border border-input bg-card px-3 py-2 focus-within:ring-1 focus-within:ring-ring">
+              <textarea
+                ref="inputRef"
+                v-model="inputText"
+                placeholder="输入消息..."
+                rows="1"
+                class="min-h-[36px] max-h-[120px] flex-1 resize-none bg-transparent py-2 text-sm outline-none"
+                :disabled="isStreaming"
+                @keydown="handleKeydown"
+              />
+
+              <Button
+                v-if="isStreaming"
+                variant="destructive"
+                size="icon"
+                class="size-8 rounded-full shrink-0"
+                @click="stopGeneration"
+              >
+                <span class="size-2.5 rounded-full bg-white" />
+              </Button>
+              <Button
+                v-else
+                variant="default"
+                size="icon"
+                class="size-8 rounded-full shrink-0"
+                :disabled="!inputText.trim()"
+                @click="handleSend"
+              >
+                <SendIcon class="size-4" />
+              </Button>
             </div>
           </div>
-        </template>
-      </StreamChatMessageList>
-
-      <!-- 底部输入区 -->
-      <div class="border-t bg-background p-3 sm:p-4 shrink-0">
-        <!-- 推理中提示 -->
-        <div
-          v-if="isReasoning"
-          class="flex items-center gap-2 text-xs text-muted-foreground mb-2 px-1"
-        >
-          <Loader2Icon class="size-3 animate-spin" />
-          <span>正在思考...</span>
         </div>
 
-        <div class="flex items-end gap-2 rounded-lg border border-input bg-card px-3 py-2 focus-within:ring-1 focus-within:ring-ring">
-          <textarea
-            ref="inputRef"
-            v-model="inputText"
-            placeholder="输入消息..."
-            rows="1"
-            class="min-h-[36px] max-h-[120px] flex-1 resize-none bg-transparent py-2 text-sm outline-none"
-            :disabled="isStreaming"
-            @keydown="handleKeydown"
-          />
-
-          <Button
-            v-if="isStreaming"
-            variant="destructive"
-            size="icon"
-            class="size-8 rounded-full shrink-0"
-            @click="stopGeneration"
-          >
-            <span class="size-2.5 rounded-full bg-white" />
-          </Button>
-          <Button
-            v-else
-            variant="default"
-            size="icon"
-            class="size-8 rounded-full shrink-0"
-            :disabled="!inputText.trim()"
-            @click="handleSend"
-          >
-            <SendIcon class="size-4" />
-          </Button>
-        </div>
+        <!-- 可视化输出抽屉 -->
+        <AgentVisionDrawer
+          v-model:open="isVisionDrawerOpen"
+          :visions="agentVisionList"
+          :chat-id="_chatId ?? ''"
+          :content-id="lastUserContentId"
+          :content="lastUserContent"
+        />
       </div>
     </template>
   </div>
