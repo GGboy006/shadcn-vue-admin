@@ -5,7 +5,7 @@ import { ofetch } from 'ofetch'
 import { toast } from 'vue-sonner'
 
 import { ApiStatus } from '@/constants/api-status'
-import { API_BASE_URL, API_TIMEOUT } from '@/constants/app-config'
+import { API_BASE_URL, API_TIMEOUT, BASE_URL } from '@/constants/app-config'
 import pinia from '@/plugins/pinia/setup'
 import { useAuthStore } from '@/stores/auth'
 
@@ -29,7 +29,7 @@ const apiFetch = ofetch.create({
         const authStore = useAuthStore(pinia)
         authStore.clearAuth()
         toast.error('登录已过期，请重新登录')
-        window.location.href = '/auth/sign-in'
+        window.location.href = `${BASE_URL}auth/sign-in`
         throw new Error('登录已过期')
       }
       toast.error(body.msg || '请求失败')
@@ -40,7 +40,7 @@ const apiFetch = ofetch.create({
     if (response.status === 401) {
       const authStore = useAuthStore(pinia)
       authStore.clearAuth()
-      window.location.href = '/auth/sign-in'
+      window.location.href = `${BASE_URL}auth/sign-in`
     }
   },
 })

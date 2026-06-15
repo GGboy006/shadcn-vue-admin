@@ -10,6 +10,7 @@ declare global {
   const API_TIMEOUT: typeof import('../constants/app-config').API_TIMEOUT
   const ApiStatus: typeof import('../constants/api-status').ApiStatus
   const ApiStatusMessage: typeof import('../constants/api-status').ApiStatusMessage
+  const BASE_URL: typeof import('../constants/app-config').BASE_URL
   const CONTENT_LAYOUTS: typeof import('../constants/themes').CONTENT_LAYOUTS
   const DEFAULT_PAGE_SIZE: typeof import('../constants/pagination').DEFAULT_PAGE_SIZE
   const EffectScope: typeof import('vue').EffectScope
