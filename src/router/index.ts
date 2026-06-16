@@ -1,11 +1,13 @@
 import { setupLayouts } from 'virtual:generated-layouts'
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import { handleHotUpdate, routes } from 'vue-router/auto-routes'
+
+import env from '@/utils/env'
 
 import { setupRouterGuard } from './guard'
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(env.VITE_BASE_URL),
   routes: setupLayouts(routes),
 
   scrollBehavior() {
