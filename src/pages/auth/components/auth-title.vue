@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useColorMode } from '@vueuse/core'
 
+import { withBase } from '@/utils/with-base'
+
 const mode = useColorMode()
 const logo = computed(() => {
-  return mode.value === 'dark' ? '/logo.svg' : '/logo-black.svg'
+  return withBase(mode.value === 'dark' ? '/logo.svg' : '/logo-black.svg')
 })
 </script>
 

@@ -9,6 +9,7 @@ import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessa
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
+import { withBase } from '@/utils/with-base'
 
 import { notificationsValidator } from '../validators/notifications.validator'
 
@@ -177,7 +178,7 @@ const onSubmit = handleSubmit((values) => {
           </FormLabel>
           <FormDescription>
             您可以在
-            <a href="/examples/forms">
+            <a :href="withBase('/examples/forms')">
               移动设置
             </a> 页面管理移动通知。
           </FormDescription>

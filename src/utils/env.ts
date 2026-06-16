@@ -5,9 +5,9 @@ import { z } from 'zod'
 import { EnvSchema } from '@/validators/env.validator'
 
 /**
- * Load .env file and validate it against the schema
- * Has this file, it will be loaded automatically by vite and we will be have environment variables available type
- * If EnvSchema Object has Key but not in .env file, it will be have a error in page
+ * 加载 .env 文件并根据架构进行验证
+ * 如果存在此文件，它将被 vite 自动加载，我们将可以使用类型化的环境变量
+ * 如果 EnvSchema 对象中有键但在 .env 文件中没有，该页面将出现错误
  */
 
 const { data: env, error } = EnvSchema.safeParse(import.meta.env)

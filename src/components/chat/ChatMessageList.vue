@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useGetImageGenerationQuery } from '@/services/api/conversation.api'
+import { withBase } from '@/utils/with-base'
 
 interface Props {
   messages: IChatMessage[]
@@ -208,7 +209,7 @@ function isLeftSide(msg: IChatMessage) {
           >
             <!-- 头像 -->
             <Avatar v-if="msg.role === 'assistant'" class="mt-1 size-8 shrink-0">
-              <AvatarImage src="/robot.png" alt="AI" />
+              <AvatarImage :src="withBase('/robot.png')" alt="AI" />
               <AvatarFallback>AI</AvatarFallback>
             </Avatar>
             <Avatar v-else-if="msg.role === 'station_master'" class="mt-1 size-8 shrink-0">

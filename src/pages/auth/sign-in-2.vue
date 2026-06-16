@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { withBase } from '@/utils/with-base'
+
 import AuthTitle from './components/auth-title.vue'
 import LoginForm from './components/login-form.vue'
 </script>
@@ -7,7 +9,7 @@ import LoginForm from './components/login-form.vue'
   <div class="w-full h-screen lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
     <div class="relative hidden bg-muted lg:block">
       <img
-        src="/placeholder.png"
+        :src="withBase('/placeholder.png')"
         alt="Image"
         width="1920"
         height="1080"

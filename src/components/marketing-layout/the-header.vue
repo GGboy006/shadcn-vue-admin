@@ -5,6 +5,7 @@ import LanguageChange from '@/components/language-change.vue'
 import SignInButton from '@/components/sign-in-button.vue'
 import SignUpButton from '@/components/sign-up-button.vue'
 import ToggleTheme from '@/components/toggle-theme.vue'
+import { withBase } from '@/utils/with-base'
 
 const mode = useColorMode()
 </script>
@@ -13,7 +14,7 @@ const mode = useColorMode()
   <header class="h-14 flex items-center marketing-header sticky top-0 z-99">
     <router-link to="/" class="flex items-center gap-2">
       <UiAvatar>
-        <UiAvatarImage :src="`${mode === 'dark' ? '/logo.svg' : '/logo-black.svg'}`" alt="Logo" />
+        <UiAvatarImage :src="withBase(mode === 'dark' ? '/logo.svg' : '/logo-black.svg')" alt="Logo" />
       </UiAvatar>
       <span class="text-base font-bold">Shadcn Vue Admin</span>
     </router-link>

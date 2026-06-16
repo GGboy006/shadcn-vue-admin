@@ -33,6 +33,7 @@ import {
   userTagConfig,
 } from '@/services/api/conversation.api'
 import { useStationRegenerateStore } from '@/stores/station-regenerate'
+import { withBase } from '@/utils/with-base'
 
 const router = useRouter()
 
@@ -291,7 +292,7 @@ function getInitials(name: string) {
               <!-- 头像 -->
               <div class="relative shrink-0">
                 <Avatar class="size-10">
-                  <AvatarImage src="/robot.png" />
+                  <AvatarImage :src="withBase('/robot.png')" />
                   <AvatarFallback>{{ getInitials(userTagConfig[item.userTag] || '用户') }}</AvatarFallback>
                 </Avatar>
                 <!-- 服务模式角标 -->
@@ -388,7 +389,7 @@ function getInitials(name: string) {
             </Button>
             <template v-if="conversation">
               <Avatar class="size-9">
-                <AvatarImage src="/robot.png" alt="AI" />
+                <AvatarImage :src="withBase('/robot.png')" alt="AI" />
                 <AvatarFallback>AI</AvatarFallback>
               </Avatar>
               <div>

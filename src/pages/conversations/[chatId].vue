@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useApiFetch } from '@/composables/use-fetch'
 import { useGetConversationDetailQuery } from '@/services/api/conversation.api'
+import { withBase } from '@/utils/with-base'
 
 const route = useRoute<'/conversations/[chatId]'>()
 const router = useRouter()
@@ -92,7 +93,7 @@ function handleKeydown(e: KeyboardEvent) {
 
         <template v-if="conversation">
           <Avatar class="size-9">
-            <AvatarImage src="/robot.png" alt="AI" />
+            <AvatarImage :src="withBase('/robot.png')" alt="AI" />
             <AvatarFallback>AI</AvatarFallback>
           </Avatar>
           <div>

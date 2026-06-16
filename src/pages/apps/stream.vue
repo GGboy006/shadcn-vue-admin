@@ -11,6 +11,7 @@ import {
   useGetAgentDetailQuery,
   useGetCozeDetailQuery,
 } from '@/services/api/skill.api'
+import { withBase } from '@/utils/with-base'
 
 import AgentPromptTemplateForm from './components/AgentPromptTemplateForm.vue'
 import AgentVisionDrawer from './components/AgentVisionDrawer.vue'
@@ -55,9 +56,9 @@ const skillName = computed(() => detail.value?.name || 'AI 助手')
 // 技能图标
 const skillIcon = computed(() => {
   if (isCozeDetail(detail.value)) {
-    return detail.value.iconURL || '/robot.png'
+    return withBase(detail.value.iconURL || '/robot.png')
   }
-  return detail.value?.icon || '/robot.png'
+  return withBase(detail.value?.icon || '/robot.png')
 })
 
 // 开场白

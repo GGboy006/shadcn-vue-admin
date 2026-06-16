@@ -15,6 +15,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
+import { withBase } from '@/utils/with-base'
 
 import StreamMarkdownContent from './StreamMarkdownContent.vue'
 
@@ -102,7 +103,7 @@ function formatTime(time: string) {
         >
           <!-- AI 头像 -->
           <Avatar v-if="!isUser(msg)" class="mt-1 size-8 shrink-0">
-            <AvatarImage src="/robot.png" alt="AI" />
+            <AvatarImage :src="withBase('/robot.png')" alt="AI" />
             <AvatarFallback>AI</AvatarFallback>
           </Avatar>
           <!-- 用户头像 -->

@@ -1,13 +1,14 @@
 import { AudioWaveformIcon, CommandIcon, GalleryVerticalEndIcon } from '@lucide/vue'
 
 import { useSidebar } from '@/composables/use-sidebar'
+import { withBase } from '@/utils/with-base'
 
 import type { SidebarData, Team, User } from '../types'
 
 const user: User = {
   name: 'shadcn',
   email: 'm@example.com',
-  avatar: '/avatars/shadcn.jpg',
+  avatar: withBase('/avatars/shadcn.jpg'),
 }
 
 const teams: Team[] = [
