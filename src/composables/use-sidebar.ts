@@ -1,4 +1,4 @@
-import { BoxesIcon, HeadsetIcon, LayoutDashboardIcon, MessageSquareIcon, PodcastIcon, SettingsIcon, UserIcon, UsersIcon, WrenchIcon } from '@lucide/vue'
+import { BoxesIcon, HeadsetIcon, LayoutDashboardIcon, MessageSquareIcon, SettingsIcon, UserIcon, UsersIcon, WrenchIcon } from '@lucide/vue'
 
 import type { NavGroup } from '@/components/app-sidebar/types'
 
@@ -29,8 +29,8 @@ export function useSidebar() {
         { title: 'AI工具管理', url: '/apps', icon: BoxesIcon },
         { title: '会话列表', url: '/conversations', icon: MessageSquareIcon },
         { title: '商户/物业管理', url: '/merchants', icon: UsersIcon },
-        { title: 'AI 对话示例', url: '/ai-talk', icon: PodcastIcon },
-        { title: '聊天工作台', url: '/admin/chat-workbench', icon: HeadsetIcon, roles: [3, 4] },
+        // { title: 'AI 对话示例', url: '/ai-talk', icon: PodcastIcon },
+        { title: '聊天工作台', url: '/admin/chat-workbench', icon: HeadsetIcon, roles: [3] },
       ],
     },
     // {

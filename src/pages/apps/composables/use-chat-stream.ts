@@ -5,6 +5,7 @@ import type { IChatMessage } from '@/services/api/conversation.api'
 import type { IMessageListQuery, IStreamChatMessage } from '@/services/api/skill.api'
 
 import { createStreamUrl, useTextStream } from '@/composables/use-text-stream'
+import { convertStreamMessagesToChatMessages } from '@/services/api/conversation.api'
 import { useCreateConversationMutation, useGetMessageListQuery } from '@/services/api/skill.api'
 
 /** 聊天角色 */
@@ -362,24 +363,10 @@ export function useChatStream(
 
   /**
    * 从历史消息数据转换为 IChatMessage
+   * @deprecated 请使用 conversation.api.ts 中的 convertStreamMessagesToChatMessages
    */
   function convertHistoryToMessages(history: IStreamChatMessage[]): IChatMessage[] {
-    return history.map(msg => ({
-      id: `${msg.chatId}-${msg.createTime}`,
-      chatId: String(msg.chatId),
-      role: msg.role === 'user' ? 'user' : 'assistant',
-      content: msg.content || msg.showContent || '',
-      finalContent: msg.showContent || msg.content || '',
-      parts: [],
-      attachments: [],
-      createTime: msg.createTime,
-      reasoningSegments: msg.reasoningContent
-        ? [{ messageId: `${msg.chatId}-${msg.createTime}`, content: msg.reasoningContent, duration: msg.reasoningDuration }]
-        : [],
-      imageGenerationId: 0,
-      steps: null,
-      contentId: msg.contentId ? String(msg.contentId) : undefined,
-    }))
+    return convertStreamMessagesToChatMessages(history)
   }
 
   // ==================== 重置 ====================

@@ -5,6 +5,7 @@ import type { IWizardStepForm } from '@/pages/apps/types/wizard.types'
 import { useApiFetch } from '@/composables/use-fetch'
 
 import type { IResponse } from '../types/response.type'
+import type { IStreamChatMessage } from './skill.api'
 
 // ==================== 图片生成结果查询类型 ====================
 
@@ -296,7 +297,7 @@ export function useGetConversationListQuery(query: Ref<IConversationListQuery>) 
 }
 
 /** 获取会话详情（包含消息历史） */
-export function useGetConversationDetailQuery(chatId: Ref<string>) {
+export function useGetConversationDetailQuery(chatId: Ref<string>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IConversationDetailResponse, Error>({
@@ -304,7 +305,7 @@ export function useGetConversationDetailQuery(chatId: Ref<string>) {
     queryFn: async () => await apiFetch<IConversationDetailResponse>(`/agentScopeChat/conversation/${chatId.value}`, {
       method: 'get',
     }),
-    enabled: computed(() => !!chatId.value),
+    enabled: computed(() => !!chatId.value && (enabled?.value ?? true)),
     retry: false,
   })
 }
@@ -329,4 +330,24 @@ export function useGetImageGenerationQuery(imageGenerationId: Ref<number | undef
       return false
     },
   })
+}
+
+/** 将流式消息列表转换为 IChatMessage */
+export function convertStreamMessagesToChatMessages(history: IStreamChatMessage[]): IChatMessage[] {
+  return history.map(msg => ({
+    id: `${msg.chatId}-${msg.createTime}`,
+    chatId: String(msg.chatId),
+    role: msg.role === 'user' ? 'user' : 'assistant',
+    content: msg.content || msg.showContent || '',
+    finalContent: msg.showContent || msg.content || '',
+    parts: [],
+    attachments: [],
+    createTime: msg.createTime,
+    reasoningSegments: msg.reasoningContent
+      ? [{ messageId: `${msg.chatId}-${msg.createTime}`, content: msg.reasoningContent, duration: msg.reasoningDuration }]
+      : [],
+    imageGenerationId: 0,
+    steps: null,
+    contentId: msg.contentId ? String(msg.contentId) : undefined,
+  }))
 }

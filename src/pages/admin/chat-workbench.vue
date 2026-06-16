@@ -7,10 +7,11 @@ import {
   SendIcon,
 } from '@lucide/vue'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query'
+import { useEventListener } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { toast } from 'vue-sonner'
 
-import type { IChatMessage, IConversation, IConversationListQuery } from '@/services/api/conversation.api'
+import type { IChatMessage, IConversation, IConversationDetail, IConversationListQuery } from '@/services/api/conversation.api'
 import type { IResponse } from '@/services/types/response.type'
 
 import ChatMessageList from '@/components/chat/ChatMessageList.vue'
@@ -28,10 +29,12 @@ import {
 import { useApiFetch } from '@/composables/use-fetch'
 import { cn } from '@/lib/utils'
 import {
+  convertStreamMessagesToChatMessages,
   serviceModeConfig,
   useGetConversationDetailQuery,
   userTagConfig,
 } from '@/services/api/conversation.api'
+import { useGetMessageListQuery } from '@/services/api/skill.api'
 import { useStationRegenerateStore } from '@/stores/station-regenerate'
 import { withBase } from '@/utils/with-base'
 
@@ -103,8 +106,21 @@ function handleBackToList() {
   mobileSelectedChatId.value = ''
 }
 
-// 列表滚动触底加载
 const listScrollRef = ref<InstanceType<typeof ScrollArea>>()
+
+// 监听 ScrollArea viewport 滚动事件（Reka UI ScrollAreaRoot 不会自动转发 scroll 事件）
+let stopScrollListener: (() => void) | undefined
+watch(listScrollRef, (ref) => {
+  stopScrollListener?.()
+  if (!ref)
+    return
+  const viewport = ref.$el?.querySelector('[data-radix-scroll-area-viewport]')
+  if (!viewport)
+    return
+  stopScrollListener = useEventListener(viewport, 'scroll', onListScroll)
+})
+
+// 列表滚动触底加载
 function onListScroll() {
   const viewport = listScrollRef.value?.$el?.querySelector('[data-radix-scroll-area-viewport]')
   if (!viewport)
@@ -133,12 +149,52 @@ function formatListTime(dateStr: string | undefined) {
 
 const chatIdRef = computed(() => selectedChatId.value)
 
-const { data: detailData, isLoading: isDetailLoading } = useGetConversationDetailQuery(chatIdRef)
+// 当前选中的会话（用于获取 type 等元信息）
+const selectedConversation = computed(() => {
+  return conversationList.value.find(c => String(c.chatId) === selectedChatId.value)
+})
 
-const conversation = computed(() => detailData.value?.data)
+// Coze/Agent 类型会话使用 /aiCommon/messageList 获取消息
+const isStreamType = computed(() => {
+  const type = selectedConversation.value?.type
+  return type === 2 || type === 3
+})
 
+// 原有详情查询（非 2/3 类型时启用）
+const { data: detailData, isLoading: isDetailLoading } = useGetConversationDetailQuery(
+  chatIdRef,
+  computed(() => !isStreamType.value),
+)
+
+// 消息列表查询（2/3 类型时启用）
+const messageListQuery = computed(() => {
+  if (!selectedChatId.value || !isStreamType.value)
+    return null
+  return {
+    chatId: selectedChatId.value,
+    pageNum: 1,
+    pageSize: 100,
+    searchCount: false,
+  }
+})
+
+const { data: messageListData, isLoading: isMessageListLoading } = useGetMessageListQuery(messageListQuery)
+
+// 会话元信息：优先从详情接口获取，否则从会话列表获取
+const conversation = computed(() => detailData.value?.data ?? selectedConversation.value)
+
+// 统一消息列表
 const messages = computed<IChatMessage[]>(() => {
-  return conversation.value?.messages ?? []
+  if (isStreamType.value) {
+    const list = messageListData.value?.data?.list ?? []
+    return convertStreamMessagesToChatMessages(list)
+  }
+  return (conversation.value as IConversationDetail | undefined)?.messages ?? []
+})
+
+// 统一的详情加载状态
+const isLoadingDetail = computed(() => {
+  return isStreamType.value ? isMessageListLoading.value : isDetailLoading.value
 })
 
 const inputText = ref('')
@@ -161,9 +217,14 @@ async function handleSend() {
     })
 
     inputText.value = ''
-    // 刷新会话详情以显示新消息
+    // 刷新消息列表以显示新消息
     // flex-col-reverse 模式下新消息自动出现在底部，无需手动滚动
-    queryClient.invalidateQueries({ queryKey: ['conversationDetail', selectedChatId.value] })
+    if (isStreamType.value) {
+      queryClient.invalidateQueries({ queryKey: ['messageList'] })
+    }
+    else {
+      queryClient.invalidateQueries({ queryKey: ['conversationDetail', selectedChatId.value] })
+    }
   }
   catch (error) {
     console.error('发送消息失败:', error)
@@ -249,8 +310,7 @@ function getInitials(name: string) {
       <!-- 会话列表 -->
       <ScrollArea
         ref="listScrollRef"
-        class="flex-1"
-        @scroll="onListScroll"
+        class="flex-1 min-h-0"
       >
         <div class="flex flex-col">
           <!-- 加载中 -->
@@ -411,7 +471,7 @@ function getInitials(name: string) {
               </div>
             </template>
 
-            <template v-else-if="isDetailLoading">
+            <template v-else-if="isLoadingDetail">
               <Skeleton class="size-9 rounded-full" />
               <div class="space-y-1">
                 <Skeleton class="h-4 w-24" />
