@@ -154,19 +154,19 @@ const selectedConversation = computed(() => {
   return conversationList.value.find(c => String(c.chatId) === selectedChatId.value)
 })
 
-// Coze/Agent 类型会话使用 /aiCommon/messageList 获取消息
+// Coze/Agent 类型会话（type 1/2）使用 /aiCommon/messageList 获取消息
 const isStreamType = computed(() => {
   const type = selectedConversation.value?.type
-  return type === 2 || type === 3
+  return type === 1 || type === 2
 })
 
-// 原有详情查询（非 2/3 类型时启用）
+// 原有详情查询（非 1/2 类型时启用）
 const { data: detailData, isLoading: isDetailLoading } = useGetConversationDetailQuery(
   chatIdRef,
   computed(() => !isStreamType.value),
 )
 
-// 消息列表查询（2/3 类型时启用）
+// 消息列表查询（1/2 类型时启用）
 const messageListQuery = computed(() => {
   if (!selectedChatId.value || !isStreamType.value)
     return null
@@ -197,12 +197,15 @@ const isLoadingDetail = computed(() => {
   return isStreamType.value ? isMessageListLoading.value : isDetailLoading.value
 })
 
+// type 1/2 为流式会话，工作台仅查看，禁止手动输入
+const isInputDisabled = computed(() => isStreamType.value)
+
 const inputText = ref('')
 const isSending = ref(false)
 const queryClient = useQueryClient()
 
 async function handleSend() {
-  if (!inputText.value.trim() || !selectedChatId.value)
+  if (!inputText.value.trim() || !selectedChatId.value || isInputDisabled.value)
     return
 
   isSending.value = true
@@ -499,12 +502,21 @@ function getInitials(name: string) {
 
         <!-- 输入框 -->
         <div class="border-t bg-background p-3 sm:p-4 shrink-0">
-          <div class="flex items-end gap-2 rounded-lg border border-input bg-card px-3 py-2 focus-within:ring-1 focus-within:ring-ring">
+          <div
+            :class="cn(
+              'flex items-end gap-2 rounded-lg border border-input bg-card px-3 py-2',
+              !isInputDisabled && 'focus-within:ring-1 focus-within:ring-ring',
+            )"
+          >
             <textarea
               v-model="inputText"
-              placeholder="输入消息..."
+              :placeholder="isInputDisabled ? '该会话为AI流式会话，仅可查看' : '输入消息...'"
               rows="1"
-              class="min-h-[36px] max-h-[120px] flex-1 resize-none bg-transparent py-2 text-sm outline-none"
+              :disabled="isInputDisabled"
+              :class="cn(
+                'min-h-[36px] max-h-[120px] flex-1 resize-none bg-transparent py-2 text-sm outline-none',
+                isInputDisabled && 'cursor-not-allowed opacity-60',
+              )"
               @keydown="handleKeydown"
             />
 
@@ -512,7 +524,7 @@ function getInitials(name: string) {
               variant="default"
               size="icon"
               class="size-8 rounded-full shrink-0"
-              :disabled="!inputText.trim()"
+              :disabled="isInputDisabled || !inputText.trim()"
               @click="handleSend"
             >
               <SendIcon class="size-4" />
