@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T">
-import type { Table } from '@tanstack/vue-table'
+import type { Column, Table } from '@tanstack/vue-table'
 
 import { RefreshCcwIcon, Settings2Icon } from '@lucide/vue'
 
@@ -15,6 +15,10 @@ const columns = computed(() => props.table.getAllColumns()
 function resetColumnVisible() {
   columns.value.forEach(column => column.toggleVisibility(true))
 }
+
+function getColumnLabel(column: Column<T>) {
+  return (column.columnDef.meta as { title?: string } | undefined)?.title ?? column.id
+}
 </script>
 
 <template>
@@ -26,11 +30,11 @@ function resetColumnVisible() {
         class="hidden h-8 ml-auto lg:flex"
       >
         <Settings2Icon class="size-4 mr-2" />
-        Columns View
+        列视图
       </UiButton>
     </UiDropdownMenuTrigger>
     <UiDropdownMenuContent align="end" class="w-[150px]">
-      <UiDropdownMenuLabel>Toggle columns</UiDropdownMenuLabel>
+      <UiDropdownMenuLabel>切换列</UiDropdownMenuLabel>
       <UiDropdownMenuSeparator />
 
       <UiDropdownMenuCheckboxItem
@@ -40,7 +44,7 @@ function resetColumnVisible() {
         :model-value="column.getIsVisible()"
         @update:model-value="(value:boolean) => column.toggleVisibility(!!value)"
       >
-        {{ column.id }}
+        {{ getColumnLabel(column) }}
       </UiDropdownMenuCheckboxItem>
 
       <UiDropdownMenuSeparator />
@@ -49,7 +53,7 @@ function resetColumnVisible() {
         @click="resetColumnVisible"
       >
         <RefreshCcwIcon />
-        Reset
+        重置
       </UiDropdownMenuItem>
     </UiDropdownMenuContent>
   </UiDropdownMenu>

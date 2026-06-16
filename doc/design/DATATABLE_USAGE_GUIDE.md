@@ -298,6 +298,7 @@ export const columns: ColumnDef<IConversation>[] = [
   {
     accessorKey: 'title',
     header: ({ column }) => h(DataTableColumnHeader<IConversation>, { column, title: '会话标题' }),
+    meta: { title: '会话标题' },
     cell: ({ row }) => h('div', { class: 'font-medium' }, row.getValue('title') || '未命名会话'),
     enableSorting: false,
     enableHiding: false,
@@ -305,6 +306,7 @@ export const columns: ColumnDef<IConversation>[] = [
   {
     accessorKey: 'userTag',
     header: ({ column }) => h(DataTableColumnHeader<IConversation>, { column, title: '用户标签' }),
+    meta: { title: '用户标签' },
     cell: ({ row }) => {
       const tag = row.getValue('userTag') as number
       return h(Badge, { variant: 'outline' }, () => userTagConfig[tag] || '未知')
@@ -314,6 +316,7 @@ export const columns: ColumnDef<IConversation>[] = [
   {
     accessorKey: 'serviceMode',
     header: ({ column }) => h(DataTableColumnHeader<IConversation>, { column, title: '服务模式' }),
+    meta: { title: '服务模式' },
     cell: ({ row }) => {
       const mode = row.getValue('serviceMode') as number
       const config = serviceModeConfig[mode]
@@ -324,12 +327,14 @@ export const columns: ColumnDef<IConversation>[] = [
   {
     accessorKey: 'lastMessagePreview',
     header: ({ column }) => h(DataTableColumnHeader<IConversation>, { column, title: '最后消息' }),
+    meta: { title: '最后消息' },
     cell: ({ row }) => h('div', { class: 'max-w-[200px] truncate text-sm text-muted-foreground' }, row.getValue('lastMessagePreview') || '-'),
     enableSorting: false,
   },
   {
     accessorKey: 'lastMessageTime',
     header: ({ column }) => h(DataTableColumnHeader<IConversation>, { column, title: '最后消息时间' }),
+    meta: { title: '最后消息时间' },
     cell: ({ row }) => h('div', { class: 'text-sm text-muted-foreground' }, formatDate(row.getValue('lastMessageTime'))),
     enableSorting: false,
   },
@@ -431,7 +436,12 @@ const serverPagination = computed(() => ({
 4. **列的 `accessorKey` 要与后端字段一致**
    - 如果后端字段名不一致，可用 `accessorFn: row => row.xxx` 或 `id` 自定义。
 
-5. **行操作建议放在 `columns.ts` 里**
+5. **列视图（显示/隐藏列）的中文标题**
+   - `view-options.vue` 默认读取 `column.columnDef.meta.title`
+   - 所以在 `columns.ts` 里定义列时，除了给 `DataTableColumnHeader` 传 `title`，还要加 `meta: { title: '...' }`
+   - 没写 `meta.title` 的列会回退显示 `column.id`（英文）
+
+6. **行操作建议放在 `columns.ts` 里**
    - 通过 `h(DataTableRowActions, { row })` 渲染，保持 `columns.ts`  pure，操作逻辑抽到 `data-table-row-actions.vue`。
 
 ---
