@@ -1,3 +1,9 @@
+<!--
+  TODO: 多小区/组织切换器占位组件
+  当前在 app-sidebar/index.vue 中通过 enableCommunitySwitch 开关关闭。
+  后续产品支持“一个运营人员管理多个小区”时，可直接启用该组件，
+  或在此基础上改名为 CommunitySwitcher 并接入真实的小区/组织数据。
+-->
 <script lang="ts" setup>
 import { ChevronsUpDownIcon, PlusIcon } from '@lucide/vue'
 
