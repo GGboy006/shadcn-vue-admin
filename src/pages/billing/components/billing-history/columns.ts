@@ -13,6 +13,7 @@ export const columns: ColumnDef<Billing>[] = [
   {
     accessorKey: 'id',
     header: ({ column }) => h(DataTableColumnHeader<Billing>, { column, title: 'ID' }),
+    meta: { title: 'ID' },
     cell: ({ row }) => h('div', { }, row.getValue('id')),
     enableSorting: false,
     enableHiding: false,
@@ -20,6 +21,7 @@ export const columns: ColumnDef<Billing>[] = [
   {
     accessorKey: 'amount',
     header: ({ column }) => h(DataTableColumnHeader<Billing>, { column, title: 'amount' }),
+    meta: { title: 'amount' },
     cell: ({ row }) => h('div', { }, row.getValue('amount')),
     enableSorting: false,
     enableHiding: false,
@@ -27,6 +29,7 @@ export const columns: ColumnDef<Billing>[] = [
   {
     accessorKey: 'date',
     header: ({ column }) => h(DataTableColumnHeader<Billing>, { column, title: 'billing date' }),
+    meta: { title: 'billing date' },
     cell: ({ row }) => h('div', { }, row.getValue('date')),
     enableSorting: false,
     enableHiding: false,
@@ -34,6 +37,7 @@ export const columns: ColumnDef<Billing>[] = [
   {
     accessorKey: 'plan',
     header: ({ column }) => h(DataTableColumnHeader<Billing>, { column, title: 'billing plan' }),
+    meta: { title: 'billing plan' },
     cell: ({ row }) => h('div', { }, row.getValue('plan')),
     enableSorting: false,
     enableHiding: false,
@@ -41,6 +45,7 @@ export const columns: ColumnDef<Billing>[] = [
   {
     accessorKey: 'status',
     header: ({ column }) => h(DataTableColumnHeader<Billing>, { column, title: 'status' }),
+    meta: { title: 'status' },
     cell: ({ row }) => {
       const status = statuses.find(status => status.value === row.getValue('status'))
       if (!status)
@@ -65,6 +70,7 @@ export const columns: ColumnDef<Billing>[] = [
   {
     accessorKey: 'orderId',
     header: ({ column }) => h(DataTableColumnHeader<Billing>, { column, title: 'Order ID' }),
+    meta: { title: 'Order ID' },
     cell: ({ row }) => h('div', { }, row.getValue('orderId') || 'N/A'),
     enableSorting: false,
     enableHiding: false,

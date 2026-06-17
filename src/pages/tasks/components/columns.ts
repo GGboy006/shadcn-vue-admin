@@ -15,6 +15,7 @@ export const columns: ColumnDef<Task>[] = [
   {
     accessorKey: 'id',
     header: ({ column }) => h(DataTableColumnHeader<Task>, { column, title: 'Task' }),
+    meta: { title: 'Task' },
     cell: ({ row }) => h('div', { class: 'w-20' }, row.getValue('id')),
     enableSorting: false,
     enableHiding: false,
@@ -23,6 +24,7 @@ export const columns: ColumnDef<Task>[] = [
     accessorKey: 'title',
     header: ({ column }) => h(DataTableColumnHeader<Task>, { column, title: 'Title' }),
 
+    meta: { title: 'Title' },
     cell: ({ row }) => {
       const label = labels.find(label => label.value === row.original.label)
 
@@ -36,6 +38,7 @@ export const columns: ColumnDef<Task>[] = [
     accessorKey: 'status',
     header: ({ column }) => h(DataTableColumnHeader<Task>, { column, title: 'Status' }),
 
+    meta: { title: 'Status' },
     cell: ({ row }) => {
       const status = statuses.find(
         status => status.value === row.getValue('status'),
@@ -56,6 +59,7 @@ export const columns: ColumnDef<Task>[] = [
   {
     accessorKey: 'priority',
     header: ({ column }) => h(DataTableColumnHeader<Task>, { column, title: 'Priority' }),
+    meta: { title: 'Priority' },
     cell: ({ row }) => {
       const priority = priorities.find(
         priority => priority.value === row.getValue('priority'),

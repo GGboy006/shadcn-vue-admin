@@ -33,6 +33,7 @@ export const columns: ColumnDef<Merchant>[] = [
   {
     accessorKey: 'merchantName',
     header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '名称' }),
+    meta: { title: '名称' },
     cell: ({ row }) => h('div', { class: 'font-medium' }, row.getValue('merchantName')),
     enableSorting: false,
     enableHiding: false,
@@ -42,6 +43,7 @@ export const columns: ColumnDef<Merchant>[] = [
   {
     accessorKey: 'type',
     header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '类型' }),
+    meta: { title: '类型' },
     cell: ({ row }) => {
       const type = row.getValue('type') as number
       const config = merchantTypeConfig[type]
@@ -56,6 +58,7 @@ export const columns: ColumnDef<Merchant>[] = [
   {
     accessorKey: 'status',
     header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '状态' }),
+    meta: { title: '状态' },
     cell: ({ row }) => h(MerchantStatusSwitch, { merchant: row.original }),
     enableSorting: false,
     enableResizing: true,
@@ -65,6 +68,7 @@ export const columns: ColumnDef<Merchant>[] = [
     id: 'contact',
     accessorKey: 'contactName',
     header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '联系人' }),
+    meta: { title: '联系人' },
     cell: ({ row }) => {
       const name = row.getValue('contactName') as string
       const phone = row.original.contactPhone
@@ -80,6 +84,7 @@ export const columns: ColumnDef<Merchant>[] = [
   {
     accessorKey: 'signDate',
     header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '签约日期' }),
+    meta: { title: '签约日期' },
     cell: ({ row }) => h('div', { class: 'text-sm tabular-nums' }, row.getValue('signDate') || '-'),
     enableSorting: false,
     enableResizing: true,
@@ -88,6 +93,7 @@ export const columns: ColumnDef<Merchant>[] = [
   {
     accessorKey: 'signFee',
     header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '签约费用' }),
+    meta: { title: '签约费用' },
     cell: ({ row }) => {
       const fee = row.getValue('signFee') as number
       return h('div', { class: 'text-sm tabular-nums' }, fee != null ? `$${fee}` : '-')
@@ -99,6 +105,7 @@ export const columns: ColumnDef<Merchant>[] = [
   {
     accessorKey: 'remark',
     header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '备注' }),
+    meta: { title: '备注' },
     cell: ({ row }) => h('div', { class: 'max-w-[200px] truncate text-sm text-muted-foreground' }, row.getValue('remark') || '-'),
     enableSorting: false,
     enableResizing: true,
@@ -107,6 +114,7 @@ export const columns: ColumnDef<Merchant>[] = [
   {
     accessorKey: 'merchantCode',
     header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '商户编号' }),
+    meta: { title: '商户编号' },
     cell: ({ row }) => h('div', { class: 'text-sm text-muted-foreground' }, row.getValue('merchantCode') || '-'),
     enableSorting: false,
     enableHiding: true,
@@ -116,6 +124,7 @@ export const columns: ColumnDef<Merchant>[] = [
   {
     accessorKey: 'businessStatus',
     header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '营业状态' }),
+    meta: { title: '营业状态' },
     cell: ({ row }) => {
       const businessStatus = row.getValue('businessStatus') as number
       if (!businessStatus)
@@ -133,6 +142,7 @@ export const columns: ColumnDef<Merchant>[] = [
   {
     accessorKey: 'address',
     header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '详细地址' }),
+    meta: { title: '详细地址' },
     cell: ({ row }) => h('div', { class: 'max-w-[200px] truncate text-sm text-muted-foreground' }, row.getValue('address') || '-'),
     enableSorting: false,
     enableHiding: true,
