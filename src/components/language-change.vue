@@ -44,13 +44,13 @@ function handleLocaleChange(val: AcceptableValue) {
         v-model="locale"
         @update:model-value="handleLocaleChange"
       >
-        <UiDropdownMenuRadioItem value="en">
-          <Icon icon="flag:us-4x3" />
-          <span>English</span>
-        </UiDropdownMenuRadioItem>
         <UiDropdownMenuRadioItem value="zh">
           <Icon icon="flag:cn-4x3" />
           <span>中文</span>
+        </UiDropdownMenuRadioItem>
+        <UiDropdownMenuRadioItem value="en">
+          <Icon icon="flag:us-4x3" />
+          <span>English</span>
         </UiDropdownMenuRadioItem>
       </UiDropdownMenuRadioGroup>
     </UiDropdownMenuContent>
