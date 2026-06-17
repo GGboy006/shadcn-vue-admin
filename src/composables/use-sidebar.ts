@@ -25,12 +25,13 @@ export function useSidebar() {
       title: '通用',
       items: [
         { title: '仪表盘', url: '/dashboard', icon: LayoutDashboardIcon },
+        { title: '聊天工作台', url: '/admin/chat-workbench', icon: HeadsetIcon, roles: [3] },
         // { title: '任务', url: '/tasks', icon: ListTodoIcon },
         { title: 'AI工具管理', url: '/apps', icon: BoxesIcon },
         { title: '会话列表', url: '/conversations', icon: MessageSquareIcon },
         { title: '商户/物业管理', url: '/merchants', icon: UsersIcon, roles: [3] },
         // { title: 'AI 对话示例', url: '/ai-talk', icon: PodcastIcon },
-        { title: '聊天工作台', url: '/admin/chat-workbench', icon: HeadsetIcon, roles: [3] },
+
       ],
     },
     // {
