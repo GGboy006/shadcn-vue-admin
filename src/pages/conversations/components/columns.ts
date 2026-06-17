@@ -24,7 +24,6 @@ export const columns: ColumnDef<IConversation>[] = [
     enableResizing: true,
   },
   {
-    id: '用户标签',
     accessorKey: 'userTag',
     header: ({ column }) => h(DataTableColumnHeader<IConversation>, { column, title: '用户标签' }),
     meta: { title: '用户标签' },
