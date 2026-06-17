@@ -538,8 +538,6 @@ function getInitials(name: string) {
 
 <route lang="yaml">
 meta:
-  auth: true
-  roles: [3,4]
-  title: '聊天工作台'
+  roles: [3]
   layout: fixed
 </route>
