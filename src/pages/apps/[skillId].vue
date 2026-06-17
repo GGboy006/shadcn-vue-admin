@@ -8,6 +8,7 @@ import { useApiFetch } from '@/composables/use-fetch'
 import { useGetSkillMerchantsQuery, useManualTakeoverMutation } from '@/services/api/skill.api'
 import { useAuthStore } from '@/stores/auth'
 import { useStationRegenerateStore } from '@/stores/station-regenerate'
+import { downloadImage } from '@/utils/download-image'
 
 import type { IChoiceOption } from './types/wizard.types'
 
@@ -131,11 +132,10 @@ function handleBack() {
 // 处理下载
 function handleDownload() {
   if (wizard.generatedImageUrl.value) {
-    const link = document.createElement('a')
-    link.href = wizard.generatedImageUrl.value
-    link.download = `ai-generated-${Date.now()}.png`
-    link.target = '_blank'
-    link.click()
+    downloadImage(
+      wizard.generatedImageUrl.value,
+      `ai-generated-${Date.now()}`,
+    )
   }
 }
 

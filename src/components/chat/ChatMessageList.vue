@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useGetImageGenerationQuery } from '@/services/api/conversation.api'
+import { downloadImage } from '@/utils/download-image'
 import { withBase } from '@/utils/with-base'
 
 interface Props {
@@ -34,8 +35,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   /** 点击重新生成 */
   regenerate: [msg: IChatMessage]
-  /** 点击下载图片 */
-  downloadImage: [url: string, msgId: string]
 }>()
 
 const slots = useSlots()
@@ -109,15 +108,7 @@ function getImageStatus(imageGenerationId: number | undefined): {
 }
 
 function handleDownloadImage(url: string, msgId: string) {
-  if (!url)
-    return
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `image-${msgId}.png`
-  link.target = '_blank'
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
+  downloadImage(url, `image-${msgId}`)
 }
 
 // ==================== 消息样式（根据 userPosition 动态计算） ====================
