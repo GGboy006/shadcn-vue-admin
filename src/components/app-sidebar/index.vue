@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useSidebar } from '@/composables/use-sidebar'
 import { useAuthStore } from '@/stores/auth'
 import { useUserInfoStore } from '@/stores/user-info'
 
@@ -12,9 +13,14 @@ import TeamSwitcher from './team-switcher.vue'
 const authStore = useAuthStore()
 const userInfoStore = useUserInfoStore()
 
-// 功能开关：是否启用多小区/团队切换器
+// 必须直接调用 useSidebar() 获取响应式 navData。
+// sidebar-data.ts 里导出的是 navData.value 的静态快照，切换账号后不会更新。
+const { navData } = useSidebar()
+
+// 功能开关：当前关闭多小区切换器，未来可直接开启 TeamSwitcher
 const enableCommunitySwitch = false
 
+// 根据角色动态显示左上角名称
 const userType = computed(() => authStore.userInfo?.userType)
 const isStationMaster = computed(() => userType.value === 3)
 const isMerchant = computed(() => userType.value === 4 || userType.value === 5)
@@ -48,7 +54,7 @@ const sidebarTitle = computed(() => {
     </UiSidebarHeader>
 
     <UiSidebarContent>
-      <NavTeam :nav-main="sidebarData.navMain" />
+      <NavTeam :nav-main="navData" />
     </UiSidebarContent>
 
     <UiSidebarFooter>

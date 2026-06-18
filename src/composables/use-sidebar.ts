@@ -4,7 +4,10 @@ import type { NavGroup } from '@/components/app-sidebar/types'
 
 export function useSidebar() {
   const authStore = useAuthStore()
-  const userType = authStore.getUserType()
+
+  // 必须用 computed 包裹，否则退出登录换账号后 userType 不会更新。
+  // 之前用 const userType = authStore.getUserType() 只读取了一次快照。
+  const userType = computed(() => authStore.userInfo?.userType)
 
   const allSettingsNavItems = [
     { title: '个人资料', url: '/settings/', icon: UserIcon },
@@ -14,13 +17,15 @@ export function useSidebar() {
     // { title: '显示', url: '/settings/display', icon: PictureInPicture2Icon },
   ]
 
-  const settingsNavItems = allSettingsNavItems.filter((item) => {
+  // settings 子菜单也需要随 userType 重新过滤
+  const settingsNavItems = computed(() => allSettingsNavItems.filter((item) => {
     if (!item.roles)
       return true
-    return userType !== undefined && item.roles.includes(userType)
-  })
+    return userType.value !== undefined && item.roles.includes(userType.value)
+  }))
 
-  const rawNavData = ref<NavGroup[]> ([
+  // rawNavData 必须用 computed，因为“设置”组依赖 settingsNavItems
+  const rawNavData = computed<NavGroup[]>(() => [
     {
       title: '通用',
       items: [
@@ -64,7 +69,7 @@ export function useSidebar() {
     {
       title: '其他',
       items: [
-        { title: '设置', items: settingsNavItems, icon: SettingsIcon },
+        { title: '设置', items: settingsNavItems.value, icon: SettingsIcon },
         // { title: '组件属性', url: '/prop-components', icon: ComponentIcon },
         // { title: '帮助中心', url: '/help-center', icon: BadgeHelpIcon },
         // { title: '外部页面(GitHub)', url: 'https://www.github.com/Whbbit1999/shadcn-vue-admin', icon: BirdIcon },
@@ -72,13 +77,14 @@ export function useSidebar() {
     },
   ])
 
+  // 最终菜单：根据 userType 过滤带 roles 的菜单项
   const navData = computed<NavGroup[]>(() => {
     return rawNavData.value.map(group => ({
       ...group,
       items: group.items.filter((item) => {
         if (!item.roles)
           return true
-        return userType !== undefined && item.roles.includes(userType)
+        return userType.value !== undefined && item.roles.includes(userType.value)
       }),
     }))
   })
