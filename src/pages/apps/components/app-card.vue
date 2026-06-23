@@ -66,7 +66,7 @@ function handleClick() {
       <div class="flex items-start gap-1.5 mt-2.5 text-xs rounded-md bg-gray-100  p-2  text-muted-foreground">
         <SparklesIcon class="mt-0.5 size-3.5 shrink-0 text-primary" />
         <span class="line-clamp-1 sm:line-clamp-2">
-          输入活动主题和文案，AI自动生成多种风格的海报供选择
+          {{ app.inputType === 1 ? '输入文本内容，AI智能生成回复与建议' : '输入活动主题和文案，AI自动生成多种风格的海报供选择' }}
         </span>
       </div>
     </CardContent>
