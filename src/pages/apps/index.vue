@@ -107,7 +107,7 @@ function goToPage(page: number) {
           </SelectContent>
         </Select>
       </div>
-      <SortSelect v-model:sort="sort" />
+      <SortSelect v-if="false" v-model:sort="sort" />
     </div>
 
     <!-- 卡片网格 -->
