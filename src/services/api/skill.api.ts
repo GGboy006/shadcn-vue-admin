@@ -31,8 +31,8 @@ export const inputTypeFilterOptions = [
   { label: '全部', value: 'all' },
   { label: '文本生成', value: '1' },
   { label: '图像生成', value: '2' },
-  { label: '语音合成', value: '3' },
-  { label: '混合', value: '4' },
+  // { label: '语音合成', value: '3' },
+  // { label: '混合', value: '4' },
 ] as const
 
 /** 分配状态映射配置 */
