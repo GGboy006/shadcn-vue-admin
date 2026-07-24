@@ -8,6 +8,7 @@ import Badge from '@/components/ui/badge/Badge.vue'
 import type { Merchant } from '../data/schema'
 
 import DataTableRowActions from './data-table-row-actions.vue'
+import MerchantNameLink from './merchant-name-link.vue'
 import MerchantStatusSwitch from './merchant-status-switch.vue'
 
 export const merchantStatusConfig: Record<number, { label: string, style: string }> = {
@@ -34,7 +35,7 @@ export const columns: ColumnDef<Merchant>[] = [
     accessorKey: 'merchantName',
     header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '名称' }),
     meta: { title: '名称' },
-    cell: ({ row }) => h('div', { class: 'font-medium' }, row.getValue('merchantName')),
+    cell: ({ row }) => h(MerchantNameLink, { merchant: row.original }),
     enableSorting: false,
     enableHiding: false,
     enableResizing: true,

@@ -279,6 +279,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/merchant-business/overview/': RouteRecordInfo<
+      '/merchant-business/overview/',
+      '/merchant-business/overview',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/merchant-business/profile/': RouteRecordInfo<
       '/merchant-business/profile/',
       '/merchant-business/profile',
@@ -582,6 +589,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/merchant-business/order/index.vue': {
       routes:
         | '/merchant-business/order/'
+      views:
+        | never
+    }
+    'src/pages/merchant-business/overview/index.vue': {
+      routes:
+        | '/merchant-business/overview/'
       views:
         | never
     }

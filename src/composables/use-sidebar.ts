@@ -16,6 +16,7 @@ export function useSidebar() {
 
   /** 商户后台菜单项;「商户资料」selfOnly:站长代客过滤掉 */
   const merchantBusinessNavItems: NavItem[] = [
+    { title: '商户概览', url: '/merchant-business/overview', icon: LayoutDashboardIcon },
     { title: '商户资料', url: '/merchant-business/profile', icon: StoreIcon, selfOnly: true },
     { title: '商品分类', url: '/merchant-business/category', icon: FolderTreeIcon },
     { title: '商品管理', url: '/merchant-business/goods', icon: PackageIcon },

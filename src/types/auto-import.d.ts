@@ -81,6 +81,7 @@ declare global {
   const useCssModule: typeof import('vue').useCssModule
   const useCssVars: typeof import('vue').useCssVars
   const useCurrentMerchantId: typeof import('../composables/use-current-merchant-id').useCurrentMerchantId
+  const useEnterMerchantBusiness: typeof import('../composables/use-enter-merchant-business').useEnterMerchantBusiness
   const useId: typeof import('vue').useId
   const useLink: typeof import('vue-router')['useLink']
   const useMerchantBusinessStore: typeof import('../stores/merchant-business').useMerchantBusinessStore

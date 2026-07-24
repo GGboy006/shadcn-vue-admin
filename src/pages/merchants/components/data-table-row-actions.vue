@@ -5,7 +5,7 @@ import type { Component } from 'vue'
 import { BotIcon, EllipsisIcon, PencilIcon, StoreIcon } from '@lucide/vue'
 
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
-import { useMerchantBusinessStore } from '@/stores/merchant-business'
+import { useEnterMerchantBusiness } from '@/composables/use-enter-merchant-business'
 
 import type { Merchant } from '../data/schema'
 
@@ -38,11 +38,10 @@ function handleAssign() {
   router.push(`/merchants/${merchant.value.merchantId}`)
 }
 
+const { enterMerchantBusiness } = useEnterMerchantBusiness()
 function handleEnterBusiness() {
   // 同窗口跳转:存入代客 store(带商户名),菜单自动重载为商户后台
-  const store = useMerchantBusinessStore()
-  store.enterProxy(merchant.value.merchantId, merchant.value.merchantName)
-  router.push({ path: '/merchant-business', query: { mId: merchant.value.merchantId } })
+  enterMerchantBusiness(merchant.value.merchantId, merchant.value.merchantName)
 }
 </script>
 

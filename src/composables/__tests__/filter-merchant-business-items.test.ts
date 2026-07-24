@@ -5,6 +5,7 @@ import type { NavItem } from '@/components/app-sidebar/types'
 import { filterMerchantBusinessItems } from '@/composables/filter-merchant-business-items'
 
 const items: (NavItem & { selfOnly?: boolean })[] = [
+  { title: '商户概览', url: '/merchant-business/overview' },
   { title: '商户资料', url: '/merchant-business/profile', selfOnly: true },
   { title: '商品分类', url: '/merchant-business/category' },
   { title: '商品管理', url: '/merchant-business/goods' },
@@ -18,6 +19,7 @@ describe('filterMerchantBusinessItems', () => {
     const result = filterMerchantBusinessItems(items, { userType: 4, proxyMode: false })
 
     expect(result.map(i => i.title)).toEqual([
+      '商户概览',
       '商户资料',
       '商品分类',
       '商品管理',
@@ -30,7 +32,7 @@ describe('filterMerchantBusinessItems', () => {
   it('should keep all items for property (userType=5) self mode', () => {
     const result = filterMerchantBusinessItems(items, { userType: 5, proxyMode: false })
 
-    expect(result.map(i => i.title)).toHaveLength(6)
+    expect(result.map(i => i.title)).toHaveLength(7)
     expect(result.map(i => i.title)).toContain('商户资料')
   })
 
@@ -38,6 +40,7 @@ describe('filterMerchantBusinessItems', () => {
     const result = filterMerchantBusinessItems(items, { userType: 3, proxyMode: true })
 
     expect(result.map(i => i.title)).toEqual([
+      '商户概览',
       '商品分类',
       '商品管理',
       'FAQ',
@@ -51,5 +54,7 @@ describe('filterMerchantBusinessItems', () => {
     const result = filterMerchantBusinessItems(items, { userType: undefined, proxyMode: true })
 
     expect(result.map(i => i.title)).not.toContain('商户资料')
+    // 商户概览非 selfOnly,代客态保留
+    expect(result.map(i => i.title)).toContain('商户概览')
   })
 })
