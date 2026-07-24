@@ -28,6 +28,7 @@ declare global {
   const defineComponent: typeof import('vue').defineComponent
   const definePage: typeof import('vue-router/experimental').definePage
   const effectScope: typeof import('vue').effectScope
+  const filterMerchantBusinessItems: typeof import('../composables/filter-merchant-business-items').filterMerchantBusinessItems
   const getCurrentInstance: typeof import('vue').getCurrentInstance
   const getCurrentScope: typeof import('vue').getCurrentScope
   const getCurrentWatcher: typeof import('vue').getCurrentWatcher
@@ -79,8 +80,10 @@ declare global {
   const useAuthStore: typeof import('../stores/auth').useAuthStore
   const useCssModule: typeof import('vue').useCssModule
   const useCssVars: typeof import('vue').useCssVars
+  const useCurrentMerchantId: typeof import('../composables/use-current-merchant-id').useCurrentMerchantId
   const useId: typeof import('vue').useId
   const useLink: typeof import('vue-router')['useLink']
+  const useMerchantBusinessStore: typeof import('../stores/merchant-business').useMerchantBusinessStore
   const useModal: typeof import('../composables/use-modal').useModal
   const useModel: typeof import('vue').useModel
   const useRoute: typeof import('vue-router').useRoute

@@ -2,9 +2,10 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
-import { BotIcon, EllipsisIcon, PencilIcon } from '@lucide/vue'
+import { BotIcon, EllipsisIcon, PencilIcon, StoreIcon } from '@lucide/vue'
 
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
+import { useMerchantBusinessStore } from '@/stores/merchant-business'
 
 import type { Merchant } from '../data/schema'
 
@@ -36,6 +37,13 @@ function handleSelect(command: TCommand) {
 function handleAssign() {
   router.push(`/merchants/${merchant.value.merchantId}`)
 }
+
+function handleEnterBusiness() {
+  // 同窗口跳转:存入代客 store(带商户名),菜单自动重载为商户后台
+  const store = useMerchantBusinessStore()
+  store.enterProxy(merchant.value.merchantId, merchant.value.merchantName)
+  router.push({ path: '/merchant-business', query: { mId: merchant.value.merchantId } })
+}
 </script>
 
 <template>
@@ -59,6 +67,11 @@ function handleAssign() {
         <UiDropdownMenuItem @click.stop="handleAssign">
           <BotIcon class="size-4 mr-2" />
           分配AI工具
+        </UiDropdownMenuItem>
+
+        <UiDropdownMenuItem @click.stop="handleEnterBusiness">
+          <StoreIcon class="size-4 mr-2" />
+          进入商户后台
         </UiDropdownMenuItem>
 
         <UiDropdownMenuSeparator />

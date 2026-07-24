@@ -237,6 +237,55 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/merchant-business/': RouteRecordInfo<
+      '/merchant-business/',
+      '/merchant-business',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/merchant-business/activity/': RouteRecordInfo<
+      '/merchant-business/activity/',
+      '/merchant-business/activity',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/merchant-business/category/': RouteRecordInfo<
+      '/merchant-business/category/',
+      '/merchant-business/category',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/merchant-business/faq/': RouteRecordInfo<
+      '/merchant-business/faq/',
+      '/merchant-business/faq',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/merchant-business/goods/': RouteRecordInfo<
+      '/merchant-business/goods/',
+      '/merchant-business/goods',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/merchant-business/order/': RouteRecordInfo<
+      '/merchant-business/order/',
+      '/merchant-business/order',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/merchant-business/profile/': RouteRecordInfo<
+      '/merchant-business/profile/',
+      '/merchant-business/profile',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/merchants/': RouteRecordInfo<
       '/merchants/',
       '/merchants',
@@ -497,6 +546,48 @@ declare module 'vue-router/auto-routes' {
     'src/pages/marketing/hello.vue': {
       routes:
         | '/marketing/hello'
+      views:
+        | never
+    }
+    'src/pages/merchant-business/index.vue': {
+      routes:
+        | '/merchant-business/'
+      views:
+        | never
+    }
+    'src/pages/merchant-business/activity/index.vue': {
+      routes:
+        | '/merchant-business/activity/'
+      views:
+        | never
+    }
+    'src/pages/merchant-business/category/index.vue': {
+      routes:
+        | '/merchant-business/category/'
+      views:
+        | never
+    }
+    'src/pages/merchant-business/faq/index.vue': {
+      routes:
+        | '/merchant-business/faq/'
+      views:
+        | never
+    }
+    'src/pages/merchant-business/goods/index.vue': {
+      routes:
+        | '/merchant-business/goods/'
+      views:
+        | never
+    }
+    'src/pages/merchant-business/order/index.vue': {
+      routes:
+        | '/merchant-business/order/'
+      views:
+        | never
+    }
+    'src/pages/merchant-business/profile/index.vue': {
+      routes:
+        | '/merchant-business/profile/'
       views:
         | never
     }
