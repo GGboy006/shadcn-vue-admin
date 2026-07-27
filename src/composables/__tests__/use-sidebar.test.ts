@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { useSidebar } from '@/composables/use-sidebar'
 import { useAuthStore } from '@/stores/auth'
-import { useMerchantBusinessStore } from '@/stores/merchant-business'
 
 interface LoginUserVO {
   nickname: string
@@ -14,8 +13,7 @@ interface LoginUserVO {
 }
 
 function setUser(userType: number) {
-  const auth = useAuthStore()
-  auth.setUserInfo({
+  useAuthStore().setUserInfo({
     nickname: '',
     avatar: '',
     gender: 0,
@@ -42,12 +40,11 @@ describe('useSidebar navData', () => {
     setActivePinia(createPinia())
   })
 
-  it('商户自身(userType=4):通用 + 商户后台(含商户资料) + 设置', () => {
+  it('商户(userType=4):通用 + 商户后台(含商户资料) + 设置', () => {
     setUser(4)
     const { navData } = useSidebar()
 
-    const groups = navData.value.map(g => g.title)
-    expect(groups).toEqual(['通用', '商户后台', '其他'])
+    expect(navData.value.map(g => g.title)).toEqual(['通用', '商户后台', '其他'])
 
     // 通用组:无站长专属(聊天工作台、商户/物业管理)
     expect(leafTitles(navData.value[0])).toEqual(['仪表盘', 'AI工具管理', '会话列表'])
@@ -67,28 +64,31 @@ describe('useSidebar navData', () => {
     expect(leafTitles(navData.value[2])).toEqual(['个人资料'])
   })
 
-  it('站长代客(userType=3 + proxyMode)菜单与商户自身完全一致', () => {
-    const mbStore = useMerchantBusinessStore()
-    const { navData } = useSidebar()
-
-    // 商户自身快照
+  it('物业(userType=5)菜单与商户自身一致', () => {
     setUser(4)
-    const merchantSnapshot = snapshot(navData.value)
+    const merchantSnapshot = snapshot(useSidebar().navData.value)
 
-    // 切到站长代客
-    setUser(3)
-    mbStore.enterProxy('M1', '测试商户')
-    const proxySnapshot = snapshot(navData.value)
+    setUser(5)
+    const propertySnapshot = snapshot(useSidebar().navData.value)
 
-    expect(proxySnapshot).toEqual(merchantSnapshot)
+    expect(propertySnapshot).toEqual(merchantSnapshot)
   })
 
-  it('站长原窗口(userType=3, 非代客):通用(含站长专属) + 设置(含站长信息),无商户后台', () => {
+  it('居委会(userType=6)菜单与商户自身一致(三种商户后台用户同级)', () => {
+    setUser(4)
+    const merchantSnapshot = snapshot(useSidebar().navData.value)
+
+    setUser(6)
+    const committeeSnapshot = snapshot(useSidebar().navData.value)
+
+    expect(committeeSnapshot).toEqual(merchantSnapshot)
+  })
+
+  it('站长(userType=3):通用(含站长专属) + 设置(含站长信息),无商户后台', () => {
     setUser(3)
     const { navData } = useSidebar()
 
-    const groups = navData.value.map(g => g.title)
-    expect(groups).toEqual(['通用', '其他'])
+    expect(navData.value.map(g => g.title)).toEqual(['通用', '其他'])
 
     expect(leafTitles(navData.value[0])).toEqual([
       '仪表盘',
@@ -99,17 +99,5 @@ describe('useSidebar navData', () => {
     ])
 
     expect(leafTitles(navData.value[1])).toEqual(['个人资料', '站长信息'])
-  })
-
-  it('物业自身(userType=5)菜单与商户自身一致', () => {
-    const { navData } = useSidebar()
-
-    setUser(4)
-    const merchantSnapshot = snapshot(navData.value)
-
-    setUser(5)
-    const propertySnapshot = snapshot(navData.value)
-
-    expect(propertySnapshot).toEqual(merchantSnapshot)
   })
 })

@@ -2,20 +2,19 @@
 import { ArrowLeftIcon, StoreIcon } from '@lucide/vue'
 
 import { Button } from '@/components/ui/button'
-import { useAuthStore } from '@/stores/auth'
-import { useMerchantBusinessStore } from '@/stores/merchant-business'
+import { useUserInfoStore } from '@/stores/user-info'
+import { isProxyTab } from '@/utils/proxy-auth'
 
-const router = useRouter()
-const authStore = useAuthStore()
-const merchantBusinessStore = useMerchantBusinessStore()
+const userInfoStore = useUserInfoStore()
 
-/** 仅站长代客模式显示 */
-const visible = computed(() => authStore.userInfo?.userType === 3 && merchantBusinessStore.proxyMode)
+/** 仅代客标签页显示(新标签页换商户 token 场景) */
+const visible = computed(() => isProxyTab())
 
-function handleBack() {
-  // 退出代客:清状态 + 跳回商户列表,菜单自动重载为站长视角
-  merchantBusinessStore.clear()
-  router.push('/merchants')
+const merchantName = computed(() => userInfoStore.merchantInfo?.merchantName ?? '')
+
+function handleClose() {
+  // 关闭代客标签页,sessionStorage 随之销毁,商户 token 自动清除
+  window.close()
 }
 </script>
 
@@ -26,12 +25,12 @@ function handleBack() {
   >
     <StoreIcon class="size-4 shrink-0" />
     <span class="truncate">
-      当前操作商户:<span class="font-medium">{{ merchantBusinessStore.merchantName || '未知商户' }}</span>
+      当前代客操作商户:<span class="font-medium">{{ merchantName || '未知商户' }}</span>
     </span>
     <div class="ml-auto">
-      <Button variant="outline" size="sm" class="h-7" @click="handleBack">
+      <Button variant="outline" size="sm" class="h-7" @click="handleClose">
         <ArrowLeftIcon class="size-3.5" />
-        返回商户列表
+        关闭标签页返回
       </Button>
     </div>
   </div>

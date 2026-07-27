@@ -4,25 +4,16 @@ import type { NavGroup, NavItem } from '@/components/app-sidebar/types'
 
 import { filterMerchantBusinessItems } from '@/composables/filter-merchant-business-items'
 import { filterNavItemsByRoles } from '@/composables/filter-nav-items-by-roles'
-import { useMerchantBusinessStore } from '@/stores/merchant-business'
+import { isMerchantBusinessUser } from '@/constants/user-type'
 
 export function useSidebar() {
   const authStore = useAuthStore()
-  const merchantBusinessStore = useMerchantBusinessStore()
 
   // 必须用 computed 包裹,否则退出登录换账号后 userType 不会更新。
   // 之前用 const userType = authStore.getUserType() 只读取了一次快照。
   const userType = computed(() => authStore.userInfo?.userType)
-  const proxyMode = computed(() => merchantBusinessStore.proxyMode)
 
-  // 代客模式下,菜单按商户身份呈现,与商户自己登录一致(通用/商户后台/设置三组)
-  const effectiveUserType = computed(() => {
-    if (userType.value === 3 && proxyMode.value)
-      return 4
-    return userType.value
-  })
-
-  /** 商户后台菜单项(selfOnly 当前预留:代客态已与商户一致,不再据此过滤) */
+  /** 商户后台菜单项(selfOnly 当前预留:代客标签页已换为商户 token,userType 即商户,不再据此过滤) */
   const merchantBusinessNavItems: NavItem[] = [
     { title: '商户概览', url: '/merchant-business/overview', icon: LayoutDashboardIcon },
     { title: '商户资料', url: '/merchant-business/profile', icon: StoreIcon, selfOnly: true },
@@ -51,18 +42,18 @@ export function useSidebar() {
   ]
 
   // settings 子菜单也需要随 userType 重新过滤
-  const settingsNavItems = computed(() => filterNavItemsByRoles(allSettingsNavItems, effectiveUserType.value))
+  const settingsNavItems = computed(() => filterNavItemsByRoles(allSettingsNavItems, userType.value))
 
-  /** 商户/物业自身 + 站长代客:通用菜单 + 商户后台 + 设置(代客态经 effectiveUserType 按商户身份呈现) */
+  /** 商户/物业(含代客标签页,已换商户 token,userType 即 4/5):通用菜单 + 商户后台 + 设置 */
   const merchantSelfNavData = computed<NavGroup[]>(() => [
     {
       title: '通用',
-      items: filterNavItemsByRoles(commonNavItems, effectiveUserType.value),
+      items: filterNavItemsByRoles(commonNavItems, userType.value),
     },
     {
       title: '商户后台',
       items: filterMerchantBusinessItems(merchantBusinessNavItems, {
-        userType: effectiveUserType.value,
+        userType: userType.value,
         proxyMode: false,
       }),
     },
@@ -78,7 +69,7 @@ export function useSidebar() {
   const stationNavData = computed<NavGroup[]>(() => [
     {
       title: '通用',
-      items: filterNavItemsByRoles(commonNavItems, effectiveUserType.value),
+      items: filterNavItemsByRoles(commonNavItems, userType.value),
     },
     {
       title: '其他',
@@ -88,13 +79,11 @@ export function useSidebar() {
     },
   ])
 
-  // 最终菜单:站长原窗口 vs 商户视角(商户/物业自身 + 站长代客)
+  // 最终菜单:商户/物业/居委会(含代客标签页)用商户菜单;站长原窗口用站长菜单。
+  // 代客标签页因换商户 token,userType 已是 4/5/6,天然走商户菜单,无需特殊分支。
   const navData = computed<NavGroup[]>(() => {
-    // 商户/物业自身 或 站长代客:统一用商户菜单(代客态经 effectiveUserType 模拟商户身份)
-    if (userType.value === 4 || userType.value === 5 || (userType.value === 3 && proxyMode.value)) {
+    if (isMerchantBusinessUser(userType.value))
       return merchantSelfNavData.value
-    }
-    // 站长原窗口(及其他默认)
     return stationNavData.value
   })
 

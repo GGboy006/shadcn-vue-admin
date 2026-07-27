@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 
+import { lazyAuthStorage } from '@/utils/proxy-auth'
+
 export interface LoginUserVO {
   nickname: string
   avatar: string
@@ -42,5 +44,9 @@ export const useAuthStore = defineStore('user', () => {
     getUserType,
   }
 }, {
-  persist: true,
+  persist: {
+    // 代客标签页(新窗口换商户 token)用 sessionStorage 与站长 localStorage 隔离;
+    // 其余标签页用 localStorage。lazyAuthStorage 懒求值,避免模块加载即访问 DOM。
+    storage: lazyAuthStorage,
+  },
 })

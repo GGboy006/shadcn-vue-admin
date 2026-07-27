@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 
+import { lazyAuthStorage } from '@/utils/proxy-auth'
+
 /** 站长信息 */
 export interface BusinessStationMasterVO {
   stationId: number
@@ -70,5 +72,8 @@ export const useUserInfoStore = defineStore('user-info', () => {
     clearUserInfo,
   }
 }, {
-  persist: true,
+  persist: {
+    // 代客标签页用 sessionStorage 与站长 localStorage 隔离(与 auth.ts 一致)
+    storage: lazyAuthStorage,
+  },
 })

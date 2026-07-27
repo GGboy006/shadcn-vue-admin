@@ -36,6 +36,13 @@ describe('filterMerchantBusinessItems', () => {
     expect(result.map(i => i.title)).toContain('商户资料')
   })
 
+  it('should keep all items for committee (userType=6) self mode', () => {
+    const result = filterMerchantBusinessItems(items, { userType: 6, proxyMode: false })
+
+    expect(result.map(i => i.title)).toHaveLength(7)
+    expect(result.map(i => i.title)).toContain('商户资料')
+  })
+
   it('should hide selfOnly items for station master proxy mode (userType=3)', () => {
     const result = filterMerchantBusinessItems(items, { userType: 3, proxyMode: true })
 

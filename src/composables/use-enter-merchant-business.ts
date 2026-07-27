@@ -1,21 +1,40 @@
-import { useMerchantBusinessStore } from '@/stores/merchant-business'
+import { toast } from 'vue-sonner'
+
+import { BASE_URL } from '@/constants/app-config'
+import { fetchMerchantToken } from '@/services/api/proxy-login.api'
+import { generateProxyKey, writeProxyAuth } from '@/utils/proxy-auth'
 
 /**
- * 进入商户后台(站长代客)的统一入口。
+ * 站长代客进入商户后台(新标签页 + 换商户 token)。
  *
- * 行为:写入代客 store(merchantId + merchantName)-> 跳转 /merchant-business?mId=xxx。
- * 商户列表「进入商户后台」按钮 与 名称列点击 复用此逻辑,避免重复实现。
+ * 流程:
+ * 1. 同步 window.open 代客入口页(在用户手势内,避免弹窗拦截),URL 带 proxy=1&k
+ * 2. 异步调换 token 接口(站长 token + merchantId -> 商户 token + 商户视角 user)
+ * 3. 成功后写 localStorage 中转 {token, user}(供新标签页读取);失败则新标签页因中转超时显示错误
  *
- * 路由守卫(merchant-business-guard)会读取 mId 触发 enterProxy,
- * 这里显式调用以保证 merchantName 立即可用(守卫只拿 mId,拿不到 name)。
+ * 新标签页 /auth/proxy-entry 启动后:读中转 -> setToken/setUserInfo ->
+ * 用新 token 调 /merchant/myMerchantInfo 取 merchantInfo -> 跳商户概览。
+ * 换 token 必须在站长标签页完成(代客入口页 sessionStorage 为空,无站长 token 可用)。
  */
 export function useEnterMerchantBusiness() {
-  const store = useMerchantBusinessStore()
-  const router = useRouter()
+  async function enterMerchantBusiness(merchantId: string, merchantName?: string) {
+    const key = generateProxyKey()
+    // 同步开窗(用户手势内),URL 仅带 key,不暴露 merchantId
+    // 拼 BASE_URL 前缀(生产 base 可能是 /xiaoqu-c/),否则路由 404
+    window.open(`${BASE_URL}auth/proxy-entry?proxy=1&k=${encodeURIComponent(key)}`, '_blank')
 
-  function enterMerchantBusiness(merchantId: string, merchantName: string) {
-    store.enterProxy(merchantId, merchantName)
-    router.push({ path: '/merchant-business', query: { mId: merchantId } })
+    if (merchantName)
+      toast.message(`正在进入「${merchantName}」商户后台...`)
+
+    try {
+      const res = await fetchMerchantToken(merchantId)
+      // 中转只存 token + user;merchantInfo 由入口页用新 token 调 myMerchantInfo 获取
+      writeProxyAuth({ token: res.token, user: res.user }, key)
+    }
+    catch {
+      toast.error('进入商户后台失败,请重试')
+      // 中转未写入,新标签页将因超时显示错误
+    }
   }
 
   return {

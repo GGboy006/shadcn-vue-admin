@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useSidebar } from '@/composables/use-sidebar'
+import { isMerchantBusinessUser } from '@/constants/user-type'
 import { useAuthStore } from '@/stores/auth'
 import { useUserInfoStore } from '@/stores/user-info'
 
@@ -23,7 +24,7 @@ const enableCommunitySwitch = false
 // 根据角色动态显示左上角名称
 const userType = computed(() => authStore.userInfo?.userType)
 const isStationMaster = computed(() => userType.value === 3)
-const isMerchant = computed(() => userType.value === 4 || userType.value === 5)
+const isMerchant = computed(() => isMerchantBusinessUser(userType.value))
 
 const sidebarTitle = computed(() => {
   if (isStationMaster.value)

@@ -14,12 +14,14 @@ declare global {
   const CONTENT_LAYOUTS: typeof import('../constants/themes').CONTENT_LAYOUTS
   const DEFAULT_PAGE_SIZE: typeof import('../constants/pagination').DEFAULT_PAGE_SIZE
   const EffectScope: typeof import('vue').EffectScope
+  const MERCHANT_BUSINESS_USER_TYPES: typeof import('../constants/user-type').MERCHANT_BUSINESS_USER_TYPES
   const PAGE_SIZES: typeof import('../constants/pagination').PAGE_SIZES
   const RADIUS: typeof import('../constants/themes').RADIUS
   const RouterPath: typeof import('../constants/route-path').RouterPath
   const THEMES: typeof import('../constants/themes').THEMES
   const THEMES_COLOR: typeof import('../constants/themes')['THEMES_COLOR']
   const THEME_PRIMARY_COLORS: typeof import('../constants/themes').THEME_PRIMARY_COLORS
+  const UserType: typeof import('../constants/user-type').UserType
   const computed: typeof import('vue').computed
   const createApp: typeof import('vue').createApp
   const createStreamUrl: typeof import('../composables/use-text-stream').createStreamUrl
@@ -35,6 +37,7 @@ declare global {
   const getCurrentWatcher: typeof import('vue').getCurrentWatcher
   const h: typeof import('vue').h
   const inject: typeof import('vue').inject
+  const isMerchantBusinessUser: typeof import('../constants/user-type').isMerchantBusinessUser
   const isProxy: typeof import('vue').isProxy
   const isReactive: typeof import('vue').isReactive
   const isReadonly: typeof import('vue').isReadonly
@@ -85,9 +88,9 @@ declare global {
   const useEnterMerchantBusiness: typeof import('../composables/use-enter-merchant-business').useEnterMerchantBusiness
   const useId: typeof import('vue').useId
   const useLink: typeof import('vue-router')['useLink']
-  const useMerchantBusinessStore: typeof import('../stores/merchant-business').useMerchantBusinessStore
   const useModal: typeof import('../composables/use-modal').useModal
   const useModel: typeof import('vue').useModel
+  const useProxyEntry: typeof import('../composables/use-proxy-entry').useProxyEntry
   const useRoute: typeof import('vue-router').useRoute
   const useRouter: typeof import('vue-router').useRouter
   const useSidebar: typeof import('../composables/use-sidebar').useSidebar
@@ -115,6 +118,9 @@ declare global {
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, ShallowRef, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
   // @ts-ignore
+  export type { ProxyEntryResult } from '../composables/use-proxy-entry'
+  import('../composables/use-proxy-entry')
+  // @ts-ignore
   export type { TextStreamEvent, TextStreamOptions } from '../composables/use-text-stream'
   import('../composables/use-text-stream')
   // @ts-ignore
@@ -126,6 +132,9 @@ declare global {
   // @ts-ignore
   export type { Theme, Radius, ContentLayout } from '../constants/themes'
   import('../constants/themes')
+  // @ts-ignore
+  export type { UserType } from '../constants/user-type'
+  import('../constants/user-type')
   // @ts-ignore
   export type { LoginUserVO } from '../stores/auth'
   import('../stores/auth')

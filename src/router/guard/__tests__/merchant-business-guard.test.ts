@@ -5,7 +5,6 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { resolveMerchantBusinessRoute } from '@/router/guard/merchant-business-guard'
 import { useAuthStore } from '@/stores/auth'
-import { useMerchantBusinessStore } from '@/stores/merchant-business'
 import { useUserInfoStore } from '@/stores/user-info'
 
 function makeRoute(path: string, query: Record<string, string> = {}): RouteLocationNormalized {
@@ -17,122 +16,83 @@ describe('resolveMerchantBusinessRoute', () => {
     setActivePinia(createPinia())
   })
 
-  describe('站长(userType=3)进入商户后台', () => {
-    it('should enterProxy and pass when mId present in query', () => {
-      const authStore = useAuthStore()
-      authStore.setToken('station-token')
-      authStore.setUserInfo({ userType: 3 } as any)
-
-      const store = useMerchantBusinessStore()
-      const result = resolveMerchantBusinessRoute(makeRoute('/merchant-business', { mId: 'M1001', mName: '星巴克' }))
-
-      expect(result).toBeUndefined()
-      expect(store.proxyMode).toBe(true)
-      expect(store.merchantId).toBe('M1001')
-      expect(store.merchantName).toBe('星巴克')
-    })
-
-    it('should pass without change when already in proxy mode', () => {
-      const authStore = useAuthStore()
-      authStore.setToken('station-token')
-      authStore.setUserInfo({ userType: 3 } as any)
-
-      const store = useMerchantBusinessStore()
-      store.enterProxy('M1001', '星巴克')
-
-      const result = resolveMerchantBusinessRoute(makeRoute('/merchant-business/category'))
-
-      expect(result).toBeUndefined()
-      expect(store.merchantId).toBe('M1001') // 未被覆盖
-    })
-
-    it('should redirect to /merchants when no mId and not in proxy mode', () => {
-      const authStore = useAuthStore()
-      authStore.setToken('station-token')
-      authStore.setUserInfo({ userType: 3 } as any)
-
-      const result = resolveMerchantBusinessRoute(makeRoute('/merchant-business'))
-
-      expect(result).toBe('/merchants')
-    })
-  })
-
   describe('商户/物业(userType=4/5)进入商户后台', () => {
-    it('should initSelf and pass when merchantId available', () => {
+    it('有 merchantId -> 放行', () => {
       const authStore = useAuthStore()
       authStore.setToken('merchant-token')
       authStore.setUserInfo({ userType: 4 } as any)
-      const userInfoStore = useUserInfoStore()
-      userInfoStore.setMerchantInfo({ merchantId: 'M_SELF' } as any)
+      useUserInfoStore().setMerchantInfo({ merchantId: 'M_SELF' } as any)
 
-      const store = useMerchantBusinessStore()
       const result = resolveMerchantBusinessRoute(makeRoute('/merchant-business/profile'))
-
       expect(result).toBeUndefined()
-      expect(store.proxyMode).toBe(false)
-      expect(store.merchantId).toBe('M_SELF')
     })
 
-    it('should redirect to 403 when merchantId missing', () => {
+    it('无 merchantId -> /errors/403', () => {
       const authStore = useAuthStore()
       authStore.setToken('merchant-token')
       authStore.setUserInfo({ userType: 4 } as any)
       // 不设置 merchantInfo
 
       const result = resolveMerchantBusinessRoute(makeRoute('/merchant-business/profile'))
-
       expect(result).toBe('/errors/403')
     })
 
-    it('should also work for property (userType=5)', () => {
+    it('物业(userType=5)同样放行', () => {
       const authStore = useAuthStore()
       authStore.setToken('prop-token')
       authStore.setUserInfo({ userType: 5 } as any)
-      const userInfoStore = useUserInfoStore()
-      userInfoStore.setMerchantInfo({ merchantId: 'P_SELF' } as any)
+      useUserInfoStore().setMerchantInfo({ merchantId: 'P_SELF' } as any)
 
-      const store = useMerchantBusinessStore()
       const result = resolveMerchantBusinessRoute(makeRoute('/merchant-business/goods'))
-
       expect(result).toBeUndefined()
-      expect(store.merchantId).toBe('P_SELF')
-      expect(store.proxyMode).toBe(false)
+    })
+
+    it('代客标签页(userType=4,merchantInfo 由换 token 写入)同样放行', () => {
+      const authStore = useAuthStore()
+      authStore.setToken('proxy-merchant-token')
+      authStore.setUserInfo({ userType: 4 } as any)
+      useUserInfoStore().setMerchantInfo({ merchantId: 'M_PROXY' } as any)
+
+      const result = resolveMerchantBusinessRoute(makeRoute('/merchant-business/overview'))
+      expect(result).toBeUndefined()
+    })
+
+    it('居委会(userType=6)有 merchantId 放行', () => {
+      const authStore = useAuthStore()
+      authStore.setToken('committee-token')
+      authStore.setUserInfo({ userType: 6 } as any)
+      useUserInfoStore().setMerchantInfo({ merchantId: 'C_SELF' } as any)
+
+      const result = resolveMerchantBusinessRoute(makeRoute('/merchant-business/goods'))
+      expect(result).toBeUndefined()
     })
   })
 
-  describe('离开商户后台(非 /merchant-business 路由)', () => {
-    it('should auto clear proxy mode when leaving to another route', () => {
+  describe('站长(userType=3)直接访问商户后台', () => {
+    it('回 /merchants(代客应走新标签页,已是商户态)', () => {
       const authStore = useAuthStore()
       authStore.setToken('station-token')
       authStore.setUserInfo({ userType: 3 } as any)
-      const store = useMerchantBusinessStore()
-      store.enterProxy('M1001', '星巴克')
 
-      const result = resolveMerchantBusinessRoute(makeRoute('/merchants'))
-
-      expect(result).toBeUndefined()
-      expect(store.proxyMode).toBe(false)
-      expect(store.merchantId).toBe('')
+      const result = resolveMerchantBusinessRoute(makeRoute('/merchant-business'))
+      expect(result).toBe('/merchants')
     })
+  })
 
-    it('should do nothing when not in proxy mode', () => {
+  describe('非商户后台路由', () => {
+    it('放行(交给其他守卫/组件)', () => {
       const authStore = useAuthStore()
       authStore.setToken('station-token')
       authStore.setUserInfo({ userType: 3 } as any)
 
-      const store = useMerchantBusinessStore()
       const result = resolveMerchantBusinessRoute(makeRoute('/dashboard'))
-
       expect(result).toBeUndefined()
-      expect(store.proxyMode).toBe(false)
     })
   })
 
   describe('未登录或身份未知', () => {
-    it('should no-op when not logged in (leave to auth guard)', () => {
-      // 不 setToken
-      const result = resolveMerchantBusinessRoute(makeRoute('/merchant/business'))
-
+    it('放行,交给 auth-guard 处理', () => {
+      const result = resolveMerchantBusinessRoute(makeRoute('/merchant-business'))
       expect(result).toBeUndefined()
     })
   })

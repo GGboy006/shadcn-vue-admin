@@ -1,3 +1,4 @@
+import { isMerchantBusinessUser } from '@/constants/user-type'
 import { useAuthStore } from '@/stores/auth'
 import { useUserInfoStore } from '@/stores/user-info'
 
@@ -46,7 +47,7 @@ export function useAuth() {
         const stationRes = await apiFetch('/station/myStationInfo')
         userInfoStore.setStationInfo(stationRes.data)
       }
-      else if (userType === 4 || userType === 5) {
+      else if (isMerchantBusinessUser(userType)) {
         const merchantRes = await apiFetch('/merchant/myMerchantInfo')
         userInfoStore.setMerchantInfo(merchantRes.data)
       }

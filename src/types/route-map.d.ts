@@ -88,6 +88,7 @@ declare module 'vue-router/auto-routes' {
       | '/auth/'
       | '/auth/forgot-password'
       | '/auth/otp'
+      | '/auth/proxy-entry'
       | '/auth/sign-in'
       | '/auth/sign-in-2'
       | '/auth/sign-up'
@@ -109,6 +110,13 @@ declare module 'vue-router/auto-routes' {
     '/auth/otp': RouteRecordInfo<
       '/auth/otp',
       '/auth/otp',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/auth/proxy-entry': RouteRecordInfo<
+      '/auth/proxy-entry',
+      '/auth/proxy-entry',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -424,6 +432,7 @@ declare module 'vue-router/auto-routes' {
         | '/auth/'
         | '/auth/forgot-password'
         | '/auth/otp'
+        | '/auth/proxy-entry'
         | '/auth/sign-in'
         | '/auth/sign-in-2'
         | '/auth/sign-up'
@@ -445,6 +454,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/auth/otp.vue': {
       routes:
         | '/auth/otp'
+      views:
+        | never
+    }
+    'src/pages/auth/proxy-entry.vue': {
+      routes:
+        | '/auth/proxy-entry'
       views:
         | never
     }
