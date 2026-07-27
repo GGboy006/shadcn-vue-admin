@@ -29,6 +29,7 @@ declare global {
   const definePage: typeof import('vue-router/experimental').definePage
   const effectScope: typeof import('vue').effectScope
   const filterMerchantBusinessItems: typeof import('../composables/filter-merchant-business-items').filterMerchantBusinessItems
+  const filterNavItemsByRoles: typeof import('../composables/filter-nav-items-by-roles').filterNavItemsByRoles
   const getCurrentInstance: typeof import('vue').getCurrentInstance
   const getCurrentScope: typeof import('vue').getCurrentScope
   const getCurrentWatcher: typeof import('vue').getCurrentWatcher

@@ -3,6 +3,7 @@ import { BoxesIcon, FolderTreeIcon, HeadsetIcon, HelpCircleIcon, LayoutDashboard
 import type { NavGroup, NavItem } from '@/components/app-sidebar/types'
 
 import { filterMerchantBusinessItems } from '@/composables/filter-merchant-business-items'
+import { filterNavItemsByRoles } from '@/composables/filter-nav-items-by-roles'
 import { useMerchantBusinessStore } from '@/stores/merchant-business'
 
 export function useSidebar() {
@@ -25,6 +26,15 @@ export function useSidebar() {
     { title: '订单管理', url: '/merchant-business/order', icon: ShoppingCartIcon },
   ]
 
+  /** 通用菜单项;roles:[3] 为站长专属,商户/物业经 filterNavItemsByRoles 过滤掉 */
+  const commonNavItems: NavItem[] = [
+    { title: '仪表盘', url: '/dashboard', icon: LayoutDashboardIcon },
+    { title: '聊天工作台', url: '/admin/chat-workbench', icon: HeadsetIcon, roles: [3] },
+    { title: 'AI工具管理', url: '/apps', icon: BoxesIcon },
+    { title: '会话列表', url: '/conversations', icon: MessageSquareIcon },
+    { title: '商户/物业管理', url: '/merchants', icon: UsersIcon, roles: [3] },
+  ]
+
   const allSettingsNavItems = [
     { title: '个人资料', url: '/settings/', icon: UserIcon },
     { title: '站长信息', url: '/settings/account', icon: WrenchIcon, roles: [3] },
@@ -34,14 +44,14 @@ export function useSidebar() {
   ]
 
   // settings 子菜单也需要随 userType 重新过滤
-  const settingsNavItems = computed(() => allSettingsNavItems.filter((item) => {
-    if (!item.roles)
-      return true
-    return userType.value !== undefined && item.roles.includes(userType.value)
-  }))
+  const settingsNavItems = computed(() => filterNavItemsByRoles(allSettingsNavItems, userType.value))
 
-  /** 商户/物业自身:商户后台 6 项 + 设置 */
+  /** 商户/物业自身:通用菜单 + 商户后台 + 设置 */
   const merchantSelfNavData = computed<NavGroup[]>(() => [
+    {
+      title: '通用',
+      items: filterNavItemsByRoles(commonNavItems, userType.value),
+    },
     {
       title: '商户后台',
       items: filterMerchantBusinessItems(merchantBusinessNavItems, {
@@ -72,13 +82,7 @@ export function useSidebar() {
   const stationNavData = computed<NavGroup[]>(() => [
     {
       title: '通用',
-      items: [
-        { title: '仪表盘', url: '/dashboard', icon: LayoutDashboardIcon },
-        { title: '聊天工作台', url: '/admin/chat-workbench', icon: HeadsetIcon, roles: [3] },
-        { title: 'AI工具管理', url: '/apps', icon: BoxesIcon },
-        { title: '会话列表', url: '/conversations', icon: MessageSquareIcon },
-        { title: '商户/物业管理', url: '/merchants', icon: UsersIcon, roles: [3] },
-      ],
+      items: filterNavItemsByRoles(commonNavItems, userType.value),
     },
     {
       title: '其他',
