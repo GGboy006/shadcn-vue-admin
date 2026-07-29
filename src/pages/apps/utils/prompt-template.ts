@@ -178,23 +178,40 @@ export function buildZodSchema(
 
     let schema: z.ZodTypeAny
 
+    // 传入 error 文案：zod v4 中它统一覆盖“类型错误（如 undefined）”与其他校验，
+    // 避免未填字段报“Invalid input: expected string, received undefined”
+    const emptyMsg = `${field.label}不能为空`
+
     if (field.component.name === 'select' && isMultiple) {
-      schema = z.array(z.string()).min(1, `${field.label}不能为空`)
-      if (!isRequired) {
-        schema = schema.or(z.array(z.string()).length(0))
-      }
+      // 必填：至少选一项；可选：允许空数组/未填
+      schema = isRequired
+        ? z.array(z.string(), { error: emptyMsg }).min(1, emptyMsg)
+        : z.array(z.string()).optional()
     }
     else {
-      schema = z.string().min(1, `${field.label}不能为空`)
-      if (!isRequired) {
-        schema = schema.optional()
-      }
+      // 必填：非空字符串；可选：允许空串/未填（不加 min，避免 '' 报错）
+      schema = isRequired
+        ? z.string({ error: emptyMsg }).min(1, emptyMsg)
+        : z.string().optional()
     }
 
     shape[field.prop] = schema
   })
 
   return z.object(shape)
+}
+
+/**
+ * 根据字段配置构建表单初始值（单值为 ''，多选为 []）
+ * 用于 useForm 的 initialValues，避免未填字段为 undefined 而报类型错误
+ * @param fields 字段配置列表
+ */
+export function buildInitialValues(fields: IPromptTemplateField[]): Record<string, unknown> {
+  const values: Record<string, unknown> = {}
+  fields.forEach((field) => {
+    values[field.prop] = getFieldEmptyValue(field)
+  })
+  return values
 }
 
 /**

@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import type { IPromptTemplateField, IPromptTemplateForm } from '../types/prompt-template.types'
 
 import {
+  buildInitialValues,
   buildZodSchema,
   evaluateCondition,
   getFieldEmptyValue,
@@ -44,8 +45,10 @@ const formSchema = computed(() => {
 })
 
 // ==================== 表单状态 ====================
+// initialValues 让每个字段默认 ''/[]，避免未填必填项为 undefined 时报 zod 类型错误
 const { handleSubmit, resetForm, values, setFieldValue } = useForm({
   validationSchema: toTypedSchema(formSchema.value),
+  initialValues: buildInitialValues(fields.value),
 })
 
 // ==================== 条件显示与联动清空 ====================
