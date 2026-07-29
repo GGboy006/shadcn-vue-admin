@@ -170,6 +170,20 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/digital-employees/': RouteRecordInfo<
+      '/digital-employees/',
+      '/digital-employees',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/digital-employees/chat': RouteRecordInfo<
+      '/digital-employees/chat',
+      '/digital-employees/chat',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/errors': RouteRecordInfo<
       '/errors',
       '/errors',
@@ -502,6 +516,18 @@ declare module 'vue-router/auto-routes' {
     'src/pages/dashboard/index.vue': {
       routes:
         | '/dashboard/'
+      views:
+        | never
+    }
+    'src/pages/digital-employees/index.vue': {
+      routes:
+        | '/digital-employees/'
+      views:
+        | never
+    }
+    'src/pages/digital-employees/chat.vue': {
+      routes:
+        | '/digital-employees/chat'
       views:
         | never
     }

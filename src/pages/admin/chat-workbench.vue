@@ -365,6 +365,7 @@ function getInitials(name: string) {
                     item.serviceMode === 0 && 'bg-primary',
                     item.serviceMode === 1 && 'bg-chart-2',
                     item.serviceMode === 2 && 'bg-destructive',
+                    item.serviceMode === 9 && 'bg-chart-4',
                   )"
                   :title="serviceModeConfig[item.serviceMode]?.label"
                 />

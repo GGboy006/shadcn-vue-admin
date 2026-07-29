@@ -52,17 +52,18 @@ export interface IAIImageGeneration {
 /** 图片生成结果响应 */
 export type IImageGenerationResponse = IResponse<IAIImageGeneration>
 
-/** 服务模式：0-AI托管 1-人工接管 2-待人工介入 */
-export type ServiceMode = 0 | 1 | 2
+/** 服务模式：0-AI托管 1-人工接管 2-待人工介入 9-数字员工 */
+export type ServiceMode = 0 | 1 | 2 | 9
 
 /** 用户标签：3-站长 4-商户 5-物业 6-居委会 7-居民 */
 export type UserTag = 3 | 4 | 5 | 6 | 7
 
 /** 服务模式映射配置 */
-export const serviceModeConfig: Record<ServiceMode, { label: string, variant: 'default' | 'secondary' | 'destructive' }> = {
+export const serviceModeConfig: Record<ServiceMode, { label: string, variant: 'default' | 'secondary' | 'destructive' | 'info' }> = {
   0: { label: 'AI托管', variant: 'default' },
   1: { label: '人工接管', variant: 'secondary' },
   2: { label: '待人工介入', variant: 'destructive' },
+  9: { label: '数字员工', variant: 'info' },
 }
 
 /** 用户标签映射配置 */
@@ -90,7 +91,7 @@ export interface IConversation {
   thirdId: string
   /** 小区站长ID */
   orgCode: string
-  /** 服务模式：0-AI托管 1-人工接管 2-待人工介入 */
+  /** 服务模式：0-AI托管 1-人工接管 2-待人工介入 9-数字员工 */
   serviceMode: ServiceMode
   /** 当前接管人ID */
   operatorId: number
@@ -251,7 +252,7 @@ export interface IConversationDetail {
   skillId: string
   /** 小区站长ID */
   orgCode: string
-  /** 服务模式：0-AI托管 1-人工接管 2-待人工介入 */
+  /** 服务模式：0-AI托管 1-人工接管 2-待人工介入 9-数字员工 */
   serviceMode: ServiceMode
   /** 当前接管人ID */
   operatorId: number
