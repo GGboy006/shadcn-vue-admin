@@ -1,0 +1,168 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://content.icitychina.net/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/community/dynamic": {
+      "put": {
+        "tags": [
+          "站长用户-社区管理"
+        ],
+        "summary": "小区动态-更新",
+        "operationId": "dynamicUpdate_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommunityDynamicUpdateReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "CommunityDynamicUpdateReq": {
+      "required": [
+        "partnerId",
+        "title",
+        "uniqueCode"
+      ],
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "标题",
+          "refType": null
+        },
+        "poster": {
+          "type": "string",
+          "description": "封面图",
+          "refType": null
+        },
+        "content": {
+          "type": "string",
+          "description": "内容",
+          "refType": null
+        },
+        "original": {
+          "type": "string",
+          "description": "来源",
+          "refType": null
+        },
+        "keywords": {
+          "type": "string",
+          "description": "关键词,英文逗号隔开",
+          "refType": null
+        },
+        "userName": {
+          "type": "string",
+          "description": "作者名称",
+          "refType": null
+        },
+        "userPoster": {
+          "type": "string",
+          "description": "作者头像",
+          "refType": null
+        },
+        "userUniqueCode": {
+          "type": "string",
+          "description": "作者唯一标识",
+          "refType": null
+        },
+        "sourceUrl": {
+          "type": "string",
+          "description": "文章来源网址",
+          "refType": null
+        },
+        "auditStatus": {
+          "type": "integer",
+          "description": "审核状态【0:待审核;1:审核拒绝;2:审核通过】",
+          "format": "int32",
+          "refType": null
+        },
+        "isEnable": {
+          "type": "integer",
+          "description": "启用状态【1:启用;2:禁用】",
+          "format": "int32",
+          "refType": null
+        },
+        "partnerId": {
+          "type": "string",
+          "description": "合伙人id",
+          "refType": null
+        },
+        "partnerPid": {
+          "type": "string",
+          "description": "合伙人父级id",
+          "refType": null
+        },
+        "describes": {
+          "type": "string",
+          "description": "文章介绍",
+          "refType": null
+        },
+        "auditMsg": {
+          "type": "string",
+          "description": "审核描述",
+          "refType": null
+        },
+        "communityUniqueCode": {
+          "type": "string",
+          "description": "社区唯一标识",
+          "refType": null
+        },
+        "uniqueCode": {
+          "type": "string",
+          "description": "唯一标识",
+          "refType": null
+        }
+      },
+      "description": "社区动态更新请求对象"
+    },
+    "BaseResponseBoolean": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
