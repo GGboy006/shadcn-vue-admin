@@ -1,4 +1,4 @@
-import { BotIcon, BoxesIcon, Building2Icon, FolderTreeIcon, HeadsetIcon, HelpCircleIcon, LandmarkIcon, LayoutDashboardIcon, MessageSquareIcon, PackageIcon, SettingsIcon, ShoppingCartIcon, StoreIcon, TagIcon, UserIcon, WrenchIcon } from '@lucide/vue'
+import { BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, ConciergeBellIcon, FolderTreeIcon, HandHelpingIcon, HeadsetIcon, HelpCircleIcon, LandmarkIcon, LayoutDashboardIcon, LightbulbIcon, MegaphoneIcon, MessageSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, SettingsIcon, ShoppingCartIcon, StoreIcon, TagIcon, UserIcon, WrenchIcon } from '@lucide/vue'
 
 import type { NavGroup, NavItem } from '@/components/app-sidebar/types'
 
@@ -34,6 +34,17 @@ export function useSidebar() {
     { title: '商户管理', url: '/merchants', icon: StoreIcon, roles: [3] },
     { title: '物业管理', url: '/properties', icon: Building2Icon, roles: [3] },
     { title: '居委会管理', url: '/committees', icon: LandmarkIcon, roles: [3] },
+  ]
+
+  /** 小区服务菜单项;roles:[3] 为站长专属,仅站长可见;页面为占位,后续再开发具体内容 */
+  const communityServiceNavItems: NavItem[] = [
+    { title: '社区电话列表', url: '/community/phone-list', icon: PhoneIcon, roles: [3] },
+    { title: '小区动态', url: '/community/news', icon: NewspaperIcon, roles: [3] },
+    { title: '小区公告', url: '/community/announcement', icon: MegaphoneIcon, roles: [3] },
+    { title: '办事指南', url: '/community/guide', icon: BookOpenIcon, roles: [3] },
+    { title: '便民服务', url: '/community/convenience', icon: HandHelpingIcon, roles: [3] },
+    { title: '知识服务', url: '/community/knowledge', icon: LightbulbIcon, roles: [3] },
+    { title: '管家服务', url: '/community/steward', icon: ConciergeBellIcon, roles: [3] },
   ]
 
   const allSettingsNavItems = [
@@ -73,6 +84,10 @@ export function useSidebar() {
     {
       title: '通用',
       items: filterNavItemsByRoles(commonNavItems, userType.value),
+    },
+    {
+      title: '小区服务',
+      items: filterNavItemsByRoles(communityServiceNavItems, userType.value),
     },
     {
       title: '其他',

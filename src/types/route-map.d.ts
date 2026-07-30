@@ -156,6 +156,55 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/community/announcement/': RouteRecordInfo<
+      '/community/announcement/',
+      '/community/announcement',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/community/convenience/': RouteRecordInfo<
+      '/community/convenience/',
+      '/community/convenience',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/community/guide/': RouteRecordInfo<
+      '/community/guide/',
+      '/community/guide',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/community/knowledge/': RouteRecordInfo<
+      '/community/knowledge/',
+      '/community/knowledge',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/community/news/': RouteRecordInfo<
+      '/community/news/',
+      '/community/news',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/community/phone-list/': RouteRecordInfo<
+      '/community/phone-list/',
+      '/community/phone-list',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/community/steward/': RouteRecordInfo<
+      '/community/steward/',
+      '/community/steward',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/conversations/': RouteRecordInfo<
       '/conversations/',
       '/conversations',
@@ -518,6 +567,48 @@ declare module 'vue-router/auto-routes' {
     'src/pages/committees/index.vue': {
       routes:
         | '/committees/'
+      views:
+        | never
+    }
+    'src/pages/community/announcement/index.vue': {
+      routes:
+        | '/community/announcement/'
+      views:
+        | never
+    }
+    'src/pages/community/convenience/index.vue': {
+      routes:
+        | '/community/convenience/'
+      views:
+        | never
+    }
+    'src/pages/community/guide/index.vue': {
+      routes:
+        | '/community/guide/'
+      views:
+        | never
+    }
+    'src/pages/community/knowledge/index.vue': {
+      routes:
+        | '/community/knowledge/'
+      views:
+        | never
+    }
+    'src/pages/community/news/index.vue': {
+      routes:
+        | '/community/news/'
+      views:
+        | never
+    }
+    'src/pages/community/phone-list/index.vue': {
+      routes:
+        | '/community/phone-list/'
+      views:
+        | never
+    }
+    'src/pages/community/steward/index.vue': {
+      routes:
+        | '/community/steward/'
       views:
         | never
     }
