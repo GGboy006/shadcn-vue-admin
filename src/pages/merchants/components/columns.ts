@@ -16,12 +16,6 @@ export const merchantStatusConfig: Record<number, { label: string, style: string
   2: { label: '禁用', style: 'bg-red-100/30 text-red-900 dark:text-red-200 border-red-200' },
 }
 
-export const merchantTypeConfig: Record<number, { label: string, variant: 'info' | 'success' | 'warning' }> = {
-  4: { label: '商户', variant: 'info' },
-  5: { label: '物业', variant: 'success' },
-  6: { label: '居委会', variant: 'warning' },
-}
-
 export const businessStatusConfig: Record<number, { label: string, variant: 'info' | 'warning' | 'secondary' | 'destructive' }> = {
   1: { label: '营业中', variant: 'info' },
   2: { label: '休息中', variant: 'warning' },
@@ -38,21 +32,6 @@ export const columns: ColumnDef<Merchant>[] = [
     cell: ({ row }) => h(MerchantNameLink, { merchant: row.original }),
     enableSorting: false,
     enableHiding: false,
-    enableResizing: true,
-  },
-
-  {
-    accessorKey: 'type',
-    header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '类型' }),
-    meta: { title: '类型' },
-    cell: ({ row }) => {
-      const type = row.getValue('type') as number
-      const config = merchantTypeConfig[type]
-      if (!config)
-        return null
-      return h(Badge, { variant: config.variant }, () => config.label)
-    },
-    enableSorting: false,
     enableResizing: true,
   },
 

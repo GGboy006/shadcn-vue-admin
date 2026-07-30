@@ -19,6 +19,7 @@ import MerchantCreate from './components/merchant-create.vue'
 const query = ref<IMerchantListQuery>({
   pageNum: 1,
   pageSize: 10,
+  type: '4',
 })
 
 const { data, isLoading } = useGetMerchantListQuery(query)
@@ -41,7 +42,6 @@ const serverPagination = computed(() => ({
 
 const search = ref('')
 const status = ref<string | undefined>(undefined)
-const type = ref<string | undefined>(undefined)
 
 const debouncedUpdateSearch = useDebounceFn((val: string) => {
   query.value.merchantName = val || undefined
@@ -53,27 +53,22 @@ watch(status, (val) => {
   query.value.status = val
   query.value.pageNum = 1
 })
-watch(type, (val) => {
-  query.value.type = val
-  query.value.pageNum = 1
-})
 
 function handleReset() {
   search.value = ''
   status.value = undefined
-  type.value = undefined
   query.value.pageNum = 1
 }
 </script>
 
 <template>
   <BasicPage
-    title="商户/物业管理"
-    description="管理小区内的商户和物业账号"
+    title="商户管理"
+    description="管理小区内的商户账号"
     sticky
   >
     <template #actions>
-      <MerchantCreate />
+      <MerchantCreate :type="4" />
     </template>
     <div class="overflow-x-auto">
       <DataTable
@@ -87,10 +82,8 @@ function handleReset() {
             :table="table"
             :search="search"
             :status="status"
-            :type="type"
             @update:search="search = $event"
             @update:status="status = $event"
-            @update:type="type = $event"
             @reset="handleReset"
           />
         </template>

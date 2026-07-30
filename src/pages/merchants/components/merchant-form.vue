@@ -3,7 +3,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 
-import type { IMerchantAddDTO, IMerchantUpdateDTO } from '@/services/api/merchant.api'
+import type { IMerchantAddDTO, IMerchantUpdateDTO, MerchantType } from '@/services/api/merchant.api'
 
 import { DatePicker } from '@/components/prop-ui/date-picker'
 import { Button } from '@/components/ui/button'
@@ -19,8 +19,10 @@ import type { MerchantValidator } from '../validators/merchant.validator'
 
 import { merchantValidator } from '../validators/merchant.validator'
 
-const { merchant } = defineProps<{
+const { merchant, type } = defineProps<{
   merchant?: Merchant
+  /** 新建时由所在页面固定的类型 */
+  type?: MerchantType
 }>()
 
 const emits = defineEmits<{
@@ -53,6 +55,9 @@ const statusList = [
 const isEdit = computed(() => !!merchant?.merchantId)
 const passwordLabel = computed(() => isEdit.value ? '登录密码（留空则不修改）' : '登录密码')
 
+/** 类型由编辑对象或所在页面固定，表单内只读展示 */
+const typeLabel = computed(() => types.find(t => t.value === (merchant?.type ?? type))?.label ?? '商户/物业')
+
 const { upload } = useUpload()
 
 const initialValues = reactive<MerchantValidator>({
@@ -60,7 +65,7 @@ const initialValues = reactive<MerchantValidator>({
   nickname: merchant?.nickname || merchant?.merchantName || '',
   phone: merchant?.phone || '',
   password: '',
-  type: merchant?.type || 4,
+  type: merchant?.type || type || 4,
   gender: merchant?.gender ?? 0,
   avatar: merchant?.avatar || '',
   logo: merchant?.logo || '',
@@ -177,30 +182,14 @@ const onSubmit = handleSubmit((values) => {
 <template>
   <div class="max-h-[600px] overflow-y-auto">
     <form class="space-y-6" @submit="onSubmit">
-      <!-- 类型：编辑时只读，新增时可选 -->
-      <FormField v-slot="{ componentField }" name="type">
+      <!-- 类型：由编辑对象或所在页面固定，仅展示 -->
+      <FormField name="type">
         <FormItem>
           <FormLabel>类型</FormLabel>
           <FormControl>
-            <template v-if="isEdit">
-              <div class="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm items-center">
-                {{ types.find(t => t.value === merchant?.type)?.label }}
-              </div>
-            </template>
-            <Select v-else v-bind="componentField">
-              <FormControl>
-                <SelectTrigger class="w-full">
-                  <SelectValue placeholder="选择类型" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem v-for="t in types" :key="t.value" :value="t.value">
-                    {{ t.label }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <div class="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm items-center">
+              {{ typeLabel }}
+            </div>
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -216,7 +205,7 @@ const onSubmit = handleSubmit((values) => {
           <FormField v-slot="{ componentField }" name="merchantName">
             <FormItem class="col-span-full md:col-span-2">
               <FormLabel required>
-                商户/物业名称
+                {{ typeLabel }}名称
               </FormLabel>
               <FormControl>
                 <Input type="text" v-bind="componentField" />

@@ -11,6 +11,8 @@ import MerchantForm from './merchant-form.vue'
 
 const props = defineProps<{
   merchant?: Merchant
+  /** 新建时由所在页面固定的类型 */
+  type?: MerchantType
 }>()
 
 defineEmits(['close'])
@@ -30,7 +32,7 @@ const merchantDetail = computed(() => {
 })
 
 const typeLabel = computed(() => {
-  const type = merchantDetail.value?.type ?? props.merchant?.type
+  const type = merchantDetail.value?.type ?? props.merchant?.type ?? props.type
   if (!type)
     return '商户/物业'
   const config = merchantTypeConfig[type as MerchantType]
@@ -73,6 +75,7 @@ const description = computed(() => {
     <MerchantForm
       v-else
       :merchant="merchantDetail"
+      :type="type"
       @close="$emit('close')"
     />
   </div>

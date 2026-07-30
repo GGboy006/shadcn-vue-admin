@@ -46,7 +46,7 @@ describe('useSidebar navData', () => {
 
     expect(navData.value.map(g => g.title)).toEqual(['通用', '商户后台', '其他'])
 
-    // 通用组:无站长专属(聊天工作台、商户/物业管理)
+    // 通用组:无站长专属(聊天工作台、商户/物业/居委会管理)
     expect(leafTitles(navData.value[0])).toEqual(['仪表盘', 'AI工具管理', '会话列表'])
 
     // 商户后台组:含商户资料
@@ -93,9 +93,12 @@ describe('useSidebar navData', () => {
     expect(leafTitles(navData.value[0])).toEqual([
       '仪表盘',
       '聊天工作台',
+      'OPC 数字员工',
       'AI工具管理',
       '会话列表',
-      '商户/物业管理',
+      '商户管理',
+      '物业管理',
+      '居委会管理',
     ])
 
     expect(leafTitles(navData.value[1])).toEqual(['个人资料', '站长信息'])

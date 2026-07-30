@@ -11,23 +11,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 import type { Merchant } from '../data/schema'
 
-import { callTypes, userTypes } from '../data/data'
+import { callTypes } from '../data/data'
 
 interface DataTableToolbarProps {
   table: Table<Merchant>
   search?: string
   status?: string
-  type?: string
 }
 const props = defineProps<DataTableToolbarProps>()
 const emits = defineEmits<{
   (e: 'update:search', value: string): void
   (e: 'update:status', value: string | undefined): void
-  (e: 'update:type', value: string | undefined): void
   (e: 'reset'): void
 }>()
 
-const isFiltered = computed(() => !!props.search || !!props.status || !!props.type)
+const isFiltered = computed(() => !!props.search || !!props.status)
 
 const searchModel = computed({
   get: () => props.search ?? '',
@@ -37,11 +35,6 @@ const searchModel = computed({
 const statusModel = computed({
   get: () => props.status ?? 'all',
   set: val => emits('update:status', val === 'all' ? undefined : val),
-})
-
-const typeModel = computed({
-  get: () => props.type ?? 'all',
-  set: val => emits('update:type', val === 'all' ? undefined : val),
 })
 
 function handleReset() {
@@ -67,19 +60,6 @@ function handleReset() {
           </SelectItem>
           <SelectItem v-for="s in callTypes" :key="s.value" :value="s.value">
             {{ s.label }}
-          </SelectItem>
-        </SelectContent>
-      </Select>
-      <Select v-model="typeModel">
-        <SelectTrigger class="h-8 w-[120px]">
-          <SelectValue placeholder="类型" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">
-            全部类型
-          </SelectItem>
-          <SelectItem v-for="t in userTypes" :key="t.value" :value="t.value">
-            {{ t.label }}
           </SelectItem>
         </SelectContent>
       </Select>

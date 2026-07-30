@@ -1,4 +1,4 @@
-import { BotIcon, BoxesIcon, FolderTreeIcon, HeadsetIcon, HelpCircleIcon, LayoutDashboardIcon, MessageSquareIcon, PackageIcon, SettingsIcon, ShoppingCartIcon, StoreIcon, TagIcon, UserIcon, UsersIcon, WrenchIcon } from '@lucide/vue'
+import { BotIcon, BoxesIcon, Building2Icon, FolderTreeIcon, HeadsetIcon, HelpCircleIcon, LandmarkIcon, LayoutDashboardIcon, MessageSquareIcon, PackageIcon, SettingsIcon, ShoppingCartIcon, StoreIcon, TagIcon, UserIcon, WrenchIcon } from '@lucide/vue'
 
 import type { NavGroup, NavItem } from '@/components/app-sidebar/types'
 
@@ -31,7 +31,9 @@ export function useSidebar() {
     { title: 'OPC 数字员工', url: '/digital-employees', icon: BotIcon, roles: [3] },
     { title: 'AI工具管理', url: '/apps', icon: BoxesIcon },
     { title: '会话列表', url: '/conversations', icon: MessageSquareIcon },
-    { title: '商户/物业管理', url: '/merchants', icon: UsersIcon, roles: [3] },
+    { title: '商户管理', url: '/merchants', icon: StoreIcon, roles: [3] },
+    { title: '物业管理', url: '/properties', icon: Building2Icon, roles: [3] },
+    { title: '居委会管理', url: '/committees', icon: LandmarkIcon, roles: [3] },
   ]
 
   const allSettingsNavItems = [

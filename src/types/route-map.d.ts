@@ -149,6 +149,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/committees/': RouteRecordInfo<
+      '/committees/',
+      '/committees',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/conversations/': RouteRecordInfo<
       '/conversations/',
       '/conversations',
@@ -336,6 +343,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/properties/': RouteRecordInfo<
+      '/properties/',
+      '/properties',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/settings/': RouteRecordInfo<
       '/settings/',
       '/settings',
@@ -501,6 +515,12 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
+    'src/pages/committees/index.vue': {
+      routes:
+        | '/committees/'
+      views:
+        | never
+    }
     'src/pages/conversations/index.vue': {
       routes:
         | '/conversations/'
@@ -660,6 +680,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/prop-components/index.vue': {
       routes:
         | '/prop-components/'
+      views:
+        | never
+    }
+    'src/pages/properties/index.vue': {
+      routes:
+        | '/properties/'
       views:
         | never
     }
