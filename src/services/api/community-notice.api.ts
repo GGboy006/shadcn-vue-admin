@@ -1,0 +1,195 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+
+import { useApiFetch } from '@/composables/use-fetch'
+
+import type { IResponse } from '../types/response.type'
+
+/** 内容类型：1=文本，2=链接 */
+export type NoticeContentType = 1 | 2
+
+/** 是否公有：1=公有，2=私有 */
+export type NoticePublicStatus = 1 | 2
+
+/** 内容类型映射配置 */
+export const noticeContentTypeConfig: Record<NoticeContentType, { label: string, variant: 'default' | 'info' }> = {
+  1: { label: '文本', variant: 'default' },
+  2: { label: '链接', variant: 'info' },
+}
+
+/** 是否公有映射配置 */
+export const noticePublicStatusConfig: Record<NoticePublicStatus, { label: string, variant: 'success' | 'secondary' }> = {
+  1: { label: '公有', variant: 'success' },
+  2: { label: '私有', variant: 'secondary' },
+}
+
+/** 分页列表查询参数 */
+export interface ICommunityNoticeListQuery {
+  /** 关键词（模糊搜索） */
+  keyword?: string
+  /** 页码 */
+  pageNum: number
+  /** 每页数量 */
+  pageSize: number
+  /** 是否查询总条数 */
+  searchCount?: string
+  /** 排序字段集合 */
+  sortItemList?: string
+}
+
+/** 社区公告 VO */
+export interface ICommunityNotice {
+  /** 主键ID */
+  id: number
+  /** 唯一标识 */
+  uniqueCode: string
+  /** 标题 */
+  title: string
+  /** 简介 */
+  introduction?: string
+  /** 内容 */
+  content?: string
+  /** 内容类型：1=文本，2=链接 */
+  contentType?: NoticeContentType
+  /** 跳转链接 */
+  h5Url?: string
+  /** 是否公有：1=公有，2=私有 */
+  isPublic?: NoticePublicStatus
+  /** 公告关联的内容编码 */
+  resCode?: string
+  /** 排序 */
+  torder?: number
+  /** 合伙人标识 */
+  partnerId?: string
+  /** 创建时间 */
+  createTime?: string
+  /** 更新时间 */
+  updateTime?: string
+}
+
+/** 分页结果 */
+export interface IPageResult<T> {
+  /** 当前页 */
+  pageNum: number
+  /** 每页的数量 */
+  pageSize: number
+  /** 总记录数 */
+  total: number
+  /** 总页数 */
+  pages: number
+  /** 结果集 */
+  list: T[]
+  /** 是否为空 */
+  emptyFlag: boolean
+}
+
+/** 新增请求体 */
+export interface ICommunityNoticeAddDTO {
+  /** 标题 */
+  title: string
+  /** 简介 */
+  introduction?: string
+  /** 内容 */
+  content?: string
+  /** 内容类型：1=文本，2=链接 */
+  contentType?: NoticeContentType
+  /** 跳转链接 */
+  h5Url?: string
+  /** 是否公有：1=公有，2=私有 */
+  isPublic?: NoticePublicStatus
+  /** 排序 */
+  torder?: number
+}
+
+/** 更新请求体（在新增基础上增加 uniqueCode） */
+export interface ICommunityNoticeUpdateDTO extends ICommunityNoticeAddDTO {
+  /** 唯一标识 */
+  uniqueCode: string
+}
+
+/** 分页列表响应 */
+export type ICommunityNoticeListResponse = IResponse<IPageResult<ICommunityNotice>>
+
+/** 详情响应 */
+export type ICommunityNoticeDetailResponse = IResponse<ICommunityNotice>
+
+// ==================== API 封装 ====================
+
+/** 获取小区公告分页列表 */
+export function useGetNoticePageQuery(query: Ref<ICommunityNoticeListQuery>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<ICommunityNoticeListResponse, Error>({
+    queryKey: ['communityNoticeList', query],
+    queryFn: async () => await apiFetch<ICommunityNoticeListResponse>('/community/notice/page', {
+      method: 'get',
+      query: query.value,
+    }),
+    retry: false,
+  })
+}
+
+/** 获取小区公告详情 */
+export function useGetNoticeDetailQuery(uniqueCode: Ref<string | undefined>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<ICommunityNoticeDetailResponse, Error>({
+    queryKey: ['communityNoticeDetail', uniqueCode],
+    queryFn: async () => await apiFetch<ICommunityNoticeDetailResponse>('/community/notice/detail', {
+      method: 'get',
+      query: { uniqueCode: uniqueCode.value },
+    }),
+    enabled: () => !!uniqueCode.value,
+    retry: false,
+  })
+}
+
+/** 新增小区公告 */
+export function useCreateNoticeMutation() {
+  const { apiFetch } = useApiFetch()
+  const queryClient = useQueryClient()
+
+  return useMutation<IResponse<boolean>, Error, ICommunityNoticeAddDTO>({
+    mutationKey: ['createCommunityNotice'],
+    mutationFn: async data => await apiFetch<IResponse<boolean>>('/community/notice', {
+      method: 'post',
+      body: data,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['communityNoticeList'] })
+    },
+  })
+}
+
+/** 更新小区公告 */
+export function useUpdateNoticeMutation() {
+  const { apiFetch } = useApiFetch()
+  const queryClient = useQueryClient()
+
+  return useMutation<IResponse<boolean>, Error, ICommunityNoticeUpdateDTO>({
+    mutationKey: ['updateCommunityNotice'],
+    mutationFn: async data => await apiFetch<IResponse<boolean>>('/community/notice', {
+      method: 'put',
+      body: data,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['communityNoticeList'] })
+      queryClient.invalidateQueries({ queryKey: ['communityNoticeDetail'] })
+    },
+  })
+}
+
+/** 删除小区公告 */
+export function useDeleteNoticeMutation() {
+  const { apiFetch } = useApiFetch()
+  const queryClient = useQueryClient()
+
+  return useMutation<IResponse<boolean>, Error, string>({
+    mutationKey: ['deleteCommunityNotice'],
+    mutationFn: async uniqueCode => await apiFetch<IResponse<boolean>>(`/community/notice/${uniqueCode}`, {
+      method: 'delete',
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['communityNoticeList'] })
+    },
+  })
+}

@@ -1,0 +1,71 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://content.icitychina.net/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/community/notice/{uniqueCode}": {
+      "delete": {
+        "tags": [
+          "站长用户-社区管理"
+        ],
+        "summary": "小区公告-删除",
+        "operationId": "noticeRemove_1",
+        "parameters": [
+          {
+            "name": "uniqueCode",
+            "in": "path",
+            "description": "公告唯一标识",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "BaseResponseBoolean": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

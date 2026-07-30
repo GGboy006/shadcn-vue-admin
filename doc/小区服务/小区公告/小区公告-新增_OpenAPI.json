@@ -1,0 +1,128 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "小区站长驾驶舱",
+    "description": "小区站长驾驶舱接口文档",
+    "contact": {
+      "name": "management"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://content.icitychina.net/web",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/community/notice": {
+      "post": {
+        "tags": [
+          "站长用户-社区管理"
+        ],
+        "summary": "小区公告-新增",
+        "operationId": "noticeAdd_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommunityNoticeAddReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "CommunityNoticeAddReq": {
+      "required": [
+        "partnerId",
+        "title"
+      ],
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "标题",
+          "refType": null
+        },
+        "introduction": {
+          "type": "string",
+          "description": "简介",
+          "refType": null
+        },
+        "content": {
+          "type": "string",
+          "description": "内容",
+          "refType": null
+        },
+        "contentType": {
+          "type": "integer",
+          "description": "内容类型【1:文本;2:链接;】",
+          "format": "int32",
+          "refType": null
+        },
+        "h5Url": {
+          "type": "string",
+          "description": "跳转链接",
+          "refType": null
+        },
+        "isPublic": {
+          "type": "integer",
+          "description": "是否公有：1.是(公有)；2.否（私有）",
+          "format": "int32",
+          "refType": null
+        },
+        "resCode": {
+          "type": "string",
+          "description": "公告关联的内容编码",
+          "refType": null
+        },
+        "torder": {
+          "type": "integer",
+          "description": "排序",
+          "format": "int32",
+          "refType": null
+        },
+        "partnerId": {
+          "type": "string",
+          "description": "合伙人标识",
+          "refType": null
+        }
+      },
+      "description": "社区公告新增请求对象"
+    },
+    "BaseResponseBoolean": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
