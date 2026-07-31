@@ -69,7 +69,7 @@ function isActive(menu: NavItem): boolean {
                 </UiSidebarMenuButton>
               </UiCollapsibleTrigger>
             </UiSidebarMenuItem>
-            <UiCollapsibleContent>
+            <UiCollapsibleContent class="overflow-hidden data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up">
               <UiSidebarMenuSub>
                 <UiSidebarMenuSubItem v-for="subItem in menu.items" :key="subItem.title">
                   <UiSidebarMenuSubButton as-child :is-active="isActive(subItem as NavItem)">
