@@ -4,6 +4,7 @@ import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 import { z } from 'zod'
 
+import { DateTimePicker } from '@/components/prop-ui/date-picker'
 import { ModalClose, ModalFooter, ModalHeader, ModalTitle } from '@/components/prop-ui/modal'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -20,7 +21,7 @@ import { optionalInt, optionalNumber, showInvalidSubmitToast } from '@/validator
 
 import type { ActivityFormValues } from '../data/schema'
 
-import { buildActivityPayload, toDateTimeLocalInput } from '../data/payload'
+import { buildActivityPayload } from '../data/payload'
 
 const props = defineProps<{
   context?: {
@@ -66,8 +67,8 @@ const initialValues = reactive<ActivityFormValues>({
   address: props.context?.initialValues?.address,
   isCharge: props.context?.initialValues?.isCharge ?? 2,
   salePrice: props.context?.initialValues?.salePrice,
-  startTime: toDateTimeLocalInput(props.context?.initialValues?.startTime),
-  endTime: toDateTimeLocalInput(props.context?.initialValues?.endTime),
+  startTime: props.context?.initialValues?.startTime ?? '',
+  endTime: props.context?.initialValues?.endTime ?? '',
   torder: props.context?.initialValues?.torder,
   isRecommend: props.context?.initialValues?.isRecommend ?? 2,
   isEnable: props.context?.initialValues?.isEnable ?? 1,
@@ -197,7 +198,7 @@ const onSubmit = handleSubmit((values) => {
               开始时间
             </FormLabel>
             <FormControl>
-              <Input type="datetime-local" v-bind="componentField" />
+              <DateTimePicker v-bind="componentField" placeholder="选择开始时间" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -209,7 +210,7 @@ const onSubmit = handleSubmit((values) => {
               结束时间
             </FormLabel>
             <FormControl>
-              <Input type="datetime-local" v-bind="componentField" />
+              <DateTimePicker v-bind="componentField" placeholder="选择结束时间" />
             </FormControl>
             <FormMessage />
           </FormItem>
