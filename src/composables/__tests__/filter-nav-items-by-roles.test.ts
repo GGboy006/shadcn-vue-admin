@@ -71,4 +71,55 @@ describe('filterNavItemsByRoles', () => {
   it('should return empty array for empty input', () => {
     expect(filterNavItemsByRoles([], 3)).toEqual([])
   })
+
+  describe('nested items (二级菜单)', () => {
+    const nestedItems: NavItem[] = [
+      {
+        title: 'AI服务管理',
+        items: [
+          { title: 'OPC 数字员工', url: '/digital-employees', roles: [3] },
+          { title: 'AI工具管理', url: '/apps' },
+        ],
+      },
+      { title: '仪表盘', url: '/dashboard' },
+    ]
+
+    it('keeps parent + all children for station master (userType=3)', () => {
+      const result = filterNavItemsByRoles(nestedItems, 3)
+      expect(result.map(i => i.title)).toEqual(['AI服务管理', '仪表盘'])
+      const parent = result[0]
+      expect(parent.items?.map(i => i.title)).toEqual(['OPC 数字员工', 'AI工具管理'])
+    })
+
+    it('filters out restricted children but keeps parent for merchant (userType=4)', () => {
+      const result = filterNavItemsByRoles(nestedItems, 4)
+      expect(result.map(i => i.title)).toEqual(['AI服务管理', '仪表盘'])
+      const parent = result[0]
+      expect(parent.items?.map(i => i.title)).toEqual(['AI工具管理'])
+    })
+
+    it('hides parent when all children are filtered out', () => {
+      const allRestricted: NavItem[] = [
+        {
+          title: '站长专属组',
+          items: [
+            { title: '菜单A', url: '/a', roles: [3] },
+            { title: '菜单B', url: '/b', roles: [3] },
+          ],
+        },
+        { title: '仪表盘', url: '/dashboard' },
+      ]
+      const result = filterNavItemsByRoles(allRestricted, 4)
+      expect(result.map(i => i.title)).toEqual(['仪表盘'])
+    })
+  })
+
+  it('keeps flat behavior unchanged (backward compatible)', () => {
+    const flat: NavItem[] = [
+      { title: '仪表盘', url: '/dashboard' },
+      { title: '站长专属', url: '/x', roles: [3] },
+    ]
+    expect(filterNavItemsByRoles(flat, 4).map(i => i.title)).toEqual(['仪表盘'])
+    expect(filterNavItemsByRoles(flat, 3).map(i => i.title)).toEqual(['仪表盘', '站长专属'])
+  })
 })

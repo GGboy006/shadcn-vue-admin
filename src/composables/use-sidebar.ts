@@ -1,4 +1,4 @@
-import { BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, ConciergeBellIcon, FolderTreeIcon, HandHelpingIcon, HeadsetIcon, HelpCircleIcon, LandmarkIcon, LayoutDashboardIcon, LightbulbIcon, MegaphoneIcon, MessageSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, SettingsIcon, ShoppingCartIcon, StoreIcon, TagIcon, UserIcon, WrenchIcon } from '@lucide/vue'
+import { BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, ConciergeBellIcon, FolderTreeIcon, HandHelpingIcon, HeadsetIcon, HelpCircleIcon, LandmarkIcon, LayoutDashboardIcon, LightbulbIcon, MegaphoneIcon, MessageSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, SettingsIcon, ShoppingCartIcon, SparklesIcon, StoreIcon, TagIcon, UserIcon, WrenchIcon } from '@lucide/vue'
 
 import type { NavGroup, NavItem } from '@/components/app-sidebar/types'
 
@@ -28,8 +28,14 @@ export function useSidebar() {
   const commonNavItems: NavItem[] = [
     { title: '仪表盘', url: '/dashboard', icon: LayoutDashboardIcon },
     { title: '聊天工作台', url: '/admin/chat-workbench', icon: HeadsetIcon, roles: [3] },
-    { title: 'OPC 数字员工', url: '/digital-employees', icon: BotIcon, roles: [3] },
-    { title: 'AI工具管理', url: '/apps', icon: BoxesIcon },
+    {
+      title: 'AI服务管理',
+      icon: SparklesIcon,
+      items: [
+        { title: 'OPC 数字员工', url: '/digital-employees', icon: BotIcon, roles: [3] },
+        { title: 'AI工具管理', url: '/apps', icon: BoxesIcon },
+      ],
+    },
     { title: '会话列表', url: '/conversations', icon: MessageSquareIcon },
     { title: '商户管理', url: '/merchants', icon: StoreIcon, roles: [3] },
     { title: '物业管理', url: '/properties', icon: Building2Icon, roles: [3] },
