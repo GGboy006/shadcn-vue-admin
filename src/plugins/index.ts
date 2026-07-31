@@ -7,8 +7,10 @@ import { setupNProgress } from './nprogress/setup'
 import { setupPinia } from './pinia/setup'
 import { setupRouter } from './router/setup'
 import { setupTanstackVueQuery } from './tanstack-vue-query/setup'
+import { setupZod } from './zod/setup'
 
 export function setupPlugins(app: App) {
+  setupZod()
   setupDayjs()
   setupNProgress()
   setupAutoAnimate(app)
