@@ -16,6 +16,7 @@ import {
   useCreateActivityMutation,
   useUpdateActivityMutation,
 } from '@/services/api/merchant-business.api'
+import { optionalInt, optionalNumber, showInvalidSubmitToast } from '@/validators/common'
 
 import type { ActivityFormValues } from '../data/schema'
 
@@ -45,10 +46,10 @@ const activitySchema = z.object({
   content: z.string().nullable().optional(),
   address: z.string().nullable().optional(),
   isCharge: z.number().nullable().optional(),
-  salePrice: z.number().nullable().optional(),
+  salePrice: optionalNumber,
   startTime: z.string().min(1, '开始时间不能为空'),
   endTime: z.string().min(1, '结束时间不能为空'),
-  torder: z.number().nullable().optional(),
+  torder: optionalInt,
   isRecommend: z.number().nullable().optional(),
   isEnable: z.number().nullable().optional(),
 })
@@ -126,7 +127,7 @@ const onSubmit = handleSubmit((values) => {
   catch (err: any) {
     toast.error(err.message || '提交失败')
   }
-})
+}, showInvalidSubmitToast)
 </script>
 
 <template>

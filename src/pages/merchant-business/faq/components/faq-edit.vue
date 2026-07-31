@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Textarea } from '@/components/ui/textarea'
 import { useCurrentMerchantId } from '@/composables/use-current-merchant-id'
 import { useCreateFaqMutation, useUpdateFaqMutation } from '@/services/api/merchant-business.api'
+import { optionalInt, showInvalidSubmitToast } from '@/validators/common'
 
 import type { FaqFormValues } from '../data/schema'
 
@@ -34,7 +35,7 @@ const faqSchema = z.object({
   categoryName: z.string().optional(),
   question: z.string().min(1, '问题不能为空'),
   answer: z.string().min(1, '答案不能为空'),
-  torder: z.number().optional(),
+  torder: optionalInt,
   isEnable: z.number().optional(),
 })
 
@@ -83,7 +84,7 @@ const onSubmit = handleSubmit((values) => {
       onError: (err: any) => toast.error(err.message || '创建失败'),
     })
   }
-})
+}, showInvalidSubmitToast)
 </script>
 
 <template>

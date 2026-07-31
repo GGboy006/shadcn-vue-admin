@@ -84,11 +84,11 @@ describe('useSidebar navData', () => {
     expect(committeeSnapshot).toEqual(merchantSnapshot)
   })
 
-  it('站长(userType=3):通用(含站长专属) + 设置(含站长信息),无商户后台', () => {
+  it('站长(userType=3):通用(含站长专属) + 小区服务 + 设置(含站长信息),无商户后台', () => {
     setUser(3)
     const { navData } = useSidebar()
 
-    expect(navData.value.map(g => g.title)).toEqual(['通用', '其他'])
+    expect(navData.value.map(g => g.title)).toEqual(['通用', '小区服务', '其他'])
 
     expect(leafTitles(navData.value[0])).toEqual([
       '仪表盘',
@@ -101,6 +101,16 @@ describe('useSidebar navData', () => {
       '居委会管理',
     ])
 
-    expect(leafTitles(navData.value[1])).toEqual(['个人资料', '站长信息'])
+    expect(leafTitles(navData.value[1])).toEqual([
+      '社区电话列表',
+      '小区动态',
+      '小区公告',
+      '办事指南',
+      '便民服务',
+      '知识服务',
+      '管家服务',
+    ])
+
+    expect(leafTitles(navData.value[2])).toEqual(['个人资料', '站长信息'])
   })
 })

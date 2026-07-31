@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useCreateNoticeMutation, useUpdateNoticeMutation } from '@/services/api/community-notice.api'
+import { showInvalidSubmitToast } from '@/validators/common'
 
 import type { NoticeValidator } from '../validators/notice.validator'
 
@@ -109,7 +110,7 @@ const onSubmit = handleSubmit((values) => {
       },
     })
   }
-})
+}, showInvalidSubmitToast)
 </script>
 
 <template>

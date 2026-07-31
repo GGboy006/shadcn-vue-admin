@@ -18,6 +18,7 @@ import {
   useGetGoodsDetailQuery,
   useUpdateGoodsMutation,
 } from '@/services/api/merchant-business.api'
+import { optionalInt, optionalNumber, optionalString, showInvalidSubmitToast } from '@/validators/common'
 
 import type { GoodsFormValues } from '../data/schema'
 
@@ -41,12 +42,12 @@ const goodsSchema = z.object({
   name: z.string().min(1, '商品名称不能为空'),
   cateCode: z.string().min(1, '请选择分类'),
   cateName: z.string().min(1, '请选择分类'),
-  poster: z.string().optional(),
-  detailPoster: z.string().optional(),
-  describes: z.string().optional(),
-  content: z.string().optional(),
-  salePrice: z.number().optional(),
-  torder: z.number().optional(),
+  poster: optionalString,
+  detailPoster: optionalString,
+  describes: optionalString,
+  content: optionalString,
+  salePrice: optionalNumber,
+  torder: optionalInt,
   isRecommend: z.number().optional(),
   freeFlag: z.number().optional(),
 })
@@ -136,7 +137,7 @@ const onSubmit = handleSubmit((values) => {
       onError: (err: any) => toast.error(err.message || '创建失败'),
     })
   }
-})
+}, showInvalidSubmitToast)
 </script>
 
 <template>

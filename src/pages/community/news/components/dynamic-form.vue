@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { useUpload } from '@/composables/use-upload'
 import { useCreateDynamicMutation, useUpdateDynamicMutation } from '@/services/api/community-dynamic.api'
+import { showInvalidSubmitToast } from '@/validators/common'
 
 import type { DynamicValidator } from '../validators/dynamic.validator'
 
@@ -126,7 +127,7 @@ const onSubmit = handleSubmit((values) => {
       },
     })
   }
-})
+}, showInvalidSubmitToast)
 </script>
 
 <template>

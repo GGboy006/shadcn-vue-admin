@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Textarea } from '@/components/ui/textarea'
 import { useUpload } from '@/composables/use-upload'
 import { useCreateMerchantMutation, useUpdateMerchantMutation } from '@/services/api/merchant.api'
+import { showInvalidSubmitToast } from '@/validators/common'
 
 import type { Merchant } from '../data/schema'
 import type { MerchantValidator } from '../validators/merchant.validator'
@@ -61,6 +62,7 @@ const typeLabel = computed(() => types.find(t => t.value === (merchant?.type ?? 
 const { upload } = useUpload()
 
 const initialValues = reactive<MerchantValidator>({
+  merchantId: merchant?.merchantId,
   merchantName: merchant?.merchantName || '',
   nickname: merchant?.nickname || merchant?.merchantName || '',
   phone: merchant?.phone || '',
@@ -176,7 +178,7 @@ const onSubmit = handleSubmit((values) => {
       },
     })
   }
-})
+}, showInvalidSubmitToast)
 </script>
 
 <template>

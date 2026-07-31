@@ -21,6 +21,7 @@ import {
   useGetMyMerchantInfoQuery,
   useUpdateMyMerchantInfoMutation,
 } from '@/services/api/merchant-business.api'
+import { optionalNumber, optionalString, showInvalidSubmitToast } from '@/validators/common'
 
 import type { ProfileFormValues } from './data/payload'
 
@@ -33,27 +34,27 @@ const info = computed(() => data.value?.data)
 const profileSchema = z.object({
   merchantId: z.string(),
   type: z.number(),
-  nickname: z.string().optional(),
-  phone: z.string().optional(),
-  password: z.string().optional(),
-  avatar: z.string().optional(),
-  gender: z.number().optional(),
-  merchantName: z.string().optional(),
-  logo: z.string().optional(),
+  nickname: optionalString,
+  phone: optionalString,
+  password: optionalString,
+  avatar: optionalString,
+  gender: optionalNumber,
+  merchantName: optionalString,
+  logo: optionalString,
   bannerImages: z.array(z.string()).optional(),
   otherImages: z.array(z.string()).optional(),
-  contactName: z.string().optional(),
-  contactPhone: z.string().optional(),
-  address: z.string().optional(),
-  externalUrl: z.string().optional(),
-  signDate: z.string().optional(),
-  signFee: z.number().optional(),
-  businessStatus: z.number().optional(),
-  businessHours: z.string().optional(),
-  consumptionPerCapita: z.number().optional(),
-  settlementCycle: z.number().optional(),
-  remark: z.string().optional(),
-  status: z.number().optional(),
+  contactName: optionalString,
+  contactPhone: optionalString,
+  address: optionalString,
+  externalUrl: optionalString,
+  signDate: optionalString,
+  signFee: optionalNumber,
+  businessStatus: optionalNumber,
+  businessHours: optionalString,
+  consumptionPerCapita: optionalNumber,
+  settlementCycle: optionalNumber,
+  remark: optionalString,
+  status: optionalNumber,
 })
 
 const { handleSubmit, setFieldValue, values: formValues, resetForm } = useForm({
@@ -71,31 +72,32 @@ const { handleSubmit, setFieldValue, values: formValues, resetForm } = useForm({
 watch(info, (val) => {
   if (!val)
     return
+  // 后端可能返回 null,统一清洗为 undefined,避免 zod optional 校验失败
   resetForm({
     values: {
       merchantId: val.merchantId,
       type: val.type,
-      nickname: val.nickname,
-      phone: val.phone,
+      nickname: val.nickname ?? undefined,
+      phone: val.phone ?? undefined,
       password: '',
-      avatar: val.avatar,
-      gender: val.gender,
-      merchantName: val.merchantName,
-      logo: val.logo,
+      avatar: val.avatar ?? undefined,
+      gender: val.gender ?? undefined,
+      merchantName: val.merchantName ?? undefined,
+      logo: val.logo ?? undefined,
       bannerImages: val.bannerImages ?? [],
       otherImages: val.otherImages ?? [],
-      contactName: val.contactName,
-      contactPhone: val.contactPhone,
-      address: val.address,
-      externalUrl: val.externalUrl,
-      signDate: val.signDate,
-      signFee: val.signFee,
-      businessStatus: val.businessStatus,
-      businessHours: val.businessHours,
-      consumptionPerCapita: val.consumptionPerCapita,
-      settlementCycle: val.settlementCycle,
-      remark: val.remark,
-      status: val.status,
+      contactName: val.contactName ?? undefined,
+      contactPhone: val.contactPhone ?? undefined,
+      address: val.address ?? undefined,
+      externalUrl: val.externalUrl ?? undefined,
+      signDate: val.signDate ?? undefined,
+      signFee: val.signFee ?? undefined,
+      businessStatus: val.businessStatus ?? undefined,
+      businessHours: val.businessHours ?? undefined,
+      consumptionPerCapita: val.consumptionPerCapita ?? undefined,
+      settlementCycle: val.settlementCycle ?? undefined,
+      remark: val.remark ?? undefined,
+      status: val.status ?? undefined,
     } as ProfileFormValues,
   })
 }, { immediate: true })
@@ -158,7 +160,7 @@ const onSubmit = handleSubmit((values) => {
   catch (err: any) {
     toast.error(err.message || '提交失败')
   }
-})
+}, showInvalidSubmitToast)
 </script>
 
 <template>

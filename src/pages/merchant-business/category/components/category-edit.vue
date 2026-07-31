@@ -10,6 +10,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input'
 import { useCurrentMerchantId } from '@/composables/use-current-merchant-id'
 import { useCreateCateMutation, useUpdateCateMutation } from '@/services/api/merchant-business.api'
+import { optionalInt, showInvalidSubmitToast } from '@/validators/common'
 
 import type { CategoryEditContext, CategoryFormValues } from '../data/schema'
 
@@ -27,7 +28,7 @@ const isEdit = computed(() => !!props.context?.cateCode)
 
 const categorySchema = z.object({
   name: z.string().min(1, '分类名称不能为空'),
-  torder: z.number().optional(),
+  torder: optionalInt,
 })
 
 const initialValues = reactive<CategoryFormValues>({
@@ -67,7 +68,7 @@ const onSubmit = handleSubmit((values) => {
       onError: (err: any) => toast.error(err.message || '创建失败'),
     })
   }
-})
+}, showInvalidSubmitToast)
 </script>
 
 <template>
