@@ -15,10 +15,10 @@ import type { IChatMessage, IConversation, IConversationDetail, IConversationLis
 import type { IResponse } from '@/services/types/response.type'
 
 import ChatMessageList from '@/components/chat/ChatMessageList.vue'
+import { FlipClock } from '@/components/prop-ui/flip-clock'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { DigitalClock } from '@/components/ui/clock'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -290,7 +290,7 @@ function getInitials(name: string) {
     >
       <!-- 时钟 -->
       <div class="p-3 pb-0 flex justify-center">
-        <DigitalClock format="HH:mm:ss" :show-period="true" />
+        <FlipClock size="mini" />
       </div>
 
       <!-- 头部 Tabs -->
