@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>hsl vs oklch 明暗派生对比</title>
+    <style>
+      body {
+        font-family: -apple-system, 'PingFang SC', sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 40px 20px;
+        color: #222;
+      }
+      h1 {
+        font-size: 20px;
+        text-align: center;
+        margin: 0 0 8px;
+      }
+      .sub {
+        text-align: center;
+        color: #666;
+        font-size: 13px;
+        margin-bottom: 32px;
+      }
+      .row {
+        max-width: 920px;
+        margin: 0 auto 36px;
+      }
+      .row-title {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .tag {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+        font-family: monospace;
+      }
+      .tag-hsl {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .tag-okl {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+      }
+      .swatch {
+        aspect-ratio: 1.4;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 8px;
+        color: #fff;
+        font-size: 11px;
+        font-family: monospace;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      }
+      .swatch .l-label {
+        font-weight: 600;
+      }
+      .swatch .v-label {
+        opacity: 0.85;
+        font-size: 9px;
+        margin-top: 2px;
+      }
+      .caption {
+        font-size: 12px;
+        color: #666;
+        margin-top: 8px;
+        line-height: 1.6;
+      }
+      .caption b {
+        color: #222;
+      }
+      .arrow {
+        text-align: center;
+        font-size: 18px;
+        color: #999;
+        margin: 4px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>同一蓝色,两种色彩空间做明暗梯度</h1>
+    <p class="sub">两个基础色都是"同一个蓝"(视觉一致)。下面用各自的 L 维度派生 7 档亮度,看过渡是否均匀。</p>
+
+    <!-- HSL 行 -->
+    <div class="row">
+      <div class="row-title">HSL 派生 <span class="tag-hsl">hsl(221 83% L%)</span></div>
+      <div class="swatches" id="hsl-row"></div>
+      <p class="caption">
+        HSL 的 L 维度是 <b>sRGB 的加权平均</b>,不是感知亮度。看中间几档:
+        <b>相邻档的视觉亮度差忽大忽小</b>(尤其低亮度区跳变明显), 且纯色档(中间)看起来比同 L 的灰色"更亮" --
+        这就是感知不均匀。
+      </p>
+    </div>
+
+    <div class="arrow">↓ 对比 ↓</div>
+
+    <!-- oklch 行 -->
+    <div class="row">
+      <div class="row-title">oklch 派生 <span class="tag-okl">oklch(L 0.22 264)</span></div>
+      <div class="swatches" id="okl-row"></div>
+      <p class="caption">
+        oklch 的 L 是 <b>感知亮度</b>。相邻档的视觉亮度差 <b>基本等距</b>, 过渡顺滑。这就是 shadcn / Tailwind v4 选
+        oklch 做主题系统的根本原因 -- 派生色阶、明暗模式时,梯度天然均匀,不用人工微调。
+      </p>
+    </div>
+
+    <script>
+      // 同一个"蓝":HSL(221 83% 53%) ≈ oklch(0.5465 0.2455 262.8657)
+      // 视觉上两者是同一个颜色
+
+      // HSL:固定 H=221 S=83%, L 从 15% 到 95%,7 档
+      const hslLs = [15, 28, 41, 53, 65, 78, 91]
+      const hslRow = document.getElementById('hsl-row')
+      hslLs.forEach((L) => {
+        const color = `hsl(221 83% ${L}%)`
+        const div = document.createElement('div')
+        div.className = 'swatch'
+        div.style.background = color
+        // 文字颜色根据亮度切换,保证可读
+        const textColor = L > 60 ? '#000' : '#fff'
+        div.style.color = textColor
+        div.style.textShadow = L > 60 ? 'none' : '0 1px 2px rgba(0,0,0,0.5)'
+        div.innerHTML = `<span class="l-label">L ${L}%</span><span class="v-label">${color}</span>`
+        hslRow.appendChild(div)
+      })
+
+      // oklch:固定 C=0.22 H=264, L 从 0.15 到 0.95,7 档
+      const oklLs = [0.15, 0.28, 0.41, 0.54, 0.65, 0.78, 0.91]
+      const oklRow = document.getElementById('okl-row')
+      oklLs.forEach((L) => {
+        const color = `oklch(${L} 0.22 264)`
+        const div = document.createElement('div')
+        div.className = 'swatch'
+        div.style.background = color
+        const textColor = L > 0.6 ? '#000' : '#fff'
+        div.style.color = textColor
+        div.style.textShadow = L > 0.6 ? 'none' : '0 1px 2px rgba(0,0,0,0.5)'
+        div.innerHTML = `<span class="l-label">L ${L}</span><span class="v-label">${color}</span>`
+        oklRow.appendChild(div)
+      })
+    </script>
+  </body>
+</html>
