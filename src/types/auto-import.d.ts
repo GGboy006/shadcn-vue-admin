@@ -130,7 +130,7 @@ declare global {
   export type { ApiStatus } from '../constants/api-status'
   import('../constants/api-status')
   // @ts-ignore
-  export type { Theme, Radius, ContentLayout } from '../constants/themes'
+  export type { Radius, ContentLayout } from '../constants/themes'
   import('../constants/themes')
   // @ts-ignore
   export type { UserType } from '../constants/user-type'

@@ -1,7 +1,11 @@
+/* 滚动条样式,Firefox 与 Chrome 系各用一套,颜色统一跟随主题变量 */
 * {
-  scrollbar-color: #8885 var(--c-border);
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
 
+/* Chrome / Safari / Edge */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -11,15 +15,15 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--c-border);
+  background: transparent;
   border-radius: 1px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #8885;
+  background: var(--border);
   border-radius: 1px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8886;
+  background: color-mix(in oklch, var(--border) 70%, var(--foreground));
 }
