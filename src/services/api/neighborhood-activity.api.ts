@@ -161,8 +161,8 @@ export function useGetActivityDetailQuery(uniqueCode: Ref<string | undefined>, e
       query: { uniqueCode: uniqueCode.value },
     }),
     // 默认仅 uniqueCode 有值即请求;组件层可传入更严格的 enabled(如弹层打开才请求),
-    // 避免 row-actions 常驻挂载的详情组件在列表加载时就触发请求。
-    enabled: () => enabled?.value ?? !!uniqueCode.value,
+    // 此时仍需 uniqueCode 有值(组件传 isOpen 时,新建场景 uniqueCode 为空,必须由 &&!!code 拦住避免 /detail?uniqueCode=undefined)。
+    enabled: () => (enabled?.value ?? true) && !!uniqueCode.value,
     retry: false,
   })
 }

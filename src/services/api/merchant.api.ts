@@ -363,8 +363,8 @@ export function useGetMerchantDetailQuery(merchantId: Ref<string | undefined>, e
       method: 'get',
     }),
     // 默认仅 merchantId 有值即请求;组件层可传入更严格的 enabled(如弹层打开才请求),
-    // 避免 row-actions 常驻挂载的详情组件在列表加载时就触发请求。
-    enabled: () => enabled?.value ?? !!merchantId.value,
+    // 此时仍需 id 有值(组件传 isOpen 时,新建场景 id 为空,必须由 &&!!id 拦住避免 /merchant/undefined)。
+    enabled: () => (enabled?.value ?? true) && !!merchantId.value,
     retry: false,
   })
 }
