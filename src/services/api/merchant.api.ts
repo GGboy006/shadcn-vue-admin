@@ -146,6 +146,10 @@ export interface IMerchant {
   settlementCycle: SettlementCycle
   /** 状态：1=启用，2=禁用 */
   status: MerchantStatus
+  /** 服务居民数（居委会） */
+  serveResidents?: number
+  /** 成员数（居委会） */
+  members?: number
   /** 备注 */
   remark: string
 }
@@ -244,6 +248,89 @@ export interface IMerchantUpdateDTO {
   status?: MerchantStatus
 }
 
+// ==================== 居委会（站长侧 /station/neighborhood） ====================
+
+/**
+ * 新增居委会 DTO（对接文档 1.3 BusinessOrgAddDTO）。
+ *
+ * 与商户通用 AddDTO 的区别:
+ * - merchantCode 必填(城市居委会标识,站长手动粘贴)
+ * - 无 password(后端从城市库拉取手机号生成本地账号)
+ * - 无 type(后端固定为 6,前端不传)
+ * - 含居委会特有的 serveResidents/members
+ */
+export interface ICommitteeAddDTO {
+  /** 城市居委会标识（绑定用,站长手动粘贴输入） */
+  merchantCode: string
+  /** 本地管理员昵称 */
+  nickname: string
+  /** 头像 URL */
+  avatar?: string
+  /** 性别：0=未知，1=男，2=女 */
+  gender?: Gender
+  /** 联系人 */
+  contactName?: string
+  /** 联系电话 */
+  contactPhone?: string
+  /** 详细地址 */
+  address?: string
+  /** 签约日期 */
+  signDate?: string
+  /** 签约费用 */
+  signFee?: number
+  /** 服务居民数，默认 0 */
+  serveResidents?: number
+  /** 成员数，默认 0 */
+  members?: number
+  /** 简介；为空时用城市库简介 */
+  remark?: string
+  /** 1=启用，2=禁用 */
+  status?: MerchantStatus
+}
+
+/**
+ * 更新居委会 DTO（对接文档 1.4 BusinessOrgUpdateDTO）。
+ *
+ * merchantId 必填（居委会本地 ID，必须归属当前站长）；
+ * password 为空则不修改；type 后端固定为 6。
+ */
+export interface ICommitteeUpdateDTO {
+  /** 居委会本地 ID */
+  merchantId: string
+  /** 昵称 */
+  nickname?: string
+  /** 登录手机号 */
+  phone?: string
+  /** 登录密码；空则不修改 */
+  password?: string
+  /** 头像 */
+  avatar?: string
+  /** 性别 */
+  gender?: Gender
+  /** 居委会名称 */
+  merchantName?: string
+  /** Logo */
+  logo?: string
+  /** 联系人 */
+  contactName?: string
+  /** 联系电话 */
+  contactPhone?: string
+  /** 详细地址 */
+  address?: string
+  /** 签约日期 */
+  signDate?: string
+  /** 签约费用 */
+  signFee?: number
+  /** 服务居民数 */
+  serveResidents?: number
+  /** 成员数 */
+  members?: number
+  /** 简介（同步城市 instruction） */
+  remark?: string
+  /** 1=启用，2=禁用 */
+  status?: MerchantStatus
+}
+
 /** 分页列表响应 */
 export type IMerchantListResponse = IResponse<IPageResult<IMerchant>>
 
@@ -267,7 +354,7 @@ export function useGetMerchantListQuery(query: Ref<IMerchantListQuery>) {
 }
 
 /** 获取商户/物业详情 */
-export function useGetMerchantDetailQuery(merchantId: Ref<string | undefined>) {
+export function useGetMerchantDetailQuery(merchantId: Ref<string | undefined>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IMerchantDetailResponse, Error>({
@@ -275,7 +362,9 @@ export function useGetMerchantDetailQuery(merchantId: Ref<string | undefined>) {
     queryFn: async () => await apiFetch<IMerchantDetailResponse>(`/station/merchant/${merchantId.value}`, {
       method: 'get',
     }),
-    enabled: () => !!merchantId.value,
+    // 默认仅 merchantId 有值即请求;组件层可传入更严格的 enabled(如弹层打开才请求),
+    // 避免 row-actions 常驻挂载的详情组件在列表加载时就触发请求。
+    enabled: () => enabled?.value ?? !!merchantId.value,
     retry: false,
   })
 }
@@ -305,6 +394,51 @@ export function useUpdateMerchantMutation() {
   return useMutation<IResponse<boolean>, Error, IMerchantUpdateDTO>({
     mutationKey: ['updateMerchant'],
     mutationFn: async data => await apiFetch<IResponse<boolean>>('/station/merchant', {
+      method: 'put',
+      body: data,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchantList'] })
+      queryClient.invalidateQueries({ queryKey: ['merchantDetail'] })
+    },
+  })
+}
+
+/**
+ * 新增居委会（对接文档 1.3，`POST /station/neighborhood`）。
+ *
+ * 绑定城市居委会并创建本地管理员账号；名称/手机号/密码/Logo 等从城市库拉取。
+ * merchantCode 必须在城市库存在且未被绑定。
+ */
+export function useCreateCommitteeMutation() {
+  const { apiFetch } = useApiFetch()
+  const queryClient = useQueryClient()
+
+  return useMutation<IResponse<boolean>, Error, ICommitteeAddDTO>({
+    mutationKey: ['createCommittee'],
+    mutationFn: async data => await apiFetch<IResponse<boolean>>('/station/neighborhood', {
+      method: 'post',
+      body: data,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchantList'] })
+    },
+  })
+}
+
+/**
+ * 更新居委会（对接文档 1.4，`PUT /station/neighborhood`）。
+ *
+ * 站长更新居委会资料，并同步城市 updateOrg。
+ * 仅允许操作 type=6 且归属当前站长的数据。
+ */
+export function useUpdateCommitteeMutation() {
+  const { apiFetch } = useApiFetch()
+  const queryClient = useQueryClient()
+
+  return useMutation<IResponse<boolean>, Error, ICommitteeUpdateDTO>({
+    mutationKey: ['updateCommittee'],
+    mutationFn: async data => await apiFetch<IResponse<boolean>>('/station/neighborhood', {
       method: 'put',
       body: data,
     }),
