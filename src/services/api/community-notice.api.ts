@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import { useApiFetch } from '@/composables/use-fetch'
 
-import type { IResponse } from '../types/response.type'
+import type { IPageResult, IResponse } from '../types/response.type'
 
 /** 内容类型：1=文本，2=链接 */
 export type NoticeContentType = 1 | 2
@@ -64,22 +64,6 @@ export interface ICommunityNotice {
   createTime?: string
   /** 更新时间 */
   updateTime?: string
-}
-
-/** 分页结果 */
-export interface IPageResult<T> {
-  /** 当前页 */
-  pageNum: number
-  /** 每页的数量 */
-  pageSize: number
-  /** 总记录数 */
-  total: number
-  /** 总页数 */
-  pages: number
-  /** 结果集 */
-  list: T[]
-  /** 是否为空 */
-  emptyFlag: boolean
 }
 
 /** 新增请求体 */

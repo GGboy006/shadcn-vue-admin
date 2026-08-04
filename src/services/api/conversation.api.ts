@@ -4,7 +4,7 @@ import type { IWizardStepForm } from '@/pages/apps/types/wizard.types'
 
 import { useApiFetch } from '@/composables/use-fetch'
 
-import type { IResponse } from '../types/response.type'
+import type { IPageResult, IResponse } from '../types/response.type'
 import type { IStreamChatMessage } from './skill.api'
 
 // ==================== 图片生成结果查询类型 ====================
@@ -111,22 +111,6 @@ export interface IConversation {
   lastMessageTime: string
   /** 最后消息预览 */
   lastMessagePreview: string
-}
-
-/** 分页结果 */
-export interface IPageResult<T> {
-  /** 当前页 */
-  pageNum: number
-  /** 每页的数量 */
-  pageSize: number
-  /** 总记录数 */
-  total: number
-  /** 总页数 */
-  pages: number
-  /** 结果集 */
-  list: T[]
-  /** 是否为空 */
-  emptyFlag: boolean
 }
 
 /** 会话列表查询参数 */

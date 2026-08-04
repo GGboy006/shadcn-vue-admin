@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import { useApiFetch } from '@/composables/use-fetch'
 
-import type { IResponse } from '../types/response.type'
+import type { IPageResult, IResponse } from '../types/response.type'
 
 import { merchantBusinessKey, merchantModulePath } from './merchant-business-urls'
 
@@ -22,16 +22,6 @@ export interface IPageQuery {
   pageSize: number
   /** 是否查询总条数 */
   searchCount?: boolean
-}
-
-/** 分页结果(PageResult<T>) */
-export interface IPageResult<T> {
-  pageNum: number
-  pageSize: number
-  total: number
-  pages: number
-  list: T[]
-  emptyFlag: boolean
 }
 
 // ==================== 一、商户信息 ====================

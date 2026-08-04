@@ -168,7 +168,7 @@ export function useEmployeeChatStream(
           conversationId.value = result.data.conversationId
         }
         else {
-          throw new Error(result.message || '创建会话失败')
+          throw new Error(result.msg || '创建会话失败')
         }
       }
       catch (error) {

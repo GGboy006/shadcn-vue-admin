@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import { useApiFetch } from '@/composables/use-fetch'
 
-import type { IResponse } from '../types/response.type'
+import type { IPageResult, IResponse } from '../types/response.type'
 
 /** 商户/物业类型：4=商户，5=物业，6=居委会 */
 export type MerchantType = 4 | 5 | 6
@@ -148,22 +148,6 @@ export interface IMerchant {
   status: MerchantStatus
   /** 备注 */
   remark: string
-}
-
-/** 分页结果 */
-export interface IPageResult<T> {
-  /** 当前页 */
-  pageNum: number
-  /** 每页的数量 */
-  pageSize: number
-  /** 总记录数 */
-  total: number
-  /** 总页数 */
-  pages: number
-  /** 结果集 */
-  list: T[]
-  /** 是否为空 */
-  emptyFlag: boolean
 }
 
 /** 新增商户/物业 DTO */

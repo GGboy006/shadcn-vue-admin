@@ -16,13 +16,12 @@ const mockData: ISystemConfig[] = [
   },
 ]
 
-function generateReturnData(data: ISystemConfig, success: boolean = true): IResponse<ISystemConfig> {
+function generateReturnData(data: ISystemConfig): IResponse<ISystemConfig> {
   return {
+    code: 0,
+    msg: 'success',
+    level: null,
     data,
-    extra: {},
-    code: 200,
-    message: 'success',
-    success,
   }
 }
 

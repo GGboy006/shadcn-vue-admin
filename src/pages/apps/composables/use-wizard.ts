@@ -556,7 +556,7 @@ export function useWizard(skillId: Ref<string>) {
         // imageStatus === 0 继续轮询
       }
       else {
-        throw new Error(result.message || '生成失败')
+        throw new Error(result.msg || '生成失败')
       }
     }
     catch (error) {

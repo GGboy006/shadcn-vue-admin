@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import { useApiFetch } from '@/composables/use-fetch'
 
-import type { IResponse } from '../types/response.type'
+import type { IPageResult, IResponse } from '../types/response.type'
 
 /** 审核状态：0=待审核，1=审核拒绝，2=审核通过 */
 export type DynamicAuditStatus = 0 | 1 | 2
@@ -77,22 +77,6 @@ export interface ICommunityDynamic {
   createTime?: string
   /** 更新时间 */
   operatorTime?: string
-}
-
-/** 分页结果 */
-export interface IPageResult<T> {
-  /** 当前页 */
-  pageNum: number
-  /** 每页的数量 */
-  pageSize: number
-  /** 总记录数 */
-  total: number
-  /** 总页数 */
-  pages: number
-  /** 结果集 */
-  list: T[]
-  /** 是否为空 */
-  emptyFlag: boolean
 }
 
 /** 新增请求体 */

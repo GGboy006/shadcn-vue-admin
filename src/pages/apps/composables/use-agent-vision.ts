@@ -118,7 +118,7 @@ export function useAgentVision(options: UseAgentVisionOptions) {
         pptState.value = 'polling'
       }
       else {
-        throw new Error(result.message || 'PPT 转换失败')
+        throw new Error(result.msg || 'PPT 转换失败')
       }
     }
     catch (err) {
