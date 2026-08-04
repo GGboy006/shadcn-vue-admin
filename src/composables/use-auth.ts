@@ -1,4 +1,4 @@
-import { isMerchantBusinessUser } from '@/constants/user-type'
+import { isMerchantBusinessUser, UserType } from '@/constants/user-type'
 import { useAuthStore } from '@/stores/auth'
 import { useUserInfoStore } from '@/stores/user-info'
 
@@ -27,6 +27,11 @@ export function useAuth() {
   }
 
   function toHome() {
+    // 居委会后台首页是 /neighborhood/home,其余身份回 /dashboard
+    if (authStore.userInfo?.userType === UserType.committee) {
+      router.push({ path: '/neighborhood/home' })
+      return
+    }
     router.push({ path: '/dashboard' })
   }
 

@@ -1,5 +1,6 @@
 import type { IProxyLoginResp } from '@/services/api/proxy-login.api'
 
+import { UserType } from '@/constants/user-type'
 import { useAuthStore } from '@/stores/auth'
 import { clearProxyAuth, markProxyTab, readProxyAuth, waitForProxyAuth } from '@/utils/proxy-auth'
 
@@ -54,7 +55,9 @@ export function useProxyEntry() {
 
     markProxyTab()
     clearProxyAuth(key)
-    router.replace('/merchant-business/overview')
+    // 居委会(userType=6)后台首页是 /neighborhood/home,商户概览页 roles=[3,4,5] 不含 6,
+    // 直接跳 /merchant-business/overview 会 403;其余身份照旧跳商户概览。
+    router.replace(authStore.userInfo?.userType === UserType.committee ? '/neighborhood/home' : '/merchant-business/overview')
     return { ok: true }
   }
 

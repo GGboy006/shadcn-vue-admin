@@ -2,6 +2,7 @@ import type { Router } from 'vue-router'
 
 import { storeToRefs } from 'pinia'
 
+import { UserType } from '@/constants/user-type'
 import pinia from '@/plugins/pinia/setup'
 import { useAuthStore } from '@/stores/auth'
 
@@ -17,15 +18,18 @@ export function setupAuthGuard(router: Router) {
     const isFromAuthPage = from.path.startsWith('/auth')
     const isWhiteList = WHITE_LIST.includes(to.path)
 
-    // 已登录用户访问登录页 → 重定向到首页或之前页面
+    const userType = authStore.userInfo?.userType
+
+    // 已登录用户访问登录页 -> 重定向到首页或之前页面
     if (isLogin.value && isAuthPage) {
       if (from.path && from.path !== to.path && !isFromAuthPage) {
         return from
       }
-      return { path: '/dashboard' }
+      // 居委会后台首页是 /neighborhood/home,其余身份回 /dashboard
+      return { path: userType === UserType.committee ? '/neighborhood/home' : '/dashboard' }
     }
 
-    // 未登录用户访问非白名单页面 → 重定向到登录页
+    // 未登录用户访问非白名单页面 -> 重定向到登录页
     if (!isLogin.value && !isAuthPage && !isWhiteList) {
       return {
         path: '/auth/sign-in',
@@ -34,7 +38,6 @@ export function setupAuthGuard(router: Router) {
     }
 
     // 角色权限判断：页面需要特定角色，但用户没有
-    const userType = authStore.userInfo?.userType
     const requiredRoles = to.meta.roles as number[] | undefined
     if (requiredRoles && (!userType || !requiredRoles.includes(userType))) {
       return { path: '/errors/403' }
