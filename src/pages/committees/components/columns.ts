@@ -8,6 +8,7 @@ import Badge from '@/components/ui/badge/Badge.vue'
 import type { Merchant } from '../../merchants/data/schema'
 
 import { merchantStatusConfig } from '../../merchants/components/columns'
+import MerchantNameLink from '../../merchants/components/merchant-name-link.vue'
 import DataTableRowActions from './data-table-row-actions.vue'
 
 export const columns: ColumnDef<Merchant>[] = [
@@ -16,7 +17,7 @@ export const columns: ColumnDef<Merchant>[] = [
     accessorKey: 'merchantName',
     header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '名称' }),
     meta: { title: '名称' },
-    cell: ({ row }) => h('div', { class: 'max-w-[240px] truncate text-sm font-medium' }, row.getValue('merchantName') || '-'),
+    cell: ({ row }) => h(MerchantNameLink, { merchant: row.original }),
     enableSorting: false,
     enableHiding: false,
     enableResizing: true,
