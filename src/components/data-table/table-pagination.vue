@@ -105,7 +105,7 @@ function goToLastPage() {
     <div class="flex items-center space-x-6 lg:space-x-8">
       <div class="flex items-center space-x-2">
         <p class="hidden text-sm font-medium line-clamp-1 md:block">
-          Rows per page
+          每页条数
         </p>
         <UiSelect
           :model-value="`${currentPageSize}`"
@@ -122,7 +122,7 @@ function goToLastPage() {
         </UiSelect>
       </div>
       <div class="flex w-[100px] items-center justify-center text-sm font-medium">
-        Page {{ currentPage }} of {{ totalPages }}
+        第 {{ currentPage }} / {{ totalPages }} 页
       </div>
       <div class="flex items-center space-x-2">
         <UiButton
