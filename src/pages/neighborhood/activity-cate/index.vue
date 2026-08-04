@@ -6,21 +6,28 @@ meta:
 <script setup lang="ts">
 import { PlusIcon } from '@lucide/vue'
 
-import type { INeighborhoodCate } from '@/services/api/neighborhood-cate.api'
+import type { INeighborhoodCate, INeighborhoodCateListQuery } from '@/services/api/neighborhood-cate.api'
 
 import { BasicPage } from '@/components/global-layout'
 import NoResultFound from '@/components/no-result-found.vue'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useGetCateAllQuery } from '@/services/api/neighborhood-cate.api'
+import { useGetCateListQuery } from '@/services/api/neighborhood-cate.api'
 
 import CateCard from './components/cate-card.vue'
 import CateDeleteDialog from './components/cate-delete-dialog.vue'
 import CateFormSheet from './components/cate-form-sheet.vue'
 
-const { data, isLoading } = useGetCateAllQuery()
+// 用分页接口一次拉全量(pageSize=99),不展示分页组件。
+// 原因:/cate/all 后端只返回启用的,分类管理需要看到全部(含禁用)。
+const query = ref<INeighborhoodCateListQuery>({
+  pageNum: 1,
+  pageSize: 99,
+})
 
-const list = computed(() => data.value?.data ?? [])
+const { data, isLoading } = useGetCateListQuery(query)
+
+const list = computed(() => data.value?.data?.list ?? [])
 
 // 新建 / 编辑 Sheet
 const isFormOpen = ref(false)

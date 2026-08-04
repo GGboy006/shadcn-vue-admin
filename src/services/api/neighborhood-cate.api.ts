@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import { useApiFetch } from '@/composables/use-fetch'
 
-import type { IResponse } from '../types/response.type'
+import type { IPageParam, IPageResult, IResponse } from '../types/response.type'
 
 // ==================== 类型 ====================
 
@@ -51,8 +51,14 @@ export interface INeighborhoodCateUpdateDTO extends INeighborhoodCateAddDTO {
   uniqueCode: string
 }
 
-/** 全量列表响应 */
-export type INeighborhoodCateListResponse = IResponse<INeighborhoodCate[]>
+/** 列表查询参数(对接文档 3.2,/neighborhood/cate/page) */
+export interface INeighborhoodCateListQuery extends IPageParam {
+  /** 关键词(模糊搜索) */
+  keyword?: string
+}
+
+/** 分页列表响应 */
+export type INeighborhoodCateListResponse = IResponse<IPageResult<INeighborhoodCate>>
 
 /** 详情响应(与列表项字段一致) */
 export type INeighborhoodCateDetailResponse = IResponse<INeighborhoodCate>
@@ -60,17 +66,22 @@ export type INeighborhoodCateDetailResponse = IResponse<INeighborhoodCate>
 // ==================== API 封装 ====================
 
 /**
- * 获取全部活动分类(对接文档 3.2,`/neighborhood/cate/all`)。
+ * 获取活动分类分页列表(对接文档 3.2,`/neighborhood/cate/page`)。
  *
- * 分类数量通常不多,一次拉全量供卡片列表渲染。
+ * 注意:`/cate/all` 后端只返回启用的分类,无法展示禁用项;
+ * 分类管理需要看到全部(含禁用),故改用分页接口。
+ * 分类数量通常不多,前端固定 `pageSize=99` 一次拉全量,不展示分页组件。
+ *
+ * @param query 分页参数(pageNum/pageSize),固定传 pageSize=99
  */
-export function useGetCateAllQuery() {
+export function useGetCateListQuery(query: Ref<INeighborhoodCateListQuery>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<INeighborhoodCateListResponse, Error>({
-    queryKey: ['neighborhoodCateAll'],
-    queryFn: async () => await apiFetch<INeighborhoodCateListResponse>('/neighborhood/cate/all', {
+    queryKey: ['neighborhoodCateList', query],
+    queryFn: async () => await apiFetch<INeighborhoodCateListResponse>('/neighborhood/cate/page', {
       method: 'get',
+      query: query.value,
     }),
     retry: false,
   })
@@ -103,7 +114,7 @@ export function useCreateCateMutation() {
       body: data,
     }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['neighborhoodCateAll'] })
+      queryClient.invalidateQueries({ queryKey: ['neighborhoodCateList'] })
     },
   })
 }
@@ -120,7 +131,7 @@ export function useUpdateCateMutation() {
       body: data,
     }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['neighborhoodCateAll'] })
+      queryClient.invalidateQueries({ queryKey: ['neighborhoodCateList'] })
       queryClient.invalidateQueries({ queryKey: ['neighborhoodCateDetail'] })
     },
   })
@@ -137,7 +148,7 @@ export function useDeleteCateMutation() {
       method: 'delete',
     }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['neighborhoodCateAll'] })
+      queryClient.invalidateQueries({ queryKey: ['neighborhoodCateList'] })
     },
   })
 }
