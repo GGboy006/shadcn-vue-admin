@@ -1,10 +1,10 @@
-import { BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, ConciergeBellIcon, FolderTreeIcon, HandHelpingIcon, HeadsetIcon, HelpCircleIcon, LandmarkIcon, LayoutDashboardIcon, LightbulbIcon, MegaphoneIcon, MessageSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, SettingsIcon, ShoppingCartIcon, SparklesIcon, StoreIcon, TagIcon, UserIcon, WrenchIcon } from '@lucide/vue'
+import { BookmarkIcon, BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, CalendarDaysIcon, CalendarRangeIcon, Columns3Icon, ConciergeBellIcon, FolderTreeIcon, HandHelpingIcon, HeadsetIcon, HelpCircleIcon, HomeIcon, ImageIcon, LandmarkIcon, LayoutDashboardIcon, LayoutGridIcon, LifeBuoyIcon, LightbulbIcon, MegaphoneIcon, MessageSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, SettingsIcon, ShoppingCartIcon, SparklesIcon, StoreIcon, TagIcon, UserIcon, WrenchIcon } from '@lucide/vue'
 
 import type { NavGroup, NavItem } from '@/components/app-sidebar/types'
 
 import { filterMerchantBusinessItems } from '@/composables/filter-merchant-business-items'
 import { filterNavItemsByRoles } from '@/composables/filter-nav-items-by-roles'
-import { isMerchantBusinessUser } from '@/constants/user-type'
+import { isMerchantBusinessUser, UserType } from '@/constants/user-type'
 
 export function useSidebar() {
   const authStore = useAuthStore()
@@ -53,6 +53,41 @@ export function useSidebar() {
     { title: '管家服务', url: '/community/steward', icon: ConciergeBellIcon, roles: [3] },
   ]
 
+  /**
+   * 居委会后台菜单项(userType=6 专属)。
+   *
+   * 顺序与《居委会对接接口》0.7 居委会侧前端菜单结构一致;
+   * 活动管理 / 服务管理 为二级菜单父级(父级本身无独立页面);
+   * 专题文章为专题管理列表项点击进入的详情子页面,不在菜单中;
+   * 首页当前为占位空页面,接口后补。
+   */
+  const neighborhoodNavItems: NavItem[] = [
+    { title: '首页', url: '/neighborhood/home', icon: HomeIcon },
+    { title: '公告管理', url: '/neighborhood/notice', icon: MegaphoneIcon },
+    {
+      title: '活动管理',
+      icon: CalendarDaysIcon,
+      items: [
+        { title: '活动分类', url: '/neighborhood/activity-cate', icon: FolderTreeIcon },
+        { title: '活动列表', url: '/neighborhood/activity', icon: CalendarRangeIcon },
+      ],
+    },
+    { title: '广告管理', url: '/neighborhood/banner', icon: ImageIcon },
+    { title: '资讯动态', url: '/neighborhood/dynamic', icon: NewspaperIcon },
+    {
+      title: '服务管理',
+      icon: LayoutGridIcon,
+      items: [
+        { title: '栏目管理', url: '/neighborhood/unified', icon: Columns3Icon },
+        { title: '专题管理', url: '/neighborhood/special', icon: BookmarkIcon },
+      ],
+    },
+    { title: '居委会信息', url: '/neighborhood/org-info', icon: Building2Icon },
+    { title: '服务热线', url: '/neighborhood/service-guide', icon: PhoneIcon },
+    { title: '在线留言', url: '/neighborhood/leave-message', icon: MessageSquareIcon },
+    { title: '居委会服务', url: '/neighborhood/service', icon: LifeBuoyIcon },
+  ]
+
   const allSettingsNavItems = [
     { title: '个人资料', url: '/settings/', icon: UserIcon },
     { title: '站长信息', url: '/settings/account', icon: WrenchIcon, roles: [3] },
@@ -65,25 +100,44 @@ export function useSidebar() {
   const settingsNavItems = computed(() => filterNavItemsByRoles(allSettingsNavItems, userType.value))
 
   /** 商户/物业(含代客标签页,已换商户 token,userType 即 4/5):通用菜单 + 商户后台 + 设置 */
-  const merchantSelfNavData = computed<NavGroup[]>(() => [
-    {
-      title: '通用',
-      items: filterNavItemsByRoles(commonNavItems, userType.value),
-    },
-    {
-      title: '商户后台',
-      items: filterMerchantBusinessItems(merchantBusinessNavItems, {
-        userType: userType.value,
-        proxyMode: false,
-      }),
-    },
-    {
-      title: '其他',
-      items: [
-        { title: '设置', items: settingsNavItems.value, icon: SettingsIcon },
-      ],
-    },
-  ])
+  const merchantSelfNavData = computed<NavGroup[]>(() => {
+    // 居委会(userType=6):居委会和商户内容差别巨大,菜单完全不同,
+    // 走居委会专属菜单组,不展示商户那套(商品/订单/FAQ 等)。
+    if (userType.value === UserType.committee) {
+      return [
+        {
+          title: '居委会后台',
+          items: neighborhoodNavItems,
+        },
+        {
+          title: '其他',
+          items: [
+            { title: '设置', items: settingsNavItems.value, icon: SettingsIcon },
+          ],
+        },
+      ]
+    }
+
+    return [
+      {
+        title: '通用',
+        items: filterNavItemsByRoles(commonNavItems, userType.value),
+      },
+      {
+        title: '商户后台',
+        items: filterMerchantBusinessItems(merchantBusinessNavItems, {
+          userType: userType.value,
+          proxyMode: false,
+        }),
+      },
+      {
+        title: '其他',
+        items: [
+          { title: '设置', items: settingsNavItems.value, icon: SettingsIcon },
+        ],
+      },
+    ]
+  })
 
   /** 站长原窗口:保持原有菜单 */
   const stationNavData = computed<NavGroup[]>(() => [
