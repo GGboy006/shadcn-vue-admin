@@ -64,7 +64,7 @@ const filterFunction = (list: DataTableFacetedFilter['options'], term: string) =
       >
         <UiCommandInput :placeholder="title" />
         <UiCommandList>
-          <UiCommandEmpty>No results found.</UiCommandEmpty>
+          <UiCommandEmpty>暂无匹配项</UiCommandEmpty>
           <UiCommandGroup>
             <UiCommandItem
               v-for="option in options"

@@ -49,9 +49,9 @@ const firstKey = computed(() => navigator?.userAgent.includes('Mac OS') ? '⌘' 
               <EmptyMedia variant="icon">
                 <MenuIcon />
               </EmptyMedia>
-              <EmptyTitle>No menu found.</EmptyTitle>
+              <EmptyTitle>未找到菜单</EmptyTitle>
               <EmptyDescription>
-                Try searching for a command or check the spelling.
+                试试搜索其他关键词,或检查拼写是否正确。
               </EmptyDescription>
             </EmptyHeader>
           </Empty>

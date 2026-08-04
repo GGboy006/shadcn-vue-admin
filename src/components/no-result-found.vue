@@ -10,9 +10,9 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/
       <EmptyMedia variant="icon">
         <FolderOpenIcon />
       </EmptyMedia>
-      <EmptyTitle>No result found.</EmptyTitle>
+      <EmptyTitle>暂无数据</EmptyTitle>
       <EmptyDescription>
-        Please try a different search term or check the spelling.
+        试试其他关键词,或检查拼写是否正确。
       </EmptyDescription>
     </EmptyHeader>
   </Empty>
