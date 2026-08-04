@@ -357,7 +357,12 @@ const onSubmit = handleSubmit((values) => {
       <FormItem>
         <FormLabel>内容</FormLabel>
         <FormControl>
-          <RichTextEditor v-model="formValues.content" placeholder="请输入活动详细内容" :min-height="200" />
+          <RichTextEditor
+            :model-value="formValues.content ?? ''"
+            placeholder="请输入活动详细内容"
+            :min-height="200"
+            @update:model-value="setFieldValue('content', $event ?? '')"
+          />
         </FormControl>
         <FormMessage />
       </FormItem>

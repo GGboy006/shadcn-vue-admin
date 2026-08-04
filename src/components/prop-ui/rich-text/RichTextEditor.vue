@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import {
   AlignCenterIcon,
+  AlignJustifyIcon,
   AlignLeftIcon,
   AlignRightIcon,
   BoldIcon,
+  ChevronsUpDownIcon,
   Heading1Icon,
   Heading2Icon,
   Heading3Icon,
@@ -11,9 +13,11 @@ import {
   ImagePlusIcon,
   ItalicIcon,
   Link2Icon,
+  ListChecksIcon,
   ListIcon,
   ListOrderedIcon,
   PaletteIcon,
+  QuoteIcon,
   Redo2Icon,
   StrikethroughIcon,
   UnderlineIcon,
@@ -23,6 +27,8 @@ import Color from '@tiptap/extension-color'
 import Highlight from '@tiptap/extension-highlight'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
+import { TaskItem } from '@tiptap/extension-task-item'
+import { TaskList } from '@tiptap/extension-task-list'
 import TextAlign from '@tiptap/extension-text-align'
 import { TextStyle } from '@tiptap/extension-text-style'
 import Underline from '@tiptap/extension-underline'
@@ -73,6 +79,8 @@ const editor = useEditor({
     TextStyle,
     Color,
     Highlight,
+    TaskList,
+    TaskItem.configure({ nested: true }),
   ],
   onUpdate: ({ editor: e }) => {
     // 同步给 v-model(仅在有变化时,避免循环)
@@ -201,6 +209,19 @@ function unsetHighlight() {
   highlightPopoverOpen.value = false
 }
 
+/** 当前段落类型(标题下拉按钮显示文案) */
+const headingLabel = computed(() => {
+  if (!editor.value)
+    return '正文'
+  if (editor.value.isActive('heading', { level: 1 }))
+    return '标题 1'
+  if (editor.value.isActive('heading', { level: 2 }))
+    return '标题 2'
+  if (editor.value.isActive('heading', { level: 3 }))
+    return '标题 3'
+  return '正文'
+})
+
 /** 工具栏按钮是否激活(用于 Toggle pressed 态) */
 function isActive(name: string, attrs?: Record<string, unknown>): boolean {
   if (!editor.value)
@@ -246,34 +267,32 @@ function isAlign(align: string): boolean {
 
       <Separator orientation="vertical" class="mx-1 h-6" />
 
-      <!-- 标题 -->
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="isActive('heading', { level: 1 })"
-        aria-label="标题1"
-        @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
-      >
-        <Heading1Icon class="size-4" />
-      </Toggle>
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="isActive('heading', { level: 2 })"
-        aria-label="标题2"
-        @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
-      >
-        <Heading2Icon class="size-4" />
-      </Toggle>
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="isActive('heading', { level: 3 })"
-        aria-label="标题3"
-        @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
-      >
-        <Heading3Icon class="size-4" />
-      </Toggle>
+      <!-- 标题(下拉菜单) -->
+      <UiDropdownMenu>
+        <UiDropdownMenuTrigger as-child>
+          <Button variant="ghost" size="sm" class="h-8 gap-1 px-2 text-sm">
+            {{ headingLabel }}
+            <ChevronsUpDownIcon class="size-3" />
+          </Button>
+        </UiDropdownMenuTrigger>
+        <UiDropdownMenuContent align="start" class="w-32">
+          <UiDropdownMenuItem @click="editor.chain().focus().setParagraph().run()">
+            正文
+          </UiDropdownMenuItem>
+          <UiDropdownMenuItem @click="editor.chain().focus().toggleHeading({ level: 1 }).run()">
+            <Heading1Icon class="mr-2 size-4" />
+            标题 1
+          </UiDropdownMenuItem>
+          <UiDropdownMenuItem @click="editor.chain().focus().toggleHeading({ level: 2 }).run()">
+            <Heading2Icon class="mr-2 size-4" />
+            标题 2
+          </UiDropdownMenuItem>
+          <UiDropdownMenuItem @click="editor.chain().focus().toggleHeading({ level: 3 }).run()">
+            <Heading3Icon class="mr-2 size-4" />
+            标题 3
+          </UiDropdownMenuItem>
+        </UiDropdownMenuContent>
+      </UiDropdownMenu>
 
       <Separator orientation="vertical" class="mx-1 h-6" />
 
@@ -336,6 +355,24 @@ function isAlign(align: string): boolean {
       >
         <ListOrderedIcon class="size-4" />
       </Toggle>
+      <Toggle
+        variant="default"
+        size="sm"
+        :pressed="isActive('taskList')"
+        aria-label="任务列表"
+        @click="editor.chain().focus().toggleTaskList().run()"
+      >
+        <ListChecksIcon class="size-4" />
+      </Toggle>
+      <Toggle
+        variant="default"
+        size="sm"
+        :pressed="isActive('blockquote')"
+        aria-label="引用"
+        @click="editor.chain().focus().toggleBlockquote().run()"
+      >
+        <QuoteIcon class="size-4" />
+      </Toggle>
 
       <Separator orientation="vertical" class="mx-1 h-6" />
 
@@ -366,6 +403,15 @@ function isAlign(align: string): boolean {
         @click="editor.chain().focus().setTextAlign('right').run()"
       >
         <AlignRightIcon class="size-4" />
+      </Toggle>
+      <Toggle
+        variant="default"
+        size="sm"
+        :pressed="isAlign('justify')"
+        aria-label="两端对齐"
+        @click="editor.chain().focus().setTextAlign('justify').run()"
+      >
+        <AlignJustifyIcon class="size-4" />
       </Toggle>
 
       <Separator orientation="vertical" class="mx-1 h-6" />
@@ -544,5 +590,28 @@ function isAlign(align: string): boolean {
   padding-left: 1rem;
   margin: 0.5rem 0;
   color: hsl(var(--muted-foreground));
+}
+
+/* 任务列表:复选框样式 */
+.rich-text-content .ProseMirror ul[data-type='taskList'] {
+  list-style: none;
+  padding: 0;
+}
+
+.rich-text-content .ProseMirror ul[data-type='taskList'] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.rich-text-content .ProseMirror ul[data-type='taskList'] li > label {
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+  user-select: none;
+}
+
+.rich-text-content .ProseMirror ul[data-type='taskList'] li > div {
+  flex: 1;
+  min-width: 0;
 }
 </style>
