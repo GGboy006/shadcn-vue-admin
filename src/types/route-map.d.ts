@@ -385,6 +385,13 @@ declare module 'vue-router/auto-routes' {
       { merchantId: ParamValue<false> },
       | never
     >,
+    '/neighborhood/activity-cate/': RouteRecordInfo<
+      '/neighborhood/activity-cate/',
+      '/neighborhood/activity-cate',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/neighborhood/home': RouteRecordInfo<
       '/neighborhood/home',
       '/neighborhood/home',
@@ -786,6 +793,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/merchants/[merchantId].vue': {
       routes:
         | '/merchants/[merchantId]'
+      views:
+        | never
+    }
+    'src/pages/neighborhood/activity-cate/index.vue': {
+      routes:
+        | '/neighborhood/activity-cate/'
       views:
         | never
     }
