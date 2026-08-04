@@ -111,7 +111,7 @@ function goToLastPage() {
           :model-value="`${currentPageSize}`"
           @update:model-value="handlePageSizeChange"
         >
-          <UiSelectTrigger class="h-8 w-[70px]">
+          <UiSelectTrigger class="h-8 w-[80px]">
             <UiSelectValue :placeholder="`${currentPageSize}`" />
           </UiSelectTrigger>
           <UiSelectContent side="top">
