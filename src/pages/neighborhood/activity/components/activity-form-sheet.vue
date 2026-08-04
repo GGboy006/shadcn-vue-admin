@@ -34,7 +34,7 @@ const isEdit = computed(() => !!props.activity?.uniqueCode)
 const uniqueCode = computed(() => props.activity?.uniqueCode)
 
 // 编辑时拉详情回填表单(列表项字段不全,以详情为准)
-const { data: detailData, isLoading: isDetailLoading } = useGetActivityDetailQuery(uniqueCode)
+const { data: detailData, isLoading: isDetailLoading } = useGetActivityDetailQuery(uniqueCode, isOpen)
 
 const activityDetail = computed(() => {
   if (!isEdit.value)

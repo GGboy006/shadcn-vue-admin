@@ -32,7 +32,7 @@ const isOpen = computed({
 
 const uniqueCode = computed(() => props.uniqueCode)
 
-const { data, isLoading } = useGetNoticeDetailQuery(uniqueCode)
+const { data, isLoading } = useGetNoticeDetailQuery(uniqueCode, isOpen)
 
 const detail = computed(() => data.value?.data)
 

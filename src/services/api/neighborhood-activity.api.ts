@@ -151,7 +151,7 @@ export function useGetActivityPageQuery(query: Ref<INeighborhoodActivityListQuer
 }
 
 /** 获取居委会活动详情 */
-export function useGetActivityDetailQuery(uniqueCode: Ref<string | undefined>) {
+export function useGetActivityDetailQuery(uniqueCode: Ref<string | undefined>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<INeighborhoodActivityDetailResponse, Error>({
@@ -160,7 +160,9 @@ export function useGetActivityDetailQuery(uniqueCode: Ref<string | undefined>) {
       method: 'get',
       query: { uniqueCode: uniqueCode.value },
     }),
-    enabled: () => !!uniqueCode.value,
+    // 默认仅 uniqueCode 有值即请求;组件层可传入更严格的 enabled(如弹层打开才请求),
+    // 避免 row-actions 常驻挂载的详情组件在列表加载时就触发请求。
+    enabled: () => enabled?.value ?? !!uniqueCode.value,
     retry: false,
   })
 }

@@ -33,7 +33,7 @@ const isOpen = computed({
 
 const uniqueCode = computed(() => props.uniqueCode)
 
-const { data, isLoading } = useGetActivityDetailQuery(uniqueCode)
+const { data, isLoading } = useGetActivityDetailQuery(uniqueCode, isOpen)
 
 const detail = computed(() => data.value?.data)
 

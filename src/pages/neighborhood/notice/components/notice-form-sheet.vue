@@ -35,7 +35,7 @@ const isEdit = computed(() => !!props.notice?.uniqueCode)
 const uniqueCode = computed(() => props.notice?.uniqueCode)
 
 // 编辑时拉详情回填表单(列表项字段不全,以详情为准)
-const { data: detailData, isLoading: isDetailLoading } = useGetNoticeDetailQuery(uniqueCode)
+const { data: detailData, isLoading: isDetailLoading } = useGetNoticeDetailQuery(uniqueCode, isOpen)
 
 const noticeDetail = computed(() => {
   if (!isEdit.value)
