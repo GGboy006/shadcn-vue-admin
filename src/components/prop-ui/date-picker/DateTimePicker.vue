@@ -135,11 +135,36 @@ function onClear(e: Event) {
 
 // ==================== 触发器显示 ====================
 
+/**
+ * 实际显示的时间格式片段,按 timePicker 精度动态拼接:
+ * - hideTime:无时间片段
+ * - 未传 timePicker(缺省):HH:mm:ss
+ * - 传 timePicker:按 {hour,minute,second} 哪些为 true 拼对应片段
+ *   例:{second:false} -> HH:mm;{minute:false,second:false} -> HH
+ * 这样传 {second:false} 时触发器不再带 :00 秒,与弹层隐藏秒列保持一致。
+ */
+const timeFormat = computed(() => {
+  if (props.hideTime)
+    return ''
+  const tp = props.timePicker
+  const showHour = !tp || tp.hour
+  const showMinute = !tp || tp.minute
+  const showSecond = !tp || tp.second
+  const parts: string[] = []
+  if (showHour)
+    parts.push(props.use12HourFormat ? 'hh' : 'HH')
+  if (showMinute)
+    parts.push('mm')
+  if (showSecond)
+    parts.push('ss')
+  const body = parts.join(':')
+  return props.use12HourFormat ? ` ${body} A` : ` ${body}`
+})
+
 const displayText = computed(() => {
   if (!modelValue.value)
     return props.placeholder || (props.hideTime ? '选择日期' : '选择日期时间')
-  const timePart = props.hideTime ? '' : (props.use12HourFormat ? ' hh:mm:ss A' : ' HH:mm:ss')
-  return dayjs(modelValue.value).format(`YYYY-MM-DD${timePart}`)
+  return dayjs(modelValue.value).format(`YYYY-MM-DD${timeFormat.value}`)
 })
 
 const monthLabel = computed(() => dayjs(month.value).format('MMMM'))
