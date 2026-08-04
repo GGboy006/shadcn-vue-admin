@@ -9,11 +9,11 @@ import type { INeighborhoodActivity, INeighborhoodActivityAddDTO, INeighborhoodA
 import type { INeighborhoodCateListQuery } from '@/services/api/neighborhood-cate.api'
 
 import { DateTimePicker } from '@/components/prop-ui/date-picker'
+import { RichTextEditor } from '@/components/prop-ui/rich-text'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
 import {
   useCreateActivityMutation,
   useUpdateActivityMutation,
@@ -352,12 +352,12 @@ const onSubmit = handleSubmit((values) => {
       </FormItem>
     </FormField>
 
-    <!-- 内容 -->
-    <FormField v-slot="{ componentField }" name="content">
+    <!-- 内容(富文本) -->
+    <FormField name="content">
       <FormItem>
         <FormLabel>内容</FormLabel>
         <FormControl>
-          <Textarea v-bind="componentField" placeholder="活动详细内容" rows="5" />
+          <RichTextEditor v-model="formValues.content" placeholder="请输入活动详细内容" :min-height="200" />
         </FormControl>
         <FormMessage />
       </FormItem>

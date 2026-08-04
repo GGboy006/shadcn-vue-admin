@@ -53,7 +53,7 @@ const props = withDefaults(defineProps<{
   disabled: false,
 })
 
-const modelValue = defineModel<string>()
+const modelValue = defineModel<string | null>()
 
 const editor = useEditor({
   content: modelValue.value || '',
