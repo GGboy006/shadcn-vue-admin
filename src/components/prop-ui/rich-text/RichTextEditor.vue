@@ -24,6 +24,7 @@ import Highlight from '@tiptap/extension-highlight'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import TextAlign from '@tiptap/extension-text-align'
+import { TextStyle } from '@tiptap/extension-text-style'
 import Underline from '@tiptap/extension-underline'
 import StarterKit from '@tiptap/starter-kit'
 import { EditorContent, useEditor } from '@tiptap/vue-3'
@@ -68,6 +69,8 @@ const editor = useEditor({
     }),
     Image.configure({ inline: false, allowBase64: false }),
     TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    // TextStyle 必须在 Color 之前注册:Color 的 setColor 依赖它写入 style 属性
+    TextStyle,
     Color,
     Highlight,
   ],
