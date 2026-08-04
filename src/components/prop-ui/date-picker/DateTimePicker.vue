@@ -54,7 +54,12 @@ const minDate = computed(() => (props.min ? dayjs(props.min).toDate() : undefine
 const maxDate = computed(() => (props.max ? dayjs(props.max).toDate() : undefined))
 
 /** 外部字符串值 → JS Date;无值时用当前时间作为初始锚点。 */
-const initDate = computed(() => (modelValue.value ? dayjs(modelValue.value).toDate() : new Date()))
+const initDate = computed(() => {
+  if (modelValue.value)
+    return dayjs(modelValue.value).toDate()
+  // 无值时用当前时间作锚点,但秒/毫秒清零,避免秒列停在当前真实秒
+  return dayjs().second(0).millisecond(0).toDate()
+})
 
 // 弹层内的工作副本:date=待确认的完整日期时间,month=日历当前展示月
 const date = ref<Date>(initDate.value)
