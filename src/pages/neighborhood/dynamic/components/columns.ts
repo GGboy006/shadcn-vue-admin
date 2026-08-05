@@ -17,6 +17,20 @@ import DataTableRowActions from './data-table-row-actions.vue'
 export const columns: ColumnDef<INeighborhoodDynamic>[] = [
   SelectColumn as ColumnDef<INeighborhoodDynamic>,
   {
+    accessorKey: 'poster',
+    header: ({ column }) => h(DataTableColumnHeader<INeighborhoodDynamic>, { column, title: '封面' }),
+    meta: { title: '封面' },
+    cell: ({ row }) => {
+      const poster = row.original.poster
+      if (!poster)
+        return h('div', { class: 'text-sm text-muted-foreground' }, '-')
+      return h('img', { src: poster, alt: '封面', class: 'h-10 w-16 rounded border object-cover' })
+    },
+    enableSorting: false,
+    enableHiding: false,
+    enableResizing: false,
+  },
+  {
     accessorKey: 'title',
     header: ({ column }) => h(DataTableColumnHeader<INeighborhoodDynamic>, { column, title: '标题' }),
     meta: { title: '标题' },
