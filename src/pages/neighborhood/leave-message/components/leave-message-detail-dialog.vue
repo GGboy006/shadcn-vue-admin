@@ -30,7 +30,7 @@ const isOpen = computed({
 
 <template>
   <Dialog v-model:open="isOpen">
-    <DialogContent class="sm:max-w-2xl">
+    <DialogContent class="sm:max-w-2xl" @open-auto-focus.prevent>
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2 text-base">
           <MessageSquareIcon class="size-5" />
