@@ -441,6 +441,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/neighborhood/special/[specialCode]/article': RouteRecordInfo<
+      '/neighborhood/special/[specialCode]/article',
+      '/neighborhood/special/:specialCode/article',
+      { specialCode: ParamValue<true> },
+      { specialCode: ParamValue<false> },
+      | never
+    >,
     '/neighborhood/unified/': RouteRecordInfo<
       '/neighborhood/unified/',
       '/neighborhood/unified',
@@ -876,6 +883,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/neighborhood/special/index.vue': {
       routes:
         | '/neighborhood/special/'
+      views:
+        | never
+    }
+    'src/pages/neighborhood/special/[specialCode]/article.vue': {
+      routes:
+        | '/neighborhood/special/[specialCode]/article'
       views:
         | never
     }
