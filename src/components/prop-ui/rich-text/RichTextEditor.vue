@@ -209,8 +209,22 @@ function unsetHighlight() {
   highlightPopoverOpen.value = false
 }
 
+// 编辑器选区/内容变化时驱动工具栏激活态刷新
+// isActive/editor.isActive 本身是命令式调用,非响应式;
+// 通过 transaction 事件递增计数器,让依赖它的 computed(headingLabel 等)重算。
+const editorUpdateTick = ref(0)
+watch(editor, (e) => {
+  if (!e)
+    return
+  e.on('transaction', () => {
+    editorUpdateTick.value++
+  })
+})
+
 /** 当前段落类型(标题下拉按钮显示文案) */
 const headingLabel = computed(() => {
+  // 读一下 tick,使其成为响应式依赖
+  void editorUpdateTick.value
   if (!editor.value)
     return '正文'
   if (editor.value.isActive('heading', { level: 1 }))
@@ -224,6 +238,8 @@ const headingLabel = computed(() => {
 
 /** 工具栏按钮是否激活(用于 Toggle pressed 态) */
 function isActive(name: string, attrs?: Record<string, unknown>): boolean {
+  // 读 tick 驱动响应式更新
+  void editorUpdateTick.value
   if (!editor.value)
     return false
   return editor.value.isActive(name, attrs)
@@ -231,9 +247,10 @@ function isActive(name: string, attrs?: Record<string, unknown>): boolean {
 
 /** 当前对齐方式是否为指定值 */
 function isAlign(align: string): boolean {
+  // 读 tick 驱动响应式更新
+  void editorUpdateTick.value
   if (!editor.value)
     return false
-  // 当前光标所在段落的 textAlign 属性
   const node = editor.value.isActive('heading') ? 'heading' : 'paragraph'
   return editor.value.getAttributes(node).textAlign === align
 }
