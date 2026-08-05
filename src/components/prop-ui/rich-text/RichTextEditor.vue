@@ -43,8 +43,9 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
-import { Toggle } from '@/components/ui/toggle'
 import { useUpload } from '@/composables/use-upload'
+
+import ToolbarButton from './ToolbarButton.vue'
 
 /** 工具栏是否可编辑(只读时隐藏交互但保留展示) */
 const props = withDefaults(defineProps<{
@@ -261,26 +262,20 @@ function isAlign(align: string): boolean {
     <!-- 工具栏 -->
     <div v-if="!disabled" class="flex flex-wrap items-center gap-0.5 border-b p-1">
       <!-- 撤销/重做 -->
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="false"
+      <ToolbarButton
+        label="撤销"
         :disabled="!editor.can().undo()"
-        aria-label="撤销"
         @click="editor.chain().focus().undo().run()"
       >
         <Undo2Icon class="size-4" />
-      </Toggle>
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="false"
+      </ToolbarButton>
+      <ToolbarButton
+        label="重做"
         :disabled="!editor.can().redo()"
-        aria-label="重做"
         @click="editor.chain().focus().redo().run()"
       >
         <Redo2Icon class="size-4" />
-      </Toggle>
+      </ToolbarButton>
 
       <Separator orientation="vertical" class="mx-1 h-6" />
 
@@ -314,122 +309,98 @@ function isAlign(align: string): boolean {
       <Separator orientation="vertical" class="mx-1 h-6" />
 
       <!-- 加粗/斜体/下划线/删除线 -->
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="isActive('bold')"
-        aria-label="加粗"
+      <ToolbarButton
+        label="加粗"
+        :active="isActive('bold')"
         @click="editor.chain().focus().toggleBold().run()"
       >
         <BoldIcon class="size-4" />
-      </Toggle>
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="isActive('italic')"
-        aria-label="斜体"
+      </ToolbarButton>
+      <ToolbarButton
+        label="斜体"
+        :active="isActive('italic')"
         @click="editor.chain().focus().toggleItalic().run()"
       >
         <ItalicIcon class="size-4" />
-      </Toggle>
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="isActive('underline')"
-        aria-label="下划线"
+      </ToolbarButton>
+      <ToolbarButton
+        label="下划线"
+        :active="isActive('underline')"
         @click="editor.chain().focus().toggleUnderline().run()"
       >
         <UnderlineIcon class="size-4" />
-      </Toggle>
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="isActive('strike')"
-        aria-label="删除线"
+      </ToolbarButton>
+      <ToolbarButton
+        label="删除线"
+        :active="isActive('strike')"
         @click="editor.chain().focus().toggleStrike().run()"
       >
         <StrikethroughIcon class="size-4" />
-      </Toggle>
+      </ToolbarButton>
 
       <Separator orientation="vertical" class="mx-1 h-6" />
 
       <!-- 列表 -->
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="isActive('bulletList')"
-        aria-label="无序列表"
+      <ToolbarButton
+        label="无序列表"
+        :active="isActive('bulletList')"
         @click="editor.chain().focus().toggleBulletList().run()"
       >
         <ListIcon class="size-4" />
-      </Toggle>
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="isActive('orderedList')"
-        aria-label="有序列表"
+      </ToolbarButton>
+      <ToolbarButton
+        label="有序列表"
+        :active="isActive('orderedList')"
         @click="editor.chain().focus().toggleOrderedList().run()"
       >
         <ListOrderedIcon class="size-4" />
-      </Toggle>
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="isActive('taskList')"
-        aria-label="任务列表"
+      </ToolbarButton>
+      <ToolbarButton
+        label="任务列表"
+        :active="isActive('taskList')"
         @click="editor.chain().focus().toggleTaskList().run()"
       >
         <ListChecksIcon class="size-4" />
-      </Toggle>
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="isActive('blockquote')"
-        aria-label="引用"
+      </ToolbarButton>
+      <ToolbarButton
+        label="引用"
+        :active="isActive('blockquote')"
         @click="editor.chain().focus().toggleBlockquote().run()"
       >
         <QuoteIcon class="size-4" />
-      </Toggle>
+      </ToolbarButton>
 
       <Separator orientation="vertical" class="mx-1 h-6" />
 
       <!-- 对齐 -->
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="isAlign('left')"
-        aria-label="左对齐"
+      <ToolbarButton
+        label="左对齐"
+        :active="isAlign('left')"
         @click="editor.chain().focus().setTextAlign('left').run()"
       >
         <AlignLeftIcon class="size-4" />
-      </Toggle>
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="isAlign('center')"
-        aria-label="居中"
+      </ToolbarButton>
+      <ToolbarButton
+        label="居中"
+        :active="isAlign('center')"
         @click="editor.chain().focus().setTextAlign('center').run()"
       >
         <AlignCenterIcon class="size-4" />
-      </Toggle>
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="isAlign('right')"
-        aria-label="右对齐"
+      </ToolbarButton>
+      <ToolbarButton
+        label="右对齐"
+        :active="isAlign('right')"
         @click="editor.chain().focus().setTextAlign('right').run()"
       >
         <AlignRightIcon class="size-4" />
-      </Toggle>
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="isAlign('justify')"
-        aria-label="两端对齐"
+      </ToolbarButton>
+      <ToolbarButton
+        label="两端对齐"
+        :active="isAlign('justify')"
         @click="editor.chain().focus().setTextAlign('justify').run()"
       >
         <AlignJustifyIcon class="size-4" />
-      </Toggle>
+      </ToolbarButton>
 
       <Separator orientation="vertical" class="mx-1 h-6" />
 
@@ -494,15 +465,13 @@ function isAlign(align: string): boolean {
       <!-- 链接 -->
       <Popover v-model:open="linkPopoverOpen">
         <PopoverTrigger as-child>
-          <Toggle
-            variant="default"
-            size="sm"
-            :pressed="isActive('link')"
-            aria-label="链接"
+          <ToolbarButton
+            label="链接"
+            :active="isActive('link')"
             @click="openLinkPopover"
           >
             <Link2Icon class="size-4" />
-          </Toggle>
+          </ToolbarButton>
         </PopoverTrigger>
         <PopoverContent class="w-80 p-2" align="start">
           <div class="flex flex-col gap-2">
@@ -521,15 +490,12 @@ function isAlign(align: string): boolean {
       </Popover>
 
       <!-- 图片 -->
-      <Toggle
-        variant="default"
-        size="sm"
-        :pressed="false"
-        aria-label="插入图片"
+      <ToolbarButton
+        label="插入图片"
         @click="handleImageUpload"
       >
         <ImagePlusIcon class="size-4" />
-      </Toggle>
+      </ToolbarButton>
     </div>
 
     <!-- 编辑区 -->
