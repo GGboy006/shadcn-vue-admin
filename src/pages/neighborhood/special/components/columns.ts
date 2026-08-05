@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/vue-table'
 
 import { h } from 'vue'
-import { useRouter } from 'vue-router'
+import { RouterLink } from 'vue-router'
 
 import type { INeighborhoodSpecial } from '@/services/api/neighborhood-special.api'
 
@@ -11,13 +11,6 @@ import { specialEnableStatusConfig } from '@/services/api/neighborhood-special.a
 
 import DataTableRowActions from './data-table-row-actions.vue'
 
-const router = useRouter()
-
-/** 点击专题名称跳转到该专题下的文章列表(3.8 子页) */
-function handleNameClick(special: INeighborhoodSpecial) {
-  router.push(`/neighborhood/special/${special.uniqueCode}/article`)
-}
-
 export const columns: ColumnDef<INeighborhoodSpecial>[] = [
   SelectColumn as ColumnDef<INeighborhoodSpecial>,
   {
@@ -25,14 +18,13 @@ export const columns: ColumnDef<INeighborhoodSpecial>[] = [
     header: ({ column }) => h(DataTableColumnHeader<INeighborhoodSpecial>, { column, title: '专题名称' }),
     meta: { title: '专题名称' },
     cell: ({ row }) => h(
-      'button',
+      RouterLink,
       {
-        type: 'button',
-        class: 'max-w-[200px] truncate text-left text-sm font-medium text-primary hover:underline cursor-pointer',
+        to: `/neighborhood/special/${row.original.uniqueCode}/article`,
+        class: 'max-w-[200px] truncate block text-left text-sm font-medium text-primary hover:underline cursor-pointer',
         title: `查看「${row.original.name}」下的文章`,
-        onClick: () => handleNameClick(row.original),
       },
-      row.getValue('name') || '-',
+      () => row.getValue('name') || '-',
     ),
     enableSorting: false,
     enableHiding: false,
