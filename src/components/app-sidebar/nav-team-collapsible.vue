@@ -18,22 +18,28 @@ const { state, isMobile } = useSidebar()
 
 function isCollapsed(menu: NavItem): boolean {
   const pathname = route.path
-  navMain.forEach((group) => {
-    group.items.forEach((item) => {
-      if (item.url === pathname) {
-        return true
-      }
-    })
-  })
-  return !!menu.items?.some(item => item.url === pathname)
+  return !!menu.items?.some(item => isPathActive(pathname, item.url))
 }
 
 function isActive(menu: NavItem): boolean {
   const pathname = route.path
   if (menu.url) {
-    return pathname === menu.url
+    return isPathActive(pathname, menu.url)
   }
-  return !!menu.items?.some(item => item.url === pathname)
+  return !!menu.items?.some(item => isPathActive(pathname, item.url))
+}
+
+/**
+ * 路径激活判断:支持前缀匹配,使详情子页(如 /neighborhood/special/[code]/article)
+ * 也能激活其父级菜单(/neighborhood/special)。
+ *
+ * 匹配规则:pathname === url,或 pathname 以 `url + '/'` 开头。
+ * 用 `url + '/'` 而非裸 `url` 前缀,避免 /neighborhood/activity 误匹配 /neighborhood/activity-cate。
+ */
+function isPathActive(pathname: string, url?: string): boolean {
+  if (!url)
+    return false
+  return pathname === url || pathname.startsWith(`${url}/`)
 }
 </script>
 
