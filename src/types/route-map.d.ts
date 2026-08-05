@@ -434,6 +434,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/neighborhood/service-guide/': RouteRecordInfo<
+      '/neighborhood/service-guide/',
+      '/neighborhood/service-guide',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/neighborhood/special/': RouteRecordInfo<
       '/neighborhood/special/',
       '/neighborhood/special',
@@ -877,6 +884,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/neighborhood/org-info/index.vue': {
       routes:
         | '/neighborhood/org-info/'
+      views:
+        | never
+    }
+    'src/pages/neighborhood/service-guide/index.vue': {
+      routes:
+        | '/neighborhood/service-guide/'
       views:
         | never
     }
