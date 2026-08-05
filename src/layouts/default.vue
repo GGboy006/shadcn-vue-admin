@@ -6,7 +6,6 @@ import { useRoute } from 'vue-router'
 import AppSidebar from '@/components/app-sidebar/index.vue'
 import CommandMenuPanel from '@/components/command-menu-panel/index.vue'
 import ThemePopover from '@/components/custom-theme/theme-popover.vue'
-import LanguageChange from '@/components/language-change.vue'
 import ProxyBanner from '@/components/merchant-business/proxy-banner.vue'
 import ToggleTheme from '@/components/toggle-theme.vue'
 import { SIDEBAR_COOKIE_NAME } from '@/components/ui/sidebar/utils'
@@ -39,7 +38,6 @@ const isFixedLayout = computed(() => route.meta.layout === 'fixed')
         <CommandMenuPanel />
         <div class="flex-1" />
         <div class="ml-auto flex items-center space-x-4">
-          <LanguageChange />
           <ToggleTheme />
           <ThemePopover />
         </div>

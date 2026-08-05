@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { useColorMode } from '@vueuse/core'
 
-import LanguageChange from '@/components/language-change.vue'
 import SignInButton from '@/components/sign-in-button.vue'
 import SignUpButton from '@/components/sign-up-button.vue'
 import ToggleTheme from '@/components/toggle-theme.vue'
@@ -27,7 +26,6 @@ const mode = useColorMode()
     </div>
 
     <div class="flex gap-2">
-      <LanguageChange />
       <ToggleTheme />
     </div>
   </header>
