@@ -406,6 +406,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/neighborhood/dynamic/': RouteRecordInfo<
+      '/neighborhood/dynamic/',
+      '/neighborhood/dynamic',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/neighborhood/home': RouteRecordInfo<
       '/neighborhood/home',
       '/neighborhood/home',
@@ -825,6 +832,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/neighborhood/banner/index.vue': {
       routes:
         | '/neighborhood/banner/'
+      views:
+        | never
+    }
+    'src/pages/neighborhood/dynamic/index.vue': {
+      routes:
+        | '/neighborhood/dynamic/'
       views:
         | never
     }
