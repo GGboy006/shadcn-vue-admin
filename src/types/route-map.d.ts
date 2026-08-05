@@ -420,6 +420,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/neighborhood/leave-message/': RouteRecordInfo<
+      '/neighborhood/leave-message/',
+      '/neighborhood/leave-message',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/neighborhood/notice/': RouteRecordInfo<
       '/neighborhood/notice/',
       '/neighborhood/notice',
@@ -872,6 +879,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/neighborhood/home.vue': {
       routes:
         | '/neighborhood/home'
+      views:
+        | never
+    }
+    'src/pages/neighborhood/leave-message/index.vue': {
+      routes:
+        | '/neighborhood/leave-message/'
       views:
         | never
     }
