@@ -5,6 +5,8 @@ import { EyeIcon } from '@lucide/vue'
 
 import type { INeighborhoodLeaveMessage } from '@/services/api/neighborhood-leave-message.api'
 
+import { Button } from '@/components/ui/button'
+
 import LeaveMessageDetailDialog from './leave-message-detail-dialog.vue'
 
 interface DataTableRowActionsProps {
@@ -21,23 +23,16 @@ function handleView() {
 </script>
 
 <template>
-  <UiDropdownMenu>
-    <UiDropdownMenuTrigger as-child>
-      <UiButton
-        variant="ghost"
-        class="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-      >
-        <EyeIcon class="size-4" />
-        <span class="sr-only">Open menu</span>
-      </UiButton>
-    </UiDropdownMenuTrigger>
-    <UiDropdownMenuContent align="end" class="w-[120px]">
-      <UiDropdownMenuItem @click.stop="handleView">
-        <EyeIcon class="mr-2 size-4" />
-        查看详情
-      </UiDropdownMenuItem>
-    </UiDropdownMenuContent>
-  </UiDropdownMenu>
+  <Button
+    variant="ghost"
+    size="icon"
+    class="size-8"
+    title="查看详情"
+    @click="handleView"
+  >
+    <EyeIcon class="size-4" />
+    <span class="sr-only">查看详情</span>
+  </Button>
 
   <LeaveMessageDetailDialog
     v-model:open="isDetailOpen"
