@@ -5,6 +5,7 @@ import type { Component } from 'vue'
 import { EyeIcon, PencilIcon, Trash2Icon } from '@lucide/vue'
 
 import { DataTableRowActions } from '@/components/data-table'
+import { FormSheet, FormSheetContent } from '@/components/prop-ui/form-sheet'
 import { Modal, ModalContent, ModalHeader, ModalTitle } from '@/components/prop-ui/modal'
 
 import type { Goods } from '../data/schema'
@@ -19,7 +20,11 @@ interface DataTableRowActionsProps {
 const props = defineProps<DataTableRowActionsProps>()
 const goods = computed(() => props.row.original)
 
-const isOpen = ref(false)
+// 编辑走 FormSheet(响应式抽屉)
+const isEditOpen = ref(false)
+
+// 查看 / 删除共用 Modal(保留原逻辑,只摘出编辑)
+const isModalOpen = ref(false)
 const showComponent = shallowRef<Component | null>(null)
 
 const items = [
@@ -29,23 +34,38 @@ const items = [
 ]
 
 function handleAction(key: string) {
+  if (key === 'edit') {
+    isEditOpen.value = true
+    return
+  }
   if (key === 'view')
     showComponent.value = GoodsDetail
-  else if (key === 'edit')
-    showComponent.value = GoodsEdit
   else if (key === 'delete')
     showComponent.value = GoodsDelete
-  isOpen.value = true
+  isModalOpen.value = true
 }
 </script>
 
 <template>
-  <Modal v-model:open="isOpen">
-    <DataTableRowActions
-      :items="items"
-      content-width="w-[180px]"
-      @action="handleAction"
-    />
+  <!-- 操作列:dropdown 触发器 -->
+  <DataTableRowActions
+    :items="items"
+    content-width="w-[180px]"
+    @action="handleAction"
+  />
+
+  <!-- 编辑:FormSheet(桌面右侧抽屉 / 移动底部抽屉) -->
+  <FormSheet v-model:open="isEditOpen">
+    <FormSheetContent>
+      <GoodsEdit
+        :context="goods.uniqueCode ? { goodsCode: goods.uniqueCode } : undefined"
+        @close="isEditOpen = false"
+      />
+    </FormSheetContent>
+  </FormSheet>
+
+  <!-- 查看 / 删除:保留 Modal(按需求暂不改) -->
+  <Modal v-model:open="isModalOpen">
     <ModalContent :class="showComponent === GoodsDetail ? 'sm:max-w-[640px]' : ''">
       <template v-if="showComponent === GoodsDetail">
         <ModalHeader>
@@ -56,9 +76,8 @@ function handleAction(key: string) {
       <component
         :is="showComponent"
         v-else
-        :context="goods.uniqueCode ? { goodsCode: goods.uniqueCode } : undefined"
         :goods="goods"
-        @close="isOpen = false"
+        @close="isModalOpen = false"
       />
     </ModalContent>
   </Modal>
