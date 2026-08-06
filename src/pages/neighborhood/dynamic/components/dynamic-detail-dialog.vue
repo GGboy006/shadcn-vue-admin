@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 
-import { Badge } from '@/components/ui/badge'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+  Modal,
+  ModalContent,
+  ModalDescription,
+  ModalHeader,
+  ModalTitle,
+} from '@/components/prop-ui/modal'
+import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   dynamicAuditStatusConfig,
@@ -62,16 +62,16 @@ const contentTypeConfig = computed(() => {
 </script>
 
 <template>
-  <Dialog v-model:open="isOpen">
-    <DialogContent class="sm:max-w-2xl">
-      <DialogHeader>
-        <DialogTitle class="text-base">
+  <Modal v-model:open="isOpen">
+    <ModalContent class="sm:max-w-2xl">
+      <ModalHeader>
+        <ModalTitle class="text-base">
           资讯动态详情
-        </DialogTitle>
-        <DialogDescription class="sr-only">
+        </ModalTitle>
+        <ModalDescription class="sr-only">
           查看居委会资讯动态的完整内容
-        </DialogDescription>
-      </DialogHeader>
+        </ModalDescription>
+      </ModalHeader>
 
       <div class="max-h-[70vh] overflow-y-auto">
         <div v-if="isLoading" class="space-y-4">
@@ -165,8 +165,8 @@ const contentTypeConfig = computed(() => {
           暂无数据
         </div>
       </div>
-    </DialogContent>
-  </Dialog>
+    </ModalContent>
+  </Modal>
 </template>
 
 <style>

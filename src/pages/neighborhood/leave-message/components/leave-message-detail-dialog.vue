@@ -6,12 +6,12 @@ import type { INeighborhoodLeaveMessage } from '@/services/api/neighborhood-leav
 
 import PropUiCopy from '@/components/prop-ui/copy/Copy.vue'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+  Modal,
+  ModalContent,
+  ModalDescription,
+  ModalHeader,
+  ModalTitle,
+} from '@/components/prop-ui/modal'
 
 const props = defineProps<{
   open: boolean
@@ -29,17 +29,17 @@ const isOpen = computed({
 </script>
 
 <template>
-  <Dialog v-model:open="isOpen">
-    <DialogContent class="sm:max-w-2xl" @open-auto-focus.prevent>
-      <DialogHeader>
-        <DialogTitle class="flex items-center gap-2 text-base">
+  <Modal v-model:open="isOpen">
+    <ModalContent class="sm:max-w-2xl" @open-auto-focus.prevent>
+      <ModalHeader>
+        <ModalTitle class="flex items-center gap-2 text-base">
           <MessageSquareIcon class="size-5" />
           留言详情
-        </DialogTitle>
-        <DialogDescription class="sr-only">
+        </ModalTitle>
+        <ModalDescription class="sr-only">
           查看留言完整内容
-        </DialogDescription>
-      </DialogHeader>
+        </ModalDescription>
+      </ModalHeader>
 
       <div v-if="message" class="space-y-6">
         <!-- 留言人信息 -->
@@ -85,6 +85,6 @@ const isOpen = computed({
       <div v-else class="py-10 text-center text-sm text-muted-foreground">
         暂无数据
       </div>
-    </DialogContent>
-  </Dialog>
+    </ModalContent>
+  </Modal>
 </template>
