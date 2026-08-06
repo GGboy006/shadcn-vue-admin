@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Loading from '@/components/loading.vue'
 import { Toaster } from '@/components/ui/sonner'
+import { TooltipProvider as UiTooltipProvider } from '@/components/ui/tooltip'
 import { useSystemTheme } from '@/composables/use-system-theme'
 
 useSystemTheme()
@@ -16,13 +17,15 @@ useSystemTheme()
   :close-button="true"    显示关闭按钮
   /> -->
 
-  <Suspense>
-    <router-view v-slot="{ Component, route }">
-      <component :is="Component" :key="route" />
-    </router-view>
+  <UiTooltipProvider :delay-duration="300">
+    <Suspense>
+      <router-view v-slot="{ Component, route }">
+        <component :is="Component" :key="route" />
+      </router-view>
 
-    <template #fallback>
-      <Loading />
-    </template>
-  </Suspense>
+      <template #fallback>
+        <Loading />
+      </template>
+    </Suspense>
+  </UiTooltipProvider>
 </template>

@@ -15,7 +15,7 @@ interface DataTableRowActionsProps {
 }
 
 const props = withDefaults(defineProps<DataTableRowActionsProps>(), {
-  mode: 'dropdown',
+  mode: 'buttons',
   contentWidth: 'w-[160px]',
   autoSeparator: true,
 })
@@ -34,25 +34,29 @@ watchEffect(() => {
 </script>
 
 <template>
-  <!-- 按钮组模式:平铺的图标按钮 -->
+  <!-- 按钮组模式:平铺的图标按钮,每个按钮带 Tooltip 悬浮提示 -->
   <div
     v-if="props.mode === 'buttons'"
     class="flex items-center justify-end gap-1"
   >
-    <UiButton
-      v-for="item in props.items"
-      :key="item.key"
-      variant="ghost"
-      size="icon"
-      class="size-8"
-      :class="item.variant === 'destructive' ? 'text-destructive hover:text-destructive' : ''"
-      :disabled="item.disabled"
-      :title="item.label"
-      @click="emit('action', item.key)"
-    >
-      <component :is="item.icon" v-if="item.icon" class="size-4" />
-      <span class="sr-only">{{ item.label }}</span>
-    </UiButton>
+    <UiTooltip v-for="item in props.items" :key="item.key">
+      <UiTooltipTrigger as-child>
+        <UiButton
+          variant="ghost"
+          size="icon"
+          class="size-8"
+          :class="item.variant === 'destructive' ? 'text-destructive hover:text-destructive' : ''"
+          :disabled="item.disabled"
+          @click="emit('action', item.key)"
+        >
+          <component :is="item.icon" v-if="item.icon" class="size-4" />
+          <span class="sr-only">{{ item.label }}</span>
+        </UiButton>
+      </UiTooltipTrigger>
+      <UiTooltipContent>
+        {{ item.label }}
+      </UiTooltipContent>
+    </UiTooltip>
   </div>
 
   <!-- dropdown 模式:省略号下拉菜单 -->
