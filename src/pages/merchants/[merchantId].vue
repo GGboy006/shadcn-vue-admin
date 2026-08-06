@@ -281,17 +281,17 @@ function formatDate(dateStr: string | undefined): string {
 
               <!-- 图标:优先用后端 icon URL,加载失败回退 inputType 图标 -->
               <div
-                class="size-10 rounded-lg flex items-center justify-center shrink-0 overflow-hidden"
+                class="size-12 rounded-lg flex items-center justify-center shrink-0 overflow-hidden"
                 :class="getSkillIconBg(skill)"
               >
                 <img
                   v-if="skill.icon && !iconFallback.has(skill.skillId)"
                   :src="skill.icon"
                   :alt="skill.name"
-                  class="size-6 object-contain"
+                  class="size-7 object-contain"
                   @error="onIconError(skill)"
                 >
-                <component :is="getSkillFallbackIcon(skill)" v-else class="size-5" />
+                <component :is="getSkillFallbackIcon(skill)" v-else class="size-6" />
               </div>
 
               <!-- 内容 -->
