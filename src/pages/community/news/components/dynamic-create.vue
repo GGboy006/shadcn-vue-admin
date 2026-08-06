@@ -1,24 +1,17 @@
 <script lang="ts" setup>
 import { PlusIcon } from '@lucide/vue'
 
-import { Modal, ModalContent, ModalTrigger } from '@/components/prop-ui/modal'
-
 import DynamicEdit from './dynamic-edit.vue'
 
 const isOpen = ref(false)
 </script>
 
 <template>
-  <Modal v-model:open="isOpen">
-    <ModalTrigger as-child>
-      <UiButton>
-        <PlusIcon />
-        新建小区动态
-      </UiButton>
-    </ModalTrigger>
+  <UiButton @click="isOpen = true">
+    <PlusIcon />
+    新建小区动态
+  </UiButton>
 
-    <ModalContent>
-      <DynamicEdit @close="isOpen = false" />
-    </ModalContent>
-  </Modal>
+  <!-- DynamicEdit 自带 FormSheet 响应式外壳 -->
+  <DynamicEdit v-model:open="isOpen" @close="isOpen = false" />
 </template>
