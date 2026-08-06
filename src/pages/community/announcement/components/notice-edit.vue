@@ -1,22 +1,32 @@
 <script lang="ts" setup>
 import type { ICommunityNotice } from '@/services/api/community-notice.api'
 
-import { ModalDescription, ModalHeader, ModalTitle } from '@/components/prop-ui/modal'
+import { FormSheet, FormSheetContent, FormSheetDescription, FormSheetHeader, FormSheetTitle } from '@/components/prop-ui/form-sheet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useGetNoticeDetailQuery } from '@/services/api/community-notice.api'
 
 import NoticeForm from './notice-form.vue'
 
 const props = defineProps<{
+  open: boolean
   notice?: ICommunityNotice
 }>()
 
-defineEmits(['close'])
+const emit = defineEmits<{
+  'update:open': [value: boolean]
+  'close': []
+}>()
+
+const isOpen = computed({
+  get: () => props.open,
+  set: value => emit('update:open', value),
+})
 
 const isEdit = computed(() => !!props.notice?.uniqueCode)
 
 const uniqueCode = computed(() => props.notice?.uniqueCode)
 
+// 编辑时拉详情
 const { data: detailData, isLoading: isDetailLoading } = useGetNoticeDetailQuery(uniqueCode)
 
 const noticeDetail = computed(() => {
@@ -31,32 +41,41 @@ const description = computed(() => {
   const name = noticeDetail.value?.title ?? props.notice?.title
   return isEdit.value ? `编辑 ${name}` : '创建一条新的小区公告'
 })
+
+function handleClose() {
+  emit('close')
+  emit('update:open', false)
+}
 </script>
 
 <template>
-  <div>
-    <ModalHeader>
-      <ModalTitle>
-        {{ title }}
-      </ModalTitle>
-      <ModalDescription>
-        {{ description }}
-      </ModalDescription>
-    </ModalHeader>
+  <FormSheet v-model:open="isOpen">
+    <FormSheetContent>
+      <FormSheetHeader class="border-b px-4 py-3">
+        <FormSheetTitle class="text-base">
+          {{ title }}
+        </FormSheetTitle>
+        <FormSheetDescription class="sr-only">
+          {{ description }}
+        </FormSheetDescription>
+      </FormSheetHeader>
 
-    <div v-if="isEdit && isDetailLoading" class="space-y-4 py-4">
-      <Skeleton class="h-10 w-full" />
-      <Skeleton class="h-24 w-full" />
-      <div class="grid grid-cols-2 gap-4">
-        <Skeleton class="h-10 w-full" />
-        <Skeleton class="h-10 w-full" />
+      <div class="flex-1 overflow-y-auto p-4">
+        <div v-if="isEdit && isDetailLoading" class="space-y-4">
+          <Skeleton class="h-10 w-full" />
+          <Skeleton class="h-24 w-full" />
+          <div class="grid grid-cols-2 gap-4">
+            <Skeleton class="h-10 w-full" />
+            <Skeleton class="h-10 w-full" />
+          </div>
+        </div>
+
+        <NoticeForm
+          v-else
+          :notice="noticeDetail"
+          @close="handleClose"
+        />
       </div>
-    </div>
-
-    <NoticeForm
-      v-else
-      :notice="noticeDetail"
-      @close="$emit('close')"
-    />
-  </div>
+    </FormSheetContent>
+  </FormSheet>
 </template>

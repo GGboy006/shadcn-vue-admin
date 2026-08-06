@@ -2,9 +2,11 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
+import { EyeIcon, PencilIcon, Trash2Icon } from '@lucide/vue'
+
 import type { ICommunityNotice } from '@/services/api/community-notice.api'
 
-import { DataTableRowActions, useRowActions } from '@/components/data-table'
+import { DataTableRowActions } from '@/components/data-table'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
 
 import NoticeDeleteContent from './notice-delete.vue'
@@ -17,40 +19,54 @@ interface DataTableRowActionsProps {
 const props = defineProps<DataTableRowActionsProps>()
 const notice = computed(() => props.row.original)
 
-const isOpen = ref(false)
+// 查看走独立 Sheet(已是 Sheet,保留不动)
 const isDetailOpen = ref(false)
 
+// 编辑走 FormSheet(NoticeEdit 自带 FormSheet 外壳)
+const isEditOpen = ref(false)
+
+// 删除保留 Modal
+const isDeleteOpen = ref(false)
 const showComponent = shallowRef<Component | null>(null)
 
-function handleEdit() {
-  showComponent.value = NoticeEdit
-  isOpen.value = true
+const items = [
+  { key: 'view', label: '查看', icon: EyeIcon },
+  { key: 'edit', label: '编辑', icon: PencilIcon },
+  { key: 'delete', label: '删除', icon: Trash2Icon, variant: 'destructive' as const },
+]
+
+function handleAction(key: string) {
+  if (key === 'view') {
+    isDetailOpen.value = true
+  }
+  else if (key === 'edit') {
+    isEditOpen.value = true
+  }
+  else if (key === 'delete') {
+    showComponent.value = NoticeDeleteContent
+    isDeleteOpen.value = true
+  }
 }
-function handleDelete() {
-  showComponent.value = NoticeDeleteContent
-  isOpen.value = true
-}
-const { items, handleAction } = useRowActions({
-  view: () => { isDetailOpen.value = true },
-  edit: handleEdit,
-  delete: handleDelete,
-})
 </script>
 
 <template>
-  <Modal v-model:open="isOpen">
-    <DataTableRowActions :items="items" @action="handleAction" />
+  <!-- 操作列:dropdown 触发器 -->
+  <DataTableRowActions :items="items" @action="handleAction" />
+
+  <!-- 查看:Sheet(保留原样) -->
+  <NoticeDetailSheet v-model:open="isDetailOpen" :unique-code="notice.uniqueCode" />
+
+  <!-- 编辑:FormSheet(NoticeEdit 自带响应式外壳) -->
+  <NoticeEdit v-model:open="isEditOpen" :notice="notice" @close="isEditOpen = false" />
+
+  <!-- 删除:保留 Modal -->
+  <Modal v-model:open="isDeleteOpen">
     <ModalContent>
       <component
         :is="showComponent"
         :notice="notice"
-        @close="isOpen = false"
+        @close="isDeleteOpen = false"
       />
     </ModalContent>
   </Modal>
-
-  <NoticeDetailSheet
-    v-model:open="isDetailOpen"
-    :unique-code="notice.uniqueCode"
-  />
 </template>
