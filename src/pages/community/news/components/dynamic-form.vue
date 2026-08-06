@@ -131,7 +131,7 @@ const onSubmit = handleSubmit((values) => {
 </script>
 
 <template>
-  <div class="max-h-[600px] overflow-y-auto">
+  <div class="space-y-6">
     <form class="space-y-6" @submit="onSubmit">
       <!-- 标题 -->
       <FormField v-slot="{ componentField }" name="title">

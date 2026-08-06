@@ -182,7 +182,7 @@ const onSubmit = handleSubmit((values) => {
 </script>
 
 <template>
-  <div class="max-h-[600px] overflow-y-auto">
+  <div class="space-y-6">
     <form class="space-y-6" @submit="onSubmit">
       <!-- 类型：由编辑对象或所在页面固定，仅展示 -->
       <FormField name="type">
