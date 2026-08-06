@@ -22,7 +22,7 @@ const table = useGenerateVueTable<Merchant>(props, {
   <DataTable :columns :data :loading :table :server-pagination="serverPagination">
     <template #toolbar>
       <slot name="toolbar" :table="table">
-        <DataTableToolbar :table class="w-full overflow-x-auto" />
+        <DataTableToolbar :table class="w-full" />
       </slot>
     </template>
   </DataTable>

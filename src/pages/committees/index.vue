@@ -70,24 +70,22 @@ function handleReset() {
     <template #actions>
       <CommitteeCreate />
     </template>
-    <div class="overflow-x-auto">
-      <DataTable
-        :loading="isLoading"
-        :data="list"
-        :columns="columns"
-        :server-pagination="serverPagination"
-      >
-        <template #toolbar="{ table }">
-          <DataTableToolbar
-            :table="table"
-            :search="search"
-            :status="status"
-            @update:search="search = $event"
-            @update:status="status = $event"
-            @reset="handleReset"
-          />
-        </template>
-      </DataTable>
-    </div>
+    <DataTable
+      :loading="isLoading"
+      :data="list"
+      :columns="columns"
+      :server-pagination="serverPagination"
+    >
+      <template #toolbar="{ table }">
+        <DataTableToolbar
+          :table="table"
+          :search="search"
+          :status="status"
+          @update:search="search = $event"
+          @update:status="status = $event"
+          @reset="handleReset"
+        />
+      </template>
+    </DataTable>
   </BasicPage>
 </template>

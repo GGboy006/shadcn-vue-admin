@@ -66,24 +66,22 @@ function handleReset() {
     description="查看AI生成图片的历史会话记录"
     sticky
   >
-    <div class="overflow-x-auto">
-      <DataTable
-        :loading="isLoading"
-        :data="list"
-        :columns="columns"
-        :server-pagination="serverPagination"
-      >
-        <template #toolbar="{ table }">
-          <DataTableToolbar
-            :table="table"
-            :search="searchTitle"
-            :status="status"
-            @update:search="searchTitle = $event"
-            @update:status="status = $event"
-            @reset="handleReset"
-          />
-        </template>
-      </DataTable>
-    </div>
+    <DataTable
+      :loading="isLoading"
+      :data="list"
+      :columns="columns"
+      :server-pagination="serverPagination"
+    >
+      <template #toolbar="{ table }">
+        <DataTableToolbar
+          :table="table"
+          :search="searchTitle"
+          :status="status"
+          @update:search="searchTitle = $event"
+          @update:status="status = $event"
+          @reset="handleReset"
+        />
+      </template>
+    </DataTable>
   </BasicPage>
 </template>

@@ -63,22 +63,20 @@ function handleReset() {
     <template #actions>
       <ServiceCreate />
     </template>
-    <div class="overflow-x-auto">
-      <DataTable
-        :loading="isLoading"
-        :data="list"
-        :columns="columns"
-        :server-pagination="serverPagination"
-      >
-        <template #toolbar="{ table }">
-          <DataTableToolbar
-            :table="table"
-            :search="search"
-            @update:search="search = $event"
-            @reset="handleReset"
-          />
-        </template>
-      </DataTable>
-    </div>
+    <DataTable
+      :loading="isLoading"
+      :data="list"
+      :columns="columns"
+      :server-pagination="serverPagination"
+    >
+      <template #toolbar="{ table }">
+        <DataTableToolbar
+          :table="table"
+          :search="search"
+          @update:search="search = $event"
+          @reset="handleReset"
+        />
+      </template>
+    </DataTable>
   </BasicPage>
 </template>
