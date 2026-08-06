@@ -5,6 +5,7 @@ import type { Component } from 'vue'
 import { EyeIcon, PencilIcon, Trash2Icon } from '@lucide/vue'
 
 import { DataTableRowActions } from '@/components/data-table'
+import { FormSheet, FormSheetContent } from '@/components/prop-ui/form-sheet'
 import { Modal, ModalContent, ModalHeader, ModalTitle } from '@/components/prop-ui/modal'
 
 import type { Activity } from '../data/schema'
@@ -19,7 +20,11 @@ interface DataTableRowActionsProps {
 const props = defineProps<DataTableRowActionsProps>()
 const activity = computed(() => props.row.original)
 
-const isOpen = ref(false)
+// 编辑走 FormSheet(响应式抽屉)
+const isEditOpen = ref(false)
+
+// 查看 / 删除共用 Modal(保留原逻辑,只摘出编辑)
+const isModalOpen = ref(false)
 const showComponent = shallowRef<Component | null>(null)
 
 const items = [
@@ -29,23 +34,38 @@ const items = [
 ]
 
 function handleAction(key: string) {
+  if (key === 'edit') {
+    isEditOpen.value = true
+    return
+  }
   if (key === 'view')
     showComponent.value = ActivityDetail
-  else if (key === 'edit')
-    showComponent.value = ActivityEdit
   else if (key === 'delete')
     showComponent.value = ActivityDelete
-  isOpen.value = true
+  isModalOpen.value = true
 }
 </script>
 
 <template>
-  <Modal v-model:open="isOpen">
-    <DataTableRowActions
-      :items="items"
-      content-width="w-[180px]"
-      @action="handleAction"
-    />
+  <!-- 操作列:dropdown 触发器 -->
+  <DataTableRowActions
+    :items="items"
+    content-width="w-[180px]"
+    @action="handleAction"
+  />
+
+  <!-- 编辑:FormSheet(桌面右侧抽屉 / 移动底部抽屉) -->
+  <FormSheet v-model:open="isEditOpen">
+    <FormSheetContent>
+      <ActivityEdit
+        :context="activity.uniqueCode ? { uniqueCode: activity.uniqueCode, initialValues: { name: activity.name, poster: activity.poster, detailPoster: activity.detailPoster, sponsorName: activity.sponsorName, cateCode: activity.cateCode, cateName: activity.cateName, describes: activity.describes, content: activity.content, address: activity.address, isCharge: activity.isCharge, salePrice: activity.salePrice, startTime: activity.startTime, endTime: activity.endTime, torder: activity.torder, isRecommend: activity.isRecommend, isEnable: activity.isEnable } } : undefined"
+        @close="isEditOpen = false"
+      />
+    </FormSheetContent>
+  </FormSheet>
+
+  <!-- 查看 / 删除:保留 Modal(按需求暂不改) -->
+  <Modal v-model:open="isModalOpen">
     <ModalContent :class="showComponent === ActivityDetail ? 'sm:max-w-[640px]' : ''">
       <template v-if="showComponent === ActivityDetail">
         <ModalHeader>
@@ -56,9 +76,8 @@ function handleAction(key: string) {
       <component
         :is="showComponent"
         v-else
-        :context="activity.uniqueCode ? { uniqueCode: activity.uniqueCode, initialValues: { name: activity.name, poster: activity.poster, detailPoster: activity.detailPoster, sponsorName: activity.sponsorName, cateCode: activity.cateCode, cateName: activity.cateName, describes: activity.describes, content: activity.content, address: activity.address, isCharge: activity.isCharge, salePrice: activity.salePrice, startTime: activity.startTime, endTime: activity.endTime, torder: activity.torder, isRecommend: activity.isRecommend, isEnable: activity.isEnable } } : undefined"
         :activity="activity"
-        @close="isOpen = false"
+        @close="isModalOpen = false"
       />
     </ModalContent>
   </Modal>
