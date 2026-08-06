@@ -9,7 +9,7 @@ import { PlusIcon } from '@lucide/vue'
 import type { ICatePageQuery } from '@/services/api/merchant-business.api'
 
 import { BasicPage } from '@/components/global-layout'
-import { Modal, ModalContent, ModalTrigger } from '@/components/prop-ui/modal'
+import { FormSheet, FormSheetContent } from '@/components/prop-ui/form-sheet'
 import { useCurrentMerchantId } from '@/composables/use-current-merchant-id'
 import { useGetCatePageQuery } from '@/services/api/merchant-business.api'
 
@@ -53,17 +53,16 @@ const createOpen = ref(false)
 
     <template v-else>
       <div class="flex items-center justify-end mb-4">
-        <Modal v-model:open="createOpen">
-          <ModalTrigger as-child>
-            <UiButton>
-              <PlusIcon />
-              新建分类
-            </UiButton>
-          </ModalTrigger>
-          <ModalContent>
+        <UiButton @click="createOpen = true">
+          <PlusIcon />
+          新建分类
+        </UiButton>
+
+        <FormSheet v-model:open="createOpen">
+          <FormSheetContent>
             <CategoryEdit @close="createOpen = false" />
-          </ModalContent>
-        </Modal>
+          </FormSheetContent>
+        </FormSheet>
       </div>
 
       <DataTable :columns :data="list" :loading="isLoading" :server-pagination="serverPagination" />
