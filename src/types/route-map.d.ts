@@ -525,20 +525,6 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/tasks/': RouteRecordInfo<
-      '/tasks/',
-      '/tasks',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
-    '/users/': RouteRecordInfo<
-      '/users/',
-      '/users',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
   }
 
   /**
@@ -976,18 +962,6 @@ declare module 'vue-router/auto-routes' {
     'src/pages/settings/notifications.vue': {
       routes:
         | '/settings/notifications'
-      views:
-        | never
-    }
-    'src/pages/tasks/index.vue': {
-      routes:
-        | '/tasks/'
-      views:
-        | never
-    }
-    'src/pages/users/index.vue': {
-      routes:
-        | '/users/'
       views:
         | never
     }
