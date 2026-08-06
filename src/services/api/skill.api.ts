@@ -16,11 +16,38 @@ export type SkillToolMode = 1 | 2
 export type SkillAssignStatus = 1 | 2 | 3
 
 /** 输入类型映射配置 */
-export const skillInputTypeConfig: Record<SkillInputType, { label: string, icon: string }> = {
-  1: { label: '文本生成', icon: 'FileText' },
-  2: { label: '图像生成', icon: 'Image' },
-  3: { label: '语音合成', icon: 'Mic' },
-  4: { label: '混合', icon: 'Layers' },
+export const skillInputTypeConfig: Record<SkillInputType, {
+  label: string
+  icon: string
+  /** 图标背景配色(浅底深字,含 dark 模式) */
+  iconBg: string
+  /** inputType 标签配色(浅底深字,与图标背景同色系) */
+  badge: string
+}> = {
+  1: {
+    label: '文本生成',
+    icon: 'FileText',
+    iconBg: 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400',
+    badge: 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border-blue-200 dark:border-blue-900',
+  },
+  2: {
+    label: '图像生成',
+    icon: 'Image',
+    iconBg: 'bg-rose-50 text-rose-600 dark:bg-rose-950 dark:text-rose-400',
+    badge: 'bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border-rose-200 dark:border-rose-900',
+  },
+  3: {
+    label: '语音合成',
+    icon: 'Mic',
+    iconBg: 'bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-400',
+    badge: 'bg-violet-50 text-violet-700 dark:bg-violet-950 dark:text-violet-300 border-violet-200 dark:border-violet-900',
+  },
+  4: {
+    label: '混合',
+    icon: 'Layers',
+    iconBg: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400',
+    badge: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900',
+  },
 }
 
 // 兼容旧代码的别名导出

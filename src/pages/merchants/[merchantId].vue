@@ -109,6 +109,7 @@ function handleSave() {
 }
 
 // ==================== 图标映射 ====================
+// 后端返回 icon URL 时用真实图标,无 URL 或加载失败时回退到 inputType 对应的 lucide 图标
 const inputTypeIconMap: Record<number, any> = {
   1: FileTextIcon,
   2: ImageIcon,
@@ -116,18 +117,19 @@ const inputTypeIconMap: Record<number, any> = {
   4: BarChart3Icon,
 }
 
-function getSkillIcon(skill: IAssignSkill) {
+/** 图片加载失败时,标记该 skill 用 fallback 图标 */
+const iconFallback = ref<Set<number>>(new Set())
+
+function getSkillFallbackIcon(skill: IAssignSkill) {
   return inputTypeIconMap[skill.inputType] || LayersIcon
 }
 
 function getSkillIconBg(skill: IAssignSkill): string {
-  const map: Record<number, string> = {
-    1: 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400',
-    2: 'bg-rose-50 text-rose-600 dark:bg-rose-950 dark:text-rose-400',
-    3: 'bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-400',
-    4: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400',
-  }
-  return map[skill.inputType] || 'bg-gray-50 text-gray-600 dark:bg-gray-900 dark:text-gray-400'
+  return skillInputTypeConfig[skill.inputType]?.iconBg || 'bg-gray-50 text-gray-600 dark:bg-gray-900 dark:text-gray-400'
+}
+
+function onIconError(skill: IAssignSkill) {
+  iconFallback.value.add(skill.skillId)
 }
 
 // ==================== 格式化 ====================
@@ -277,34 +279,45 @@ function formatDate(dateStr: string | undefined): string {
                 @click.stop
               />
 
-              <!-- 图标 -->
+              <!-- 图标:优先用后端 icon URL,加载失败回退 inputType 图标 -->
               <div
-                class="size-10 rounded-lg flex items-center justify-center shrink-0"
+                class="size-10 rounded-lg flex items-center justify-center shrink-0 overflow-hidden"
                 :class="getSkillIconBg(skill)"
               >
-                <component :is="getSkillIcon(skill)" class="size-5" />
+                <img
+                  v-if="skill.icon && !iconFallback.has(skill.skillId)"
+                  :src="skill.icon"
+                  :alt="skill.name"
+                  class="size-6 object-contain"
+                  @error="onIconError(skill)"
+                >
+                <component :is="getSkillFallbackIcon(skill)" v-else class="size-5" />
               </div>
 
               <!-- 内容 -->
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
                   <span class="font-semibold text-sm">{{ skill.name }}</span>
-                  <Badge variant="outline" class="text-xs">
+                  <span
+                    class="inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-xs font-medium"
+                    :class="skillInputTypeConfig[skill.inputType]?.badge || 'bg-muted text-muted-foreground border-border'"
+                  >
+                    <component :is="getSkillFallbackIcon(skill)" class="size-3" />
                     {{ skillInputTypeConfig[skill.inputType]?.label || '未知' }}
-                  </Badge>
+                  </span>
                 </div>
                 <p class="text-sm text-muted-foreground mt-1 line-clamp-2">
                   {{ skill.description }}
                 </p>
-                <div v-if="skill.tags && skill.tags.length > 0" class="flex gap-1 mt-2 flex-wrap">
-                  <Badge
+                <div v-if="skill.tags && skill.tags.length > 0" class="flex gap-1.5 mt-2 flex-wrap">
+                  <span
                     v-for="tag in skill.tags"
                     :key="tag"
-                    variant="secondary"
-                    class="text-xs"
+                    class="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2 py-0.5 text-xs text-muted-foreground"
                   >
+                    <span class="size-1 rounded-full bg-current opacity-50" />
                     {{ tag }}
-                  </Badge>
+                  </span>
                 </div>
               </div>
 
