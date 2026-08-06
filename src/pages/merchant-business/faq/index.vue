@@ -10,7 +10,7 @@ import { useDebounceFn } from '@vueuse/core'
 import type { IFaqPageQuery } from '@/services/api/merchant-business.api'
 
 import { BasicPage } from '@/components/global-layout'
-import { Modal, ModalContent, ModalTrigger } from '@/components/prop-ui/modal'
+import { FormSheet, FormSheetContent } from '@/components/prop-ui/form-sheet'
 import { Input } from '@/components/ui/input'
 import { useCurrentMerchantId } from '@/composables/use-current-merchant-id'
 import { useGetFaqPageQuery } from '@/services/api/merchant-business.api'
@@ -63,17 +63,16 @@ const createOpen = ref(false)
     <template v-else>
       <div class="flex items-center justify-between mb-4">
         <Input v-model="search" placeholder="按问题/标签筛选..." class="h-9 w-[200px] lg:w-[280px]" />
-        <Modal v-model:open="createOpen">
-          <ModalTrigger as-child>
-            <UiButton>
-              <PlusIcon />
-              新建FAQ
-            </UiButton>
-          </ModalTrigger>
-          <ModalContent>
+        <UiButton @click="createOpen = true">
+          <PlusIcon />
+          新建FAQ
+        </UiButton>
+
+        <FormSheet v-model:open="createOpen">
+          <FormSheetContent>
             <FaqEdit @close="createOpen = false" />
-          </ModalContent>
-        </Modal>
+          </FormSheetContent>
+        </FormSheet>
       </div>
 
       <DataTable :columns :data="list" :loading="isLoading" :server-pagination="serverPagination" />

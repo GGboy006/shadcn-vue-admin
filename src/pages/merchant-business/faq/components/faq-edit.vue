@@ -4,7 +4,7 @@ import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 import { z } from 'zod'
 
-import { ModalClose, ModalFooter, ModalHeader, ModalTitle } from '@/components/prop-ui/modal'
+import { FormSheetClose, FormSheetFooter, FormSheetHeader, FormSheetTitle } from '@/components/prop-ui/form-sheet'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -88,12 +88,14 @@ const onSubmit = handleSubmit((values) => {
 </script>
 
 <template>
-  <form @submit="onSubmit">
-    <ModalHeader>
-      <ModalTitle>{{ isEdit ? '编辑FAQ' : '新建FAQ' }}</ModalTitle>
-    </ModalHeader>
+  <form class="flex h-full flex-col" @submit="onSubmit">
+    <FormSheetHeader class="border-b px-4 py-3">
+      <FormSheetTitle class="text-base">
+        {{ isEdit ? '编辑FAQ' : '新建FAQ' }}
+      </FormSheetTitle>
+    </FormSheetHeader>
 
-    <div class="space-y-4 py-4">
+    <div class="flex-1 space-y-4 overflow-y-auto p-4">
       <FormField v-slot="{ componentField }" name="categoryName">
         <FormItem>
           <FormLabel>标签</FormLabel>
@@ -162,15 +164,15 @@ const onSubmit = handleSubmit((values) => {
       </div>
     </div>
 
-    <ModalFooter>
-      <ModalClose as-child>
-        <Button variant="outline">
+    <FormSheetFooter class="border-t px-4 py-3">
+      <FormSheetClose as-child>
+        <Button variant="outline" type="button">
           取消
         </Button>
-      </ModalClose>
+      </FormSheetClose>
       <Button type="submit" :disabled="isSubmitting">
         {{ isSubmitting ? '保存中...' : '保存' }}
       </Button>
-    </ModalFooter>
+    </FormSheetFooter>
   </form>
 </template>

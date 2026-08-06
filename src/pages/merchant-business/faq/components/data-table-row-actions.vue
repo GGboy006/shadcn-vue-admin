@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
-import type { Component } from 'vue'
 
 import { DataTableRowActions, useRowActions } from '@/components/data-table'
+import { FormSheet, FormSheetContent } from '@/components/prop-ui/form-sheet'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
 
 import type { Faq } from '../data/schema'
@@ -16,34 +16,40 @@ interface DataTableRowActionsProps {
 const props = defineProps<DataTableRowActionsProps>()
 const faq = computed(() => props.row.original)
 
-const isOpen = ref(false)
-const showComponent = shallowRef<Component | null>(null)
+const isEditOpen = ref(false)
+const isDeleteOpen = ref(false)
 
 function handleEdit() {
-  showComponent.value = FaqEdit
-  isOpen.value = true
+  isEditOpen.value = true
 }
 function handleDelete() {
-  showComponent.value = FaqDelete
-  isOpen.value = true
+  isDeleteOpen.value = true
 }
 const { items, handleAction } = useRowActions({ edit: handleEdit, delete: handleDelete })
 </script>
 
 <template>
-  <Modal v-model:open="isOpen">
-    <DataTableRowActions
-      :items="items"
-      content-width="w-[180px]"
-      @action="handleAction"
-    />
-    <ModalContent>
-      <component
-        :is="showComponent"
+  <!-- 操作列:dropdown 触发器 -->
+  <DataTableRowActions
+    :items="items"
+    content-width="w-[180px]"
+    @action="handleAction"
+  />
+
+  <!-- 编辑:FormSheet(桌面右侧抽屉 / 移动底部抽屉) -->
+  <FormSheet v-model:open="isEditOpen">
+    <FormSheetContent>
+      <FaqEdit
         :context="faq.uniqueCode ? { faqCode: faq.uniqueCode, initialValues: { categoryName: faq.categoryName, question: faq.question, answer: faq.answer, torder: faq.torder, isEnable: faq.isEnable } } : undefined"
-        :faq="faq"
-        @close="isOpen = false"
+        @close="isEditOpen = false"
       />
+    </FormSheetContent>
+  </FormSheet>
+
+  <!-- 删除:保留 Modal(按需求暂不改) -->
+  <Modal v-model:open="isDeleteOpen">
+    <ModalContent>
+      <FaqDelete :faq="faq" @close="isDeleteOpen = false" />
     </ModalContent>
   </Modal>
 </template>
