@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
-import type { Component } from 'vue'
 
 import { BotIcon, PencilIcon, StoreIcon, Trash2Icon } from '@lucide/vue'
 
@@ -20,9 +19,12 @@ const props = defineProps<DataTableRowActionsProps>()
 const merchant = computed(() => props.row.original)
 
 const router = useRouter()
-const isOpen = ref(false)
 
-const showComponent = shallowRef<Component | null>(null)
+// 编辑走 FormSheet(MerchantEdit 自带响应式外壳)
+const isEditOpen = ref(false)
+
+// 删除保留 Modal
+const isDeleteOpen = ref(false)
 
 const items = [
   { key: 'edit', label: '编辑', icon: PencilIcon },
@@ -30,11 +32,6 @@ const items = [
   { key: 'enter', label: '进入商户后台', icon: StoreIcon },
   { key: 'delete', label: '删除', icon: Trash2Icon, variant: 'destructive' as const },
 ]
-
-function handleSelect(command: 'edit' | 'delete') {
-  showComponent.value = command === 'edit' ? MerchantEdit : MerchantDelete
-  isOpen.value = true
-}
 
 function handleAssign() {
   router.push(`/merchants/${merchant.value.merchantId}`)
@@ -48,30 +45,31 @@ function handleEnterBusiness() {
 
 function handleAction(key: string) {
   if (key === 'edit')
-    handleSelect('edit')
+    isEditOpen.value = true
   else if (key === 'assign')
     handleAssign()
   else if (key === 'enter')
     handleEnterBusiness()
   else if (key === 'delete')
-    handleSelect('delete')
+    isDeleteOpen.value = true
 }
 </script>
 
 <template>
-  <Modal v-model:open="isOpen">
-    <DataTableRowActions
-      :items="items"
-      content-width="w-[180px]"
-      @action="handleAction"
-    />
+  <!-- 操作列:dropdown 触发器 -->
+  <DataTableRowActions
+    :items="items"
+    content-width="w-[180px]"
+    @action="handleAction"
+  />
 
+  <!-- 编辑:FormSheet(MerchantEdit 自带响应式外壳) -->
+  <MerchantEdit v-model:open="isEditOpen" :merchant="merchant" @close="isEditOpen = false" />
+
+  <!-- 删除:保留 Modal -->
+  <Modal v-model:open="isDeleteOpen">
     <ModalContent>
-      <component
-        :is="showComponent"
-        :merchant="merchant"
-        @close="isOpen = false"
-      />
+      <MerchantDelete :merchant="merchant" @close="isDeleteOpen = false" />
     </ModalContent>
   </Modal>
 </template>

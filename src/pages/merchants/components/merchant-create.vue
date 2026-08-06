@@ -3,7 +3,6 @@ import { UserRoundPlusIcon } from '@lucide/vue'
 
 import type { MerchantType } from '@/services/api/merchant.api'
 
-import { Modal, ModalContent, ModalTrigger } from '@/components/prop-ui/modal'
 import { merchantTypeConfig } from '@/services/api/merchant.api'
 
 import MerchantEdit from './merchant-edit.vue'
@@ -19,16 +18,11 @@ const typeLabel = computed(() => merchantTypeConfig[type]?.label || '商户/物�
 </script>
 
 <template>
-  <Modal v-model:open="isOpen">
-    <ModalTrigger as-child>
-      <UiButton>
-        <UserRoundPlusIcon />
-        新建{{ typeLabel }}
-      </UiButton>
-    </ModalTrigger>
+  <UiButton @click="isOpen = true">
+    <UserRoundPlusIcon />
+    新建{{ typeLabel }}
+  </UiButton>
 
-    <ModalContent>
-      <MerchantEdit :type="type" @close="isOpen = false" />
-    </ModalContent>
-  </Modal>
+  <!-- MerchantEdit 自带 FormSheet 响应式外壳 -->
+  <MerchantEdit v-model:open="isOpen" :type="type" @close="isOpen = false" />
 </template>
