@@ -37,7 +37,7 @@ export const columns: ColumnDef<Merchant>[] = [
     header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '联系人' }),
     meta: { title: '联系人' },
     cell: ({ row }) => {
-      const name = row.getValue('contactName') as string
+      const name = row.original.contactName
       const phone = row.original.contactPhone
       return h('div', { class: 'flex flex-col gap-0.5' }, [
         h('span', { class: 'text-sm' }, name || '-'),
