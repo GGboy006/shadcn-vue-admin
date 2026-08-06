@@ -2,8 +2,7 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
-import { EllipsisIcon, FilePenLineIcon, Trash2Icon } from '@lucide/vue'
-
+import { DataTableRowActions } from '@/components/data-table'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
 
 import type { Task } from '../data/schema'
@@ -45,22 +44,11 @@ async function handleSelect(command: TCommand) {
 
 <template>
   <Modal v-model:open="isOpen">
-    <UiDropdownMenu>
-      <UiDropdownMenuTrigger as-child>
-        <UiButton
-          variant="ghost"
-          class="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-        >
-          <EllipsisIcon class="size-4" />
-          <span class="sr-only">打开菜单</span>
-        </UiButton>
-      </UiDropdownMenuTrigger>
-      <UiDropdownMenuContent align="end" class="w-[160px]">
-        <UiDropdownMenuItem @select.stop="handleSelect('edit')">
-          <span>编辑</span>
-          <UiDropdownMenuShortcut> <FilePenLineIcon class="size-4" /> </UiDropdownMenuShortcut>
-        </UiDropdownMenuItem>
-
+    <DataTableRowActions
+      @edit="handleSelect('edit')"
+      @delete="handleSelect('delete')"
+    >
+      <template #extra-items>
         <UiDropdownMenuItem disabled>
           复制
         </UiDropdownMenuItem>
@@ -80,15 +68,8 @@ async function handleSelect(command: TCommand) {
             </UiDropdownMenuRadioGroup>
           </UiDropdownMenuSubContent>
         </UiDropdownMenuSub>
-
-        <UiDropdownMenuSeparator />
-
-        <UiDropdownMenuItem @select.stop="handleSelect('delete')">
-          <span>删除</span>
-          <UiDropdownMenuShortcut> <Trash2Icon class="size-4" /> </UiDropdownMenuShortcut>
-        </UiDropdownMenuItem>
-      </UiDropdownMenuContent>
-    </UiDropdownMenu>
+      </template>
+    </DataTableRowActions>
 
     <ModalContent>
       <component :is="showComponent" :task="task" @close="isOpen = false" />

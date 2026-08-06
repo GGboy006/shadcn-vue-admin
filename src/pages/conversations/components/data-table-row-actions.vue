@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { IConversation } from '@/services/api/conversation.api'
 
-import { Button } from '@/components/ui/button'
+import { DataTableRowActions } from '@/components/data-table'
 
 import { getConversationDetailRoute } from '../utils/navigation'
 
@@ -18,7 +18,11 @@ function handleViewDetail() {
 </script>
 
 <template>
-  <Button variant="ghost" size="sm" @click="handleViewDetail">
-    查看详情
-  </Button>
+  <DataTableRowActions
+    mode="buttons"
+    :show-edit="false"
+    :show-delete="false"
+    view-text="查看详情"
+    @view="handleViewDetail"
+  />
 </template>

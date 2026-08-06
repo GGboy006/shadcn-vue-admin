@@ -2,8 +2,7 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
-import { EllipsisIcon, EyeIcon, PencilIcon } from '@lucide/vue'
-
+import { DataTableRowActions } from '@/components/data-table'
 import { Modal, ModalContent, ModalHeader, ModalTitle } from '@/components/prop-ui/modal'
 
 import type { Activity } from '../data/schema'
@@ -35,39 +34,13 @@ function handleSelect(command: TCommand) {
 
 <template>
   <Modal v-model:open="isOpen">
-    <UiDropdownMenu>
-      <UiDropdownMenuTrigger as-child>
-        <UiButton
-          variant="ghost"
-          class="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-        >
-          <EllipsisIcon class="size-4" />
-          <span class="sr-only">Open menu</span>
-        </UiButton>
-      </UiDropdownMenuTrigger>
-      <UiDropdownMenuContent align="end" class="w-[180px]">
-        <UiDropdownMenuItem @click.stop="handleSelect('detail')">
-          <EyeIcon class="size-4 mr-2" />
-          查看详情
-        </UiDropdownMenuItem>
-
-        <UiDropdownMenuItem @click.stop="handleSelect('edit')">
-          <PencilIcon class="size-4 mr-2" />
-          编辑
-        </UiDropdownMenuItem>
-
-        <UiDropdownMenuSeparator />
-
-        <UiDropdownMenuItem
-          class="text-destructive focus:text-destructive"
-          @click.stop="handleSelect('delete')"
-        >
-          删除
-          <UiDropdownMenuShortcut>⌘⌫</UiDropdownMenuShortcut>
-        </UiDropdownMenuItem>
-      </UiDropdownMenuContent>
-    </UiDropdownMenu>
-
+    <DataTableRowActions
+      view-text="查看详情"
+      content-width="w-[180px]"
+      @view="handleSelect('detail')"
+      @edit="handleSelect('edit')"
+      @delete="handleSelect('delete')"
+    />
     <ModalContent :class="showComponent === ActivityDetail ? 'sm:max-w-[640px]' : ''">
       <template v-if="showComponent === ActivityDetail">
         <ModalHeader>
