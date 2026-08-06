@@ -2,6 +2,8 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
+import { PencilIcon, Trash2Icon } from '@lucide/vue'
+
 import { DataTableRowActions } from '@/components/data-table'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
 
@@ -40,22 +42,26 @@ async function handleSelect(command: TCommand) {
     console.error(`Failed to load component for "${command}"`, e)
   }
 }
+
+const items = [
+  { key: 'edit', label: '编辑', icon: PencilIcon },
+  { key: 'copy', label: '复制', disabled: true },
+  { key: 'star', label: '收藏', disabled: true },
+  { key: 'delete', label: '删除', icon: Trash2Icon, variant: 'destructive' as const },
+]
+
+function handleAction(key: string) {
+  if (key === 'edit')
+    handleSelect('edit')
+  else if (key === 'delete')
+    handleSelect('delete')
+}
 </script>
 
 <template>
   <Modal v-model:open="isOpen">
-    <DataTableRowActions
-      @edit="handleSelect('edit')"
-      @delete="handleSelect('delete')"
-    >
-      <template #extra-items>
-        <UiDropdownMenuItem disabled>
-          复制
-        </UiDropdownMenuItem>
-        <UiDropdownMenuItem disabled>
-          收藏
-        </UiDropdownMenuItem>
-
+    <DataTableRowActions :items="items" @action="handleAction">
+      <template #extra>
         <UiDropdownMenuSeparator />
 
         <UiDropdownMenuSub>

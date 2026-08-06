@@ -11,11 +11,18 @@ import DynamicFormSheet from './dynamic-form-sheet.vue'
 
 const props = defineProps<{ row: Row<INeighborhoodDynamic> }>()
 const dynamic = computed(() => props.row.original)
-const { isDetailOpen, isEditOpen, isDeleteOpen, openDetail, openEdit, openDelete } = useRowActions()
+const isDetailOpen = ref(false)
+const isEditOpen = ref(false)
+const isDeleteOpen = ref(false)
+const { items, handleAction } = useRowActions({
+  view: () => { isDetailOpen.value = true },
+  edit: () => { isEditOpen.value = true },
+  delete: () => { isDeleteOpen.value = true },
+})
 </script>
 
 <template>
-  <DataTableRowActions @view="openDetail" @edit="openEdit" @delete="openDelete" />
+  <DataTableRowActions :items="items" @action="handleAction" />
 
   <DynamicDetailDialog v-model:open="isDetailOpen" :unique-code="dynamic?.uniqueCode" />
   <DynamicFormSheet v-model:open="isEditOpen" :dynamic="dynamic" />

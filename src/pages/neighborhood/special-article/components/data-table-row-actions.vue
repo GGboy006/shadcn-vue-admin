@@ -11,11 +11,18 @@ import SpecialArticleFormSheet from './special-article-form-sheet.vue'
 
 const props = defineProps<{ row: Row<INeighborhoodSpecialArticle>, specialCode: string }>()
 const article = computed(() => props.row.original)
-const { isDetailOpen, isEditOpen, isDeleteOpen, openDetail, openEdit, openDelete } = useRowActions()
+const isDetailOpen = ref(false)
+const isEditOpen = ref(false)
+const isDeleteOpen = ref(false)
+const { items, handleAction } = useRowActions({
+  view: () => { isDetailOpen.value = true },
+  edit: () => { isEditOpen.value = true },
+  delete: () => { isDeleteOpen.value = true },
+})
 </script>
 
 <template>
-  <DataTableRowActions @view="openDetail" @edit="openEdit" @delete="openDelete" />
+  <DataTableRowActions :items="items" @action="handleAction" />
 
   <SpecialArticleDetailDialog v-model:open="isDetailOpen" :unique-code="article?.uniqueCode" />
   <SpecialArticleFormSheet

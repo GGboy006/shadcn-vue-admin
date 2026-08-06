@@ -11,11 +11,18 @@ import NoticeFormSheet from './notice-form-sheet.vue'
 
 const props = defineProps<{ row: Row<INeighborhoodNotice> }>()
 const notice = computed(() => props.row.original)
-const { isDetailOpen, isEditOpen, isDeleteOpen, openDetail, openEdit, openDelete } = useRowActions()
+const isDetailOpen = ref(false)
+const isEditOpen = ref(false)
+const isDeleteOpen = ref(false)
+const { items, handleAction } = useRowActions({
+  view: () => { isDetailOpen.value = true },
+  edit: () => { isEditOpen.value = true },
+  delete: () => { isDeleteOpen.value = true },
+})
 </script>
 
 <template>
-  <DataTableRowActions @view="openDetail" @edit="openEdit" @delete="openDelete" />
+  <DataTableRowActions :items="items" @action="handleAction" />
 
   <!-- 查看:Dialog(居中弹窗,只读详情) -->
   <NoticeDetailDialog v-model:open="isDetailOpen" :unique-code="notice?.uniqueCode" />

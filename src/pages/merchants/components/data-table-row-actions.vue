@@ -2,7 +2,7 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
-import { BotIcon, StoreIcon } from '@lucide/vue'
+import { BotIcon, PencilIcon, StoreIcon, Trash2Icon } from '@lucide/vue'
 
 import { DataTableRowActions } from '@/components/data-table'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
@@ -23,15 +23,16 @@ const router = useRouter()
 const isOpen = ref(false)
 
 const showComponent = shallowRef<Component | null>(null)
-type TCommand = 'edit' | 'delete'
 
-function handleSelect(command: TCommand) {
-  if (command === 'edit') {
-    showComponent.value = MerchantEdit
-  }
-  else {
-    showComponent.value = MerchantDelete
-  }
+const items = [
+  { key: 'edit', label: '编辑', icon: PencilIcon },
+  { key: 'assign', label: '分配AI工具', icon: BotIcon },
+  { key: 'enter', label: '进入商户后台', icon: StoreIcon },
+  { key: 'delete', label: '删除', icon: Trash2Icon, variant: 'destructive' as const },
+]
+
+function handleSelect(command: 'edit' | 'delete') {
+  showComponent.value = command === 'edit' ? MerchantEdit : MerchantDelete
   isOpen.value = true
 }
 
@@ -44,28 +45,26 @@ function handleEnterBusiness() {
   // 同窗口跳转:存入代客 store(带商户名),菜单自动重载为商户后台
   enterMerchantBusiness(merchant.value.merchantId, merchant.value.merchantName)
 }
+
+function handleAction(key: string) {
+  if (key === 'edit')
+    handleSelect('edit')
+  else if (key === 'assign')
+    handleAssign()
+  else if (key === 'enter')
+    handleEnterBusiness()
+  else if (key === 'delete')
+    handleSelect('delete')
+}
 </script>
 
 <template>
   <Modal v-model:open="isOpen">
     <DataTableRowActions
-      :show-view="false"
+      :items="items"
       content-width="w-[180px]"
-      @edit="handleSelect('edit')"
-      @delete="handleSelect('delete')"
-    >
-      <template #extra-items>
-        <UiDropdownMenuItem @click.stop="handleAssign">
-          <BotIcon class="mr-2 size-4" />
-          分配AI工具
-        </UiDropdownMenuItem>
-
-        <UiDropdownMenuItem @click.stop="handleEnterBusiness">
-          <StoreIcon class="mr-2 size-4" />
-          进入商户后台
-        </UiDropdownMenuItem>
-      </template>
-    </DataTableRowActions>
+      @action="handleAction"
+    />
 
     <ModalContent>
       <component

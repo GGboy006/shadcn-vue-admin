@@ -6,6 +6,18 @@ export interface FacetedFilterOption {
   icon?: Component
 }
 
+/** DataTableRowActions 的单个操作项 */
+export interface RowActionItem {
+  /** 唯一标识,回传给 @action */
+  key: string
+  label: string
+  /** 图标组件,lucide icon */
+  icon?: Component
+  /** default | destructive(红色 + ⌘⌫ 快捷键) */
+  variant?: 'default' | 'destructive'
+  disabled?: boolean
+}
+
 export interface ServerPagination {
   page: number
   pageSize: number

@@ -2,7 +2,7 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
-import { DataTableRowActions } from '@/components/data-table'
+import { DataTableRowActions, useRowActions } from '@/components/data-table'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
 
 import type { Category } from '../data/schema'
@@ -18,21 +18,24 @@ const category = computed(() => props.row.original)
 
 const isOpen = ref(false)
 const showComponent = shallowRef<Component | null>(null)
-type TCommand = 'edit' | 'delete'
 
-function handleSelect(command: TCommand) {
-  showComponent.value = command === 'edit' ? CategoryEdit : CategoryDelete
+function handleEdit() {
+  showComponent.value = CategoryEdit
   isOpen.value = true
 }
+function handleDelete() {
+  showComponent.value = CategoryDelete
+  isOpen.value = true
+}
+const { items, handleAction } = useRowActions({ edit: handleEdit, delete: handleDelete })
 </script>
 
 <template>
   <Modal v-model:open="isOpen">
     <DataTableRowActions
-      :show-view="false"
+      :items="items"
       content-width="w-[180px]"
-      @edit="handleSelect('edit')"
-      @delete="handleSelect('delete')"
+      @action="handleAction"
     />
     <ModalContent>
       <component

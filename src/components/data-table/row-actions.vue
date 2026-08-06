@@ -1,35 +1,36 @@
 <script setup lang="ts">
-import { EllipsisIcon, EyeIcon, PencilIcon, Trash2Icon } from '@lucide/vue'
+import { EllipsisIcon } from '@lucide/vue'
+
+import type { RowActionItem } from './types'
 
 interface DataTableRowActionsProps {
   /** 操作列形态:dropdown 下拉菜单(默认) | buttons 图标按钮组 */
   mode?: 'dropdown' | 'buttons'
-  showView?: boolean
-  showEdit?: boolean
-  showDelete?: boolean
-  viewText?: string
-  editText?: string
-  deleteText?: string
-  /** dropdown 模式下的菜单宽度 */
+  /** 操作项数组 */
+  items: RowActionItem[]
+  /** dropdown 模式菜单宽度 */
   contentWidth?: string
+  /** destructive 项前自动加分隔符,默认 true */
+  autoSeparator?: boolean
 }
 
 const props = withDefaults(defineProps<DataTableRowActionsProps>(), {
   mode: 'dropdown',
-  showView: true,
-  showEdit: true,
-  showDelete: true,
-  viewText: '查看',
-  editText: '编辑',
-  deleteText: '删除',
   contentWidth: 'w-[160px]',
+  autoSeparator: true,
 })
 
 const emit = defineEmits<{
-  view: []
-  edit: []
-  delete: []
+  action: [key: string]
 }>()
+
+// buttons 模式不支持 extra slot(子菜单等结构表达不了);dropdown 模式才渲染
+const hasExtraSlot = computed(() => !!useSlots().extra)
+watchEffect(() => {
+  if (props.mode === 'buttons' && hasExtraSlot.value) {
+    console.warn('[DataTableRowActions] buttons 模式不渲染 #extra slot,子菜单等结构仅 dropdown 模式支持')
+  }
+})
 </script>
 
 <template>
@@ -39,39 +40,19 @@ const emit = defineEmits<{
     class="flex items-center justify-end gap-1"
   >
     <UiButton
-      v-if="props.showView"
+      v-for="item in props.items"
+      :key="item.key"
       variant="ghost"
       size="icon"
       class="size-8"
-      :title="props.viewText"
-      @click="emit('view')"
+      :class="item.variant === 'destructive' ? 'text-destructive hover:text-destructive' : ''"
+      :disabled="item.disabled"
+      :title="item.label"
+      @click="emit('action', item.key)"
     >
-      <EyeIcon class="size-4" />
-      <span class="sr-only">{{ props.viewText }}</span>
+      <component :is="item.icon" v-if="item.icon" class="size-4" />
+      <span class="sr-only">{{ item.label }}</span>
     </UiButton>
-    <UiButton
-      v-if="props.showEdit"
-      variant="ghost"
-      size="icon"
-      class="size-8"
-      :title="props.editText"
-      @click="emit('edit')"
-    >
-      <PencilIcon class="size-4" />
-      <span class="sr-only">{{ props.editText }}</span>
-    </UiButton>
-    <UiButton
-      v-if="props.showDelete"
-      variant="ghost"
-      size="icon"
-      class="size-8 text-destructive hover:text-destructive"
-      :title="props.deleteText"
-      @click="emit('delete')"
-    >
-      <Trash2Icon class="size-4" />
-      <span class="sr-only">{{ props.deleteText }}</span>
-    </UiButton>
-    <slot name="extra-items" />
   </div>
 
   <!-- dropdown 模式:省略号下拉菜单 -->
@@ -86,28 +67,25 @@ const emit = defineEmits<{
       </UiButton>
     </UiDropdownMenuTrigger>
     <UiDropdownMenuContent align="end" :class="props.contentWidth">
-      <UiDropdownMenuItem v-if="props.showView" @click.stop="emit('view')">
-        <EyeIcon class="mr-2 size-4" />
-        {{ props.viewText }}
-      </UiDropdownMenuItem>
+      <template v-for="item in props.items" :key="item.key">
+        <UiDropdownMenuSeparator
+          v-if="props.autoSeparator && item.variant === 'destructive'"
+        />
+        <UiDropdownMenuItem
+          :variant="item.variant"
+          :disabled="item.disabled"
+          @click.stop="emit('action', item.key)"
+        >
+          <component :is="item.icon" v-if="item.icon" class="mr-2 size-4" />
+          {{ item.label }}
+          <UiDropdownMenuShortcut v-if="item.variant === 'destructive'">
+            ⌘⌫
+          </UiDropdownMenuShortcut>
+        </UiDropdownMenuItem>
+      </template>
 
-      <UiDropdownMenuItem v-if="props.showEdit" @click.stop="emit('edit')">
-        <PencilIcon class="mr-2 size-4" />
-        {{ props.editText }}
-      </UiDropdownMenuItem>
-
-      <slot name="extra-items" />
-
-      <UiDropdownMenuSeparator v-if="props.showDelete" />
-
-      <UiDropdownMenuItem
-        v-if="props.showDelete"
-        class="text-destructive focus:text-destructive"
-        @click.stop="emit('delete')"
-      >
-        {{ props.deleteText }}
-        <UiDropdownMenuShortcut>⌘⌫</UiDropdownMenuShortcut>
-      </UiDropdownMenuItem>
+      <!-- 特殊结构(子菜单等)兜底,仅 dropdown 模式 -->
+      <slot name="extra" />
     </UiDropdownMenuContent>
   </UiDropdownMenu>
 </template>

@@ -2,8 +2,7 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
-import { EllipsisIcon } from '@lucide/vue'
-
+import { DataTableRowActions, useRowActions } from '@/components/data-table'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
 
 import type { User } from '../data/schema'
@@ -33,32 +32,16 @@ async function handleSelect(command: TCommand) {
     console.error(`Failed to load component for "${command}"`, e)
   }
 }
+
+const { items, handleAction } = useRowActions({
+  edit: () => handleSelect('edit'),
+  delete: () => handleSelect('delete'),
+})
 </script>
 
 <template>
   <Modal v-model:open="isOpen">
-    <UiDropdownMenu>
-      <UiDropdownMenuTrigger as-child>
-        <UiButton
-          variant="ghost"
-          class="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-        >
-          <EllipsisIcon class="size-4" />
-          <span class="sr-only">Open menu</span>
-        </UiButton>
-      </UiDropdownMenuTrigger>
-      <UiDropdownMenuContent align="end" class="w-[160px]">
-        <UiDropdownMenuItem @click.stop="handleSelect('edit')">
-          编辑
-        </UiDropdownMenuItem>
-
-        <UiDropdownMenuItem @click.stop="handleSelect('delete')">
-          删除
-          <UiDropdownMenuShortcut>⌘⌫</UiDropdownMenuShortcut>
-        </UiDropdownMenuItem>
-      </UiDropdownMenuContent>
-    </UiDropdownMenu>
-
+    <DataTableRowActions :items="items" @action="handleAction" />
     <ModalContent>
       <component :is="showComponent" :user="user" @close="isOpen = false" />
     </ModalContent>

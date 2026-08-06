@@ -2,6 +2,8 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
+import { EyeIcon, PencilIcon, Trash2Icon } from '@lucide/vue'
+
 import { DataTableRowActions } from '@/components/data-table'
 import { Modal, ModalContent, ModalHeader, ModalTitle } from '@/components/prop-ui/modal'
 
@@ -19,15 +21,20 @@ const activity = computed(() => props.row.original)
 
 const isOpen = ref(false)
 const showComponent = shallowRef<Component | null>(null)
-type TCommand = 'detail' | 'edit' | 'delete'
 
-function handleSelect(command: TCommand) {
-  if (command === 'edit')
-    showComponent.value = ActivityEdit
-  else if (command === 'delete')
-    showComponent.value = ActivityDelete
-  else
+const items = [
+  { key: 'view', label: '查看详情', icon: EyeIcon },
+  { key: 'edit', label: '编辑', icon: PencilIcon },
+  { key: 'delete', label: '删除', icon: Trash2Icon, variant: 'destructive' as const },
+]
+
+function handleAction(key: string) {
+  if (key === 'view')
     showComponent.value = ActivityDetail
+  else if (key === 'edit')
+    showComponent.value = ActivityEdit
+  else if (key === 'delete')
+    showComponent.value = ActivityDelete
   isOpen.value = true
 }
 </script>
@@ -35,11 +42,9 @@ function handleSelect(command: TCommand) {
 <template>
   <Modal v-model:open="isOpen">
     <DataTableRowActions
-      view-text="查看详情"
+      :items="items"
       content-width="w-[180px]"
-      @view="handleSelect('detail')"
-      @edit="handleSelect('edit')"
-      @delete="handleSelect('delete')"
+      @action="handleAction"
     />
     <ModalContent :class="showComponent === ActivityDetail ? 'sm:max-w-[640px]' : ''">
       <template v-if="showComponent === ActivityDetail">

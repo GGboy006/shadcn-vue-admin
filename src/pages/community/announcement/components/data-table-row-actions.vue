@@ -4,7 +4,7 @@ import type { Component } from 'vue'
 
 import type { ICommunityNotice } from '@/services/api/community-notice.api'
 
-import { DataTableRowActions } from '@/components/data-table'
+import { DataTableRowActions, useRowActions } from '@/components/data-table'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
 
 import NoticeDeleteContent from './notice-delete.vue'
@@ -21,25 +21,25 @@ const isOpen = ref(false)
 const isDetailOpen = ref(false)
 
 const showComponent = shallowRef<Component | null>(null)
-type TCommand = 'edit' | 'delete'
 
-function handleSelect(command: TCommand) {
-  showComponent.value = command === 'edit' ? NoticeEdit : NoticeDeleteContent
+function handleEdit() {
+  showComponent.value = NoticeEdit
   isOpen.value = true
 }
-
-function handleView() {
-  isDetailOpen.value = true
+function handleDelete() {
+  showComponent.value = NoticeDeleteContent
+  isOpen.value = true
 }
+const { items, handleAction } = useRowActions({
+  view: () => { isDetailOpen.value = true },
+  edit: handleEdit,
+  delete: handleDelete,
+})
 </script>
 
 <template>
   <Modal v-model:open="isOpen">
-    <DataTableRowActions
-      @view="handleView"
-      @edit="handleSelect('edit')"
-      @delete="handleSelect('delete')"
-    />
+    <DataTableRowActions :items="items" @action="handleAction" />
     <ModalContent>
       <component
         :is="showComponent"

@@ -11,11 +11,18 @@ import ActivityFormSheet from './activity-form-sheet.vue'
 
 const props = defineProps<{ row: Row<INeighborhoodActivity> }>()
 const activity = computed(() => props.row.original)
-const { isDetailOpen, isEditOpen, isDeleteOpen, openDetail, openEdit, openDelete } = useRowActions()
+const isDetailOpen = ref(false)
+const isEditOpen = ref(false)
+const isDeleteOpen = ref(false)
+const { items, handleAction } = useRowActions({
+  view: () => { isDetailOpen.value = true },
+  edit: () => { isEditOpen.value = true },
+  delete: () => { isDeleteOpen.value = true },
+})
 </script>
 
 <template>
-  <DataTableRowActions @view="openDetail" @edit="openEdit" @delete="openDelete" />
+  <DataTableRowActions :items="items" @action="handleAction" />
 
   <ActivityDetailDialog v-model:open="isDetailOpen" :unique-code="activity?.uniqueCode" />
   <ActivityFormSheet v-model:open="isEditOpen" :activity="activity" />

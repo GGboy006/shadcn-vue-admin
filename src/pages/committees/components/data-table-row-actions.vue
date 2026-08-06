@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
 
-import { StoreIcon } from '@lucide/vue'
+import { PencilIcon, StoreIcon, Trash2Icon } from '@lucide/vue'
 
-import { DataTableRowActions, useRowActions } from '@/components/data-table'
+import { DataTableRowActions } from '@/components/data-table'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
 import { useEnterMerchantBusiness } from '@/composables/use-enter-merchant-business'
 
@@ -17,29 +17,37 @@ interface DataTableRowActionsProps {
 }
 const props = defineProps<DataTableRowActionsProps>()
 const committee = computed(() => props.row.original)
-const { isEditOpen, isDeleteOpen, openEdit, openDelete } = useRowActions()
+const isEditOpen = ref(false)
+const isDeleteOpen = ref(false)
+
+const items = [
+  { key: 'edit', label: '编辑', icon: PencilIcon },
+  { key: 'enter', label: '进入居委会后台', icon: StoreIcon },
+  { key: 'delete', label: '删除', icon: Trash2Icon, variant: 'destructive' as const },
+]
 
 const { enterMerchantBusiness } = useEnterMerchantBusiness()
 function handleEnterBusiness() {
   // 代客进入居委会后台(居委会 userType=6,已修复跳转到 /neighborhood/home)
   enterMerchantBusiness(committee.value.merchantId, committee.value.merchantName)
 }
+
+function handleAction(key: string) {
+  if (key === 'edit')
+    isEditOpen.value = true
+  else if (key === 'enter')
+    handleEnterBusiness()
+  else if (key === 'delete')
+    isDeleteOpen.value = true
+}
 </script>
 
 <template>
   <DataTableRowActions
-    :show-view="false"
+    :items="items"
     content-width="w-[180px]"
-    @edit="openEdit"
-    @delete="openDelete"
-  >
-    <template #extra-items>
-      <UiDropdownMenuItem @click.stop="handleEnterBusiness">
-        <StoreIcon class="mr-2 size-4" />
-        进入居委会后台
-      </UiDropdownMenuItem>
-    </template>
-  </DataTableRowActions>
+    @action="handleAction"
+  />
 
   <!-- 编辑:Sheet(右侧抽屉,走 /station/neighborhood) -->
   <CommitteeFormSheet v-model:open="isEditOpen" :committee="committee" />
