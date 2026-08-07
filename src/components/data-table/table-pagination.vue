@@ -131,7 +131,7 @@ function goToLastPage() {
           :disabled="!canPreviousPage"
           @click="goToFirstPage"
         >
-          <span class="sr-only">Go to first page</span>
+          <span class="sr-only">第一页</span>
           <ChevronsLeftIcon class="size-4" />
         </UiButton>
         <UiButton
@@ -140,7 +140,7 @@ function goToLastPage() {
           :disabled="!canPreviousPage"
           @click="goToPreviousPage"
         >
-          <span class="sr-only">Go to previous page</span>
+          <span class="sr-only">上一页</span>
           <ChevronLeftIcon class="size-4" />
         </UiButton>
         <UiButton
@@ -149,7 +149,7 @@ function goToLastPage() {
           :disabled="!canNextPage"
           @click="goToNextPage"
         >
-          <span class="sr-only">Go to next page</span>
+          <span class="sr-only">下一页</span>
           <ChevronRightIcon class="size-4" />
         </UiButton>
         <UiButton
@@ -158,7 +158,7 @@ function goToLastPage() {
           :disabled="!canNextPage"
           @click="goToLastPage"
         >
-          <span class="sr-only">Go to last page</span>
+          <span class="sr-only">最后一页</span>
           <ChevronsRightIcon class="size-4" />
         </UiButton>
       </div>

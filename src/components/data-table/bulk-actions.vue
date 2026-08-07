@@ -45,16 +45,16 @@ function handleClearSelection() {
             variant="outline"
             size="icon"
             class="size-6 rounded-full"
-            aria-label="Clear selection"
-            title="Clear selection (Escape)"
+            aria-label="清除选择"
+            title="清除选择（Esc 键）"
             @click="handleClearSelection"
           >
             <XIcon />
-            <span class="sr-only">Clear selection</span>
+            <span class="sr-only">清除选择</span>
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Clear selection (Escape)</p>
+          <p>清除选择（Esc 键）</p>
         </TooltipContent>
       </Tooltip>
 
@@ -67,11 +67,11 @@ function handleClearSelection() {
       <section id="bulk-actions-description" class="flex items-center gap-x-1 text-sm">
         <UiBadge
           class="min-w-8 rounded-lg"
-          :aria-label="`${selectedCount} selected`"
+          :aria-label="`已选择 ${selectedCount} 项`"
         >
           {{ selectedCount }}
         </UiBadge>
-        {{ entityName }} selected
+        已选择 {{ entityName }}
       </section>
 
       <Separator

@@ -39,7 +39,7 @@ function commandItemClick(url: string) {
 </script>
 
 <template>
-  <UiCommandGroup heading="Pages">
+  <UiCommandGroup heading="页面">
     <UiCommandItem
       v-for="command in commands"
       :key="command.title"

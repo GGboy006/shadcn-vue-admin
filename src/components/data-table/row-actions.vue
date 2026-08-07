@@ -67,7 +67,7 @@ watchEffect(() => {
         class="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
       >
         <EllipsisIcon class="size-4" />
-        <span class="sr-only">Open menu</span>
+        <span class="sr-only">打开操作菜单</span>
       </UiButton>
     </UiDropdownMenuTrigger>
     <UiDropdownMenuContent align="end" :class="props.contentWidth">

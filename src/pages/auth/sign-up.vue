@@ -33,13 +33,13 @@ import TermsOfServiceButton from './components/terms-of-service-button.vue'
                 <UiLabel for="first-name">
                   名字
                 </UiLabel>
-                <UiInput id="first-name" placeholder="Max" required />
+                <UiInput id="first-name" placeholder="请输入名字" required />
               </div>
               <div class="grid gap-2">
                 <UiLabel for="last-name">
                   姓氏
                 </UiLabel>
-                <UiInput id="last-name" placeholder="Robinson" required />
+                <UiInput id="last-name" placeholder="请输入姓氏" required />
               </div>
             </div>
             <div class="grid gap-2">

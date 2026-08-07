@@ -17,15 +17,15 @@ const menuStyles: Array<{
 }> = [
   {
     value: 'collapsible',
-    label: 'Collapsible',
+    label: '折叠式',
     icon: LayoutListIcon,
-    description: 'Traditional collapsible menu',
+    description: '传统折叠菜单',
   },
   {
     value: 'vercel',
-    label: 'Vercel Style',
+    label: 'Vercel 风格',
     icon: ChevronRightIcon,
-    description: 'Click to navigate to the next level',
+    description: '点击进入下一级',
   },
 ]
 
@@ -37,7 +37,7 @@ function handleMenuStyleChange(style: NavigationMode) {
 <template>
   <div class="space-y-1.5 pt-6">
     <UiLabel for="menu-style" class="text-xs">
-      Menu Style
+      菜单样式
     </UiLabel>
     <div class="grid grid-cols-2 gap-2 py-1.5">
       <UiButton

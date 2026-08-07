@@ -50,37 +50,37 @@ export default {
         <template v-if="canSorted">
           <UiDropdownMenuItem @click="props.column.toggleSorting(false)">
             <ArrowUpIcon class="mr-2 size-4 text-muted-foreground/70" />
-            Asc
+            升序
           </UiDropdownMenuItem>
           <UiDropdownMenuItem @click="props.column.toggleSorting(true)">
             <ArrowDownIcon class="mr-2 size-4 text-muted-foreground/70" />
-            Desc
+            降序
           </UiDropdownMenuItem>
           <UiDropdownMenuItem @click="props.column.clearSorting()">
             <ChevronsUpDownIcon class="mr-2 size-4 text-muted-foreground/70" />
-            Clear Sorting
+            清除排序
           </UiDropdownMenuItem>
           <UiDropdownMenuSeparator />
         </template>
 
         <UiDropdownMenuItem @click="props.column.toggleVisibility(false)">
           <EyeOffIcon class="mr-2 size-4 text-muted-foreground/70" />
-          Hide
+          隐藏列
         </UiDropdownMenuItem>
 
         <template v-if="canPinned">
           <UiDropdownMenuSeparator />
           <UiDropdownMenuItem @click="props.column.pin('left')">
             <ArrowLeftIcon class="mr-2 size-4 text-muted-foreground/70" />
-            Pin Left
+            固定到左侧
           </UiDropdownMenuItem>
           <UiDropdownMenuItem @click="props.column.pin('right')">
             <ArrowRightIcon class="mr-2 size-4 text-muted-foreground/70" />
-            Pin Right
+            固定到右侧
           </UiDropdownMenuItem>
           <UiDropdownMenuItem @click="props.column.pin(false)">
             <PinOffIcon class="mr-2 size-4 text-muted-foreground/70" />
-            Unpin
+            取消固定
           </UiDropdownMenuItem>
         </template>
       </UiDropdownMenuContent>

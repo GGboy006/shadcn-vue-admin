@@ -194,7 +194,7 @@ const filterRange = computed(() => {
       <Select v-model="timeRange">
         <SelectTrigger
           class="hidden w-[160px] rounded-lg sm:ml-auto sm:flex"
-          aria-label="Select a value"
+          aria-label="选择时间范围"
         >
           <SelectValue placeholder="最近 3 个月" />
         </SelectTrigger>

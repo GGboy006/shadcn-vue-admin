@@ -40,7 +40,7 @@ const filterFunction = (list: DataTableFacetedFilter['options'], term: string) =
               variant="secondary"
               class="px-1 font-normal rounded-sm"
             >
-              {{ selectedValues.size }} selected
+              已选 {{ selectedValues.size }} 项
             </UiBadge>
 
             <template v-else>
@@ -106,11 +106,11 @@ const filterFunction = (list: DataTableFacetedFilter['options'], term: string) =
             <UiCommandSeparator />
             <UiCommandGroup>
               <UiCommandItem
-                :value="{ label: 'Clear filters' }"
+                :value="{ label: '清除筛选' }"
                 class="justify-center text-center"
                 @select="column?.setFilterValue(undefined)"
               >
-                Clear filters
+                清除筛选
               </UiCommandItem>
             </UiCommandGroup>
           </template>

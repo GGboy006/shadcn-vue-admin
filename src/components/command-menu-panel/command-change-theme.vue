@@ -12,15 +12,15 @@ const mode = useColorMode()
 </script>
 
 <template>
-  <UiCommandGroup heading="Theme">
+  <UiCommandGroup heading="主题">
     <UiCommandItem value="light" @click="mode = 'light', $emit('click')">
-      <CommandItemHasIcon name="Light" :icon="SunIcon" />
+      <CommandItemHasIcon name="浅色" :icon="SunIcon" />
     </UiCommandItem>
     <UiCommandItem value="dark" @click="mode = 'dark', $emit('click')">
-      <CommandItemHasIcon name="Dark" :icon="MoonIcon" />
+      <CommandItemHasIcon name="深色" :icon="MoonIcon" />
     </UiCommandItem>
     <UiCommandItem value="system" @click="mode = 'auto', $emit('click')">
-      <CommandItemHasIcon name="System" :icon="SunMoonIcon" />
+      <CommandItemHasIcon name="跟随系统" :icon="SunMoonIcon" />
     </UiCommandItem>
   </UiCommandGroup>
 </template>

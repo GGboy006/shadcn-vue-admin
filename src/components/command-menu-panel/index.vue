@@ -41,7 +41,7 @@ const firstKey = computed(() => navigator?.userAgent.includes('Mac OS') ? '⌘' 
     </UiButton>
 
     <UiCommandDialog v-model:open="open">
-      <UiCommandInput placeholder="Type a command or search..." />
+      <UiCommandInput placeholder="输入命令或搜索..." />
       <UiCommandList>
         <UiCommandEmpty>
           <Empty>

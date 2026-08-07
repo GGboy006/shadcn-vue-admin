@@ -19,12 +19,12 @@ export const SelectColumn: ColumnDef<any> = {
   header: ({ table }) => h(Checkbox, {
     'modelValue': table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate'),
     'onUpdate:modelValue': value => table.toggleAllPageRowsSelected(!!value),
-    'ariaLabel': 'Select all',
+    'ariaLabel': '全选',
   }),
   cell: ({ row }) => h(Checkbox, {
     'modelValue': row.getIsSelected(),
     'onUpdate:modelValue': value => row.toggleSelected(!!value),
-    'ariaLabel': 'Select row',
+    'ariaLabel': '选择该行',
   }),
   enableSorting: false,
   enableHiding: false,
