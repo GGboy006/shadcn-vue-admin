@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { Badge } from '@/components/ui/badge'
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
+  Modal,
+  ModalContent,
+  ModalDescription,
+  ModalHeader,
+  ModalTitle,
+} from '@/components/prop-ui/modal'
+import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   dynamicAuditStatusConfig,
@@ -32,7 +32,7 @@ const isOpen = computed({
 
 const uniqueCode = computed(() => props.uniqueCode)
 
-const { data, isLoading } = useGetDynamicDetailQuery(uniqueCode)
+const { data, isLoading } = useGetDynamicDetailQuery(uniqueCode, isOpen)
 
 const detail = computed(() => data.value?.data)
 
@@ -59,21 +59,18 @@ const enableConfig = computed(() => {
 </script>
 
 <template>
-  <Sheet v-model:open="isOpen">
-    <SheetContent
-      side="right"
-      class="flex w-full flex-col gap-0 p-0 sm:max-w-xl md:max-w-2xl"
-    >
-      <SheetHeader class="border-b px-4 py-3">
-        <SheetTitle class="text-base">
+  <Modal v-model:open="isOpen">
+    <ModalContent class="sm:max-w-2xl">
+      <ModalHeader>
+        <ModalTitle class="text-base">
           小区动态详情
-        </SheetTitle>
-        <SheetDescription class="sr-only">
+        </ModalTitle>
+        <ModalDescription class="sr-only">
           查看小区动态的完整内容
-        </SheetDescription>
-      </SheetHeader>
+        </ModalDescription>
+      </ModalHeader>
 
-      <div class="flex-1 overflow-y-auto p-4">
+      <div class="max-h-[70vh] overflow-y-auto">
         <div v-if="isLoading" class="space-y-4">
           <Skeleton class="h-40 w-full" />
           <Skeleton class="h-6 w-2/3" />
@@ -187,6 +184,6 @@ const enableConfig = computed(() => {
           暂无数据
         </div>
       </div>
-    </SheetContent>
-  </Sheet>
+    </ModalContent>
+  </Modal>
 </template>

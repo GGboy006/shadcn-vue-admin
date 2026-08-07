@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { Badge } from '@/components/ui/badge'
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
+  Modal,
+  ModalContent,
+  ModalDescription,
+  ModalHeader,
+  ModalTitle,
+} from '@/components/prop-ui/modal'
+import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   noticeContentTypeConfig,
@@ -32,7 +32,7 @@ const isOpen = computed({
 
 const uniqueCode = computed(() => props.uniqueCode)
 
-const { data, isLoading } = useGetNoticeDetailQuery(uniqueCode)
+const { data, isLoading } = useGetNoticeDetailQuery(uniqueCode, isOpen)
 
 const detail = computed(() => data.value?.data)
 
@@ -54,21 +54,18 @@ const publicConfig = computed(() => {
 </script>
 
 <template>
-  <Sheet v-model:open="isOpen">
-    <SheetContent
-      side="right"
-      class="flex w-full flex-col gap-0 p-0 sm:max-w-xl md:max-w-2xl"
-    >
-      <SheetHeader class="border-b px-4 py-3">
-        <SheetTitle class="text-base">
+  <Modal v-model:open="isOpen">
+    <ModalContent class="sm:max-w-2xl">
+      <ModalHeader>
+        <ModalTitle class="text-base">
           小区公告详情
-        </SheetTitle>
-        <SheetDescription class="sr-only">
+        </ModalTitle>
+        <ModalDescription class="sr-only">
           查看小区公告的完整内容
-        </SheetDescription>
-      </SheetHeader>
+        </ModalDescription>
+      </ModalHeader>
 
-      <div class="flex-1 overflow-y-auto p-4">
+      <div class="max-h-[70vh] overflow-y-auto">
         <div v-if="isLoading" class="space-y-4">
           <Skeleton class="h-6 w-2/3" />
           <Skeleton class="h-4 w-full" />
@@ -77,7 +74,7 @@ const publicConfig = computed(() => {
         </div>
 
         <div v-else-if="detail" class="space-y-6">
-          <!-- 标题与状态 -->
+          <!-- �标题与状态 -->
           <div class="space-y-2">
             <h2 class="text-lg font-semibold">
               {{ detail.title }}
@@ -148,6 +145,6 @@ const publicConfig = computed(() => {
           暂无数据
         </div>
       </div>
-    </SheetContent>
-  </Sheet>
+    </ModalContent>
+  </Modal>
 </template>

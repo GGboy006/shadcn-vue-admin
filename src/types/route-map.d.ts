@@ -163,6 +163,20 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/community/cate/': RouteRecordInfo<
+      '/community/cate/',
+      '/community/cate',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/community/column/': RouteRecordInfo<
+      '/community/column/',
+      '/community/column',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/community/convenience/': RouteRecordInfo<
       '/community/convenience/',
       '/community/convenience',
@@ -194,6 +208,13 @@ declare module 'vue-router/auto-routes' {
     '/community/phone-list/': RouteRecordInfo<
       '/community/phone-list/',
       '/community/phone-list',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/community/service/': RouteRecordInfo<
+      '/community/service/',
+      '/community/service',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -653,6 +674,18 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
+    'src/pages/community/cate/index.vue': {
+      routes:
+        | '/community/cate/'
+      views:
+        | never
+    }
+    'src/pages/community/column/index.vue': {
+      routes:
+        | '/community/column/'
+      views:
+        | never
+    }
     'src/pages/community/convenience/index.vue': {
       routes:
         | '/community/convenience/'
@@ -680,6 +713,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/community/phone-list/index.vue': {
       routes:
         | '/community/phone-list/'
+      views:
+        | never
+    }
+    'src/pages/community/service/index.vue': {
+      routes:
+        | '/community/service/'
       views:
         | never
     }

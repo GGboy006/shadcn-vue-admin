@@ -2,12 +2,17 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import { useApiFetch } from '@/composables/use-fetch'
 
-import type { IPageResult, IResponse } from '../types/response.type'
+import type { IPageParam, IPageResult, IResponse } from '../types/response.type'
 
-/** 审核状态：0=待审核，1=审核拒绝，2=审核通过 */
+// ==================== 类型 ====================
+
+/**
+ * 审核状态(对接文档 10 节 / 枚举速查)。
+ * 注意:与居委会动态相反!小区服务侧 1=审核拒绝,2=审核通过。
+ * (居委会文档 3.5 是 1=通过,2=未通过,二者后端不统一,各按各的文档实现。)
+ */
 export type DynamicAuditStatus = 0 | 1 | 2
-
-/** 启用状态：1=启用，2=禁用 */
+/** 启用状态:1=启用,2=禁用 */
 export type DynamicEnableStatus = 1 | 2
 
 /** 审核状态映射配置 */
@@ -23,21 +28,13 @@ export const dynamicEnableStatusConfig: Record<DynamicEnableStatus, { label: str
   2: { label: '禁用', variant: 'secondary' },
 }
 
-/** 分页列表查询参数 */
-export interface ICommunityDynamicListQuery {
-  /** 关键词（模糊搜索） */
+/** 分页列表查询参数(对接文档 10 节) */
+export interface ICommunityDynamicListQuery extends IPageParam {
+  /** 关键词(模糊搜索) */
   keyword?: string
-  /** 页码 */
-  pageNum: number
-  /** 每页数量 */
-  pageSize: number
-  /** 是否查询总条数 */
-  searchCount?: string
-  /** 排序字段集合 */
-  sortItemList?: string
 }
 
-/** 社区动态 VO */
+/** 小区动态 VO(对接文档 10 节 TblCommunityDynamicResp) */
 export interface ICommunityDynamic {
   /** 主键ID */
   id: number
@@ -51,7 +48,7 @@ export interface ICommunityDynamic {
   content?: string
   /** 来源 */
   original?: string
-  /** 关键词，英文逗号隔开 */
+  /** 关键词,英文逗号隔开 */
   keywords?: string
   /** 作者名称 */
   userName?: string
@@ -61,11 +58,15 @@ export interface ICommunityDynamic {
   userUniqueCode?: string
   /** 文章来源网址 */
   sourceUrl?: string
-  /** 审核状态：0=待审核，1=审核拒绝，2=审核通过 */
+  /** 审核状态:0=待审核,1=审核拒绝,2=审核通过 */
   auditStatus?: DynamicAuditStatus
-  /** 启用状态：1=启用，2=禁用 */
+  /** 启用状态:1=启用,2=禁用 */
   isEnable?: DynamicEnableStatus
-  /** 是否删除：1=已删除 */
+  /** 合伙人标识(后端填充) */
+  partnerId?: string
+  /** 合伙人父级标识 */
+  partnerPid?: string
+  /** 是否删除:1=已删除 */
   isDeleted?: number
   /** 文章介绍 */
   describes?: string
@@ -79,7 +80,7 @@ export interface ICommunityDynamic {
   operatorTime?: string
 }
 
-/** 新增请求体 */
+/** 新增请求体(对接文档 10 节) */
 export interface ICommunityDynamicAddDTO {
   /** 标题 */
   title: string
@@ -89,21 +90,29 @@ export interface ICommunityDynamicAddDTO {
   content?: string
   /** 来源 */
   original?: string
-  /** 关键词，英文逗号隔开 */
+  /** 关键词,英文逗号隔开 */
   keywords?: string
   /** 作者名称 */
   userName?: string
   /** 作者头像 */
   userPoster?: string
+  /** 作者唯一标识 */
+  userUniqueCode?: string
   /** 文章来源网址 */
   sourceUrl?: string
-  /** 启用状态：1=启用，2=禁用 */
+  /** 审核状态:0=待审核,1=审核拒绝,2=审核通过 */
+  auditStatus?: DynamicAuditStatus
+  /** 启用状态:1=启用,2=禁用 */
   isEnable?: DynamicEnableStatus
   /** 文章介绍 */
   describes?: string
+  /** 审核描述 */
+  auditMsg?: string
+  /** 社区唯一标识 */
+  communityUniqueCode?: string
 }
 
-/** 更新请求体（在新增基础上增加 uniqueCode） */
+/** 更新请求体 = 新增 + uniqueCode */
 export interface ICommunityDynamicUpdateDTO extends ICommunityDynamicAddDTO {
   /** 唯一标识 */
   uniqueCode: string
@@ -112,7 +121,7 @@ export interface ICommunityDynamicUpdateDTO extends ICommunityDynamicAddDTO {
 /** 分页列表响应 */
 export type ICommunityDynamicListResponse = IResponse<IPageResult<ICommunityDynamic>>
 
-/** 详情响应 */
+/** 详情响应(与列表项字段一致,无额外字段;无独立 detail 接口,编辑用列表数据回填) */
 export type ICommunityDynamicDetailResponse = IResponse<ICommunityDynamic>
 
 // ==================== API 封装 ====================
@@ -132,7 +141,7 @@ export function useGetDynamicPageQuery(query: Ref<ICommunityDynamicListQuery>) {
 }
 
 /** 获取小区动态详情 */
-export function useGetDynamicDetailQuery(uniqueCode: Ref<string | undefined>) {
+export function useGetDynamicDetailQuery(uniqueCode: Ref<string | undefined>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<ICommunityDynamicDetailResponse, Error>({
@@ -141,7 +150,7 @@ export function useGetDynamicDetailQuery(uniqueCode: Ref<string | undefined>) {
       method: 'get',
       query: { uniqueCode: uniqueCode.value },
     }),
-    enabled: () => !!uniqueCode.value,
+    enabled: () => (enabled?.value ?? true) && !!uniqueCode.value,
     retry: false,
   })
 }

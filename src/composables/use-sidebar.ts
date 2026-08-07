@@ -51,6 +51,16 @@ export function useSidebar() {
     { title: '便民服务', url: '/community/convenience', icon: HandHelpingIcon, roles: [3] },
     { title: '知识服务', url: '/community/knowledge', icon: LightbulbIcon, roles: [3] },
     { title: '管家服务', url: '/community/steward', icon: ConciergeBellIcon, roles: [3] },
+    {
+      title: '内容配置',
+      icon: LayoutGridIcon,
+      roles: [3],
+      items: [
+        { title: '小区栏目', url: '/community/column', icon: Columns3Icon, roles: [3] },
+        { title: '小区分类', url: '/community/cate', icon: FolderTreeIcon, roles: [3] },
+        { title: '小区服务', url: '/community/service', icon: LifeBuoyIcon, roles: [3] },
+      ],
+    },
   ]
 
   /**
