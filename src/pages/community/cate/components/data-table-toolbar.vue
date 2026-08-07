@@ -4,7 +4,7 @@ import type { Table } from '@tanstack/vue-table'
 import { XIcon } from '@lucide/vue'
 import { computed } from 'vue'
 
-import type { ICommunityCate, ICommunityCateListQuery } from '@/services/api/community-cate.api'
+import type { CommunityCateType, ICommunityCate, ICommunityCateListQuery } from '@/services/api/community-cate.api'
 
 import { DataTableViewOptions } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
@@ -37,7 +37,7 @@ const typeModel = computed({
 })
 
 const typeOptions = Object.entries(communityCateTypeConfig).map(
-  ([value, config]) => ({ value: Number(value) as ICommunityCateListQuery['type'], label: config.label }),
+  ([value, config]) => ({ value: Number(value) as CommunityCateType, label: config.label }),
 )
 
 function handleReset() {

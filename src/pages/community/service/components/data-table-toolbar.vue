@@ -4,7 +4,7 @@ import type { Table } from '@tanstack/vue-table'
 import { XIcon } from '@lucide/vue'
 import { computed } from 'vue'
 
-import type { ICommunityService, ICommunityServiceListQuery } from '@/services/api/community-service.api'
+import type { CommunityServiceType, ICommunityService, ICommunityServiceListQuery } from '@/services/api/community-service.api'
 
 import { DataTableViewOptions } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
@@ -37,7 +37,7 @@ const typeModel = computed({
 })
 
 const typeOptions = Object.entries(communityServiceTypeConfig).map(
-  ([value, config]) => ({ value: Number(value) as ICommunityServiceListQuery['type'], label: config.label }),
+  ([value, config]) => ({ value: Number(value) as CommunityServiceType, label: config.label }),
 )
 
 function handleReset() {
