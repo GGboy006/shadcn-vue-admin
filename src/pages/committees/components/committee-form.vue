@@ -57,8 +57,8 @@ const initialValues = reactive<CommitteeValidator>({
   address: committee?.address || '',
   signDate: committee?.signDate || '',
   signFee: committee?.signFee ?? 0,
-  serveResidents: undefined,
-  members: undefined,
+  serveResidents: committee?.serveResidents ?? undefined,
+  members: committee?.members ?? undefined,
   remark: committee?.remark || '',
   status: committee?.status ?? 1,
 })
