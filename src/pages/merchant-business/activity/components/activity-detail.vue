@@ -3,7 +3,6 @@ import { useCurrentMerchantId } from '@/composables/use-current-merchant-id'
 import { useGetActivityDetailQuery } from '@/services/api/merchant-business.api'
 
 import {
-  activityAuditConfig,
   activityChargeConfig,
   activityRecommendConfig,
   activityStatusConfig,
@@ -56,9 +55,6 @@ function formatTime(iso: string): string {
             </span>
             <span v-if="detail.isCharge === 1 && detail.salePrice != null" class="text-xs px-2 py-0.5 rounded border bg-gray-100/30 text-gray-700 dark:text-gray-300 border-gray-200">
               ¥{{ detail.salePrice }}
-            </span>
-            <span v-if="activityAuditConfig[detail.status]" class="text-xs px-2 py-0.5 rounded border" :class="activityAuditConfig[detail.status].style">
-              {{ activityAuditConfig[detail.status].label }}
             </span>
             <span v-if="activityRecommendConfig[detail.isRecommend]" class="text-xs px-2 py-0.5 rounded border" :class="activityRecommendConfig[detail.isRecommend].style">
               {{ activityRecommendConfig[detail.isRecommend].label }}

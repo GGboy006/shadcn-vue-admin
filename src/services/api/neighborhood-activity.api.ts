@@ -8,19 +8,10 @@ import type { IPageParam, IPageResult, IResponse } from '../types/response.type'
 
 /** 是否收费:1=收费,2=免费 */
 export type ActivityChargeStatus = 1 | 2
-/** 审核状态:0=待审核,1=通过,2=未通过 */
-export type ActivityAuditStatus = 0 | 1 | 2
 /** 启用状态:1=启用,2=禁用 */
 export type ActivityEnableStatus = 1 | 2
 /** 是否推荐:1=是,2=否 */
 export type ActivityRecommendStatus = 1 | 2
-
-/** 审核状态映射配置 */
-export const activityAuditStatusConfig: Record<ActivityAuditStatus, { label: string, variant: 'warning' | 'success' | 'destructive' }> = {
-  0: { label: '待审核', variant: 'warning' },
-  1: { label: '通过', variant: 'success' },
-  2: { label: '未通过', variant: 'destructive' },
-}
 
 /** 启用状态映射配置 */
 export const activityEnableStatusConfig: Record<ActivityEnableStatus, { label: string, variant: 'default' | 'secondary' }> = {
@@ -70,8 +61,6 @@ export interface INeighborhoodActivity {
   startTime?: string
   /** 结束时间 */
   endTime?: string
-  /** 审核状态:0=待审核,1=通过,2=未通过 */
-  status?: ActivityAuditStatus
   /** 排序 */
   torder?: number
   /** 是否推荐:1=是,2=否 */
@@ -112,8 +101,6 @@ export interface INeighborhoodActivityAddDTO {
   isCharge?: ActivityChargeStatus
   /** 金额 */
   salePrice?: number
-  /** 审核状态 */
-  status?: ActivityAuditStatus
   /** 排序 */
   torder?: number
   /** 是否推荐 */

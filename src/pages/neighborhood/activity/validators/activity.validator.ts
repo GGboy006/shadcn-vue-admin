@@ -18,7 +18,6 @@ export const activityValidator = z.object({
   salePrice: optionalNumber,
   startTime: optionalString,
   endTime: optionalString,
-  status: optionalNumber,
   torder: optionalInt,
   isRecommend: optionalNumber,
   isEnable: optionalNumber,

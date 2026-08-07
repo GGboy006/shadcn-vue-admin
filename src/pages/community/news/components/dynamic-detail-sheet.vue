@@ -11,7 +11,6 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
-  dynamicAuditStatusConfig,
   dynamicEnableStatusConfig,
   useGetDynamicDetailQuery,
 } from '@/services/api/community-dynamic.api'
@@ -41,13 +40,6 @@ const keywordList = computed(() => {
   if (!keywords)
     return []
   return keywords.split(',').map(k => k.trim()).filter(Boolean)
-})
-
-const auditConfig = computed(() => {
-  const status = detail.value?.auditStatus
-  if (status === undefined || status === null)
-    return undefined
-  return dynamicAuditStatusConfig[status]
 })
 
 const enableConfig = computed(() => {
@@ -93,9 +85,6 @@ const enableConfig = computed(() => {
               {{ detail.title }}
             </h2>
             <div class="flex flex-wrap items-center gap-2">
-              <Badge v-if="auditConfig" :variant="auditConfig.variant">
-                {{ auditConfig.label }}
-              </Badge>
               <Badge v-if="enableConfig" :variant="enableConfig.variant">
                 {{ enableConfig.label }}
               </Badge>

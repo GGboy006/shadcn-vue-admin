@@ -7,7 +7,6 @@ import type { ICommunityDynamic } from '@/services/api/community-dynamic.api'
 import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 import {
-  dynamicAuditStatusConfig,
   dynamicEnableStatusConfig,
 } from '@/services/api/community-dynamic.api'
 
@@ -60,24 +59,6 @@ export const columns: ColumnDef<ICommunityDynamic>[] = [
     header: ({ column }) => h(DataTableColumnHeader<ICommunityDynamic>, { column, title: '来源' }),
     meta: { title: '来源' },
     cell: ({ row }) => h('div', { class: 'max-w-[160px] truncate text-sm text-muted-foreground' }, row.getValue('original') || '-'),
-    enableSorting: false,
-    enableHiding: true,
-    enableResizing: true,
-  },
-
-  {
-    accessorKey: 'auditStatus',
-    header: ({ column }) => h(DataTableColumnHeader<ICommunityDynamic>, { column, title: '审核状态' }),
-    meta: { title: '审核状态' },
-    cell: ({ row }) => {
-      const auditStatus = row.original.auditStatus
-      if (auditStatus === undefined || auditStatus === null)
-        return h('div', { class: 'text-sm text-muted-foreground' }, '-')
-      const config = dynamicAuditStatusConfig[auditStatus]
-      if (!config)
-        return null
-      return h(Badge, { variant: config.variant }, () => config.label)
-    },
     enableSorting: false,
     enableHiding: true,
     enableResizing: true,

@@ -11,7 +11,6 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
-  activityAuditStatusConfig,
   activityEnableStatusConfig,
   activityRecommendConfig,
   useGetActivityDetailQuery,
@@ -36,13 +35,6 @@ const uniqueCode = computed(() => props.uniqueCode)
 const { data, isLoading } = useGetActivityDetailQuery(uniqueCode, isOpen)
 
 const detail = computed(() => data.value?.data)
-
-const auditConfig = computed(() => {
-  const status = detail.value?.status
-  if (status === undefined || status === null)
-    return undefined
-  return activityAuditStatusConfig[status]
-})
 
 const enableConfig = computed(() => {
   const status = detail.value?.isEnable
@@ -88,9 +80,6 @@ const recommendConfig = computed(() => {
               {{ detail.name }}
             </h2>
             <div class="flex flex-wrap items-center gap-2">
-              <Badge v-if="auditConfig" :variant="auditConfig.variant">
-                {{ auditConfig.label }}
-              </Badge>
               <Badge v-if="enableConfig" :variant="enableConfig.variant">
                 {{ enableConfig.label }}
               </Badge>

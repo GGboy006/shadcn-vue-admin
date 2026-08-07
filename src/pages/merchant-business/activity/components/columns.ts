@@ -7,7 +7,7 @@ import Badge from '@/components/ui/badge/Badge.vue'
 
 import type { Activity } from '../data/schema'
 
-import { activityAuditConfig, activityChargeConfig, activityStatusConfig } from '../data/data'
+import { activityChargeConfig, activityStatusConfig } from '../data/data'
 import DataTableRowActions from './data-table-row-actions.vue'
 
 /** 格式化时间显示 */
@@ -57,20 +57,6 @@ export const columns: ColumnDef<Activity>[] = [
     cell: ({ row }) => {
       const isCharge = row.getValue('isCharge') as number
       const config = activityChargeConfig[isCharge]
-      if (!config)
-        return h('div', { class: 'text-sm text-muted-foreground' }, '-')
-      return h(Badge, { class: config.style }, () => config.label)
-    },
-    enableSorting: false,
-    enableResizing: true,
-  },
-  {
-    accessorKey: 'status',
-    header: ({ column }) => h(DataTableColumnHeader<Activity>, { column, title: '审核状态' }),
-    meta: { title: '审核状态' },
-    cell: ({ row }) => {
-      const status = row.getValue('status') as number
-      const config = activityAuditConfig[status]
       if (!config)
         return h('div', { class: 'text-sm text-muted-foreground' }, '-')
       return h(Badge, { class: config.style }, () => config.label)

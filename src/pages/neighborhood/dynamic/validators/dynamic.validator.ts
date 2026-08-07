@@ -14,7 +14,6 @@ export const dynamicValidator = z.object({
   sourceUrl: optionalString,
   keywords: optionalString,
   authorName: optionalString,
-  status: optionalNumber,
   torder: optionalInt,
   isEnable: optionalNumber,
 })

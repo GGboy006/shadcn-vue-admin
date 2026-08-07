@@ -498,9 +498,6 @@ export function useDeleteFaqMutation(merchantId: Ref<string>) {
 
 // ==================== 五、优惠活动 ====================
 
-/** 活动审核状态:0=待审核,1=审核通过,2=审核未通过 */
-export type ActivityAuditStatus = 0 | 1 | 2
-
 /** 活动 Resp(文档 5.1) */
 export interface IActivityResp {
   id: number
@@ -520,7 +517,6 @@ export interface IActivityResp {
   salePrice: number
   startTime: string
   endTime: string
-  status: ActivityAuditStatus
   auditTime: string
   auditRemark: string
   torder: number
@@ -545,7 +541,6 @@ export interface IActivityAddReq {
   salePrice?: number
   startTime: string
   endTime: string
-  status?: ActivityAuditStatus
   torder?: number
   isRecommend?: 1 | 2
   isEnable?: 1 | 2

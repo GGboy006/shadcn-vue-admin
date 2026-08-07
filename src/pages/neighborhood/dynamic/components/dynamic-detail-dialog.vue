@@ -11,7 +11,6 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
-  dynamicAuditStatusConfig,
   dynamicContentTypeConfig,
   dynamicEnableStatusConfig,
   useGetDynamicDetailQuery,
@@ -38,13 +37,6 @@ const { data, isLoading } = useGetDynamicDetailQuery(uniqueCode, isOpen)
 const detail = computed(() => data.value?.data)
 
 const isLink = computed(() => detail.value?.contentType === 2)
-
-const auditConfig = computed(() => {
-  const status = detail.value?.status
-  if (status === undefined || status === null)
-    return undefined
-  return dynamicAuditStatusConfig[status]
-})
 
 const enableConfig = computed(() => {
   const status = detail.value?.isEnable
@@ -92,9 +84,6 @@ const contentTypeConfig = computed(() => {
             <div class="flex flex-wrap items-center gap-2">
               <Badge v-if="contentTypeConfig" :variant="contentTypeConfig.variant">
                 {{ contentTypeConfig.label }}
-              </Badge>
-              <Badge v-if="auditConfig" :variant="auditConfig.variant">
-                {{ auditConfig.label }}
               </Badge>
               <Badge v-if="enableConfig" :variant="enableConfig.variant">
                 {{ enableConfig.label }}

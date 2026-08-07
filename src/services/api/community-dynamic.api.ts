@@ -6,21 +6,8 @@ import type { IPageParam, IPageResult, IResponse } from '../types/response.type'
 
 // ==================== 类型 ====================
 
-/**
- * 审核状态(对接文档 10 节 / 枚举速查)。
- * 注意:与居委会动态相反!小区服务侧 1=审核拒绝,2=审核通过。
- * (居委会文档 3.5 是 1=通过,2=未通过,二者后端不统一,各按各的文档实现。)
- */
-export type DynamicAuditStatus = 0 | 1 | 2
 /** 启用状态:1=启用,2=禁用 */
 export type DynamicEnableStatus = 1 | 2
-
-/** 审核状态映射配置 */
-export const dynamicAuditStatusConfig: Record<DynamicAuditStatus, { label: string, variant: 'warning' | 'destructive' | 'success' }> = {
-  0: { label: '待审核', variant: 'warning' },
-  1: { label: '审核拒绝', variant: 'destructive' },
-  2: { label: '审核通过', variant: 'success' },
-}
 
 /** 启用状态映射配置 */
 export const dynamicEnableStatusConfig: Record<DynamicEnableStatus, { label: string, variant: 'default' | 'secondary' }> = {
@@ -58,8 +45,6 @@ export interface ICommunityDynamic {
   userUniqueCode?: string
   /** 文章来源网址 */
   sourceUrl?: string
-  /** 审核状态:0=待审核,1=审核拒绝,2=审核通过 */
-  auditStatus?: DynamicAuditStatus
   /** 启用状态:1=启用,2=禁用 */
   isEnable?: DynamicEnableStatus
   /** 合伙人标识(后端填充) */
@@ -100,8 +85,6 @@ export interface ICommunityDynamicAddDTO {
   userUniqueCode?: string
   /** 文章来源网址 */
   sourceUrl?: string
-  /** 审核状态:0=待审核,1=审核拒绝,2=审核通过 */
-  auditStatus?: DynamicAuditStatus
   /** 启用状态:1=启用,2=禁用 */
   isEnable?: DynamicEnableStatus
   /** 文章介绍 */

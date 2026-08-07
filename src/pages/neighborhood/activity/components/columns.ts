@@ -7,7 +7,6 @@ import type { INeighborhoodActivity } from '@/services/api/neighborhood-activity
 import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 import {
-  activityAuditStatusConfig,
   activityEnableStatusConfig,
 } from '@/services/api/neighborhood-activity.api'
 
@@ -61,23 +60,6 @@ export const columns: ColumnDef<INeighborhoodActivity>[] = [
     header: ({ column }) => h(DataTableColumnHeader<INeighborhoodActivity>, { column, title: '结束时间' }),
     meta: { title: '结束时间' },
     cell: ({ row }) => h('div', { class: 'text-sm text-muted-foreground tabular-nums' }, row.getValue('endTime') || '-'),
-    enableSorting: false,
-    enableHiding: true,
-    enableResizing: true,
-  },
-  {
-    accessorKey: 'status',
-    header: ({ column }) => h(DataTableColumnHeader<INeighborhoodActivity>, { column, title: '审核状态' }),
-    meta: { title: '审核状态' },
-    cell: ({ row }) => {
-      const status = row.original.status
-      if (status === undefined || status === null)
-        return h('div', { class: 'text-sm text-muted-foreground' }, '-')
-      const config = activityAuditStatusConfig[status]
-      if (!config)
-        return null
-      return h(Badge, { variant: config.variant }, () => config.label)
-    },
     enableSorting: false,
     enableHiding: true,
     enableResizing: true,

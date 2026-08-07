@@ -8,17 +8,8 @@ import type { IPageParam, IPageResult, IResponse } from '../types/response.type'
 
 /** 内容类型:1=文本,2=链接 */
 export type DynamicContentType = 1 | 2
-/** 审核状态:0=待审核,1=通过,2=未通过 */
-export type DynamicAuditStatus = 0 | 1 | 2
 /** 启用状态:1=启用,2=禁用 */
 export type DynamicEnableStatus = 1 | 2
-
-/** 审核状态映射配置 */
-export const dynamicAuditStatusConfig: Record<DynamicAuditStatus, { label: string, variant: 'warning' | 'success' | 'destructive' }> = {
-  0: { label: '待审核', variant: 'warning' },
-  1: { label: '通过', variant: 'success' },
-  2: { label: '未通过', variant: 'destructive' },
-}
 
 /** 启用状态映射配置 */
 export const dynamicEnableStatusConfig: Record<DynamicEnableStatus, { label: string, variant: 'default' | 'secondary' }> = {
@@ -62,8 +53,6 @@ export interface INeighborhoodDynamic {
   keywords?: string
   /** 作者 */
   authorName?: string
-  /** 审核状态:0=待审核,1=通过,2=未通过 */
-  status?: DynamicAuditStatus
   /** 排序 */
   torder?: number
   /** 1=启用,2=禁用 */
@@ -94,8 +83,6 @@ export interface INeighborhoodDynamicAddDTO {
   keywords?: string
   /** 作者 */
   authorName?: string
-  /** 审核状态 */
-  status?: DynamicAuditStatus
   /** 排序 */
   torder?: number
   /** 启用状态 */

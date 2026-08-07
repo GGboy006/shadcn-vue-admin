@@ -7,7 +7,6 @@ import type { INeighborhoodDynamic } from '@/services/api/neighborhood-dynamic.a
 import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 import {
-  dynamicAuditStatusConfig,
   dynamicContentTypeConfig,
   dynamicEnableStatusConfig,
 } from '@/services/api/neighborhood-dynamic.api'
@@ -70,23 +69,6 @@ export const columns: ColumnDef<INeighborhoodDynamic>[] = [
     header: ({ column }) => h(DataTableColumnHeader<INeighborhoodDynamic>, { column, title: '作者' }),
     meta: { title: '作者' },
     cell: ({ row }) => h('div', { class: 'text-sm text-muted-foreground' }, row.getValue('authorName') || '-'),
-    enableSorting: false,
-    enableHiding: true,
-    enableResizing: true,
-  },
-  {
-    accessorKey: 'status',
-    header: ({ column }) => h(DataTableColumnHeader<INeighborhoodDynamic>, { column, title: '审核状态' }),
-    meta: { title: '审核状态' },
-    cell: ({ row }) => {
-      const status = row.original.status
-      if (status === undefined || status === null)
-        return h('div', { class: 'text-sm text-muted-foreground' }, '-')
-      const config = dynamicAuditStatusConfig[status]
-      if (!config)
-        return null
-      return h(Badge, { variant: config.variant }, () => config.label)
-    },
     enableSorting: false,
     enableHiding: true,
     enableResizing: true,

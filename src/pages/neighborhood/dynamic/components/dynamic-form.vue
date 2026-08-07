@@ -32,12 +32,6 @@ const contentTypeList = [
   { value: 2, label: '链接' },
 ] as const
 
-const auditStatusList = [
-  { value: 0, label: '待审核' },
-  { value: 1, label: '通过' },
-  { value: 2, label: '未通过' },
-] as const
-
 const enableList = [
   { value: 1, label: '启用' },
   { value: 2, label: '禁用' },
@@ -56,7 +50,6 @@ const initialValues = reactive<DynamicValidator>({
   sourceUrl: dynamic?.sourceUrl || '',
   keywords: dynamic?.keywords || '',
   authorName: dynamic?.authorName || '',
-  status: dynamic?.status ?? 0,
   torder: dynamic?.torder ?? undefined,
   isEnable: dynamic?.isEnable ?? 1,
 })
@@ -106,7 +99,6 @@ function buildPayload(values: DynamicValidator): INeighborhoodDynamicAddDTO | IN
     sourceUrl: isLinkType ? (values.sourceUrl || undefined) : undefined,
     keywords: values.keywords || undefined,
     authorName: values.authorName || undefined,
-    status: values.status as 0 | 1 | 2 | undefined,
     torder: values.torder ?? undefined,
     isEnable: values.isEnable as 1 | 2 | undefined,
   }
@@ -278,29 +270,8 @@ const onSubmit = handleSubmit((values) => {
       </FormItem>
     </FormField>
 
-    <!-- 审核状态 + 排序 + 启用状态 -->
-    <div class="grid grid-cols-3 gap-4">
-      <FormField v-slot="{ componentField }" name="status">
-        <FormItem>
-          <FormLabel>审核状态</FormLabel>
-          <Select v-bind="componentField">
-            <FormControl>
-              <SelectTrigger class="w-full">
-                <SelectValue placeholder="选择" />
-              </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem v-for="s in auditStatusList" :key="s.value" :value="s.value">
-                  {{ s.label }}
-                </SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
+    <!-- 排序 + 启用状态 -->
+    <div class="grid grid-cols-2 gap-4">
       <FormField v-slot="{ componentField }" name="torder">
         <FormItem>
           <FormLabel>排序</FormLabel>
