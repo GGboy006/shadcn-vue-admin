@@ -61,7 +61,5 @@ const sidebarTitle = computed(() => {
     <UiSidebarFooter>
       <NavFooter />
     </UiSidebarFooter>
-
-    <UiSidebarRail />
   </UiSidebar>
 </template>

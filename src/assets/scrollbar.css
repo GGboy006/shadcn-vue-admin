@@ -27,3 +27,16 @@
 ::-webkit-scrollbar-thumb:hover {
   background: color-mix(in oklch, var(--border) 70%, var(--foreground));
 }
+
+/* 侧边栏导航菜单:默认隐藏滚动条,鼠标悬浮进入区域才显示。
+   scrollbar-color 现代 Chrome(121+)与 Firefox 均支持,作为显隐主方案。
+   不过渡:transparent 到有色会经黑色插值闪黑,直接切换更稳。 */
+[data-slot='sidebar-content'],
+[data-sidebar='content'] {
+  scrollbar-color: transparent transparent;
+}
+
+[data-slot='sidebar-content']:hover,
+[data-sidebar='content']:hover {
+  scrollbar-color: var(--border) transparent;
+}
