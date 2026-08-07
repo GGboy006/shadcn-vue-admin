@@ -96,6 +96,11 @@ export function useEmployeeChatStream(
 
   watch(() => chatId.value, (newChatId, oldChatId) => {
     if (newChatId && newChatId !== oldChatId) {
+      // 只有真正切换会话时才清空消息；
+      // 首次创建会话（oldChatId 为 null/undefined）时不清空，避免刚发送的消息被清掉
+      if (oldChatId) {
+        messages.value = []
+      }
       messageListQuery.value = {
         chatId: newChatId,
         pageNum: 1,
@@ -303,6 +308,17 @@ export function useEmployeeChatStream(
     if (eventName === '[DONE]') {
       isStreaming.value = false
       isReasoning.value = false
+      // 把当前 assistant 消息的 contentId 同步给前一条 user 消息
+      // 续聊时后端需要每条历史消息带 contentId,否则 500
+      const lastAssistantIndex = messages.value.length - 1
+      const lastUserIndex = messages.value.length - 2
+      if (
+        lastUserIndex >= 0
+        && messages.value[lastAssistantIndex]?.contentId
+        && messages.value[lastUserIndex]?.role === 'user'
+      ) {
+        messages.value[lastUserIndex].contentId = messages.value[lastAssistantIndex].contentId
+      }
       // 仅在还没有 chatId 时从 [DONE] 的 content 中解析，避免精度丢失
       if (!chatId.value && data.content) {
         try {
@@ -327,12 +343,28 @@ export function useEmployeeChatStream(
       return
     }
 
+    // [PARAGRAPH_END] 段落结束，忽略
+    if (eventName === '[PARAGRAPH_END]') {
+      return
+    }
+
+    // [CHAT_MESSAGE] 元数据事件，不显示
+    if (eventName === '[CHAT_MESSAGE]') {
+      return
+    }
+
     // [REASONING] 推理中
     if (eventName === '[REASONING]') {
       isReasoning.value = true
       if (data.reasoningContent) {
         reasoningContent.value += data.reasoningContent
       }
+      return
+    }
+
+    // [REASONING_END] 推理结束
+    if (eventName === '[REASONING_END]') {
+      isReasoning.value = false
     }
   }
 
