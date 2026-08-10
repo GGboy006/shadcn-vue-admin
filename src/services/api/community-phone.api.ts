@@ -29,12 +29,6 @@ export interface ICommunityPhoneListQuery extends IPageParam {
   keyword?: string
 }
 
-/** 父级列表查询参数(对接文档 7 节,`/community/phone/parentList?keyword=`) */
-export interface ICommunityPhoneParentListQuery {
-  /** 关键词 */
-  keyword?: string
-}
-
 /** 社区电话 VO(对接文档 7 节 TblCommunityPhoneResp) */
 export interface ICommunityPhone {
   /** 唯一标识 */
@@ -101,8 +95,6 @@ export interface ICommunityPhoneSaveDTO {
 
 /** 分页列表响应 */
 export type ICommunityPhoneListResponse = IResponse<IPageResult<ICommunityPhone>>
-/** 父级列表响应(下拉用) */
-export type ICommunityPhoneParentListResponse = IResponse<ICommunityPhone[]>
 
 // ==================== API 封装 ====================
 
@@ -113,20 +105,6 @@ export function useGetPhonePageQuery(query: Ref<ICommunityPhoneListQuery>) {
   return useQuery<ICommunityPhoneListResponse, Error>({
     queryKey: ['communityPhoneList', query],
     queryFn: async () => await apiFetch<ICommunityPhoneListResponse>('/community/phone/page', {
-      method: 'get',
-      query: query.value,
-    }),
-    retry: false,
-  })
-}
-
-/** 获取社区电话父级列表(下拉用,对接文档 7 节,`/community/phone/parentList`) */
-export function useGetPhoneParentListQuery(query: Ref<ICommunityPhoneParentListQuery>) {
-  const { apiFetch } = useApiFetch()
-
-  return useQuery<ICommunityPhoneParentListResponse, Error>({
-    queryKey: ['communityPhoneParentList', query],
-    queryFn: async () => await apiFetch<ICommunityPhoneParentListResponse>('/community/phone/parentList', {
       method: 'get',
       query: query.value,
     }),
@@ -147,7 +125,6 @@ export function useCreatePhoneMutation() {
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['communityPhoneList'] })
-      queryClient.invalidateQueries({ queryKey: ['communityPhoneParentList'] })
     },
   })
 }
@@ -165,7 +142,6 @@ export function useUpdatePhoneMutation() {
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['communityPhoneList'] })
-      queryClient.invalidateQueries({ queryKey: ['communityPhoneParentList'] })
     },
   })
 }
@@ -182,7 +158,6 @@ export function useDeletePhoneMutation() {
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['communityPhoneList'] })
-      queryClient.invalidateQueries({ queryKey: ['communityPhoneParentList'] })
     },
   })
 }
