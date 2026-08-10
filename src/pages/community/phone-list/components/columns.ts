@@ -5,6 +5,7 @@ import { h } from 'vue'
 import type { ICommunityPhone } from '@/services/api/community-phone.api'
 
 import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { Copy } from '@/components/prop-ui/copy'
 import Badge from '@/components/ui/badge/Badge.vue'
 import {
   communityPhoneEnableStatusConfig,
@@ -87,7 +88,21 @@ export const columns: ColumnDef<ICommunityPhone>[] = [
     accessorKey: 'contactPhone',
     header: ({ column }) => h(DataTableColumnHeader<ICommunityPhone>, { column, title: '联系电话' }),
     meta: { title: '联系电话' },
-    cell: ({ row }) => h('div', { class: 'text-sm text-muted-foreground' }, row.original.contactPhone || '-'),
+    cell: ({ row }) => {
+      const phone = row.original.contactPhone
+      if (!phone)
+        return h('div', { class: 'text-sm text-muted-foreground' }, '-')
+      return h('div', { class: 'flex items-center gap-1' }, [
+        h('span', { class: 'text-sm text-muted-foreground' }, phone),
+        h(Copy, {
+          content: phone,
+          size: 'sm',
+          variant: 'ghost',
+          copyTooltipText: '复制手机号',
+          copiedTooltipText: '已复制',
+        }),
+      ])
+    },
     enableSorting: false,
     enableHiding: true,
     enableResizing: true,

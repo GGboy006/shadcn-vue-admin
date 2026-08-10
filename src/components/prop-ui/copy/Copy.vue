@@ -68,5 +68,5 @@ const { copy, copied, isSupported } = useClipboard({ source })
       </Tooltip>
     </TooltipProvider>
   </span>
-  <span v-else>Your browser does not support Clipboard API</span>
+  <span v-else>您的浏览器不支持剪贴板 API</span>
 </template>
