@@ -156,6 +156,20 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/committees/[merchantId]/assign': RouteRecordInfo<
+      '/committees/[merchantId]/assign',
+      '/committees/:merchantId/assign',
+      { merchantId: ParamValue<true> },
+      { merchantId: ParamValue<false> },
+      | never
+    >,
+    '/community/ai-tool/': RouteRecordInfo<
+      '/community/ai-tool/',
+      '/community/ai-tool',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/community/announcement/': RouteRecordInfo<
       '/community/announcement/',
       '/community/announcement',
@@ -208,6 +222,13 @@ declare module 'vue-router/auto-routes' {
     '/community/phone-list/': RouteRecordInfo<
       '/community/phone-list/',
       '/community/phone-list',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/community/resident/': RouteRecordInfo<
+      '/community/resident/',
+      '/community/resident',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -511,6 +532,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/properties/[merchantId]/assign': RouteRecordInfo<
+      '/properties/[merchantId]/assign',
+      '/properties/:merchantId/assign',
+      { merchantId: ParamValue<true> },
+      { merchantId: ParamValue<false> },
+      | never
+    >,
     '/settings/': RouteRecordInfo<
       '/settings/',
       '/settings',
@@ -668,6 +696,18 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
+    'src/pages/committees/[merchantId]/assign.vue': {
+      routes:
+        | '/committees/[merchantId]/assign'
+      views:
+        | never
+    }
+    'src/pages/community/ai-tool/index.vue': {
+      routes:
+        | '/community/ai-tool/'
+      views:
+        | never
+    }
     'src/pages/community/announcement/index.vue': {
       routes:
         | '/community/announcement/'
@@ -713,6 +753,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/community/phone-list/index.vue': {
       routes:
         | '/community/phone-list/'
+      views:
+        | never
+    }
+    'src/pages/community/resident/index.vue': {
+      routes:
+        | '/community/resident/'
       views:
         | never
     }
@@ -971,6 +1017,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/properties/index.vue': {
       routes:
         | '/properties/'
+      views:
+        | never
+    }
+    'src/pages/properties/[merchantId]/assign.vue': {
+      routes:
+        | '/properties/[merchantId]/assign'
       views:
         | never
     }
