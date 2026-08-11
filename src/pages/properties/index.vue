@@ -11,10 +11,10 @@ import type { IMerchantListQuery } from '@/services/api/merchant.api'
 import { BasicPage } from '@/components/global-layout'
 import { useGetMerchantListQuery } from '@/services/api/merchant.api'
 
-import { columns } from '../merchants/components/columns'
 import DataTableToolbar from '../merchants/components/data-table-toolbar.vue'
 import DataTable from '../merchants/components/data-table.vue'
 import MerchantCreate from '../merchants/components/merchant-create.vue'
+import { columns } from './components/columns'
 
 const query = ref<IMerchantListQuery>({
   pageNum: 1,
