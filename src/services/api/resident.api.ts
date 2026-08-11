@@ -37,6 +37,12 @@ export const residentGenderConfig: Record<ResidentGender, { label: string }> = {
   2: { label: '女' },
 }
 
+/** 启用状态映射配置 */
+export const residentEnableStatusConfig: Record<ResidentEnableStatus, { label: string, variant: 'default' | 'secondary' }> = {
+  1: { label: '启用', variant: 'default' },
+  2: { label: '禁用', variant: 'secondary' },
+}
+
 /** 居民分页列表查询参数(对接文档 5.1) */
 export interface IResidentListQuery extends IPageParam {
   /** 昵称/手机/门牌/楼栋 */
