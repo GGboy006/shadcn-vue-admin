@@ -1,4 +1,4 @@
-import { BookmarkIcon, BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, CalendarDaysIcon, CalendarRangeIcon, Columns3Icon, ConciergeBellIcon, FolderTreeIcon, HandHelpingIcon, HeadsetIcon, HelpCircleIcon, HomeIcon, ImageIcon, LandmarkIcon, LayoutDashboardIcon, LayoutGridIcon, LifeBuoyIcon, LightbulbIcon, MegaphoneIcon, MessageSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, SettingsIcon, ShoppingCartIcon, SparklesIcon, StoreIcon, TagIcon, UserIcon, WrenchIcon } from '@lucide/vue'
+import { BookmarkIcon, BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, CalendarDaysIcon, CalendarRangeIcon, Columns3Icon, ConciergeBellIcon, FolderTreeIcon, HandHelpingIcon, HeadsetIcon, HelpCircleIcon, HomeIcon, ImageIcon, LandmarkIcon, LayoutDashboardIcon, LayoutGridIcon, LifeBuoyIcon, LightbulbIcon, MegaphoneIcon, MessageSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, SettingsIcon, ShoppingCartIcon, SparklesIcon, StoreIcon, TagIcon, UserIcon, UsersIcon, WrenchIcon } from '@lucide/vue'
 
 import type { NavGroup, NavItem } from '@/components/app-sidebar/types'
 
@@ -59,6 +59,19 @@ export function useSidebar() {
         { title: '小区栏目', url: '/community/column', icon: Columns3Icon, roles: [3] },
         { title: '小区分类', url: '/community/cate', icon: FolderTreeIcon, roles: [3] },
         { title: '小区服务', url: '/community/service', icon: LifeBuoyIcon, roles: [3] },
+      ],
+    },
+  ]
+
+  /** 居民管理菜单项;roles:[3] 为站长专属,仅站长可见 */
+  const residentNavItems: NavItem[] = [
+    {
+      title: '居民管理',
+      icon: UsersIcon,
+      roles: [3],
+      items: [
+        { title: '居民管理', url: '/community/resident', icon: UserIcon, roles: [3] },
+        { title: '居民AI工具', url: '/community/ai-tool', icon: BotIcon, roles: [3] },
       ],
     },
   ]
@@ -158,6 +171,10 @@ export function useSidebar() {
     {
       title: '小区服务',
       items: filterNavItemsByRoles(communityServiceNavItems, userType.value),
+    },
+    {
+      title: '居民管理',
+      items: filterNavItemsByRoles(residentNavItems, userType.value),
     },
     {
       title: '其他',
