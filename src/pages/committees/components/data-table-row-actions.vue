@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
 
-import { PencilIcon, StoreIcon, Trash2Icon } from '@lucide/vue'
+import { BotIcon, PencilIcon, StoreIcon, Trash2Icon } from '@lucide/vue'
 
 import { DataTableRowActions } from '@/components/data-table'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
@@ -20,8 +20,11 @@ const committee = computed(() => props.row.original)
 const isEditOpen = ref(false)
 const isDeleteOpen = ref(false)
 
+const router = useRouter()
+
 const items = [
   { key: 'edit', label: '编辑', icon: PencilIcon },
+  { key: 'assign', label: '分配AI工具', icon: BotIcon },
   { key: 'enter', label: '进入居委会后台', icon: StoreIcon },
   { key: 'delete', label: '删除', icon: Trash2Icon, variant: 'destructive' as const },
 ]
@@ -32,9 +35,17 @@ function handleEnterBusiness() {
   enterMerchantBusiness(committee.value.merchantId, committee.value.merchantName)
 }
 
+// 分配AI工具:跳转居委会专属路由(复用商户分配页组件),
+// 独立路径避免侧边栏误高亮「商户管理」(前缀匹配 /merchants)。
+function handleAssign() {
+  router.push(`/committees/${committee.value.merchantId}/assign`)
+}
+
 function handleAction(key: string) {
   if (key === 'edit')
     isEditOpen.value = true
+  else if (key === 'assign')
+    handleAssign()
   else if (key === 'enter')
     handleEnterBusiness()
   else if (key === 'delete')
