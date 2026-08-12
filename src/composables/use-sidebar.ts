@@ -49,6 +49,7 @@ export function useSidebar() {
     { title: '小区公告', url: '/community/announcement', icon: MegaphoneIcon, roles: [3] },
     { title: '办事指南', url: '/community/guide', icon: BookOpenIcon, roles: [3] },
     { title: '便民服务', url: '/community/convenience', icon: HandHelpingIcon, roles: [3] },
+    { title: '意见反馈', url: '/community/feedback', icon: MessageSquareIcon, roles: [3] },
     { title: '知识服务', url: '/community/knowledge', icon: LightbulbIcon, roles: [3] },
     { title: '管家服务', url: '/community/steward', icon: ConciergeBellIcon, roles: [3] },
     {
