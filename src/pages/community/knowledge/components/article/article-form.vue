@@ -91,10 +91,10 @@ async function handleCoverUpload(event: Event) {
   }
 }
 
-function buildPayload(values: ArticleValidator): IKnowledgeArticleSaveDTO {
+function buildPayload(values: ArticleValidator, categoryId: number): IKnowledgeArticleSaveDTO {
   return {
     articleId: isEdit.value ? article?.articleId : undefined,
-    categoryId: (values.categoryId as number | undefined) ?? lockCategoryId,
+    categoryId,
     title: values.title,
     content: values.content,
     summary: values.summary || undefined,
@@ -107,7 +107,14 @@ function buildPayload(values: ArticleValidator): IKnowledgeArticleSaveDTO {
 }
 
 const onSubmit = handleSubmit((values) => {
-  const payload = buildPayload(values)
+  // 分类为必填(模板已标 required),但 optionalNumber 允许 undefined,此处显式兜底
+  const categoryId = values.categoryId ?? lockCategoryId
+  if (categoryId === undefined) {
+    toast.error('请选择分类')
+    return
+  }
+
+  const payload = buildPayload(values, categoryId)
 
   if (isEdit.value && article) {
     updateMutate(payload, {
