@@ -67,6 +67,7 @@ export function useSidebar() {
   /** 居民管理菜单项;roles:[3] 为站长专属,仅站长可见 */
   const residentNavItems: NavItem[] = [
     { title: '居民管理', url: '/community/resident', icon: UsersIcon, roles: [3] },
+    { title: '居民AI工具', url: '/community/ai-tool', icon: BotIcon, roles: [3] },
   ]
 
   /**
