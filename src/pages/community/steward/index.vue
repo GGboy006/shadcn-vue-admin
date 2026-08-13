@@ -6,15 +6,19 @@ meta:
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
 
-import type { IHousekeeperCategoryListQuery } from '@/services/api/housekeeper.api'
+import type { IHousekeeperCategoryListQuery, IHousekeeperServiceListQuery } from '@/services/api/housekeeper.api'
 
 import { BasicPage } from '@/components/global-layout'
-import { useGetHousekeeperCategoryPageQuery } from '@/services/api/housekeeper.api'
+import { useGetHousekeeperCategoryPageQuery, useGetHousekeeperServicePageQuery } from '@/services/api/housekeeper.api'
 
 import CategoryCreate from './components/category/category-create.vue'
 import { columns as categoryColumns } from './components/category/columns'
 import CategoryToolbar from './components/category/data-table-toolbar.vue'
 import CategoryDataTable from './components/category/data-table.vue'
+import { columns as serviceColumns } from './components/service/columns'
+import ServiceToolbar from './components/service/data-table-toolbar.vue'
+import ServiceDataTable from './components/service/data-table.vue'
+import ServiceCreate from './components/service/service-create.vue'
 
 const activeTab = ref<'category' | 'service' | 'staff'>('category')
 
@@ -43,7 +47,7 @@ const categoryServerPagination = computed(() => ({
 }))
 
 const categorySearch = ref('')
-const statusFilter = ref<IHousekeeperCategoryListQuery['status']>(undefined)
+const categoryStatusFilter = ref<IHousekeeperCategoryListQuery['status']>(undefined)
 
 const debouncedCategorySearch = useDebounceFn((val: string) => {
   categoryQuery.value.categoryName = val || undefined
@@ -52,17 +56,64 @@ const debouncedCategorySearch = useDebounceFn((val: string) => {
 
 watch(categorySearch, val => debouncedCategorySearch(val))
 
-watch(statusFilter, (val) => {
+watch(categoryStatusFilter, (val) => {
   categoryQuery.value.status = val
   categoryQuery.value.pageNum = 1
 })
 
 function handleCategoryReset() {
   categorySearch.value = ''
-  statusFilter.value = undefined
+  categoryStatusFilter.value = undefined
   categoryQuery.value.categoryName = undefined
   categoryQuery.value.status = undefined
   categoryQuery.value.pageNum = 1
+}
+
+/* ---------------- 服务主体 §4.1 ---------------- */
+const serviceQuery = ref<IHousekeeperServiceListQuery>({
+  pageNum: 1,
+  pageSize: 10,
+})
+
+const { data: serviceData, isLoading: isServiceLoading } = useGetHousekeeperServicePageQuery(serviceQuery)
+
+const serviceList = computed(() => serviceData.value?.data?.list ?? [])
+const serviceTotal = computed(() => serviceData.value?.data?.total ?? 0)
+
+const serviceServerPagination = computed(() => ({
+  page: serviceQuery.value.pageNum,
+  pageSize: serviceQuery.value.pageSize,
+  total: serviceTotal.value,
+  onPageChange: (page: number) => {
+    serviceQuery.value.pageNum = page
+  },
+  onPageSizeChange: (pageSize: number) => {
+    serviceQuery.value.pageSize = pageSize
+    serviceQuery.value.pageNum = 1
+  },
+}))
+
+const serviceSearch = ref('')
+const serviceStatusFilter = ref<IHousekeeperServiceListQuery['status']>(undefined)
+
+const debouncedServiceSearch = useDebounceFn((val: string) => {
+  serviceQuery.value.name = val || undefined
+  serviceQuery.value.pageNum = 1
+}, 300)
+
+watch(serviceSearch, val => debouncedServiceSearch(val))
+
+watch(serviceStatusFilter, (val) => {
+  serviceQuery.value.status = val
+  serviceQuery.value.pageNum = 1
+})
+
+function handleServiceReset() {
+  serviceSearch.value = ''
+  serviceStatusFilter.value = undefined
+  serviceQuery.value.name = undefined
+  serviceQuery.value.status = undefined
+  serviceQuery.value.pageNum = 1
 }
 </script>
 
@@ -74,6 +125,7 @@ function handleCategoryReset() {
   >
     <template #actions>
       <CategoryCreate v-if="activeTab === 'category'" />
+      <ServiceCreate v-else-if="activeTab === 'service'" />
     </template>
 
     <UiTabs v-model="activeTab" default-value="category">
@@ -101,20 +153,34 @@ function handleCategoryReset() {
             <CategoryToolbar
               :table="table"
               :search="categorySearch"
-              :status-filter="statusFilter"
+              :status-filter="categoryStatusFilter"
               @update:search="categorySearch = $event"
-              @update:status-filter="statusFilter = $event"
+              @update:status-filter="categoryStatusFilter = $event"
               @reset="handleCategoryReset"
             />
           </template>
         </CategoryDataTable>
       </UiTabsContent>
 
-      <!-- 服务主体 §4.1(批次 2) -->
+      <!-- 服务主体 §4.1 -->
       <UiTabsContent value="service" class="mt-4">
-        <div class="py-10 text-center text-sm text-muted-foreground">
-          服务主体管理开发中
-        </div>
+        <ServiceDataTable
+          :loading="isServiceLoading"
+          :data="serviceList"
+          :columns="serviceColumns"
+          :server-pagination="serviceServerPagination"
+        >
+          <template #toolbar="{ table }">
+            <ServiceToolbar
+              :table="table"
+              :search="serviceSearch"
+              :status-filter="serviceStatusFilter"
+              @update:search="serviceSearch = $event"
+              @update:status-filter="serviceStatusFilter = $event"
+              @reset="handleServiceReset"
+            />
+          </template>
+        </ServiceDataTable>
       </UiTabsContent>
 
       <!-- 服务人员 §4.2(批次 3) -->
