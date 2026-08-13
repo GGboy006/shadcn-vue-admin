@@ -35,7 +35,7 @@ function createMessage(partial: Partial<IChatMessage>): IChatMessage {
     attachments: [],
     createTime: new Date().toISOString(),
     reasoningSegments: [],
-    imageGenerationId: 0,
+    imageGenerationId: '',
     steps: null,
     contentId: undefined,
     ...partial,

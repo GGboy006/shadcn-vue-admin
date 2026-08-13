@@ -109,7 +109,7 @@ export function useChatStream(
       attachments: [],
       createTime: new Date().toISOString(),
       reasoningSegments: [],
-      imageGenerationId: 0,
+      imageGenerationId: '',
       steps: null,
       contentId: undefined,
     }
@@ -127,7 +127,7 @@ export function useChatStream(
       attachments: [],
       createTime: new Date().toISOString(),
       reasoningSegments: [],
-      imageGenerationId: 0,
+      imageGenerationId: '',
       steps: null,
       contentId: undefined,
     })
@@ -144,9 +144,9 @@ export function useChatStream(
         })
 
         if (result.code === 0 && result.data) {
-          // URL 已传入字符串 chatId 时优先保留，避免后端 number 精度丢失导致会话切换
+          // chatId 为雪花 Long,全程按字符串处理;URL 已传入时优先保留
           if (!chatId.value) {
-            chatId.value = String(result.data.chatId)
+            chatId.value = result.data.chatId
           }
           conversationId.value = result.data.conversationId
         }

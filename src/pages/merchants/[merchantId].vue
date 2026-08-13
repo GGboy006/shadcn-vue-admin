@@ -57,12 +57,12 @@ const { data: skillData, isLoading: isSkillLoading } = useGetMerchantSkillListQu
 const skillList = computed(() => skillData.value?.data?.list ?? [])
 
 // ==================== 选中状态管理 ====================
-const selectedSkillIds = ref<Set<number>>(new Set())
+const selectedSkillIds = ref<Set<string>>(new Set())
 
 // 根据接口返回的 checked 初始化选中状态
 watch(skillList, (list) => {
   if (list.length > 0) {
-    const checkedIds = new Set<number>()
+    const checkedIds = new Set<string>()
     for (const skill of list) {
       if (skill.checked) {
         checkedIds.add(skill.skillId)
@@ -118,7 +118,7 @@ const inputTypeIconMap: Record<number, any> = {
 }
 
 /** 图片加载失败时,标记该 skill 用 fallback 图标 */
-const iconFallback = ref<Set<number>>(new Set())
+const iconFallback = ref<Set<string>>(new Set())
 
 function getSkillFallbackIcon(skill: IAssignSkill) {
   return inputTypeIconMap[skill.inputType] || LayersIcon

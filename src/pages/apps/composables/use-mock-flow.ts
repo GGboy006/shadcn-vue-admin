@@ -7,7 +7,7 @@ const MOCK_FLOW_RESPONSE: { code: number, message: string, data: IFlowCompletion
   data: {
     chatId: '2062472013157679000',
     aiContent: '请根据以下信息生成宣传图片：\n\n请根据以下信息生成内容：\n\n【营销场景】\n营销场景：促销活动（满减/折扣/会员日/充值送）\n\n【展示内容】\n选择菜品：红烧牛肉面（¥30 · 红烧牛肉面，图片地址：https://citymedia.oss-cn-wulanchabu.aliyuncs.com/digital_cms_image/20260403/1775200054364.png）\n促销信息：满50减20（一次消费50减20元）\n时间信息：立即开始\n\n【视觉风格】\n视觉风格：高端黑金风（适合高端菜品，图片地址：https://citymedia.oss-cn-wulanchabu.aliyuncs.com/residential-station-manager/artificial/pre-built/black-gold.jpg）\n\n【生成海报】\n\n\n请使用以下素材图片作为参考：\n素材1图片地址：https://citymedia.oss-cn-wulanchabu.aliyuncs.com/digital_cms_image/20260403/1775200054364.png\n素材2图片地址：https://citymedia.oss-cn-wulanchabu.aliyuncs.com/residential-station-manager/artificial/pre-built/black-gold.jpg\n',
-    imageGenerationId: 11,
+    imageGenerationId: '11',
     imageStatus: 0,
     userMessageId: '6a214a5d2afd6546999d3ed8',
     aiMessageId: '6a214a5d2afd6546999d3ed9',

@@ -64,10 +64,10 @@ function getInitials(name: string) {
 
 // ==================== 图片生成 ====================
 
-const imageGenerationMap = new Map<number, ReturnType<typeof useGetImageGenerationQuery>>()
+const imageGenerationMap = new Map<string, ReturnType<typeof useGetImageGenerationQuery>>()
 
-function getImageGenerationQuery(imageGenerationId: number | undefined) {
-  if (!imageGenerationId || imageGenerationId <= 0)
+function getImageGenerationQuery(imageGenerationId: string | undefined) {
+  if (!imageGenerationId)
     return null
   if (!imageGenerationMap.has(imageGenerationId)) {
     const idRef = ref(imageGenerationId)
@@ -90,7 +90,7 @@ function parseAspectRatio(size: string | undefined): number {
   return 9 / 16
 }
 
-function getImageStatus(imageGenerationId: number | undefined): {
+function getImageStatus(imageGenerationId: string | undefined): {
   imageUrl: string | undefined
   status: 0 | 1 | 2 | undefined
   isLoading: boolean

@@ -186,8 +186,8 @@ export interface IChatMessage {
   createTime: string
   /** 分段思考内容列表 */
   reasoningSegments: IReasoningSegment[]
-  /** 关联的图片生成记录ID */
-  imageGenerationId: number
+  /** 关联的图片生成记录ID(雪花 Long,按字符串处理) */
+  imageGenerationId: string
   /** 流程步骤数据（用户选择记录） */
   steps: IWizardStepForm[] | null
   /** 流式对话消息ID：用于关联同一轮对话的 user 和 assistant 消息 */
@@ -296,7 +296,7 @@ export function useGetConversationDetailQuery(chatId: Ref<string>, enabled?: Ref
 }
 
 /** 获取图片生成结果（速创平台） */
-export function useGetImageGenerationQuery(imageGenerationId: Ref<number | undefined>) {
+export function useGetImageGenerationQuery(imageGenerationId: Ref<string | undefined>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IImageGenerationResponse, Error>({
@@ -304,7 +304,7 @@ export function useGetImageGenerationQuery(imageGenerationId: Ref<number | undef
     queryFn: async () => await apiFetch<IImageGenerationResponse>(`/aiImage/quicklyCreate/${imageGenerationId.value}`, {
       method: 'get',
     }),
-    enabled: computed(() => !!imageGenerationId.value && imageGenerationId.value > 0),
+    enabled: computed(() => !!imageGenerationId.value),
     retry: false,
     refetchInterval: (query) => {
       const data = query.state.data
@@ -321,7 +321,7 @@ export function useGetImageGenerationQuery(imageGenerationId: Ref<number | undef
 export function convertStreamMessagesToChatMessages(history: IStreamChatMessage[]): IChatMessage[] {
   return history.map(msg => ({
     id: `${msg.chatId}-${msg.createTime}`,
-    chatId: String(msg.chatId),
+    chatId: msg.chatId,
     role: msg.role === 'user' ? 'user' : 'assistant',
     content: msg.content || msg.showContent || '',
     finalContent: msg.showContent || msg.content || '',
@@ -331,7 +331,7 @@ export function convertStreamMessagesToChatMessages(history: IStreamChatMessage[
     reasoningSegments: msg.reasoningContent
       ? [{ messageId: `${msg.chatId}-${msg.createTime}`, content: msg.reasoningContent, duration: msg.reasoningDuration }]
       : [],
-    imageGenerationId: 0,
+    imageGenerationId: '',
     steps: null,
     contentId: msg.contentId ? String(msg.contentId) : undefined,
   }))

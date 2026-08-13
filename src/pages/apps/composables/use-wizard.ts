@@ -135,7 +135,7 @@ export function useWizard(skillId: Ref<string>) {
   // AI 生成状态
   const chatId = ref<string | null>(null)
   const isGenerating = ref(false)
-  const generationId = ref<number | null>(null)
+  const generationId = ref<string | null>(null)
   const generatedImageUrl = ref<string | null>(null)
   const generationStatus = ref<0 | 1 | 2 | null>(null)
   const generationError = ref<string | null>(null)
@@ -537,7 +537,8 @@ export function useWizard(skillId: Ref<string>) {
         aiContent.value = result.data.aiContent
 
         // 后端已启动图片生成，保存任务ID用于轮询
-        if (result.data.imageGenerationId > 0) {
+        // imageGenerationId 为字符串,'0'/'' 均表示未启动生成
+        if (result.data.imageGenerationId && result.data.imageGenerationId !== '0') {
           generationId.value = result.data.imageGenerationId
         }
 

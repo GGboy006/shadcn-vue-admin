@@ -6,10 +6,10 @@ export type SkillFlowInputType = 1 | 2 | 3 | 4 | 5
 
 /** AI技能流程节点详情 */
 export interface ISkillFlow {
-  /** 流程节点ID */
-  flowId: number
-  /** 所属技能ID */
-  skillId: number
+  /** 流程节点ID(雪花 Long,按字符串处理) */
+  flowId: string
+  /** 所属技能ID(雪花 Long,按字符串处理) */
+  skillId: string
   /** 步骤编码（唯一标识） */
   stepCode: string
   /** 步骤名称 */
@@ -91,8 +91,8 @@ export interface IBranchRule {
 
 /** 技能详情（含流程节点） */
 export interface ISkillDetail {
-  /** 技能ID */
-  skillId: number
+  /** 技能ID(雪花 Long,按字符串处理) */
+  skillId: string
   /** 技能名称 */
   name: string
   /** 技能图标URL */
@@ -202,8 +202,8 @@ export interface IFlowCompletionVO {
   chatId: string
   /** AI文本回复内容 */
   aiContent: string
-  /** 图片生成记录ID */
-  imageGenerationId: number
+  /** 图片生成记录ID(雪花 Long,按字符串处理) */
+  imageGenerationId: string
   /** 图片生成状态：0-生成中 1-成功 2-失败 */
   imageStatus: 0 | 1 | 2
   /** 用户消息ID */
@@ -264,7 +264,7 @@ export interface IWizardState {
   userChoices: Record<string, any>
   chatId: string | null
   isGenerating: boolean
-  generationId: number | null
+  generationId: string | null
   generatedImageUrl: string | null
   generationStatus: 0 | 1 | 2 | null
   generationError: string | null

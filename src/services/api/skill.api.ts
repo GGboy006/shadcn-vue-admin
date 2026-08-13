@@ -71,8 +71,8 @@ export const skillAssignStatusConfig: Record<SkillAssignStatus, { label: string,
 
 /** 技能 VO */
 export interface ISkill {
-  /** 技能ID */
-  skillId: number
+  /** 技能ID(雪花 Long,按字符串处理) */
+  skillId: string
   /** 技能名称 */
   name: string
   /** 技能图标URL */
@@ -101,8 +101,8 @@ export interface IAssignSkill extends ISkill {
 
 /** 商户列表 VO（站长查询已分配技能的商户） */
 export interface ISkillMerchantVO {
-  /** 商户ID */
-  merchantId: number
+  /** 商户ID(雪花 Long,按字符串处理) */
+  merchantId: string
   /** 昵称 */
   nickname: string
   /** 手机号 */
@@ -113,8 +113,8 @@ export interface ISkillMerchantVO {
   merchantName: string
   /** Logo */
   logo: string
-  /** 所属小区站长用户ID */
-  stationUserId: number
+  /** 所属小区站长用户ID(雪花 Long,按字符串处理) */
+  stationUserId: string
   /** 类型：4=商户，5=物业，6=居委会 */
   type: number
   /** 联系人 */
@@ -173,8 +173,8 @@ export interface IMerchantSkillListQuery {
 export interface ISkillAssignMerchantDTO {
   /** 被分配商户ID */
   merchantId: string
-  /** 技能ID集合 */
-  skillIds: number[]
+  /** 技能ID集合(雪花 Long,按字符串处理) */
+  skillIds: string[]
 }
 
 /** 技能列表响应 */
@@ -265,7 +265,7 @@ export function useCreateImageGenerationMutation() {
 
 /** 查询速创平台生成结果 */
 export function useGetImageGenerationResultQuery(
-  id: Ref<number | null>,
+  id: Ref<string | null>,
   status?: Ref<0 | 1 | 2 | null>,
 ) {
   const { apiFetch } = useApiFetch()
@@ -349,7 +349,8 @@ export function useFlowCompletionMutation() {
 
 /** 创建会话响应 */
 export interface ICreateConversationResponse {
-  chatId: number
+  /** 会话ID(雪花 Long,按字符串处理) */
+  chatId: string
   type: number
   conversationId: string
 }
@@ -416,7 +417,8 @@ export interface IMessageListQuery {
 
 /** 流式对话消息 */
 export interface IStreamChatMessage {
-  chatId: number
+  /** 会话ID(雪花 Long,按字符串处理) */
+  chatId: string
   role: string
   content: string
   contentType?: string
@@ -425,10 +427,13 @@ export interface IStreamChatMessage {
   reasoningDuration?: number
   keywords?: string
   type: number
-  senderId?: number
-  receiverId?: number
+  /** 发送者ID(雪花 Long,按字符串处理) */
+  senderId?: string
+  /** 接收者ID(雪花 Long,按字符串处理) */
+  receiverId?: string
   createTime: string
-  agentId?: number
+  /** AgentID(雪花 Long,按字符串处理) */
+  agentId?: string
   systemPrompt?: string
   /** 流式消息ID，用于关联同一轮对话 */
   contentId?: string | number
