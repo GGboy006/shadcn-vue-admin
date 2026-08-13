@@ -2,7 +2,7 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
-import { PencilIcon, Trash2Icon } from '@lucide/vue'
+import { PencilIcon, Trash2Icon, UserPlusIcon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
 import type { IHousekeeperCategory } from '@/services/api/housekeeper.api'
@@ -20,6 +20,8 @@ interface DataTableRowActionsProps {
 const props = defineProps<DataTableRowActionsProps>()
 const category = computed(() => props.row.original)
 
+const router = useRouter()
+
 const isEditOpen = ref(false)
 const isDeleteOpen = ref(false)
 const showComponent = shallowRef<Component | null>(null)
@@ -27,6 +29,7 @@ const showComponent = shallowRef<Component | null>(null)
 const { mutate: toggleStatus, isPending: isToggling } = useUpdateHousekeeperCategoryStatusMutation()
 
 const items = computed(() => [
+  { key: 'assign', label: '分配人员', icon: UserPlusIcon },
   { key: 'toggleStatus', label: category.value.status === 1 ? '禁用' : '启用', icon: PencilIcon, disabled: isToggling.value },
   { key: 'edit', label: '编辑', icon: PencilIcon },
   { key: 'delete', label: '删除', icon: Trash2Icon, variant: 'destructive' as const },
@@ -40,8 +43,15 @@ function handleToggleStatus() {
   })
 }
 
+function handleAssign() {
+  router.push(`/community/steward/${category.value.categoryId}`)
+}
+
 function handleAction(key: string) {
-  if (key === 'toggleStatus') {
+  if (key === 'assign') {
+    handleAssign()
+  }
+  else if (key === 'toggleStatus') {
     handleToggleStatus()
   }
   else if (key === 'edit') {
