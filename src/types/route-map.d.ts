@@ -198,6 +198,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/community/feedback/': RouteRecordInfo<
+      '/community/feedback/',
+      '/community/feedback',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/community/guide/': RouteRecordInfo<
       '/community/guide/',
       '/community/guide',
@@ -208,6 +215,20 @@ declare module 'vue-router/auto-routes' {
     '/community/knowledge/': RouteRecordInfo<
       '/community/knowledge/',
       '/community/knowledge',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/community/knowledge/[categoryId]': RouteRecordInfo<
+      '/community/knowledge/[categoryId]',
+      '/community/knowledge/:categoryId',
+      { categoryId: ParamValue<true> },
+      { categoryId: ParamValue<false> },
+      | never
+    >,
+    '/community/knowledge/articles': RouteRecordInfo<
+      '/community/knowledge/articles',
+      '/community/knowledge/articles',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -245,6 +266,13 @@ declare module 'vue-router/auto-routes' {
       '/community/steward',
       Record<never, never>,
       Record<never, never>,
+      | never
+    >,
+    '/community/steward/[categoryId]': RouteRecordInfo<
+      '/community/steward/[categoryId]',
+      '/community/steward/:categoryId',
+      { categoryId: ParamValue<true> },
+      { categoryId: ParamValue<false> },
       | never
     >,
     '/conversations/': RouteRecordInfo<
@@ -732,6 +760,12 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
+    'src/pages/community/feedback/index.vue': {
+      routes:
+        | '/community/feedback/'
+      views:
+        | never
+    }
     'src/pages/community/guide/index.vue': {
       routes:
         | '/community/guide/'
@@ -741,6 +775,18 @@ declare module 'vue-router/auto-routes' {
     'src/pages/community/knowledge/index.vue': {
       routes:
         | '/community/knowledge/'
+      views:
+        | never
+    }
+    'src/pages/community/knowledge/[categoryId].vue': {
+      routes:
+        | '/community/knowledge/[categoryId]'
+      views:
+        | never
+    }
+    'src/pages/community/knowledge/articles.vue': {
+      routes:
+        | '/community/knowledge/articles'
       views:
         | never
     }
@@ -771,6 +817,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/community/steward/index.vue': {
       routes:
         | '/community/steward/'
+      views:
+        | never
+    }
+    'src/pages/community/steward/[categoryId].vue': {
+      routes:
+        | '/community/steward/[categoryId]'
       views:
         | never
     }
