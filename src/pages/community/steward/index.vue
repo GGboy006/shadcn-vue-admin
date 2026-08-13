@@ -6,10 +6,10 @@ meta:
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
 
-import type { IHousekeeperCategoryListQuery, IHousekeeperServiceListQuery } from '@/services/api/housekeeper.api'
+import type { IHousekeeperCategoryListQuery, IHousekeeperServiceListQuery, IHousekeeperStaffListQuery } from '@/services/api/housekeeper.api'
 
 import { BasicPage } from '@/components/global-layout'
-import { useGetHousekeeperCategoryPageQuery, useGetHousekeeperServicePageQuery } from '@/services/api/housekeeper.api'
+import { useGetHousekeeperCategoryPageQuery, useGetHousekeeperServicePageQuery, useGetHousekeeperStaffPageQuery } from '@/services/api/housekeeper.api'
 
 import CategoryCreate from './components/category/category-create.vue'
 import { columns as categoryColumns } from './components/category/columns'
@@ -19,6 +19,10 @@ import { columns as serviceColumns } from './components/service/columns'
 import ServiceToolbar from './components/service/data-table-toolbar.vue'
 import ServiceDataTable from './components/service/data-table.vue'
 import ServiceCreate from './components/service/service-create.vue'
+import { columns as staffColumns } from './components/staff/columns'
+import StaffToolbar from './components/staff/data-table-toolbar.vue'
+import StaffDataTable from './components/staff/data-table.vue'
+import StaffCreate from './components/staff/staff-create.vue'
 
 const activeTab = ref<'category' | 'service' | 'staff'>('category')
 
@@ -115,6 +119,61 @@ function handleServiceReset() {
   serviceQuery.value.status = undefined
   serviceQuery.value.pageNum = 1
 }
+
+/* ---------------- 服务人员 §4.2 ---------------- */
+const staffQuery = ref<IHousekeeperStaffListQuery>({
+  pageNum: 1,
+  pageSize: 10,
+})
+
+const { data: staffData, isLoading: isStaffLoading } = useGetHousekeeperStaffPageQuery(staffQuery)
+
+const staffList = computed(() => staffData.value?.data?.list ?? [])
+const staffTotal = computed(() => staffData.value?.data?.total ?? 0)
+
+const staffServerPagination = computed(() => ({
+  page: staffQuery.value.pageNum,
+  pageSize: staffQuery.value.pageSize,
+  total: staffTotal.value,
+  onPageChange: (page: number) => {
+    staffQuery.value.pageNum = page
+  },
+  onPageSizeChange: (pageSize: number) => {
+    staffQuery.value.pageSize = pageSize
+    staffQuery.value.pageNum = 1
+  },
+}))
+
+const staffSearch = ref('')
+const staffHousekeeperIdFilter = ref<IHousekeeperStaffListQuery['housekeeperId']>(undefined)
+const staffStatusFilter = ref<IHousekeeperStaffListQuery['status']>(undefined)
+
+const debouncedStaffSearch = useDebounceFn((val: string) => {
+  staffQuery.value.staffName = val || undefined
+  staffQuery.value.pageNum = 1
+}, 300)
+
+watch(staffSearch, val => debouncedStaffSearch(val))
+
+watch(staffHousekeeperIdFilter, (val) => {
+  staffQuery.value.housekeeperId = val
+  staffQuery.value.pageNum = 1
+})
+
+watch(staffStatusFilter, (val) => {
+  staffQuery.value.status = val
+  staffQuery.value.pageNum = 1
+})
+
+function handleStaffReset() {
+  staffSearch.value = ''
+  staffHousekeeperIdFilter.value = undefined
+  staffStatusFilter.value = undefined
+  staffQuery.value.staffName = undefined
+  staffQuery.value.housekeeperId = undefined
+  staffQuery.value.status = undefined
+  staffQuery.value.pageNum = 1
+}
 </script>
 
 <template>
@@ -126,6 +185,7 @@ function handleServiceReset() {
     <template #actions>
       <CategoryCreate v-if="activeTab === 'category'" />
       <ServiceCreate v-else-if="activeTab === 'service'" />
+      <StaffCreate v-else-if="activeTab === 'staff'" />
     </template>
 
     <UiTabs v-model="activeTab" default-value="category">
@@ -183,11 +243,27 @@ function handleServiceReset() {
         </ServiceDataTable>
       </UiTabsContent>
 
-      <!-- 服务人员 §4.2(批次 3) -->
+      <!-- 服务人员 §4.2 -->
       <UiTabsContent value="staff" class="mt-4">
-        <div class="py-10 text-center text-sm text-muted-foreground">
-          服务人员管理开发中
-        </div>
+        <StaffDataTable
+          :loading="isStaffLoading"
+          :data="staffList"
+          :columns="staffColumns"
+          :server-pagination="staffServerPagination"
+        >
+          <template #toolbar="{ table }">
+            <StaffToolbar
+              :table="table"
+              :search="staffSearch"
+              :housekeeper-id-filter="staffHousekeeperIdFilter"
+              :status-filter="staffStatusFilter"
+              @update:search="staffSearch = $event"
+              @update:housekeeper-id-filter="staffHousekeeperIdFilter = $event"
+              @update:status-filter="staffStatusFilter = $event"
+              @reset="handleStaffReset"
+            />
+          </template>
+        </StaffDataTable>
       </UiTabsContent>
     </UiTabs>
   </BasicPage>
