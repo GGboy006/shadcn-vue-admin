@@ -23,8 +23,8 @@ import {
 import ProviderPicker from './components/category/provider-picker.vue'
 
 interface ProviderItem {
-  housekeeperId: number
-  staffId: number
+  housekeeperId: string
+  staffId: string
   housekeeperName?: string
   staffName?: string
   sortOrder: number
@@ -32,7 +32,7 @@ interface ProviderItem {
 
 const route = useRoute()
 const router = useRouter()
-const categoryId = computed(() => Number((route.params as Record<string, string>).categoryId))
+const categoryId = computed(() => (route.params as Record<string, string>).categoryId)
 
 // 分类详情(标题用)
 const { data: categoryData } = useGetHousekeeperCategoryDetailQuery(categoryId)
@@ -53,7 +53,7 @@ watch(providersData, (val) => {
   original.value = list.map(p => ({ ...p }))
   current.value = list.map(p => ({
     housekeeperId: p.housekeeperId,
-    staffId: p.staffId ?? 0,
+    staffId: p.staffId ?? '',
     housekeeperName: p.housekeeperName,
     staffName: p.staffName,
     sortOrder: p.sortOrder ?? 0,
@@ -94,16 +94,16 @@ function handleAdd(item: ProviderItem) {
   current.value.push(item)
 }
 
-function handleRemoveByStaff(staffId: number) {
+function handleRemoveByStaff(staffId: string) {
   current.value = current.value.filter(c => c.staffId !== staffId)
 }
 
 /* ---------------- 行操作 ---------------- */
-function handleRemove(staffId: number) {
+function handleRemove(staffId: string) {
   current.value = current.value.filter(c => c.staffId !== staffId)
 }
 
-function handleSortChange(staffId: number, val: string) {
+function handleSortChange(staffId: string, val: string | number) {
   const item = current.value.find(c => c.staffId === staffId)
   if (item)
     item.sortOrder = val === '' ? 0 : Number(val)
@@ -272,7 +272,7 @@ function handleCancelLeave() {
                   type="number"
                   :model-value="item.sortOrder"
                   class="h-8 w-20"
-                  @update:model-value="(val: string) => handleSortChange(item.staffId, val)"
+                  @update:model-value="(val: string | number) => handleSortChange(item.staffId, val)"
                 />
               </td>
               <td class="px-3 py-2 text-right">

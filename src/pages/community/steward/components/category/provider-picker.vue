@@ -11,8 +11,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useGetHousekeeperServiceListQuery, useGetHousekeeperStaffListQuery } from '@/services/api/housekeeper.api'
 
 interface ProviderItem {
-  housekeeperId: number
-  staffId: number
+  housekeeperId: string
+  staffId: string
   housekeeperName?: string
   staffName?: string
   sortOrder: number
@@ -20,12 +20,12 @@ interface ProviderItem {
 
 const props = defineProps<{
   open: boolean
-  currentStaffIds: Set<number>
+  currentStaffIds: Set<string>
 }>()
 const emit = defineEmits<{
   'update:open': [value: boolean]
   'add': [item: ProviderItem]
-  'remove': [staffId: number]
+  'remove': [staffId: string]
 }>()
 
 const isOpen = computed({
@@ -33,7 +33,7 @@ const isOpen = computed({
   set: v => emit('update:open', v),
 })
 
-const selectedHousekeeperId = ref<number | undefined>(undefined)
+const selectedHousekeeperId = ref<string | undefined>(undefined)
 
 const { data: serviceListData } = useGetHousekeeperServiceListQuery()
 const serviceOptions = computed(() =>
@@ -44,7 +44,7 @@ const housekeeperIdRef = computed(() => selectedHousekeeperId.value)
 const { data: staffListData, isLoading: isStaffLoading } = useGetHousekeeperStaffListQuery(housekeeperIdRef)
 const staffList = computed(() => staffListData.value?.data ?? [])
 
-function isChecked(staffId: number) {
+function isChecked(staffId: string) {
   return props.currentStaffIds.has(staffId)
 }
 

@@ -22,7 +22,7 @@ export const housekeeperEnableStatusConfig: Record<HousekeeperEnableStatus, { la
 /** 管家服务主体 VO(对接文档 4.1 HousekeeperServiceVO) */
 export interface IHousekeeperService {
   /** 管家服务ID */
-  housekeeperId: number
+  housekeeperId: string
   /** 站长ID */
   stationId?: number
   /** 名称 */
@@ -38,7 +38,7 @@ export interface IHousekeeperService {
   /** 联系电话 */
   contactPhone?: string
   /** 商户ID */
-  merchantId?: number
+  merchantId?: string
   /** 排序 */
   sortOrder?: number
   /** 启用状态:1=启用,2=禁用 */
@@ -62,7 +62,7 @@ export interface IHousekeeperServiceListQuery extends IPageParam {
 /** 主体新增/更新请求体(对接文档 4.1) */
 export interface IHousekeeperServiceSaveDTO {
   /** 管家服务ID(更新必填) */
-  housekeeperId?: number
+  housekeeperId?: string
   /** 名称 */
   name: string
   /** 描述 */
@@ -76,7 +76,7 @@ export interface IHousekeeperServiceSaveDTO {
   /** 联系电话 */
   contactPhone?: string
   /** 商户ID */
-  merchantId?: number
+  merchantId?: string
   /** 排序 */
   sortOrder?: number
   /** 启用状态:1=启用,2=禁用 */
@@ -116,7 +116,7 @@ export function useGetHousekeeperServiceListQuery() {
 }
 
 /** 获取管家服务主体详情(对接文档 4.1,`/housekeeper/service/{housekeeperId}`) */
-export function useGetHousekeeperServiceDetailQuery(housekeeperId: Ref<number | undefined>, enabled?: Ref<boolean>) {
+export function useGetHousekeeperServiceDetailQuery(housekeeperId: Ref<string | undefined>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IHousekeeperServiceDetailResponse, Error>({
@@ -169,7 +169,7 @@ export function useUpdateHousekeeperServiceStatusMutation() {
   const { apiFetch } = useApiFetch()
   const queryClient = useQueryClient()
 
-  return useMutation<IResponse<boolean>, Error, { housekeeperId: number, status: HousekeeperEnableStatus }>({
+  return useMutation<IResponse<boolean>, Error, { housekeeperId: string, status: HousekeeperEnableStatus }>({
     mutationKey: ['updateHousekeeperServiceStatus'],
     mutationFn: async ({ housekeeperId, status }) => await apiFetch<IResponse<boolean>>(`/housekeeper/service/${housekeeperId}/status`, {
       method: 'put',
@@ -187,7 +187,7 @@ export function useDeleteHousekeeperServiceMutation() {
   const { apiFetch } = useApiFetch()
   const queryClient = useQueryClient()
 
-  return useMutation<IResponse<boolean>, Error, number>({
+  return useMutation<IResponse<boolean>, Error, string>({
     mutationKey: ['deleteHousekeeperService'],
     mutationFn: async housekeeperId => await apiFetch<IResponse<boolean>>(`/housekeeper/service/${housekeeperId}`, {
       method: 'delete',
@@ -206,9 +206,9 @@ export function useDeleteHousekeeperServiceMutation() {
 /** 服务人员 VO(对接文档 4.2 HousekeeperStaffVO) */
 export interface IHousekeeperStaff {
   /** 人员ID */
-  staffId: number
+  staffId: string
   /** 管家服务ID */
-  housekeeperId: number
+  housekeeperId: string
   /** 管家服务名称 */
   housekeeperName?: string
   /** 站长ID */
@@ -236,7 +236,7 @@ export interface IHousekeeperStaff {
 /** 人员分页查询参数(对接文档 4.2) */
 export interface IHousekeeperStaffListQuery extends IPageParam {
   /** 管家服务ID */
-  housekeeperId?: number
+  housekeeperId?: string
   /** 人员姓名 */
   staffName?: string
   /** 状态:1=启用,2=禁用 */
@@ -246,9 +246,9 @@ export interface IHousekeeperStaffListQuery extends IPageParam {
 /** 人员新增/更新请求体(对接文档 4.2) */
 export interface IHousekeeperStaffSaveDTO {
   /** 人员ID(更新必填) */
-  staffId?: number
+  staffId?: string
   /** 管家服务ID */
-  housekeeperId: number
+  housekeeperId: string
   /** 人员姓名 */
   staffName: string
   /** 手机 */
@@ -287,7 +287,7 @@ export function useGetHousekeeperStaffPageQuery(query: Ref<IHousekeeperStaffList
 }
 
 /** 获取某管家服务下启用人员列表(对接文档 4.2,`/housekeeper/staff/list?housekeeperId=`) */
-export function useGetHousekeeperStaffListQuery(housekeeperId: Ref<number | undefined>) {
+export function useGetHousekeeperStaffListQuery(housekeeperId: Ref<string | undefined>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IHousekeeperStaffListAllResponse, Error>({
@@ -302,7 +302,7 @@ export function useGetHousekeeperStaffListQuery(housekeeperId: Ref<number | unde
 }
 
 /** 获取服务人员详情(对接文档 4.2,`/housekeeper/staff/{staffId}`) */
-export function useGetHousekeeperStaffDetailQuery(staffId: Ref<number | undefined>, enabled?: Ref<boolean>) {
+export function useGetHousekeeperStaffDetailQuery(staffId: Ref<string | undefined>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IHousekeeperStaffDetailResponse, Error>({
@@ -355,7 +355,7 @@ export function useUpdateHousekeeperStaffStatusMutation() {
   const { apiFetch } = useApiFetch()
   const queryClient = useQueryClient()
 
-  return useMutation<IResponse<boolean>, Error, { staffId: number, status: HousekeeperEnableStatus }>({
+  return useMutation<IResponse<boolean>, Error, { staffId: string, status: HousekeeperEnableStatus }>({
     mutationKey: ['updateHousekeeperStaffStatus'],
     mutationFn: async ({ staffId, status }) => await apiFetch<IResponse<boolean>>(`/housekeeper/staff/${staffId}/status`, {
       method: 'put',
@@ -373,7 +373,7 @@ export function useDeleteHousekeeperStaffMutation() {
   const { apiFetch } = useApiFetch()
   const queryClient = useQueryClient()
 
-  return useMutation<IResponse<boolean>, Error, number>({
+  return useMutation<IResponse<boolean>, Error, string>({
     mutationKey: ['deleteHousekeeperStaff'],
     mutationFn: async staffId => await apiFetch<IResponse<boolean>>(`/housekeeper/staff/${staffId}`, {
       method: 'delete',
@@ -392,7 +392,7 @@ export function useDeleteHousekeeperStaffMutation() {
 /** 服务分类 VO(对接文档 4.3 ServiceCategoryVO) */
 export interface IHousekeeperCategory {
   /** 分类ID */
-  categoryId: number
+  categoryId: string
   /** 分类名称 */
   categoryName: string
   /** 分类编码 */
@@ -418,7 +418,7 @@ export interface IHousekeeperCategory {
 /** 分类新增/更新请求体(对接文档 4.3) */
 export interface IHousekeeperCategorySaveDTO {
   /** 分类ID(更新必填) */
-  categoryId?: number
+  categoryId?: string
   /** 分类名称 */
   categoryName: string
   /** 分类编码 */
@@ -474,7 +474,7 @@ export function useGetHousekeeperCategoryListQuery() {
 }
 
 /** 获取服务分类详情(对接文档 4.3,`/housekeeper/category/{categoryId}`) */
-export function useGetHousekeeperCategoryDetailQuery(categoryId: Ref<number | undefined>, enabled?: Ref<boolean>) {
+export function useGetHousekeeperCategoryDetailQuery(categoryId: Ref<string | undefined>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IHousekeeperCategoryDetailResponse, Error>({
@@ -527,7 +527,7 @@ export function useUpdateHousekeeperCategoryStatusMutation() {
   const { apiFetch } = useApiFetch()
   const queryClient = useQueryClient()
 
-  return useMutation<IResponse<boolean>, Error, { categoryId: number, status: HousekeeperEnableStatus }>({
+  return useMutation<IResponse<boolean>, Error, { categoryId: string, status: HousekeeperEnableStatus }>({
     mutationKey: ['updateHousekeeperCategoryStatus'],
     mutationFn: async ({ categoryId, status }) => await apiFetch<IResponse<boolean>>(`/housekeeper/category/${categoryId}/status`, {
       method: 'put',
@@ -545,7 +545,7 @@ export function useDeleteHousekeeperCategoryMutation() {
   const { apiFetch } = useApiFetch()
   const queryClient = useQueryClient()
 
-  return useMutation<IResponse<boolean>, Error, number>({
+  return useMutation<IResponse<boolean>, Error, string>({
     mutationKey: ['deleteHousekeeperCategory'],
     mutationFn: async categoryId => await apiFetch<IResponse<boolean>>(`/housekeeper/category/${categoryId}`, {
       method: 'delete',
@@ -565,9 +565,9 @@ export function useDeleteHousekeeperCategoryMutation() {
 /** 分配项(单个人员分配) */
 export interface IHousekeeperCategoryProvider {
   /** 管家服务ID */
-  housekeeperId: number
+  housekeeperId: string
   /** 人员ID */
-  staffId?: number
+  staffId?: string
   /** 排序 */
   sortOrder?: number
 }
@@ -575,7 +575,7 @@ export interface IHousekeeperCategoryProvider {
 /** 全量覆盖分配请求体(对接文档 4.4) */
 export interface IHousekeeperCategoryProvidersSaveDTO {
   /** 分类ID */
-  categoryId: number
+  categoryId: string
   /** 分配列表(空数组=清空) */
   providers: IHousekeeperCategoryProvider[]
 }
@@ -583,15 +583,15 @@ export interface IHousekeeperCategoryProvidersSaveDTO {
 /** 分类已分配人员 VO(对接文档 4.4 CategoryProviderVO) */
 export interface IHousekeeperCategoryProviderVO {
   /** 分配记录ID */
-  id: number
+  id: string
   /** 分类ID */
-  categoryId: number
+  categoryId: string
   /** 管家服务ID */
-  housekeeperId: number
+  housekeeperId: string
   /** 管家服务名称 */
   housekeeperName?: string
   /** 人员ID */
-  staffId?: number
+  staffId?: string
   /** 人员名称 */
   staffName?: string
   /** 排序 */
@@ -604,7 +604,7 @@ export interface IHousekeeperCategoryProviderVO {
 export type IHousekeeperCategoryProvidersResponse = IResponse<IHousekeeperCategoryProviderVO[]>
 
 /** 获取分类已分配人员列表(对接文档 4.4,`/housekeeper/category/{categoryId}/providers`) */
-export function useGetHousekeeperCategoryProvidersQuery(categoryId: Ref<number | undefined>, enabled?: Ref<boolean>) {
+export function useGetHousekeeperCategoryProvidersQuery(categoryId: Ref<string | undefined>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IHousekeeperCategoryProvidersResponse, Error>({

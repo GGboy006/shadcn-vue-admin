@@ -39,7 +39,7 @@ const serviceOptions = computed(() =>
 
 const initialValues = reactive<HousekeeperStaffValidator>({
   staffId: staff?.staffId || undefined,
-  housekeeperId: staff?.housekeeperId ?? undefined,
+  housekeeperId: staff?.housekeeperId ?? '',
   staffName: staff?.staffName || '',
   phone: staff?.phone || undefined,
   avatar: staff?.avatar || undefined,
