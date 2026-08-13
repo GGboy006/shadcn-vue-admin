@@ -170,6 +170,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/community/ai-tool/[cateCode]': RouteRecordInfo<
+      '/community/ai-tool/[cateCode]',
+      '/community/ai-tool/:cateCode',
+      { cateCode: ParamValue<true> },
+      { cateCode: ParamValue<false> },
+      | never
+    >,
     '/community/announcement/': RouteRecordInfo<
       '/community/announcement/',
       '/community/announcement',
@@ -733,6 +740,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/community/ai-tool/index.vue': {
       routes:
         | '/community/ai-tool/'
+      views:
+        | never
+    }
+    'src/pages/community/ai-tool/[cateCode].vue': {
+      routes:
+        | '/community/ai-tool/[cateCode]'
       views:
         | never
     }
