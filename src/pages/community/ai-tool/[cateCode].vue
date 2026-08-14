@@ -21,6 +21,14 @@ import {
 } from '@/services/api/resident-ai-tool.api'
 
 import SkillAssignCard from './components/skill-assign-card.vue'
+import {
+  clearAllVisible,
+  diffSelection,
+  filterByName,
+  selectAllVisible,
+  toCheckedIds,
+  toggleId,
+} from './data/assign-selection'
 
 const route = useRoute()
 const router = useRouter()
@@ -39,55 +47,40 @@ const { data, isLoading } = useGetResidentAiToolAssignListQuery(assignQuery)
 const skillList = computed(() => data.value?.data ?? [])
 
 const keyword = ref('')
-const filteredList = computed(() => {
-  const k = keyword.value.trim().toLowerCase()
-  if (!k)
-    return skillList.value
-  return skillList.value.filter(s => s.name?.toLowerCase().includes(k))
-})
+const filteredList = computed(() => filterByName(skillList.value, keyword.value))
 
 /* ---------------- 选中状态:original=后端真相,current=本地编辑态 ---------------- */
 const original = ref<Set<string>>(new Set())
 const current = ref<Set<string>>(new Set())
 
 watch(skillList, (list) => {
-  const checked = new Set(list.filter(s => s.checked).map(s => s.skillId))
+  const checked = toCheckedIds(list)
   original.value = checked
   current.value = new Set(checked)
 }, { immediate: true })
 
-const added = computed(() => [...current.value].filter(id => !original.value.has(id)))
-const removed = computed(() => [...original.value].filter(id => !current.value.has(id)))
-const isDirty = computed(() => added.value.length > 0 || removed.value.length > 0)
-const isClearing = computed(() => current.value.size === 0 && original.value.size > 0)
+const diff = computed(() => diffSelection(original.value, current.value))
+const added = computed(() => diff.value.added)
+const removed = computed(() => diff.value.removed)
+const isDirty = computed(() => diff.value.isDirty)
+const isClearing = computed(() => diff.value.isClearing)
 
 function isSelected(skill: IResidentAiToolAssignSkill): boolean {
   return current.value.has(skill.skillId)
 }
 
 function toggleSkill(skill: IResidentAiToolAssignSkill) {
-  const next = new Set(current.value)
-  if (next.has(skill.skillId))
-    next.delete(skill.skillId)
-  else
-    next.add(skill.skillId)
-  current.value = next
+  current.value = toggleId(current.value, skill.skillId)
 }
 
 // 全选/清空只作用于「当前可见列表」:无搜索词时等价于全选/全清,
 // 有搜索词时不会误伤被过滤掉的已选项
 function handleSelectAll() {
-  const next = new Set(current.value)
-  for (const skill of filteredList.value)
-    next.add(skill.skillId)
-  current.value = next
+  current.value = selectAllVisible(current.value, filteredList.value)
 }
 
 function handleClearAll() {
-  const next = new Set(current.value)
-  for (const skill of filteredList.value)
-    next.delete(skill.skillId)
-  current.value = next
+  current.value = clearAllVisible(current.value, filteredList.value)
 }
 
 function handleResetChanges() {
