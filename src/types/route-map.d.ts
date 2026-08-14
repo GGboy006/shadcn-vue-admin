@@ -198,13 +198,6 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/community/convenience/': RouteRecordInfo<
-      '/community/convenience/',
-      '/community/convenience',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
     '/community/feedback/': RouteRecordInfo<
       '/community/feedback/',
       '/community/feedback',
@@ -764,12 +757,6 @@ declare module 'vue-router/auto-routes' {
     'src/pages/community/column/index.vue': {
       routes:
         | '/community/column/'
-      views:
-        | never
-    }
-    'src/pages/community/convenience/index.vue': {
-      routes:
-        | '/community/convenience/'
       views:
         | never
     }
