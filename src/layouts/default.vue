@@ -52,7 +52,9 @@ const isFixedLayout = computed(() => route.meta.layout === 'fixed')
           contentLayout === 'centered' ? 'container mx-auto ' : '',
         )"
       >
-        <router-view />
+        <router-view v-slot="{ Component }">
+          <component :is="Component" :key="route.fullPath" />
+        </router-view>
       </main>
     </UiSidebarInset>
   </UiSidebarProvider>

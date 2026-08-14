@@ -9,7 +9,9 @@ import Header from '@/components/marketing-layout/the-header.vue'
       <Header />
 
       <main>
-        <router-view />
+        <router-view v-slot="{ Component, route }">
+          <component :is="Component" :key="route.fullPath" />
+        </router-view>
       </main>
 
       <Footer />
