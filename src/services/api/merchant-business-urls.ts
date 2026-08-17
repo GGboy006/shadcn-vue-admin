@@ -5,8 +5,8 @@
  * 污染纯函数测试。merchant-business.api.ts 导入并 re-export。
  */
 
-/** 商户后台模块名 */
-export type MerchantModule = 'cate' | 'goods' | 'faq' | 'activity' | 'order'
+/** 商户后台模块名（activity/cate 为优惠活动分类，与 cate 商品分类区分） */
+export type MerchantModule = 'cate' | 'goods' | 'faq' | 'activity' | 'activity/cate' | 'order'
 
 /**
  * 构建商户后台模块路径前缀:`/merchant/{module}/{merchantId}`

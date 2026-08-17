@@ -1,0 +1,39 @@
+---
+description: Token-efficient tool usage for build/test/lint output and file edits
+alwaysApply: true
+---
+
+# 节省 Token 的操作规范
+
+## 1. 过滤 build/lint/test 的冗长输出
+
+`pnpm build` 会打印几百行 chunk 体积列表，不要用 `tail -300` 等方式整段读入。
+优先只关心成功/失败与错误信息：
+
+```bash
+pnpm build > /tmp/build.log 2>&1; echo "EXIT=$?"; grep -iE "error TS|ELIFECYCLE" /tmp/build.log || echo "BUILD_OK"
+pnpm vitest run 2>&1 | grep -iE "FAIL|✗|×" || echo "TEST_OK"
+```
+
+注意：不要用宽泛的 `grep -i error`，项目里文件名/路由本身可能含 "error"（如 errors 页面），会产生误报。优先看退出码，再用精确关键词（如 `error TS`、`FAIL`）定位。
+
+只有在确实需要定位失败原因时，才读取完整输出（或用 `-A/-B` 只看错误上下文）。
+
+## 2. StrReplace/Write 被 hook 拦截时的重试策略
+
+若 `StrReplace`/`Write` 报 `pre:mcp-health-check ... returned invalid JSON`：
+1. 先直接重试 1 次（多数情况下是间歇性问题，重试即可恢复）。
+2. 仍失败再退化为 Shell + Python 脚本方式，且只在必要时使用——这种方式会把新旧文本都完整写入脚本，token 成本远高于 `StrReplace`，不要作为默认首选。
+
+## 3. 避免重复调研
+
+如果先用 subagent（Task/explore）调研某个模板模块的实现，其返回结果已经包含足够代码片段时，
+不要再用 `Read` 把同一批文件完整读一遍去获取"精确代码"——subagent 返回的内容通常已经足够精确，
+必要时只针对不确定的 1-2 个关键片段做小范围 `Read` 核实，而不是全量重读。
+
+## 4. 批量创建高度相似的模板文件
+
+当需要照抄现有模块（如"分类管理"CRUD）新建一整套文件时：
+- 一次性读清楚模板的全部文件（1 轮 Read/Task），后续不要反复回读同一模板。
+- 新文件直接一次性 Write 完整内容，不要先写骨架再多次追加/修改。
+- 只需要跑一次 `lint:fix` + 一次 `build` + 一次 `vitest run` 做最终校验，不要在中间过程反复跑。

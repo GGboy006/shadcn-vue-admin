@@ -43,6 +43,14 @@ export const columns: ColumnDef<Activity>[] = [
     enableResizing: true,
   },
   {
+    accessorKey: 'cateName',
+    header: ({ column }) => h(DataTableColumnHeader<Activity>, { column, title: '分类' }),
+    meta: { title: '分类' },
+    cell: ({ row }) => h('div', { class: 'text-sm' }, row.getValue('cateName') || '-'),
+    enableSorting: false,
+    enableResizing: true,
+  },
+  {
     id: 'timeRange',
     header: ({ column }) => h(DataTableColumnHeader<Activity>, { column, title: '活动时间' }),
     meta: { title: '活动时间' },

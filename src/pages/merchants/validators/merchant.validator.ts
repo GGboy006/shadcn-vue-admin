@@ -11,6 +11,7 @@ export const merchantValidator = z.object({
   password: z.string().min(6, '密码至少6位').optional().or(z.literal('')),
   type: z.number().min(1),
   gender: optionalNumber,
+  categoryCode: z.string().min(1, '请选择商户分类'),
   avatar: optionalString,
   logo: optionalString,
   contactName: optionalString,

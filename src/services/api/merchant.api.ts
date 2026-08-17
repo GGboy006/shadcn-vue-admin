@@ -337,6 +337,139 @@ export type IMerchantListResponse = IResponse<IPageResult<IMerchant>>
 /** 详情响应 */
 export type IMerchantDetailResponse = IResponse<IMerchant>
 
+// ==================== 商户分类（站长端，/station/merchant/category） ====================
+
+/**
+ * 商户分类 VO（对接文档 2.1/2.2 TblCouponCategoryResp）。
+ *
+ * 底层复用 `tbl_coupon_category` 表（type 固定为商户分类），
+ * layoutType 为该表遗留的通用布局字段，本模块暂不在 UI 中使用。
+ */
+export interface IMerchantCategoryVO {
+  /** 分类唯一标识，即商户侧 categoryCode */
+  uniqueCode: string
+  /** 分类名称 */
+  name: string
+  /** 排序 */
+  torder: number
+  /** 状态：1=启用，2=禁用 */
+  status: MerchantStatus
+  /** 分类类型：固定为商户分类 */
+  type: number
+  /** 布局：1美团 2饿了么 3滴滴 4快递100（遗留字段，暂不使用） */
+  layoutType?: number
+  /** 合伙人ID */
+  partnerId: string
+  createTime?: string
+  updateTime?: string
+}
+
+/** 商户分类分页查询参数 */
+export interface IMerchantCategoryPageQuery {
+  /** 分类名称模糊 */
+  keyword?: string
+  pageNum: number
+  pageSize: number
+}
+
+/** 新增商户分类 DTO */
+export interface IMerchantCategoryAddDTO {
+  name: string
+  torder?: number
+  status?: MerchantStatus
+  layoutType?: number
+}
+
+/** 更新商户分类 DTO */
+export interface IMerchantCategoryUpdateDTO {
+  uniqueCode: string
+  name: string
+  torder?: number
+  status?: MerchantStatus
+  layoutType?: number
+}
+
+/** 获取商户分类分页列表 */
+export function useGetMerchantCategoryPageQuery(query: Ref<IMerchantCategoryPageQuery>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<IResponse<IPageResult<IMerchantCategoryVO>>, Error>({
+    queryKey: ['merchantCategoryPage', query],
+    queryFn: async () => await apiFetch<IResponse<IPageResult<IMerchantCategoryVO>>>('/station/merchant/category/page', {
+      method: 'get',
+      query: query.value,
+    }),
+    retry: false,
+  })
+}
+
+/** 获取全部已启用商户分类（下拉选项用） */
+export function useGetMerchantCategoryListQuery(enabled?: Ref<boolean>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<IResponse<IMerchantCategoryVO[]>, Error>({
+    queryKey: ['merchantCategoryAll'],
+    queryFn: async () => await apiFetch<IResponse<IMerchantCategoryVO[]>>('/station/merchant/category/list', {
+      method: 'get',
+    }),
+    enabled: () => enabled?.value ?? true,
+    retry: false,
+  })
+}
+
+/** 新增商户分类 */
+export function useCreateMerchantCategoryMutation() {
+  const { apiFetch } = useApiFetch()
+  const queryClient = useQueryClient()
+
+  return useMutation<IResponse<string>, Error, IMerchantCategoryAddDTO>({
+    mutationKey: ['createMerchantCategory'],
+    mutationFn: async data => await apiFetch<IResponse<string>>('/station/merchant/category', {
+      method: 'post',
+      body: data,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchantCategoryPage'] })
+      queryClient.invalidateQueries({ queryKey: ['merchantCategoryAll'] })
+    },
+  })
+}
+
+/** 更新商户分类 */
+export function useUpdateMerchantCategoryMutation() {
+  const { apiFetch } = useApiFetch()
+  const queryClient = useQueryClient()
+
+  return useMutation<IResponse<boolean>, Error, IMerchantCategoryUpdateDTO>({
+    mutationKey: ['updateMerchantCategory'],
+    mutationFn: async data => await apiFetch<IResponse<boolean>>('/station/merchant/category', {
+      method: 'put',
+      body: data,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchantCategoryPage'] })
+      queryClient.invalidateQueries({ queryKey: ['merchantCategoryAll'] })
+    },
+  })
+}
+
+/** 删除商户分类 */
+export function useDeleteMerchantCategoryMutation() {
+  const { apiFetch } = useApiFetch()
+  const queryClient = useQueryClient()
+
+  return useMutation<IResponse<boolean>, Error, string>({
+    mutationKey: ['deleteMerchantCategory'],
+    mutationFn: async uniqueCode => await apiFetch<IResponse<boolean>>(`/station/merchant/category/${uniqueCode}`, {
+      method: 'delete',
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchantCategoryPage'] })
+      queryClient.invalidateQueries({ queryKey: ['merchantCategoryAll'] })
+    },
+  })
+}
+
 // ==================== API 封装 ====================
 
 /** 获取商户/物业分页列表 */

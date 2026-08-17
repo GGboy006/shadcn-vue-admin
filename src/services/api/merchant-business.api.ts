@@ -255,6 +255,128 @@ export function useDeleteCateMutation(merchantId: Ref<string>) {
   })
 }
 
+// ==================== 二.二、优惠活动分类 ====================
+
+/**
+ * 优惠活动分类 Resp（对接文档 4.1，全部/下拉用）。
+ *
+ * 与商品分类同表 `tbl_app_enterprise_cate`，但 type=1（企业活动），
+ * 路径为 `/merchant/activity/cate/{merchantId}`，不要与商品分类 `/merchant/cate` 混淆。
+ */
+export interface IActivityCateResp {
+  uniqueCode: string
+  orgCode: string
+  name: string
+  type: number
+  torder: number
+  isEnable: 1 | 2
+}
+
+/** 优惠活动分类分页 VO（文档 4.2） */
+export interface IActivityCateVO {
+  uniqueCode: string
+  orgCode: string
+  name: string
+  torder: number
+  isEnable: 1 | 2
+  activityCount: number
+}
+
+/** 优惠活动分类新增 DTO */
+export interface IActivityCateAddReq {
+  name: string
+  torder?: number
+}
+
+/** 优惠活动分类更新 DTO */
+export interface IActivityCateUpdateReq {
+  cateCode: string
+  name: string
+  torder?: number
+}
+
+/** 优惠活动分类分页查询参数 */
+export interface IActivityCatePageQuery extends IPageQuery {}
+
+/** 获取全部优惠活动分类（下拉选项用） */
+export function useGetActivityCateAllQuery(merchantId: Ref<string>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<IResponse<IActivityCateResp[]>, Error>({
+    queryKey: merchantBusinessKey('activityCate', merchantId.value, 'all'),
+    queryFn: async () => await apiFetch<IResponse<IActivityCateResp[]>>(`${merchantModulePath('activity/cate', merchantId.value)}/all`, {
+      method: 'get',
+    }),
+    enabled: () => !!merchantId.value,
+    retry: false,
+  })
+}
+
+/** 获取优惠活动分类分页列表 */
+export function useGetActivityCatePageQuery(merchantId: Ref<string>, query: Ref<IActivityCatePageQuery>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<IResponse<IPageResult<IActivityCateVO>>, Error>({
+    queryKey: merchantBusinessKey('activityCate', merchantId.value, 'page', query),
+    queryFn: async () => await apiFetch<IResponse<IPageResult<IActivityCateVO>>>(`${merchantModulePath('activity/cate', merchantId.value)}/page`, {
+      method: 'get',
+      query: query.value,
+    }),
+    enabled: () => !!merchantId.value,
+    retry: false,
+  })
+}
+
+/** 新增优惠活动分类 */
+export function useCreateActivityCateMutation(merchantId: Ref<string>) {
+  const { apiFetch } = useApiFetch()
+  const queryClient = useQueryClient()
+
+  return useMutation<IResponse<boolean>, Error, IActivityCateAddReq>({
+    mutationKey: ['merchantBusiness', 'activityCate', 'create'],
+    mutationFn: async data => await apiFetch<IResponse<boolean>>(merchantModulePath('activity/cate', merchantId.value), {
+      method: 'post',
+      body: data,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchantBusiness', 'activityCate'] })
+    },
+  })
+}
+
+/** 更新优惠活动分类（改名后端会同步该分类下活动的 cateName） */
+export function useUpdateActivityCateMutation(merchantId: Ref<string>) {
+  const { apiFetch } = useApiFetch()
+  const queryClient = useQueryClient()
+
+  return useMutation<IResponse<boolean>, Error, IActivityCateUpdateReq>({
+    mutationKey: ['merchantBusiness', 'activityCate', 'update'],
+    mutationFn: async data => await apiFetch<IResponse<boolean>>(merchantModulePath('activity/cate', merchantId.value), {
+      method: 'put',
+      body: data,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchantBusiness', 'activityCate'] })
+    },
+  })
+}
+
+/** 删除优惠活动分类（分类下仍有活动时不可删除） */
+export function useDeleteActivityCateMutation(merchantId: Ref<string>) {
+  const { apiFetch } = useApiFetch()
+  const queryClient = useQueryClient()
+
+  return useMutation<IResponse<boolean>, Error, string>({
+    mutationKey: ['merchantBusiness', 'activityCate', 'delete'],
+    mutationFn: async cateCode => await apiFetch<IResponse<boolean>>(`${merchantModulePath('activity/cate', merchantId.value)}/${cateCode}`, {
+      method: 'delete',
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchantBusiness', 'activityCate'] })
+    },
+  })
+}
+
 // ==================== 三、商品 ====================
 
 /** 商品分页 VO(文档 3.1) */

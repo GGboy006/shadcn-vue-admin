@@ -1,4 +1,4 @@
-import { BookmarkIcon, BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, CalendarDaysIcon, CalendarRangeIcon, Columns3Icon, ConciergeBellIcon, FolderTreeIcon, HeadsetIcon, HelpCircleIcon, HomeIcon, ImageIcon, LandmarkIcon, LayoutDashboardIcon, LayoutGridIcon, LifeBuoyIcon, LightbulbIcon, MegaphoneIcon, MessageSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, SettingsIcon, ShoppingCartIcon, SparklesIcon, StoreIcon, TagIcon, UserIcon, UsersIcon, WrenchIcon } from '@lucide/vue'
+import { BookmarkIcon, BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, CalendarDaysIcon, CalendarRangeIcon, Columns3Icon, ConciergeBellIcon, FolderTreeIcon, HeadsetIcon, HelpCircleIcon, HomeIcon, ImageIcon, LandmarkIcon, LayoutDashboardIcon, LayoutGridIcon, LifeBuoyIcon, LightbulbIcon, MegaphoneIcon, MessageSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, SettingsIcon, ShoppingCartIcon, SparklesIcon, StoreIcon, TagIcon, TagsIcon, UserIcon, UsersIcon, WrenchIcon } from '@lucide/vue'
 
 import type { NavGroup, NavItem } from '@/components/app-sidebar/types'
 
@@ -21,6 +21,7 @@ export function useSidebar() {
     { title: '商品管理', url: '/merchant-business/goods', icon: PackageIcon },
     { title: 'FAQ', url: '/merchant-business/faq', icon: HelpCircleIcon },
     { title: '优惠活动', url: '/merchant-business/activity', icon: TagIcon },
+    { title: '活动分类', url: '/merchant-business/activity-cate', icon: TagsIcon },
     { title: '订单管理', url: '/merchant-business/order', icon: ShoppingCartIcon },
   ]
 
@@ -38,6 +39,7 @@ export function useSidebar() {
     },
     { title: '会话列表', url: '/conversations', icon: MessageSquareIcon },
     { title: '商户管理', url: '/merchants', icon: StoreIcon, roles: [3] },
+    { title: '商户分类', url: '/merchants/category', icon: FolderTreeIcon, roles: [3] },
     { title: '物业管理', url: '/properties', icon: Building2Icon, roles: [3] },
     { title: '居委会管理', url: '/committees', icon: LandmarkIcon, roles: [3] },
   ]

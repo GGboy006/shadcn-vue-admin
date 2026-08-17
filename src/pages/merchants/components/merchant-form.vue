@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useUpload } from '@/composables/use-upload'
-import { useCreateMerchantMutation, useUpdateMerchantMutation } from '@/services/api/merchant.api'
+import { useCreateMerchantMutation, useGetMerchantCategoryListQuery, useUpdateMerchantMutation } from '@/services/api/merchant.api'
 import { showInvalidSubmitToast } from '@/validators/common'
 
 import type { Merchant } from '../data/schema'
@@ -69,6 +69,7 @@ const initialValues = reactive<MerchantValidator>({
   password: '',
   type: merchant?.type || type || 4,
   gender: merchant?.gender ?? 0,
+  categoryCode: merchant?.categoryCode || '',
   avatar: merchant?.avatar || '',
   logo: merchant?.logo || '',
   contactName: merchant?.contactName || '',
@@ -109,6 +110,9 @@ async function handleFileUpload(event: Event, field: 'avatar' | 'logo') {
 
 const currentType = computed(() => Number(formValues.type) as 4 | 5 | 6)
 
+const { data: categoryListRes } = useGetMerchantCategoryListQuery()
+const categoryOptions = computed(() => categoryListRes.value?.data ?? [])
+
 const { mutate: createMutate, isPending: isCreating } = useCreateMerchantMutation()
 const { mutate: updateMutate, isPending: isUpdating } = useUpdateMerchantMutation()
 
@@ -121,6 +125,7 @@ function buildPayload(values: MerchantValidator): IMerchantAddDTO | IMerchantUpd
     phone: values.phone,
     type: values.type as 4 | 5 | 6,
     gender: values.gender as 0 | 1 | 2,
+    categoryCode: values.categoryCode,
     avatar: values.avatar || undefined,
     logo: values.logo || undefined,
     contactName: values.contactName || undefined,
@@ -323,6 +328,31 @@ const onSubmit = handleSubmit((values) => {
                     <SelectGroup>
                       <SelectItem v-for="s in statusList" :key="s.value" :value="s.value">
                         {{ s.label }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="categoryCode">
+            <FormItem>
+              <FormLabel required>
+                商户分类
+              </FormLabel>
+              <FormControl>
+                <Select v-bind="componentField">
+                  <FormControl>
+                    <SelectTrigger class="w-full">
+                      <SelectValue placeholder="请选择分类" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem v-for="c in categoryOptions" :key="c.uniqueCode" :value="c.uniqueCode">
+                        {{ c.name }}
                       </SelectItem>
                     </SelectGroup>
                   </SelectContent>

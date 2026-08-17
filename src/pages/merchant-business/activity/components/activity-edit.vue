@@ -15,6 +15,7 @@ import { useCurrentMerchantId } from '@/composables/use-current-merchant-id'
 import { useUpload } from '@/composables/use-upload'
 import {
   useCreateActivityMutation,
+  useGetActivityCateAllQuery,
   useUpdateActivityMutation,
 } from '@/services/api/merchant-business.api'
 import { optionalInt, optionalNumber, showInvalidSubmitToast } from '@/validators/common'
@@ -41,7 +42,7 @@ const activitySchema = z.object({
   poster: z.string().nullable().optional(),
   detailPoster: z.string().nullable().optional(),
   sponsorName: z.string().nullable().optional(),
-  cateCode: z.string().nullable().optional(),
+  cateCode: z.string().nullable().refine(val => !!val, '请选择活动分类'),
   cateName: z.string().nullable().optional(),
   describes: z.string().nullable().optional(),
   content: z.string().nullable().optional(),
@@ -98,6 +99,16 @@ async function handleFileUpload(event: Event, field: 'poster' | 'detailPoster') 
 }
 
 const { merchantId } = useCurrentMerchantId()
+const { data: activityCateListRes } = useGetActivityCateAllQuery(merchantId)
+const activityCateOptions = computed(() => activityCateListRes.value?.data ?? [])
+
+function handleCateChange(cateCode: string | number | boolean | Record<string, unknown> | unknown) {
+  const code = String(cateCode ?? '')
+  setFieldValue('cateCode', code)
+  const cate = activityCateOptions.value.find(c => c.uniqueCode === code)
+  setFieldValue('cateName', cate?.name ?? '')
+}
+
 const { mutate: createMutate, isPending: isCreating } = useCreateActivityMutation(merchantId)
 const { mutate: updateMutate, isPending: isUpdating } = useUpdateActivityMutation(merchantId)
 const isSubmitting = computed(() => isCreating.value || isUpdating.value)
@@ -188,6 +199,31 @@ const onSubmit = handleSubmit((values) => {
           <FormLabel>活动地址</FormLabel>
           <FormControl>
             <Input type="text" v-bind="componentField" placeholder="活动地址" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <FormField name="cateCode">
+        <FormItem>
+          <FormLabel required>
+            活动分类
+          </FormLabel>
+          <FormControl>
+            <Select :model-value="formValues.cateCode ?? undefined" @update:model-value="handleCateChange">
+              <FormControl>
+                <SelectTrigger class="w-full">
+                  <SelectValue placeholder="请选择分类" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem v-for="c in activityCateOptions" :key="c.uniqueCode" :value="c.uniqueCode">
+                    {{ c.name }}
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </FormControl>
           <FormMessage />
         </FormItem>

@@ -399,6 +399,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/merchant-business/activity-cate/': RouteRecordInfo<
+      '/merchant-business/activity-cate/',
+      '/merchant-business/activity-cate',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/merchant-business/category/': RouteRecordInfo<
       '/merchant-business/category/',
       '/merchant-business/category',
@@ -453,6 +460,13 @@ declare module 'vue-router/auto-routes' {
       '/merchants/:merchantId',
       { merchantId: ParamValue<true> },
       { merchantId: ParamValue<false> },
+      | never
+    >,
+    '/merchants/category/': RouteRecordInfo<
+      '/merchants/category/',
+      '/merchants/category',
+      Record<never, never>,
+      Record<never, never>,
       | never
     >,
     '/neighborhood/activity/': RouteRecordInfo<
@@ -934,6 +948,12 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
+    'src/pages/merchant-business/activity-cate/index.vue': {
+      routes:
+        | '/merchant-business/activity-cate/'
+      views:
+        | never
+    }
     'src/pages/merchant-business/category/index.vue': {
       routes:
         | '/merchant-business/category/'
@@ -979,6 +999,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/merchants/[merchantId].vue': {
       routes:
         | '/merchants/[merchantId]'
+      views:
+        | never
+    }
+    'src/pages/merchants/category/index.vue': {
+      routes:
+        | '/merchants/category/'
       views:
         | never
     }
