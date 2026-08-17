@@ -4,7 +4,7 @@ import { h } from 'vue'
 
 import type { IKnowledgeCategory } from '@/services/api/knowledge.api'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 import {
   knowledgeCategoryTypeConfig,
@@ -15,6 +15,15 @@ import DataTableRowActions from './data-table-row-actions.vue'
 
 export const columns: ColumnDef<IKnowledgeCategory>[] = [
   SelectColumn as ColumnDef<IKnowledgeCategory>,
+  {
+    accessorKey: 'icon',
+    header: ({ column }) => h(DataTableColumnHeader<IKnowledgeCategory>, { column, title: '图标' }),
+    meta: { title: '图标' },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.icon, alt: '图标' }),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: false,
+  },
   {
     accessorKey: 'categoryName',
     header: ({ column }) => h(DataTableColumnHeader<IKnowledgeCategory>, { column, title: '分类名称' }),

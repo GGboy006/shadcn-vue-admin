@@ -5,7 +5,7 @@ import { h } from 'vue'
 
 import type { IKnowledgeArticle } from '@/services/api/knowledge.api'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 import { knowledgePublishStatusConfig } from '@/services/api/knowledge.api'
 
@@ -13,6 +13,15 @@ import DataTableRowActions from './data-table-row-actions.vue'
 
 export const columns: ColumnDef<IKnowledgeArticle>[] = [
   SelectColumn as ColumnDef<IKnowledgeArticle>,
+  {
+    accessorKey: 'coverImage',
+    header: ({ column }) => h(DataTableColumnHeader<IKnowledgeArticle>, { column, title: '封面' }),
+    meta: { title: '封面' },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.coverImage, alt: '封面', size: 'h-10 w-16' }),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: false,
+  },
   {
     accessorKey: 'title',
     header: ({ column }) => h(DataTableColumnHeader<IKnowledgeArticle>, { column, title: '标题' }),

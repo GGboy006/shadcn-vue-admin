@@ -2,7 +2,7 @@ import type { ColumnDef } from '@tanstack/vue-table'
 
 import { h } from 'vue'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 
 import type { Merchant } from '../../merchants/data/schema'
@@ -25,6 +25,24 @@ export const businessStatusConfig: Record<number, { label: string, variant: 'inf
 
 export const columns: ColumnDef<Merchant>[] = [
   SelectColumn as ColumnDef<Merchant>,
+  {
+    accessorKey: 'avatar',
+    header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '头像' }),
+    meta: { title: '头像' },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.avatar, alt: '头像', shape: 'circle' }),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: false,
+  },
+  {
+    accessorKey: 'logo',
+    header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: 'Logo' }),
+    meta: { title: 'Logo' },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.logo, alt: 'Logo' }),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: false,
+  },
   {
     accessorKey: 'merchantName',
     header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '名称' }),

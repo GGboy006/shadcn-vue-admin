@@ -4,7 +4,7 @@ import { h } from 'vue'
 
 import type { IHousekeeperStaff } from '@/services/api/housekeeper.api'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 import { housekeeperEnableStatusConfig } from '@/services/api/housekeeper.api'
 
@@ -12,6 +12,15 @@ import DataTableRowActions from './data-table-row-actions.vue'
 
 export const columns: ColumnDef<IHousekeeperStaff>[] = [
   SelectColumn as ColumnDef<IHousekeeperStaff>,
+  {
+    accessorKey: 'avatar',
+    header: ({ column }) => h(DataTableColumnHeader<IHousekeeperStaff>, { column, title: '头像' }),
+    meta: { title: '头像' },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.avatar, alt: '头像', shape: 'circle' }),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: false,
+  },
   {
     accessorKey: 'staffName',
     header: ({ column }) => h(DataTableColumnHeader<IHousekeeperStaff>, { column, title: '人员姓名' }),

@@ -4,7 +4,7 @@ import { h } from 'vue'
 
 import type { ICommunityNotice } from '@/services/api/community-notice.api'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 import {
   noticeContentTypeConfig,
@@ -15,6 +15,15 @@ import DataTableRowActions from './data-table-row-actions.vue'
 
 export const columns: ColumnDef<ICommunityNotice>[] = [
   SelectColumn as ColumnDef<ICommunityNotice>,
+  {
+    accessorKey: 'poster',
+    header: ({ column }) => h(DataTableColumnHeader<ICommunityNotice>, { column, title: '封面' }),
+    meta: { title: '封面' },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.poster, alt: '封面', size: 'h-10 w-16' }),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: false,
+  },
   {
     accessorKey: 'title',
     header: ({ column }) => h(DataTableColumnHeader<ICommunityNotice>, { column, title: '标题' }),

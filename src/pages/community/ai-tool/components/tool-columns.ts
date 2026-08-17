@@ -4,7 +4,7 @@ import { h } from 'vue'
 
 import type { IResidentAiTool } from '@/services/api/resident-ai-tool.api'
 
-import { DataTableColumnHeader } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 import { residentAiToolEnableStatusConfig } from '@/services/api/resident-ai-tool.api'
 
@@ -15,6 +15,15 @@ import { residentAiToolEnableStatusConfig } from '@/services/api/resident-ai-too
  * 故不提供行操作列。`otherCode` 有值即说明后端同步城市服务成功。
  */
 export const toolColumns: ColumnDef<IResidentAiTool>[] = [
+  {
+    accessorKey: 'poster',
+    header: ({ column }) => h(DataTableColumnHeader<IResidentAiTool>, { column, title: '封面' }),
+    meta: { title: '封面' },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.poster, alt: '封面', size: 'h-10 w-16' }),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: false,
+  },
   {
     accessorKey: 'skillName',
     header: ({ column }) => h(DataTableColumnHeader<IResidentAiTool>, { column, title: '工具名称' }),

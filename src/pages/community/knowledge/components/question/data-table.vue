@@ -9,7 +9,9 @@ import DataTableToolbar from './data-table-toolbar.vue'
 const props = defineProps<DataTableProps<IKnowledgeQuestion>>()
 
 const table = useGenerateVueTable<IKnowledgeQuestion>(props, {
-  initialColumnVisibility: {},
+  initialColumnVisibility: {
+    icon: false,
+  },
 })
 </script>
 

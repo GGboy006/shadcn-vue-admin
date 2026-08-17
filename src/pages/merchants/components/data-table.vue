@@ -11,6 +11,7 @@ const props = defineProps<DataTableProps<Merchant>>()
 
 const table = useGenerateVueTable<Merchant>(props, {
   initialColumnVisibility: {
+    avatar: false,
     merchantCode: false,
     businessStatus: false,
     address: false,

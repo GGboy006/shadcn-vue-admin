@@ -9,7 +9,9 @@ import DataTableToolbar from './data-table-toolbar.vue'
 const props = defineProps<DataTableProps<IHousekeeperService>>()
 
 const table = useGenerateVueTable<IHousekeeperService>(props, {
-  initialColumnVisibility: {},
+  initialColumnVisibility: {
+    icon: false,
+  },
 })
 </script>
 

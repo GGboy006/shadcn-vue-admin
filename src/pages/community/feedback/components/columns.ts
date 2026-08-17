@@ -4,7 +4,7 @@ import { h } from 'vue'
 
 import type { IFeedback } from '@/services/api/feedback.api'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 import { feedbackStatusConfig, feedbackTypeConfig } from '@/services/api/feedback.api'
 
@@ -12,6 +12,15 @@ import DataTableRowActions from './data-table-row-actions.vue'
 
 export const columns: ColumnDef<IFeedback>[] = [
   SelectColumn as ColumnDef<IFeedback>,
+  {
+    accessorKey: 'avatar',
+    header: ({ column }) => h(DataTableColumnHeader<IFeedback>, { column, title: '头像' }),
+    meta: { title: '头像' },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.avatar, alt: '头像', shape: 'circle' }),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: false,
+  },
   {
     accessorKey: 'userName',
     header: ({ column }) => h(DataTableColumnHeader<IFeedback>, { column, title: '反馈人' }),
@@ -27,6 +36,23 @@ export const columns: ColumnDef<IFeedback>[] = [
     enableSorting: false,
     enableHiding: false,
     enableResizing: true,
+  },
+  {
+    accessorKey: 'images',
+    header: ({ column }) => h(DataTableColumnHeader<IFeedback>, { column, title: '反馈图片' }),
+    meta: { title: '反馈图片' },
+    cell: ({ row }) => {
+      const images = row.original.images
+      if (!images || images.length === 0)
+        return h(DataTableImageCell, { size: 'h-10 w-10' })
+      return h('div', { class: 'flex items-center gap-1' }, [
+        h(DataTableImageCell, { src: images[0], alt: '反馈图片', size: 'h-10 w-10' }),
+        images.length > 1 ? h('span', { class: 'text-xs text-muted-foreground' }, `+${images.length - 1}`) : null,
+      ])
+    },
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: false,
   },
   {
     accessorKey: 'feedbackType',

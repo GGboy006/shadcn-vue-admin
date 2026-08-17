@@ -5,7 +5,7 @@ import { RouterLink } from 'vue-router'
 
 import type { INeighborhoodSpecial } from '@/services/api/neighborhood-special.api'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 import { specialEnableStatusConfig } from '@/services/api/neighborhood-special.api'
 
@@ -13,6 +13,15 @@ import DataTableRowActions from './data-table-row-actions.vue'
 
 export const columns: ColumnDef<INeighborhoodSpecial>[] = [
   SelectColumn as ColumnDef<INeighborhoodSpecial>,
+  {
+    accessorKey: 'poster',
+    header: ({ column }) => h(DataTableColumnHeader<INeighborhoodSpecial>, { column, title: '封面' }),
+    meta: { title: '封面' },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.poster, alt: '封面', size: 'h-10 w-16' }),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: false,
+  },
   {
     accessorKey: 'name',
     header: ({ column }) => h(DataTableColumnHeader<INeighborhoodSpecial>, { column, title: '专题名称' }),

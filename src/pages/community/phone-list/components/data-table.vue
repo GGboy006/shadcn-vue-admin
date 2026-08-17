@@ -9,7 +9,9 @@ import DataTableToolbar from './data-table-toolbar.vue'
 const props = defineProps<DataTableProps<ICommunityPhone>>()
 
 const table = useGenerateVueTable<ICommunityPhone>(props, {
-  initialColumnVisibility: {},
+  initialColumnVisibility: {
+    poster: false,
+  },
 })
 </script>
 

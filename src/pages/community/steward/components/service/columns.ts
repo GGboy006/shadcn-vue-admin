@@ -4,7 +4,7 @@ import { h } from 'vue'
 
 import type { IHousekeeperService } from '@/services/api/housekeeper.api'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 import { housekeeperEnableStatusConfig } from '@/services/api/housekeeper.api'
 
@@ -12,6 +12,24 @@ import DataTableRowActions from './data-table-row-actions.vue'
 
 export const columns: ColumnDef<IHousekeeperService>[] = [
   SelectColumn as ColumnDef<IHousekeeperService>,
+  {
+    accessorKey: 'icon',
+    header: ({ column }) => h(DataTableColumnHeader<IHousekeeperService>, { column, title: '图标' }),
+    meta: { title: '图标' },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.icon, alt: '图标' }),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: false,
+  },
+  {
+    accessorKey: 'coverImage',
+    header: ({ column }) => h(DataTableColumnHeader<IHousekeeperService>, { column, title: '封面' }),
+    meta: { title: '封面' },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.coverImage, alt: '封面', size: 'h-10 w-16' }),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: false,
+  },
   {
     accessorKey: 'name',
     header: ({ column }) => h(DataTableColumnHeader<IHousekeeperService>, { column, title: '服务名称' }),

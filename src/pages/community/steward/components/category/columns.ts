@@ -4,7 +4,7 @@ import { h } from 'vue'
 
 import type { IHousekeeperCategory } from '@/services/api/housekeeper.api'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 import { housekeeperEnableStatusConfig } from '@/services/api/housekeeper.api'
 
@@ -12,6 +12,15 @@ import DataTableRowActions from './data-table-row-actions.vue'
 
 export const columns: ColumnDef<IHousekeeperCategory>[] = [
   SelectColumn as ColumnDef<IHousekeeperCategory>,
+  {
+    accessorKey: 'icon',
+    header: ({ column }) => h(DataTableColumnHeader<IHousekeeperCategory>, { column, title: '图标' }),
+    meta: { title: '图标' },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.icon, alt: '图标' }),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: false,
+  },
   {
     accessorKey: 'categoryName',
     header: ({ column }) => h(DataTableColumnHeader<IHousekeeperCategory>, { column, title: '分类名称' }),
