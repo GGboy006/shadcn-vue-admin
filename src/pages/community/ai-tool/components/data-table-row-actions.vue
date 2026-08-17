@@ -6,6 +6,7 @@ import { PencilIcon, SparklesIcon, Trash2Icon } from '@lucide/vue'
 import type { IResidentAiToolCate } from '@/services/api/resident-ai-tool.api'
 
 import { DataTableRowActions } from '@/components/data-table'
+import { useLazyMount } from '@/composables/use-lazy-mount'
 
 import CateDeleteDialog from './cate-delete-dialog.vue'
 import CateFormSheet from './cate-form-sheet.vue'
@@ -16,8 +17,10 @@ const cate = computed(() => props.row.original)
 const router = useRouter()
 
 const isEditOpen = ref(false)
-const isDeleteOpen = ref(false)
 
+const isEditOpenRendered = useLazyMount(isEditOpen)
+const isDeleteOpen = ref(false)
+const isDeleteOpenRendered = useLazyMount(isDeleteOpen)
 const items = computed(() => [
   { key: 'assign', label: '配置工具', icon: SparklesIcon },
   { key: 'edit', label: '编辑', icon: PencilIcon },
@@ -40,6 +43,6 @@ function handleAction(key: string) {
 <template>
   <DataTableRowActions :items="items" @action="handleAction" />
 
-  <CateFormSheet v-model:open="isEditOpen" :cate="cate" />
-  <CateDeleteDialog v-model:open="isDeleteOpen" :cate="cate" />
+  <CateFormSheet v-if="isEditOpenRendered" v-model:open="isEditOpen" :cate="cate" />
+  <CateDeleteDialog v-if="isDeleteOpenRendered" v-model:open="isDeleteOpen" :cate="cate" />
 </template>

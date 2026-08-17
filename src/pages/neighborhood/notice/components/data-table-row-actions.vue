@@ -4,6 +4,7 @@ import type { Row } from '@tanstack/vue-table'
 import type { INeighborhoodNotice } from '@/services/api/neighborhood-notice.api'
 
 import { DataTableRowActions, useRowActions } from '@/components/data-table'
+import { useLazyMount } from '@/composables/use-lazy-mount'
 
 import NoticeDeleteDialog from './notice-delete-dialog.vue'
 import NoticeDetailDialog from './notice-detail-dialog.vue'
@@ -12,8 +13,11 @@ import NoticeFormSheet from './notice-form-sheet.vue'
 const props = defineProps<{ row: Row<INeighborhoodNotice> }>()
 const notice = computed(() => props.row.original)
 const isDetailOpen = ref(false)
+const isDetailOpenRendered = useLazyMount(isDetailOpen)
 const isEditOpen = ref(false)
+const isEditOpenRendered = useLazyMount(isEditOpen)
 const isDeleteOpen = ref(false)
+const isDeleteOpenRendered = useLazyMount(isDeleteOpen)
 const { items, handleAction } = useRowActions({
   view: () => { isDetailOpen.value = true },
   edit: () => { isEditOpen.value = true },
@@ -25,11 +29,11 @@ const { items, handleAction } = useRowActions({
   <DataTableRowActions :items="items" @action="handleAction" />
 
   <!-- 查看:Dialog(居中弹窗,只读详情) -->
-  <NoticeDetailDialog v-model:open="isDetailOpen" :unique-code="notice?.uniqueCode" />
+  <NoticeDetailDialog v-if="isDetailOpenRendered" v-model:open="isDetailOpen" :unique-code="notice?.uniqueCode" />
 
   <!-- 新增/编辑:Sheet(右侧滑出抽屉,表单) -->
-  <NoticeFormSheet v-model:open="isEditOpen" :notice="notice" />
+  <NoticeFormSheet v-if="isEditOpenRendered" v-model:open="isEditOpen" :notice="notice" />
 
   <!-- 删除:AlertDialog(确认弹窗) -->
-  <NoticeDeleteDialog v-model:open="isDeleteOpen" :notice="notice" />
+  <NoticeDeleteDialog v-if="isDeleteOpenRendered" v-model:open="isDeleteOpen" :notice="notice" />
 </template>

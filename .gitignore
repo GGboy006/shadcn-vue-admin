@@ -33,3 +33,4 @@ stats.html
 .env.development
 .env.test
 .env.production
+.pnpm-store

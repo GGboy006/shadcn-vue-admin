@@ -9,6 +9,7 @@ import type { IKnowledgeCategory } from '@/services/api/knowledge.api'
 
 import { DataTableRowActions } from '@/components/data-table'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
+import { useLazyMount } from '@/composables/use-lazy-mount'
 import { useUpdateKnowledgeCategoryStatusMutation } from '@/services/api/knowledge.api'
 
 import CategoryDeleteContent from './category-delete.vue'
@@ -23,7 +24,10 @@ const category = computed(() => props.row.original)
 const router = useRouter()
 
 const isEditOpen = ref(false)
+
+const isEditOpenRendered = useLazyMount(isEditOpen)
 const isDeleteOpen = ref(false)
+const isDeleteOpenRendered = useLazyMount(isDeleteOpen)
 const showComponent = shallowRef<Component | null>(null)
 
 const { mutate: toggleStatus, isPending: isToggling } = useUpdateKnowledgeCategoryStatusMutation()
@@ -79,9 +83,9 @@ function handleAction(key: string) {
 <template>
   <DataTableRowActions :items="items" @action="handleAction" />
 
-  <CategoryEdit v-model:open="isEditOpen" :category="category" @close="isEditOpen = false" />
+  <CategoryEdit v-if="isEditOpenRendered" v-model:open="isEditOpen" :category="category" @close="isEditOpen = false" />
 
-  <Modal v-model:open="isDeleteOpen">
+  <Modal v-if="isDeleteOpenRendered" v-model:open="isDeleteOpen">
     <ModalContent>
       <component
         :is="showComponent"

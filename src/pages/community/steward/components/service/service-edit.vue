@@ -27,7 +27,7 @@ const isEdit = computed(() => !!props.service?.housekeeperId)
 const housekeeperId = computed(() => props.service?.housekeeperId)
 
 // 编辑时拉详情
-const { data: detailData, isLoading: isDetailLoading } = useGetHousekeeperServiceDetailQuery(housekeeperId)
+const { data: detailData, isLoading: isDetailLoading } = useGetHousekeeperServiceDetailQuery(housekeeperId, isOpen)
 
 const serviceDetail = computed(() => {
   if (!isEdit.value)

@@ -35,7 +35,7 @@ function handleAction(key: string) {
       <ModalHeader>
         <ModalTitle>订单详情</ModalTitle>
       </ModalHeader>
-      <OrderDetail :orderid="order.orderid" />
+      <OrderDetail v-if="isOpen" :orderid="order.orderid" />
     </ModalContent>
   </Modal>
 </template>

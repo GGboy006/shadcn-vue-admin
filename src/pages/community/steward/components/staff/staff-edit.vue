@@ -27,7 +27,7 @@ const isEdit = computed(() => !!props.staff?.staffId)
 const staffId = computed(() => props.staff?.staffId)
 
 // 编辑时拉详情
-const { data: detailData, isLoading: isDetailLoading } = useGetHousekeeperStaffDetailQuery(staffId)
+const { data: detailData, isLoading: isDetailLoading } = useGetHousekeeperStaffDetailQuery(staffId, isOpen)
 
 const staffDetail = computed(() => {
   if (!isEdit.value)

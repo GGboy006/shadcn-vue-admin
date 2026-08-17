@@ -8,6 +8,7 @@ import type { ICommunityNotice } from '@/services/api/community-notice.api'
 
 import { DataTableRowActions } from '@/components/data-table'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
+import { useLazyMount } from '@/composables/use-lazy-mount'
 
 import NoticeDeleteContent from './notice-delete.vue'
 import NoticeDetailSheet from './notice-detail-sheet.vue'
@@ -21,12 +22,13 @@ const notice = computed(() => props.row.original)
 
 // 查看走独立 Sheet(已是 Sheet,保留不动)
 const isDetailOpen = ref(false)
-
+const isDetailOpenRendered = useLazyMount(isDetailOpen)
 // 编辑走 FormSheet(NoticeEdit 自带 FormSheet 外壳)
 const isEditOpen = ref(false)
-
+const isEditOpenRendered = useLazyMount(isEditOpen)
 // 删除保留 Modal
 const isDeleteOpen = ref(false)
+const isDeleteOpenRendered = useLazyMount(isDeleteOpen)
 const showComponent = shallowRef<Component | null>(null)
 
 const items = [
@@ -54,13 +56,13 @@ function handleAction(key: string) {
   <DataTableRowActions :items="items" @action="handleAction" />
 
   <!-- 查看:Sheet(保留原样) -->
-  <NoticeDetailSheet v-model:open="isDetailOpen" :unique-code="notice.uniqueCode" />
+  <NoticeDetailSheet v-if="isDetailOpenRendered" v-model:open="isDetailOpen" :unique-code="notice.uniqueCode" />
 
   <!-- 编辑:FormSheet(NoticeEdit 自带响应式外壳) -->
-  <NoticeEdit v-model:open="isEditOpen" :notice="notice" @close="isEditOpen = false" />
+  <NoticeEdit v-if="isEditOpenRendered" v-model:open="isEditOpen" :notice="notice" @close="isEditOpen = false" />
 
   <!-- 删除:保留 Modal -->
-  <Modal v-model:open="isDeleteOpen">
+  <Modal v-if="isDeleteOpenRendered" v-model:open="isDeleteOpen">
     <ModalContent>
       <component
         :is="showComponent"

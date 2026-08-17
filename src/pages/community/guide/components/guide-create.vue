@@ -2,10 +2,13 @@
 import { PlusIcon } from '@lucide/vue'
 
 import { Button } from '@/components/ui/button'
+import { useLazyMount } from '@/composables/use-lazy-mount'
 
 import GuideFormSheet from './guide-form-sheet.vue'
 
 const isOpen = ref(false)
+
+const isOpenRendered = useLazyMount(isOpen)
 </script>
 
 <template>
@@ -14,5 +17,5 @@ const isOpen = ref(false)
     新建指南
   </Button>
 
-  <GuideFormSheet v-model:open="isOpen" />
+  <GuideFormSheet v-if="isOpenRendered" v-model:open="isOpen" />
 </template>

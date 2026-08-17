@@ -27,7 +27,7 @@ const isEdit = computed(() => !!props.question?.questionId)
 const questionId = computed(() => props.question?.questionId)
 
 // 编辑时拉详情
-const { data: detailData, isLoading: isDetailLoading } = useGetKnowledgeQuestionDetailQuery(questionId)
+const { data: detailData, isLoading: isDetailLoading } = useGetKnowledgeQuestionDetailQuery(questionId, isOpen)
 
 const questionDetail = computed(() => {
   if (!isEdit.value)

@@ -27,7 +27,7 @@ const isEdit = computed(() => !!props.category?.categoryId)
 const categoryId = computed(() => props.category?.categoryId)
 
 // 编辑时拉详情
-const { data: detailData, isLoading: isDetailLoading } = useGetHousekeeperCategoryDetailQuery(categoryId)
+const { data: detailData, isLoading: isDetailLoading } = useGetHousekeeperCategoryDetailQuery(categoryId, isOpen)
 
 const categoryDetail = computed(() => {
   if (!isEdit.value)

@@ -9,6 +9,7 @@ import type { IKnowledgeArticle, KnowledgePublishStatus } from '@/services/api/k
 
 import { DataTableRowActions } from '@/components/data-table'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
+import { useLazyMount } from '@/composables/use-lazy-mount'
 import { useUpdateKnowledgeArticlePublishStatusMutation, useUpdateKnowledgeArticleTopMutation } from '@/services/api/knowledge.api'
 
 import ArticleDeleteContent from './article-delete.vue'
@@ -23,7 +24,10 @@ const props = defineProps<DataTableRowActionsProps>()
 const article = computed(() => props.row.original)
 
 const isEditOpen = ref(false)
+
+const isEditOpenRendered = useLazyMount(isEditOpen)
 const isDeleteOpen = ref(false)
+const isDeleteOpenRendered = useLazyMount(isDeleteOpen)
 const showComponent = shallowRef<Component | null>(null)
 
 const { mutate: updatePublishStatus, isPending: isPublishing } = useUpdateKnowledgeArticlePublishStatusMutation()
@@ -108,9 +112,9 @@ function handleAction(key: string) {
 <template>
   <DataTableRowActions :items="items" @action="handleAction" />
 
-  <ArticleEdit v-model:open="isEditOpen" :article="article" :lock-category-id="lockCategoryId" @close="isEditOpen = false" />
+  <ArticleEdit v-if="isEditOpenRendered" v-model:open="isEditOpen" :article="article" :lock-category-id="lockCategoryId" @close="isEditOpen = false" />
 
-  <Modal v-model:open="isDeleteOpen">
+  <Modal v-if="isDeleteOpenRendered" v-model:open="isDeleteOpen">
     <ModalContent>
       <component
         :is="showComponent"

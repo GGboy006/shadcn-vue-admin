@@ -6,6 +6,7 @@ import { BotIcon, PencilIcon, StoreIcon, Trash2Icon } from '@lucide/vue'
 import { DataTableRowActions } from '@/components/data-table'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
 import { useEnterMerchantBusiness } from '@/composables/use-enter-merchant-business'
+import { useLazyMount } from '@/composables/use-lazy-mount'
 
 import type { Merchant } from '../../merchants/data/schema'
 
@@ -18,8 +19,9 @@ interface DataTableRowActionsProps {
 const props = defineProps<DataTableRowActionsProps>()
 const committee = computed(() => props.row.original)
 const isEditOpen = ref(false)
+const isEditOpenRendered = useLazyMount(isEditOpen)
 const isDeleteOpen = ref(false)
-
+const isDeleteOpenRendered = useLazyMount(isDeleteOpen)
 const router = useRouter()
 
 const items = [
@@ -61,10 +63,10 @@ function handleAction(key: string) {
   />
 
   <!-- 编辑:Sheet(右侧抽屉,走 /station/neighborhood) -->
-  <CommitteeFormSheet v-model:open="isEditOpen" :committee="committee" />
+  <CommitteeFormSheet v-if="isEditOpenRendered" v-model:open="isEditOpen" :committee="committee" />
 
   <!-- 删除:复用商户删除组件(删除接口共用 /station/merchant/{id},文档 1.5) -->
-  <Modal v-model:open="isDeleteOpen">
+  <Modal v-if="isDeleteOpenRendered" v-model:open="isDeleteOpen">
     <ModalContent>
       <MerchantDelete :merchant="committee" @close="isDeleteOpen = false" />
     </ModalContent>

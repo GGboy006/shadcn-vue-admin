@@ -27,7 +27,7 @@ const isEdit = computed(() => !!props.dynamic?.uniqueCode)
 const uniqueCode = computed(() => props.dynamic?.uniqueCode)
 
 // 编辑时拉详情
-const { data: detailData, isLoading: isDetailLoading } = useGetDynamicDetailQuery(uniqueCode)
+const { data: detailData, isLoading: isDetailLoading } = useGetDynamicDetailQuery(uniqueCode, isOpen)
 
 const dynamicDetail = computed(() => {
   if (!isEdit.value)

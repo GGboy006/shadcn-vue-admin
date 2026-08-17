@@ -333,7 +333,7 @@ export function useGetGoodsPageQuery(merchantId: Ref<string>, query: Ref<IGoodsP
 }
 
 /** 获取商品详情 */
-export function useGetGoodsDetailQuery(merchantId: Ref<string>, goodsCode: Ref<string | undefined>) {
+export function useGetGoodsDetailQuery(merchantId: Ref<string>, goodsCode: Ref<string | undefined>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IResponse<IGoodsResp>, Error>({
@@ -342,7 +342,7 @@ export function useGetGoodsDetailQuery(merchantId: Ref<string>, goodsCode: Ref<s
       method: 'get',
       query: { goodsCode: goodsCode.value },
     }),
-    enabled: () => !!merchantId.value && !!goodsCode.value,
+    enabled: () => (enabled?.value ?? true) && !!merchantId.value && !!goodsCode.value,
     retry: false,
   })
 }
@@ -572,7 +572,7 @@ export function useGetActivityPageQuery(merchantId: Ref<string>, query: Ref<IAct
 }
 
 /** 获取活动详情 */
-export function useGetActivityDetailQuery(merchantId: Ref<string>, activityCode: Ref<string | undefined>) {
+export function useGetActivityDetailQuery(merchantId: Ref<string>, activityCode: Ref<string | undefined>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IResponse<IActivityResp>, Error>({
@@ -581,7 +581,7 @@ export function useGetActivityDetailQuery(merchantId: Ref<string>, activityCode:
       method: 'get',
       query: { activityCode: activityCode.value },
     }),
-    enabled: () => !!merchantId.value && !!activityCode.value,
+    enabled: () => (enabled?.value ?? true) && !!merchantId.value && !!activityCode.value,
     retry: false,
   })
 }
@@ -690,7 +690,7 @@ export function useGetOrderPageQuery(merchantId: Ref<string>, query: Ref<IOrderP
 }
 
 /** 获取订单详情 */
-export function useGetOrderDetailQuery(merchantId: Ref<string>, orderid: Ref<string | undefined>) {
+export function useGetOrderDetailQuery(merchantId: Ref<string>, orderid: Ref<string | undefined>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IResponse<IOrderDetailVO>, Error>({
@@ -699,7 +699,7 @@ export function useGetOrderDetailQuery(merchantId: Ref<string>, orderid: Ref<str
       method: 'get',
       query: { orderid: orderid.value },
     }),
-    enabled: () => !!merchantId.value && !!orderid.value,
+    enabled: () => (enabled?.value ?? true) && !!merchantId.value && !!orderid.value,
     retry: false,
   })
 }

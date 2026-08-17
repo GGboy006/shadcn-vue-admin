@@ -3,6 +3,7 @@ import { UserRoundPlusIcon } from '@lucide/vue'
 
 import type { MerchantType } from '@/services/api/merchant.api'
 
+import { useLazyMount } from '@/composables/use-lazy-mount'
 import { merchantTypeConfig } from '@/services/api/merchant.api'
 
 import MerchantEdit from './merchant-edit.vue'
@@ -14,6 +15,7 @@ const { type } = defineProps<{
 
 const isOpen = ref(false)
 
+const isOpenRendered = useLazyMount(isOpen)
 const typeLabel = computed(() => merchantTypeConfig[type]?.label || '商户/物业')
 </script>
 
@@ -24,5 +26,5 @@ const typeLabel = computed(() => merchantTypeConfig[type]?.label || '商户/物�
   </UiButton>
 
   <!-- MerchantEdit 自带 FormSheet 响应式外壳 -->
-  <MerchantEdit v-model:open="isOpen" :type="type" @close="isOpen = false" />
+  <MerchantEdit v-if="isOpenRendered" v-model:open="isOpen" :type="type" @close="isOpen = false" />
 </template>

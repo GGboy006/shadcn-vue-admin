@@ -6,6 +6,7 @@ import { BotIcon, PencilIcon, StoreIcon, Trash2Icon } from '@lucide/vue'
 import { DataTableRowActions } from '@/components/data-table'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
 import { useEnterMerchantBusiness } from '@/composables/use-enter-merchant-business'
+import { useLazyMount } from '@/composables/use-lazy-mount'
 
 import type { Merchant } from '../data/schema'
 
@@ -22,10 +23,10 @@ const router = useRouter()
 
 // 编辑走 FormSheet(MerchantEdit 自带响应式外壳)
 const isEditOpen = ref(false)
-
+const isEditOpenRendered = useLazyMount(isEditOpen)
 // 删除保留 Modal
 const isDeleteOpen = ref(false)
-
+const isDeleteOpenRendered = useLazyMount(isDeleteOpen)
 const items = [
   { key: 'edit', label: '编辑', icon: PencilIcon },
   { key: 'assign', label: '分配AI工具', icon: BotIcon },
@@ -64,10 +65,10 @@ function handleAction(key: string) {
   />
 
   <!-- 编辑:FormSheet(MerchantEdit 自带响应式外壳) -->
-  <MerchantEdit v-model:open="isEditOpen" :merchant="merchant" @close="isEditOpen = false" />
+  <MerchantEdit v-if="isEditOpenRendered" v-model:open="isEditOpen" :merchant="merchant" @close="isEditOpen = false" />
 
   <!-- 删除:保留 Modal -->
-  <Modal v-model:open="isDeleteOpen">
+  <Modal v-if="isDeleteOpenRendered" v-model:open="isDeleteOpen">
     <ModalContent>
       <MerchantDelete :merchant="merchant" @close="isDeleteOpen = false" />
     </ModalContent>

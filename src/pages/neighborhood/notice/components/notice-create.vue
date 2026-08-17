@@ -2,10 +2,13 @@
 import { PlusIcon } from '@lucide/vue'
 
 import { Button } from '@/components/ui/button'
+import { useLazyMount } from '@/composables/use-lazy-mount'
 
 import NoticeFormSheet from './notice-form-sheet.vue'
 
 const isOpen = ref(false)
+
+const isOpenRendered = useLazyMount(isOpen)
 </script>
 
 <template>
@@ -14,5 +17,5 @@ const isOpen = ref(false)
     新建居委会公告
   </Button>
 
-  <NoticeFormSheet v-model:open="isOpen" />
+  <NoticeFormSheet v-if="isOpenRendered" v-model:open="isOpen" />
 </template>

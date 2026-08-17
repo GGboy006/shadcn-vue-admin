@@ -32,6 +32,7 @@ const merchantId = computed(() => props.merchant?.merchantId)
 
 const { data: detailData, isLoading: isDetailLoading } = useGetMerchantDetailQuery(
   computed(() => merchantId.value),
+  isOpen,
 )
 
 const merchantDetail = computed(() => {

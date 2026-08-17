@@ -29,7 +29,7 @@ const isEdit = computed(() => !!props.article?.articleId)
 const articleId = computed(() => props.article?.articleId)
 
 // 编辑时拉详情
-const { data: detailData, isLoading: isDetailLoading } = useGetKnowledgeArticleDetailQuery(articleId)
+const { data: detailData, isLoading: isDetailLoading } = useGetKnowledgeArticleDetailQuery(articleId, isOpen)
 
 const articleDetail = computed(() => {
   if (!isEdit.value)

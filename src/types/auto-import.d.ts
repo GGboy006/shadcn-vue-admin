@@ -87,6 +87,7 @@ declare global {
   const useCurrentMerchantId: typeof import('../composables/use-current-merchant-id').useCurrentMerchantId
   const useEnterMerchantBusiness: typeof import('../composables/use-enter-merchant-business').useEnterMerchantBusiness
   const useId: typeof import('vue').useId
+  const useLazyMount: typeof import('../composables/use-lazy-mount').useLazyMount
   const useLink: typeof import('vue-router')['useLink']
   const useModel: typeof import('vue').useModel
   const useProxyEntry: typeof import('../composables/use-proxy-entry').useProxyEntry

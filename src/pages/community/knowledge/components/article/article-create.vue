@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { PlusIcon } from '@lucide/vue'
 
+import { useLazyMount } from '@/composables/use-lazy-mount'
+
 import ArticleEdit from './article-edit.vue'
 
 const props = defineProps<{
@@ -9,6 +11,8 @@ const props = defineProps<{
 }>()
 
 const isOpen = ref(false)
+
+const isOpenRendered = useLazyMount(isOpen)
 </script>
 
 <template>
@@ -18,5 +22,5 @@ const isOpen = ref(false)
   </UiButton>
 
   <!-- ArticleEdit 自带 FormSheet 响应式外壳 -->
-  <ArticleEdit v-model:open="isOpen" :lock-category-id="props.lockCategoryId" @close="isOpen = false" />
+  <ArticleEdit v-if="isOpenRendered" v-model:open="isOpen" :lock-category-id="props.lockCategoryId" @close="isOpen = false" />
 </template>

@@ -4,6 +4,7 @@ import type { Row } from '@tanstack/vue-table'
 import { DataTableRowActions, useRowActions } from '@/components/data-table'
 import { FormSheet, FormSheetContent } from '@/components/prop-ui/form-sheet'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
+import { useLazyMount } from '@/composables/use-lazy-mount'
 
 import type { Faq } from '../data/schema'
 
@@ -17,8 +18,10 @@ const props = defineProps<DataTableRowActionsProps>()
 const faq = computed(() => props.row.original)
 
 const isEditOpen = ref(false)
-const isDeleteOpen = ref(false)
 
+const isEditOpenRendered = useLazyMount(isEditOpen)
+const isDeleteOpen = ref(false)
+const isDeleteOpenRendered = useLazyMount(isDeleteOpen)
 function handleEdit() {
   isEditOpen.value = true
 }
@@ -37,7 +40,7 @@ const { items, handleAction } = useRowActions({ edit: handleEdit, delete: handle
   />
 
   <!-- 编辑:FormSheet(桌面右侧抽屉 / 移动底部抽屉) -->
-  <FormSheet v-model:open="isEditOpen">
+  <FormSheet v-if="isEditOpenRendered" v-model:open="isEditOpen">
     <FormSheetContent>
       <FaqEdit
         :context="faq.uniqueCode ? { faqCode: faq.uniqueCode, initialValues: { categoryName: faq.categoryName, question: faq.question, answer: faq.answer, torder: faq.torder, isEnable: faq.isEnable } } : undefined"
@@ -47,7 +50,7 @@ const { items, handleAction } = useRowActions({ edit: handleEdit, delete: handle
   </FormSheet>
 
   <!-- 删除:保留 Modal(按需求暂不改) -->
-  <Modal v-model:open="isDeleteOpen">
+  <Modal v-if="isDeleteOpenRendered" v-model:open="isDeleteOpen">
     <ModalContent>
       <FaqDelete :faq="faq" @close="isDeleteOpen = false" />
     </ModalContent>

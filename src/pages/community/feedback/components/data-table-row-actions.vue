@@ -9,6 +9,7 @@ import type { IFeedback } from '@/services/api/feedback.api'
 
 import { DataTableRowActions } from '@/components/data-table'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
+import { useLazyMount } from '@/composables/use-lazy-mount'
 import { useUpdateFeedbackStatusMutation } from '@/services/api/feedback.api'
 
 import FeedbackDeleteContent from './feedback-delete.vue'
@@ -22,8 +23,12 @@ const props = defineProps<DataTableRowActionsProps>()
 const feedback = computed(() => props.row.original)
 
 const isDetailOpen = ref(false)
+
+const isDetailOpenRendered = useLazyMount(isDetailOpen)
 const isReplyOpen = ref(false)
+const isReplyOpenRendered = useLazyMount(isReplyOpen)
 const isDeleteOpen = ref(false)
+const isDeleteOpenRendered = useLazyMount(isDeleteOpen)
 const showComponent = shallowRef<Component | null>(null)
 
 const { mutate: updateStatus, isPending: isStatusPending } = useUpdateFeedbackStatusMutation()
@@ -70,13 +75,13 @@ function handleAction(key: string) {
   <DataTableRowActions :items="items" @action="handleAction" />
 
   <!-- 查看:Modal -->
-  <FeedbackDetailSheet v-model:open="isDetailOpen" :feedback-id="feedback.feedbackId" />
+  <FeedbackDetailSheet v-if="isDetailOpenRendered" v-model:open="isDetailOpen" :feedback-id="feedback.feedbackId" />
 
   <!-- 回复:Modal -->
-  <FeedbackReply v-model:open="isReplyOpen" :feedback="feedback" @close="isReplyOpen = false" />
+  <FeedbackReply v-if="isReplyOpenRendered" v-model:open="isReplyOpen" :feedback="feedback" @close="isReplyOpen = false" />
 
   <!-- 删除:Modal -->
-  <Modal v-model:open="isDeleteOpen">
+  <Modal v-if="isDeleteOpenRendered" v-model:open="isDeleteOpen">
     <ModalContent>
       <component
         :is="showComponent"

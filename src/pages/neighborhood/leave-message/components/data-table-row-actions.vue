@@ -6,13 +6,14 @@ import { EyeIcon } from '@lucide/vue'
 import type { INeighborhoodLeaveMessage } from '@/services/api/neighborhood-leave-message.api'
 
 import { DataTableRowActions } from '@/components/data-table'
+import { useLazyMount } from '@/composables/use-lazy-mount'
 
 import LeaveMessageDetailDialog from './leave-message-detail-dialog.vue'
 
 const props = defineProps<{ row: Row<INeighborhoodLeaveMessage> }>()
 const message = computed(() => props.row.original)
 const isDetailOpen = ref(false)
-
+const isDetailOpenRendered = useLazyMount(isDetailOpen)
 const items = [
   { key: 'view', label: '查看详情', icon: EyeIcon },
 ]
@@ -29,5 +30,5 @@ function handleAction(key: string) {
     @action="handleAction"
   />
 
-  <LeaveMessageDetailDialog v-model:open="isDetailOpen" :message="message" />
+  <LeaveMessageDetailDialog v-if="isDetailOpenRendered" v-model:open="isDetailOpen" :message="message" />
 </template>

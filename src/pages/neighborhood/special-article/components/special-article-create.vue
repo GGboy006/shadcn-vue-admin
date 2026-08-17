@@ -2,6 +2,7 @@
 import { PlusIcon } from '@lucide/vue'
 
 import { Button } from '@/components/ui/button'
+import { useLazyMount } from '@/composables/use-lazy-mount'
 
 import SpecialArticleFormSheet from './special-article-form-sheet.vue'
 
@@ -11,6 +12,8 @@ const { specialCode } = defineProps<{
 }>()
 
 const isOpen = ref(false)
+
+const isOpenRendered = useLazyMount(isOpen)
 </script>
 
 <template>
@@ -19,5 +22,5 @@ const isOpen = ref(false)
     新建文章
   </Button>
 
-  <SpecialArticleFormSheet v-model:open="isOpen" :special-code="specialCode" />
+  <SpecialArticleFormSheet v-if="isOpenRendered" v-model:open="isOpen" :special-code="specialCode" />
 </template>
