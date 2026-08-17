@@ -2,7 +2,7 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
-import { PencilIcon, Trash2Icon } from '@lucide/vue'
+import { BanIcon, CircleCheckIcon, PencilIcon, Trash2Icon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
 import type { IKnowledgeQuestion } from '@/services/api/knowledge.api'
@@ -33,7 +33,7 @@ const items = computed(() => {
   if (!editable.value)
     return []
   return [
-    { key: 'toggleStatus', label: question.value.status === 1 ? '禁用' : '启用', icon: PencilIcon, disabled: isToggling.value },
+    { key: 'toggleStatus', label: question.value.status === 1 ? '禁用' : '启用', icon: question.value.status === 1 ? BanIcon : CircleCheckIcon, disabled: isToggling.value },
     { key: 'edit', label: '编辑', icon: PencilIcon },
     { key: 'delete', label: '删除', icon: Trash2Icon, variant: 'destructive' as const },
   ]

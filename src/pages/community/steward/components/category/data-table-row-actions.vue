@@ -2,7 +2,7 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
-import { PencilIcon, Trash2Icon, UserPlusIcon } from '@lucide/vue'
+import { BanIcon, CircleCheckIcon, PencilIcon, Trash2Icon, UserPlusIcon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
 import type { IHousekeeperCategory } from '@/services/api/housekeeper.api'
@@ -30,7 +30,7 @@ const { mutate: toggleStatus, isPending: isToggling } = useUpdateHousekeeperCate
 
 const items = computed(() => [
   { key: 'assign', label: '分配人员', icon: UserPlusIcon },
-  { key: 'toggleStatus', label: category.value.status === 1 ? '禁用' : '启用', icon: PencilIcon, disabled: isToggling.value },
+  { key: 'toggleStatus', label: category.value.status === 1 ? '禁用' : '启用', icon: category.value.status === 1 ? BanIcon : CircleCheckIcon, disabled: isToggling.value },
   { key: 'edit', label: '编辑', icon: PencilIcon },
   { key: 'delete', label: '删除', icon: Trash2Icon, variant: 'destructive' as const },
 ])

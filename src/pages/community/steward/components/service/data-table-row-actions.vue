@@ -2,7 +2,7 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
-import { PencilIcon, Trash2Icon } from '@lucide/vue'
+import { BanIcon, CircleCheckIcon, PencilIcon, Trash2Icon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
 import type { IHousekeeperService } from '@/services/api/housekeeper.api'
@@ -27,7 +27,7 @@ const showComponent = shallowRef<Component | null>(null)
 const { mutate: toggleStatus, isPending: isToggling } = useUpdateHousekeeperServiceStatusMutation()
 
 const items = computed(() => [
-  { key: 'toggleStatus', label: service.value.status === 1 ? '禁用' : '启用', icon: PencilIcon, disabled: isToggling.value },
+  { key: 'toggleStatus', label: service.value.status === 1 ? '禁用' : '启用', icon: service.value.status === 1 ? BanIcon : CircleCheckIcon, disabled: isToggling.value },
   { key: 'edit', label: '编辑', icon: PencilIcon },
   { key: 'delete', label: '删除', icon: Trash2Icon, variant: 'destructive' as const },
 ])

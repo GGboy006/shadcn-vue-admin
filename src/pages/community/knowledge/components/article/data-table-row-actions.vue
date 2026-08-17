@@ -2,7 +2,7 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
-import { PencilIcon, PinIcon, PinOffIcon, Trash2Icon } from '@lucide/vue'
+import { ArchiveIcon, PencilIcon, PinIcon, PinOffIcon, SendIcon, Trash2Icon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
 import type { IKnowledgeArticle, KnowledgePublishStatus } from '@/services/api/knowledge.api'
@@ -50,7 +50,7 @@ const items = computed(() => {
     {
       key: 'togglePublish',
       label: isPublished.value ? '下架' : '发布',
-      icon: PencilIcon,
+      icon: isPublished.value ? ArchiveIcon : SendIcon,
       disabled: isPublishing.value,
     },
     {

@@ -2,7 +2,7 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
-import { FileTextIcon, PencilIcon, Trash2Icon } from '@lucide/vue'
+import { BanIcon, CircleCheckIcon, FileTextIcon, PencilIcon, Trash2Icon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
 import type { IKnowledgeCategory } from '@/services/api/knowledge.api'
@@ -36,7 +36,7 @@ const items = computed(() => {
     { key: 'articles', label: '查看文章', icon: FileTextIcon },
   ]
   if (editable.value) {
-    list.push({ key: 'toggleStatus', label: category.value.status === 1 ? '禁用' : '启用', icon: PencilIcon, disabled: isToggling.value })
+    list.push({ key: 'toggleStatus', label: category.value.status === 1 ? '禁用' : '启用', icon: category.value.status === 1 ? BanIcon : CircleCheckIcon, disabled: isToggling.value })
     list.push({ key: 'edit', label: '编辑', icon: PencilIcon })
     list.push({ key: 'delete', label: '删除', icon: Trash2Icon, variant: 'destructive' as const })
   }
