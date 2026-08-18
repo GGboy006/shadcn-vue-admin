@@ -86,6 +86,7 @@ describe('mapGoodsDetailToFormValues', () => {
     torder: 1,
     isRecommend: 1,
     isEnable: 1,
+    freeFlag: 1,
     createTime: '2024-01-01 10:00:00',
     updateTime: '2024-01-02 10:00:00',
   }
@@ -104,8 +105,7 @@ describe('mapGoodsDetailToFormValues', () => {
       salePrice: 18.5,
       torder: 1,
       isRecommend: 1,
-      // detail 接口未返回 freeFlag,默认收费
-      freeFlag: 0,
+      freeFlag: 1,
     })
   })
 
@@ -116,5 +116,12 @@ describe('mapGoodsDetailToFormValues', () => {
     expect(result.name).toBe('')
     expect(result.cateCode).toBe('')
     expect(result.cateName).toBe('')
+  })
+
+  it('should default freeFlag to 0 when missing', () => {
+    const { freeFlag: _freeFlag, ...rest } = detail
+    const result = mapGoodsDetailToFormValues(rest as IGoodsResp)
+
+    expect(result.freeFlag).toBe(0)
   })
 })

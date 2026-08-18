@@ -408,6 +408,8 @@ export interface IGoodsResp {
   torder: number
   isRecommend: 1 | 2
   isEnable: 1 | 2
+  /** 0=收费,1=免费 */
+  freeFlag?: 0 | 1
   createTime: string
   updateTime: string
 }

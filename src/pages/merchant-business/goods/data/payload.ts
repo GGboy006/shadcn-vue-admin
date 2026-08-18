@@ -57,7 +57,7 @@ export function buildGoodsPayload(values: GoodsFormValues, goodsCode?: string): 
  * 注意:列表 VO(3.1)缺 cateCode/detailPoster/torder 等字段,
  * 故编辑时必须拉详情接口取完整数据,不能用列表行回显。
  *
- * detail 接口未返回 freeFlag,默认 0(收费)。
+ * freeFlag 缺省时默认 0(收费)。
  */
 export function mapGoodsDetailToFormValues(detail: IGoodsResp): GoodsFormValues {
   return {
@@ -71,6 +71,6 @@ export function mapGoodsDetailToFormValues(detail: IGoodsResp): GoodsFormValues 
     salePrice: detail.salePrice,
     torder: detail.torder,
     isRecommend: detail.isRecommend,
-    freeFlag: 0,
+    freeFlag: detail.freeFlag ?? 0,
   }
 }

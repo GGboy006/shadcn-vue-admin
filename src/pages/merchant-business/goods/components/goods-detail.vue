@@ -2,7 +2,7 @@
 import { useCurrentMerchantId } from '@/composables/use-current-merchant-id'
 import { useGetGoodsDetailQuery } from '@/services/api/merchant-business.api'
 
-import { goodsRecommendConfig, goodsStatusConfig } from '../data/data'
+import { goodsChargeConfig, goodsRecommendConfig, goodsStatusConfig } from '../data/data'
 
 const props = defineProps<{
   goodsCode: string
@@ -37,6 +37,9 @@ const detail = computed(() => data.value?.data)
             价格:{{ detail.salePrice != null ? `¥${detail.salePrice}` : '-' }}
           </div>
           <div class="flex gap-2 pt-1">
+            <span v-if="goodsChargeConfig[detail.freeFlag ?? 0]" class="text-xs px-2 py-0.5 rounded border" :class="goodsChargeConfig[detail.freeFlag ?? 0].style">
+              {{ goodsChargeConfig[detail.freeFlag ?? 0].label }}
+            </span>
             <span v-if="goodsRecommendConfig[detail.isRecommend]" class="text-xs px-2 py-0.5 rounded border" :class="goodsRecommendConfig[detail.isRecommend].style">
               {{ goodsRecommendConfig[detail.isRecommend].label }}
             </span>
