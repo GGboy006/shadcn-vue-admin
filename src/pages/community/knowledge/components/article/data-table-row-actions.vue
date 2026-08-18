@@ -2,7 +2,7 @@
 import type { Row } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 
-import { ArchiveIcon, PencilIcon, PinIcon, PinOffIcon, SendIcon, Trash2Icon } from '@lucide/vue'
+import { ArchiveIcon, EyeIcon, PencilIcon, PinIcon, PinOffIcon, SendIcon, Trash2Icon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
 import type { IKnowledgeArticle, KnowledgePublishStatus } from '@/services/api/knowledge.api'
@@ -13,6 +13,7 @@ import { useLazyMount } from '@/composables/use-lazy-mount'
 import { useUpdateKnowledgeArticlePublishStatusMutation, useUpdateKnowledgeArticleTopMutation } from '@/services/api/knowledge.api'
 
 import ArticleDeleteContent from './article-delete.vue'
+import ArticleDetail from './article-detail.vue'
 import ArticleEdit from './article-edit.vue'
 
 interface DataTableRowActionsProps {
@@ -23,6 +24,8 @@ interface DataTableRowActionsProps {
 const props = defineProps<DataTableRowActionsProps>()
 const article = computed(() => props.row.original)
 
+const isViewOpen = ref(false)
+const isViewOpenRendered = useLazyMount(isViewOpen)
 const isEditOpen = ref(false)
 
 const isEditOpenRendered = useLazyMount(isEditOpen)
@@ -47,9 +50,11 @@ function nextPublishStatus(current?: KnowledgePublishStatus): KnowledgePublishSt
 }
 
 const items = computed(() => {
+  const viewItem = { key: 'view', label: '查看文章', icon: EyeIcon }
   if (!editable.value)
-    return []
-  const list: { key: string, label: string, icon: any, variant?: 'destructive', disabled?: boolean }[] = [
+    return [viewItem]
+  return [
+    viewItem,
     { key: 'edit', label: '编辑', icon: PencilIcon },
     {
       key: 'togglePublish',
@@ -65,7 +70,6 @@ const items = computed(() => {
     },
     { key: 'delete', label: '删除', icon: Trash2Icon, variant: 'destructive' as const },
   ]
-  return list
 })
 
 function handleTogglePublish() {
@@ -93,7 +97,10 @@ function handleToggleTop() {
 }
 
 function handleAction(key: string) {
-  if (key === 'edit') {
+  if (key === 'view') {
+    isViewOpen.value = true
+  }
+  else if (key === 'edit') {
     isEditOpen.value = true
   }
   else if (key === 'togglePublish') {
@@ -111,6 +118,8 @@ function handleAction(key: string) {
 
 <template>
   <DataTableRowActions :items="items" @action="handleAction" />
+
+  <ArticleDetail v-if="isViewOpenRendered" v-model:open="isViewOpen" :article-id="article.articleId" />
 
   <ArticleEdit v-if="isEditOpenRendered" v-model:open="isEditOpen" :article="article" :lock-category-id="lockCategoryId" @close="isEditOpen = false" />
 

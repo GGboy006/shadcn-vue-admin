@@ -45,7 +45,8 @@ const isEdit = computed(() => !!article?.articleId)
 // 分类下拉(§3.1 list 接口)
 const { data: categoryListData } = useGetKnowledgeCategoryListQuery()
 const categoryOptions = computed(() =>
-  (categoryListData.value?.data ?? []).map(c => ({ value: c.categoryId, label: c.categoryName })),
+  // 强制统一为 number，避免后端 categoryId 为字符串导致 Select 严格匹配失败
+  (categoryListData.value?.data ?? []).map(c => ({ value: Number(c.categoryId), label: c.categoryName })),
 )
 
 const initialValues = reactive<ArticleValidator>({
@@ -150,7 +151,7 @@ const onSubmit = handleSubmit((values) => {
           <FormLabel required>
             分类
           </FormLabel>
-          <Select v-bind="componentField" :disabled="!!lockCategoryId">
+          <Select v-bind="componentField">
             <FormControl>
               <SelectTrigger class="w-full">
                 <SelectValue placeholder="请选择分类" />
