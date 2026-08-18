@@ -5,11 +5,11 @@ import { toast } from 'vue-sonner'
 import { z } from 'zod'
 
 import { FormSheetClose, FormSheetFooter, FormSheetHeader, FormSheetTitle } from '@/components/prop-ui/form-sheet'
+import { RichTextEditor } from '@/components/prop-ui/rich-text'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
 import { useCurrentMerchantId } from '@/composables/use-current-merchant-id'
 import { useUpload } from '@/composables/use-upload'
 import {
@@ -250,11 +250,16 @@ const onSubmit = handleSubmit((values) => {
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="content">
+        <FormField name="content">
           <FormItem>
             <FormLabel>内容</FormLabel>
             <FormControl>
-              <Textarea v-bind="componentField" placeholder="商品详细内容" rows="5" />
+              <RichTextEditor
+                :model-value="formValues.content ?? ''"
+                placeholder="请输入商品详细内容"
+                :min-height="200"
+                @update:model-value="setFieldValue('content', $event ?? '')"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>

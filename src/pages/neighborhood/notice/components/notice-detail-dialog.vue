@@ -8,6 +8,7 @@ import {
   ModalHeader,
   ModalTitle,
 } from '@/components/prop-ui/modal'
+import { RichTextContent } from '@/components/prop-ui/rich-text'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -135,9 +136,7 @@ const publicConfig = computed(() => {
             <div class="text-sm font-medium text-muted-foreground">
               正文
             </div>
-            <p class="text-sm leading-relaxed whitespace-pre-wrap">
-              {{ detail.content }}
-            </p>
+            <RichTextContent :content="detail.content" />
           </div>
         </div>
 

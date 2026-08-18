@@ -5,6 +5,7 @@ import { toast } from 'vue-sonner'
 
 import type { ICommunityDynamic, ICommunityDynamicAddDTO, ICommunityDynamicUpdateDTO } from '@/services/api/community-dynamic.api'
 
+import { RichTextEditor } from '@/components/prop-ui/rich-text'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -193,11 +194,16 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
 
       <!-- 正文 -->
-      <FormField v-slot="{ componentField }" name="content">
+      <FormField name="content">
         <FormItem>
           <FormLabel>正文</FormLabel>
           <FormControl>
-            <Textarea v-bind="componentField" placeholder="请输入正文内容" rows="6" />
+            <RichTextEditor
+              :model-value="formValues.content ?? ''"
+              placeholder="请输入正文内容"
+              :min-height="240"
+              @update:model-value="setFieldValue('content', $event ?? '')"
+            />
           </FormControl>
           <FormMessage />
         </FormItem>

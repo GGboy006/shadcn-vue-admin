@@ -5,6 +5,7 @@ import { toast } from 'vue-sonner'
 
 import type { INeighborhoodNotice, INeighborhoodNoticeAddDTO, INeighborhoodNoticeUpdateDTO } from '@/services/api/neighborhood-notice.api'
 
+import { RichTextEditor } from '@/components/prop-ui/rich-text'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -49,7 +50,7 @@ const initialValues = reactive<NoticeValidator>({
 })
 
 const formSchema = toTypedSchema(noticeValidator)
-const { handleSubmit, values: formValues } = useForm({
+const { handleSubmit, setFieldValue, values: formValues } = useForm({
   validationSchema: formSchema,
   initialValues,
 })
@@ -160,11 +161,16 @@ const onSubmit = handleSubmit((values) => {
     </FormField>
 
     <!-- 正文(文本类型) -->
-    <FormField v-if="!isLink" v-slot="{ componentField }" name="content">
+    <FormField v-if="!isLink" name="content">
       <FormItem>
         <FormLabel>正文</FormLabel>
         <FormControl>
-          <Textarea v-bind="componentField" placeholder="请输入正文内容" rows="6" />
+          <RichTextEditor
+            :model-value="formValues.content ?? ''"
+            placeholder="请输入正文内容"
+            :min-height="240"
+            @update:model-value="setFieldValue('content', $event ?? '')"
+          />
         </FormControl>
         <FormMessage />
       </FormItem>

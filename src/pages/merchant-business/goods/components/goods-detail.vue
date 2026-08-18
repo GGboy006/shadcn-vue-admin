@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RichTextContent } from '@/components/prop-ui/rich-text'
 import { useCurrentMerchantId } from '@/composables/use-current-merchant-id'
 import { useGetGoodsDetailQuery } from '@/services/api/merchant-business.api'
 
@@ -68,9 +69,7 @@ const detail = computed(() => data.value?.data)
         <div class="text-muted-foreground mb-1">
           内容
         </div>
-        <div class="whitespace-pre-wrap">
-          {{ detail.content }}
-        </div>
+        <RichTextContent :content="detail.content" />
       </div>
     </template>
     <div v-else class="py-10 text-center text-muted-foreground">
