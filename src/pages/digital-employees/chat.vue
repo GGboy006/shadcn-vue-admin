@@ -147,9 +147,6 @@ watchEffect(() => {
   }
 })
 
-// 反转消息顺序，配合 StreamChatMessageList 的 flex-col-reverse 使最新消息在底部
-const displayMessages = computed(() => [...messages.value].reverse())
-
 // ==================== 输入框 ====================
 
 const inputText = ref('')
@@ -235,7 +232,7 @@ watch(inputText, autoResize)
     <!-- 内容区 -->
     <div class="flex flex-1 flex-col overflow-hidden">
       <StreamChatMessageList
-        :messages="displayMessages"
+        :messages="messages"
         :streaming="isStreaming"
         empty-text="发送消息开始对话"
       >

@@ -97,9 +97,6 @@ const {
   stopGeneration,
 } = useChatStream(skillId, skillType, chatIdFromQuery)
 
-// 反转消息顺序，配合 ChatMessageList 的 flex-col-reverse 使最新消息在底部
-const displayMessages = computed(() => [...messages.value].reverse())
-
 // ==================== Agent 表单模板 ====================
 
 /** Agent 是否有表单模板 */
@@ -252,7 +249,7 @@ function handleQuickCommand(command: CityQuickCommand) {
         <div class="flex flex-1 flex-col overflow-hidden">
           <!-- 消息列表：始终显示，欢迎区通过 header 插槽放在顶部 -->
           <StreamChatMessageList
-            :messages="displayMessages"
+            :messages="messages"
             :streaming="isStreaming"
             empty-text=""
           >
