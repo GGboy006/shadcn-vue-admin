@@ -13,6 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import {
   communityCateEnableStatusConfig,
+  communityCateTempTypeConfig,
   communityCateTypeConfig,
 } from '@/services/api/community-cate.api'
 
@@ -44,6 +45,13 @@ const enableConfig = computed(() => {
   if (status === undefined || status === null)
     return undefined
   return communityCateEnableStatusConfig[status]
+})
+
+const tempTypeConfig = computed(() => {
+  const tempType = detail.value?.tempType
+  if (tempType === undefined || tempType === null)
+    return undefined
+  return communityCateTempTypeConfig[tempType]
 })
 </script>
 
@@ -84,7 +92,7 @@ const enableConfig = computed(() => {
             </div>
             <div>
               <span class="text-muted-foreground">模板类型:</span>
-              <span>{{ detail.tempType ?? '-' }}</span>
+              <span>{{ tempTypeConfig?.label ?? '-' }}</span>
             </div>
             <div>
               <span class="text-muted-foreground">排序:</span>

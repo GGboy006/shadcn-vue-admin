@@ -13,6 +13,9 @@ import type { IPageParam, IPageResult, IResponse } from '../types/response.type'
  */
 export type CommunityCateType = 1 | 2 | 3 | 4 | 5 | 9 | 10
 
+/** 模板类型:1=阅览室,2=居委会服务,3=常规服务,4=生活快捷,5=生活服务,6=生活商户,7=服务快捷,8=便民 */
+export type CommunityCateTempType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+
 /** 启用状态:1=启用,2=禁用 */
 export type CommunityCateEnableStatus = 1 | 2
 
@@ -25,6 +28,18 @@ export const communityCateTypeConfig: Record<CommunityCateType, { label: string 
   5: { label: '服务' },
   9: { label: '商品' },
   10: { label: 'AI助手' },
+}
+
+/** 模板类型映射配置 */
+export const communityCateTempTypeConfig: Record<CommunityCateTempType, { label: string }> = {
+  1: { label: '阅览室' },
+  2: { label: '居委会服务' },
+  3: { label: '常规服务' },
+  4: { label: '生活快捷' },
+  5: { label: '生活服务' },
+  6: { label: '生活商户' },
+  7: { label: '服务快捷' },
+  8: { label: '便民' },
 }
 
 /** 启用状态映射配置 */
@@ -62,7 +77,7 @@ export interface ICommunityCate {
   /** 分类类型 */
   type?: CommunityCateType
   /** 模板类型 */
-  tempType?: number
+  tempType?: CommunityCateTempType
   /** 启用状态:1=启用,2=禁用 */
   isEnable?: CommunityCateEnableStatus
   /** 合伙人标识(后端填充) */
@@ -86,7 +101,7 @@ export interface ICommunityCateAddDTO {
   /** 分类类型 */
   type?: CommunityCateType
   /** 模板类型 */
-  tempType?: number
+  tempType?: CommunityCateTempType
   /** 启用状态:1=启用,2=禁用 */
   isEnable?: CommunityCateEnableStatus
 }
@@ -126,7 +141,7 @@ export function useGetCatePageQuery(query: Ref<ICommunityCateListQuery>) {
  * 按类型获取启用分类下拉(对接文档 12 节,`/community/cate/list?type=`)。
  * type 必填,返回该类型下启用的分类,用于下拉选择。
  */
-export function useGetCateListQuery(query: Ref<ICommunityCateDropdownQuery>) {
+export function useGetCateListQuery(query: Ref<{ type?: CommunityCateType }>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<ICommunityCateDropdownResponse, Error>({
