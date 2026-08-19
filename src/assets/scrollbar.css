@@ -1,7 +1,8 @@
 /* 滚动条样式,Firefox 与 Chrome 系各用一套,颜色统一跟随主题变量 */
 * {
   /* Firefox */
-  scrollbar-width: thin;
+  /* scrollbar-width导致滚页面抖动 */
+  /* scrollbar-width: thin; */
   scrollbar-color: var(--border) transparent;
 }
 
