@@ -221,7 +221,6 @@ async function handleSend() {
 
     inputText.value = ''
     // 刷新消息列表以显示新消息
-    // flex-col-reverse 模式下新消息自动出现在底部，无需手动滚动
     if (isStreamType.value) {
       queryClient.invalidateQueries({ queryKey: ['messageList'] })
     }
@@ -274,8 +273,6 @@ function getInitials(name: string) {
     return '?'
   return name.slice(0, 2).toUpperCase()
 }
-
-// flex-col-reverse 模式下，新消息自然排列在底部，无需手动滚动控制
 </script>
 
 <template>

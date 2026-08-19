@@ -78,9 +78,9 @@ function handleKeydown(e: KeyboardEvent) {
 </script>
 
 <template>
-  <div class="relative -m-4">
+  <div class="relative -m-4 flex h-full flex-col overflow-hidden">
     <!-- 顶部信息栏 -->
-    <div class="sticky top-0 z-10 flex items-center justify-between border-b bg-background px-4 py-3">
+    <div class="flex shrink-0 items-center justify-between border-b bg-background px-4 py-3">
       <div class="flex items-center gap-3">
         <Button
           variant="ghost"
@@ -137,7 +137,7 @@ function handleKeydown(e: KeyboardEvent) {
     />
 
     <!-- 输入框 -->
-    <div class="sticky bottom-0 z-10 border-t bg-background p-4">
+    <div class="shrink-0 border-t bg-background p-4">
       <div class="flex items-end gap-2 rounded-lg border border-input bg-card px-3 py-2 focus-within:ring-1 focus-within:ring-ring">
         <!-- 附件按钮展示没有开发 -->
         <!-- <div class="flex items-center gap-1 pb-1">
@@ -172,4 +172,5 @@ function handleKeydown(e: KeyboardEvent) {
 <route lang="yaml">
 meta:
   auth: true
+  layout: fixed
 </route>
