@@ -27,7 +27,7 @@ export function useSidebar() {
 
   /** 通用菜单项;roles:[3] 为站长专属,商户/物业经 filterNavItemsByRoles 过滤掉 */
   const commonNavItems: NavItem[] = [
-    { title: '仪表盘', url: '/dashboard', icon: LayoutDashboardIcon },
+    { title: '仪表盘', url: '/dashboard', icon: LayoutDashboardIcon, roles: [3] },
     { title: '聊天工作台', url: '/admin/chat-workbench', icon: HeadsetIcon, roles: [3] },
     {
       title: 'AI服务管理',

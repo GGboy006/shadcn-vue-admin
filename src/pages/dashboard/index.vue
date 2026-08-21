@@ -1,49 +1,58 @@
 <script lang="ts" setup>
-import { toast } from 'vue-sonner'
-
 import { BasicPage } from '@/components/global-layout'
-import { Button } from '@/components/ui/button'
+import { useStationWorkbenchQuery } from '@/services/api/workbench.api'
 
-import OverviewContent from './components/overview-content.vue'
+import WorkbenchCommittee from './components/workbench-committee.vue'
+import WorkbenchCommunity from './components/workbench-community.vue'
+import WorkbenchMerchant from './components/workbench-merchant.vue'
+import WorkbenchOverview from './components/workbench-overview.vue'
 
-const tabs = ref([
+/**
+ * Tab 划分对齐站长真实的三大管理对象:商户/小区服务/居委会(见侧边栏
+ * `stationNavData` 的分组),而不是笼统的"经营"/"待办"——避免同一份数据在
+ * 多个 Tab 里重复展示,也让每个 Tab 的数据来源都能对应到具体业务模块。
+ */
+const tabs = [
   { name: '概览', value: 'overview' },
-  { name: '分析', value: 'analytics', disabled: true },
-  { name: '报表', value: 'reports', disabled: true },
-  { name: '通知', value: 'notifications', disabled: true },
-])
+  { name: '商户', value: 'merchant' },
+  { name: '小区服务', value: 'community' },
+  { name: '居委会', value: 'committee' },
+]
 
-const activeTab = ref(tabs.value[0].value)
+const activeTab = ref(tabs[0].value)
+
+// City Data 约定每端最多调用 1 次汇总接口,这里在页面级请求一次,
+// 各 Tab 内容组件只做展示,不重复发请求。
+const { data, isLoading } = useStationWorkbenchQuery()
+const workbench = computed(() => data.value?.data)
 </script>
 
 <template>
   <BasicPage
     title="工作台"
-    description="工作区概览"
+    description="站长工作台概览"
     sticky
   >
-    <template #actions>
-      <Button
-        @click="() => toast('hello', {
-          position: 'top-center',
-        })"
-      >
-        {{ $t('download') }}
-      </Button>
-    </template>
-
     <UiTabs :default-value="activeTab" class="w-full">
       <UiTabsList>
         <UiTabsTrigger
           v-for="tab in tabs" :key="tab.value"
           :value="tab.value"
-          :disabled="tab.disabled"
         >
           {{ tab.name }}
         </UiTabsTrigger>
       </UiTabsList>
       <UiTabsContent value="overview" class="space-y-4">
-        <OverviewContent />
+        <WorkbenchOverview :workbench="workbench" :loading="isLoading" />
+      </UiTabsContent>
+      <UiTabsContent value="merchant" class="space-y-4">
+        <WorkbenchMerchant :workbench="workbench" :loading="isLoading" />
+      </UiTabsContent>
+      <UiTabsContent value="community" class="space-y-4">
+        <WorkbenchCommunity :workbench="workbench" :loading="isLoading" />
+      </UiTabsContent>
+      <UiTabsContent value="committee" class="space-y-4">
+        <WorkbenchCommittee :workbench="workbench" :loading="isLoading" />
       </UiTabsContent>
     </UiTabs>
   </BasicPage>

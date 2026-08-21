@@ -497,8 +497,8 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/neighborhood/home': RouteRecordInfo<
-      '/neighborhood/home',
+    '/neighborhood/home/': RouteRecordInfo<
+      '/neighborhood/home/',
       '/neighborhood/home',
       Record<never, never>,
       Record<never, never>,
@@ -1032,9 +1032,9 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
-    'src/pages/neighborhood/home.vue': {
+    'src/pages/neighborhood/home/index.vue': {
       routes:
-        | '/neighborhood/home'
+        | '/neighborhood/home/'
       views:
         | never
     }

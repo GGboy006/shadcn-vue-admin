@@ -439,6 +439,16 @@ declare module 'vue' {
     UiTooltipContent: typeof import('./../components/ui/tooltip/TooltipContent.vue')['default']
     UiTooltipProvider: typeof import('./../components/ui/tooltip/TooltipProvider.vue')['default']
     UiTooltipTrigger: typeof import('./../components/ui/tooltip/TooltipTrigger.vue')['default']
+    WorkbenchIncomeBarChart: typeof import('./../components/workbench/IncomeBarChart.vue')['default']
+    WorkbenchIncomeRankingList: typeof import('./../components/workbench/IncomeRankingList.vue')['default']
+    WorkbenchKpiCard: typeof import('./../components/workbench/KpiCard.vue')['default']
+    WorkbenchOrderTrendAreaChart: typeof import('./../components/workbench/OrderTrendAreaChart.vue')['default']
+    WorkbenchOrgPendingBarChart: typeof import('./../components/workbench/OrgPendingBarChart.vue')['default']
+    WorkbenchOrgRankingList: typeof import('./../components/workbench/OrgRankingList.vue')['default']
+    WorkbenchPendingDonutChart: typeof import('./../components/workbench/PendingDonutChart.vue')['default']
+    WorkbenchPendingList: typeof import('./../components/workbench/PendingList.vue')['default']
+    WorkbenchSignCompositionChart: typeof import('./../components/workbench/SignCompositionChart.vue')['default']
+    WorkbenchSignTrendChart: typeof import('./../components/workbench/SignTrendChart.vue')['default']
   }
 }
 
@@ -871,4 +881,14 @@ declare global {
   const UiTooltipContent: typeof import('./../components/ui/tooltip/TooltipContent.vue')['default']
   const UiTooltipProvider: typeof import('./../components/ui/tooltip/TooltipProvider.vue')['default']
   const UiTooltipTrigger: typeof import('./../components/ui/tooltip/TooltipTrigger.vue')['default']
+  const WorkbenchIncomeBarChart: typeof import('./../components/workbench/IncomeBarChart.vue')['default']
+  const WorkbenchIncomeRankingList: typeof import('./../components/workbench/IncomeRankingList.vue')['default']
+  const WorkbenchKpiCard: typeof import('./../components/workbench/KpiCard.vue')['default']
+  const WorkbenchOrderTrendAreaChart: typeof import('./../components/workbench/OrderTrendAreaChart.vue')['default']
+  const WorkbenchOrgPendingBarChart: typeof import('./../components/workbench/OrgPendingBarChart.vue')['default']
+  const WorkbenchOrgRankingList: typeof import('./../components/workbench/OrgRankingList.vue')['default']
+  const WorkbenchPendingDonutChart: typeof import('./../components/workbench/PendingDonutChart.vue')['default']
+  const WorkbenchPendingList: typeof import('./../components/workbench/PendingList.vue')['default']
+  const WorkbenchSignCompositionChart: typeof import('./../components/workbench/SignCompositionChart.vue')['default']
+  const WorkbenchSignTrendChart: typeof import('./../components/workbench/SignTrendChart.vue')['default']
 }

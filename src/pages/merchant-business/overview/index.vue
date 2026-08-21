@@ -6,8 +6,16 @@ meta:
 <script setup lang="ts">
 import { BasicPage } from '@/components/global-layout'
 import { useCurrentMerchantId } from '@/composables/use-current-merchant-id'
+import { useMerchantWorkbenchQuery } from '@/services/api/workbench.api'
+
+import WorkbenchOverview from './components/workbench-overview.vue'
 
 const { merchantId, merchantName, proxyMode } = useCurrentMerchantId()
+
+// City Data 约定每端最多调用 1 次汇总接口。商户/物业后台本身已经是独立子系统
+// (侧边栏有完整的商品/订单/活动等菜单),这里不再用 Tab 拆分,单页展示核心数据即可。
+const { data, isLoading } = useMerchantWorkbenchQuery()
+const workbench = computed(() => data.value?.data)
 </script>
 
 <template>
@@ -35,14 +43,8 @@ const { merchantId, merchantName, proxyMode } = useCurrentMerchantId()
         </div>
       </div>
 
-      <!-- 概览内容占位:具体指标待规划 -->
-      <div class="flex flex-col items-center justify-center py-16 rounded-xl border border-dashed text-center">
-        <div class="text-muted-foreground">
-          概览内容建设中
-        </div>
-        <div class="text-xs text-muted-foreground/70 mt-1">
-          后续将在此展示该商户的核心经营指标
-        </div>
+      <div class="space-y-4">
+        <WorkbenchOverview :workbench="workbench" :loading="isLoading" />
       </div>
     </template>
   </BasicPage>
