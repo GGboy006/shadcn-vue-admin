@@ -29,8 +29,8 @@ const workbench = computed(() => data.value?.data)
 
 <template>
   <BasicPage
-    title="工作台"
-    description="站长工作台概览"
+    title="数据看板"
+    description="站长数据看板概览"
     sticky
   >
     <UiTabs :default-value="activeTab" class="w-full">

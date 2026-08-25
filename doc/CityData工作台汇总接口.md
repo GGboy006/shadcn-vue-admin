@@ -44,6 +44,8 @@
 | communityGoodsPendingCount | Long | 社区商品未启用 |
 | secondhandPendingCount | Long | 闲置待审 |
 | leaveMessagePendingCount | Long | orgCodes 留言待处理合计（无回复态可用「未更新」或全量） |
+| orderTrend | Array | 近 7 日（本周 vs 上周同期）`{day,thisWeek,lastWeek}`，未就绪可返回 `[]` |
+| orgAnalysis | Array | 按 orgCode 拆分 `{orgCode,leaveMessagePending}`，未就绪可返回 `[]` |
 
 ### 实现提示
 
@@ -77,6 +79,7 @@
 | expiringActivityCount | Long | endTime 在未来 expiringDays 内 |
 | faqCount | Long | FAQ 总数 |
 | categoryReady | Boolean | 商品分类是否 >0 |
+| orderTrend | Array | 近 7 日 `{day,thisWeek,lastWeek}`，未就绪可返回 `[]` |
 
 ---
 
@@ -112,8 +115,8 @@
 
 | 端 | City Data 调用 | 仍查本库 |
 |----|----------------|----------|
-| 站长 | `workbench().stationSummary` ×1 | 签约/签约费/反馈/AI/智采 |
-| 商户 | `workbench().merchantSummary` ×1 | 家政单/智采/数字员工/对话 |
+| 站长 | `workbench().stationSummary` ×1 | 签约/签约费/反馈/AI 对话与生图（按 userTag 区分商户端/居民端） |
+| 商户/物业 | `workbench().merchantSummary` ×1 | 家政单/数字员工/对话 |
 | 居委会 | `workbench().orgSummary` ×1 | 反馈/知识阅读/AI |
 
 City Data 接口未上线或失败时：web 侧对应字段保持默认 0，**不阻断**本地指标返回。
