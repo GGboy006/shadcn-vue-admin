@@ -9,7 +9,7 @@ interface RoleAwareItem {
  * - 有 roles 的项:仅当前 userType 命中 roles 时可见;userType 未知(undefined)时隐藏受限项
  * - 父菜单(有 items):递归过滤子项;子项过滤后为空则隐藏整组父菜单
  *
- * 抽出为纯函数便于测试;use-sidebar.ts 中「通用」菜单组与「设置」子菜单复用。
+ * 抽出为纯函数便于测试;use-sidebar.ts 中各菜单组与「设置」复用。
  */
 export function filterNavItemsByRoles<T extends RoleAwareItem>(items: T[], userType: number | undefined): T[] {
   return items

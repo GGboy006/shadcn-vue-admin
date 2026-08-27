@@ -6,8 +6,9 @@ import { UserType } from '@/constants/user-type'
 import pinia from '@/plugins/pinia/setup'
 import { useAuthStore } from '@/stores/auth'
 
-/** 不需要登录就能访问的页面 */
-const WHITE_LIST = ['/auth/sign-in', '/auth/sign-up', '/errors/403', '/errors/404', '/errors/401', '/errors/500', '/errors/503']
+import { isPublicPath, MARKETING_HOME } from './public-path'
+
+export { isPublicPath, MARKETING_HOME }
 
 export function setupAuthGuard(router: Router) {
   router.beforeEach((to, from) => {
@@ -16,7 +17,6 @@ export function setupAuthGuard(router: Router) {
 
     const isAuthPage = to.path.startsWith('/auth')
     const isFromAuthPage = from.path.startsWith('/auth')
-    const isWhiteList = WHITE_LIST.includes(to.path)
 
     const userType = authStore.userInfo?.userType
 
@@ -29,8 +29,12 @@ export function setupAuthGuard(router: Router) {
       return { path: userType === UserType.committee ? '/neighborhood/home' : '/dashboard' }
     }
 
-    // 未登录用户访问非白名单页面 -> 重定向到登录页
-    if (!isLogin.value && !isAuthPage && !isWhiteList) {
+    // 未登录访问根路径 -> 官网
+    if (!isLogin.value && (to.path === '/' || to.path === ''))
+      return { path: MARKETING_HOME }
+
+    // 未登录用户访问非公开页面 -> 重定向到登录页
+    if (!isLogin.value && !isPublicPath(to.path)) {
       return {
         path: '/auth/sign-in',
         query: { redirect: to.fullPath },

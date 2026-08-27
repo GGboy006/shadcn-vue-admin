@@ -1,42 +1,46 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
 
-import Marquee from '@/components/inspira-ui/marquee/index.vue'
-
-const types = [
-  { name: 'Nuxt', icon: 'simple-icons:nuxt' },
-  { name: 'Vue', icon: 'simple-icons:vitess' },
-  { name: 'Vite', icon: 'simple-icons:vite' },
-  { name: 'vitest', icon: 'simple-icons:vitest' },
-  { name: 'vscode', icon: 'simple-icons:visualstudiocode' },
-  { name: 'mysql', icon: 'simple-icons:mysql' },
-  { name: 'prisma', icon: 'simple-icons:prisma' },
+const roles = [
+  {
+    icon: 'lucide:layout-dashboard',
+    titleKey: 'marketing.roles.station.title',
+    descriptionKey: 'marketing.roles.station.description',
+  },
+  {
+    icon: 'lucide:store',
+    titleKey: 'marketing.roles.merchant.title',
+    descriptionKey: 'marketing.roles.merchant.description',
+  },
+  {
+    icon: 'lucide:landmark',
+    titleKey: 'marketing.roles.committee.title',
+    descriptionKey: 'marketing.roles.committee.description',
+  },
 ]
 </script>
 
 <template>
-  <div
-    class="relative flex w-full flex-col items-center justify-center overflow-hidden -rotate-3"
-  >
-    <Marquee pause-on-hover reverse class="[--duration:50s]">
-      <div
-        v-for="type in types"
-        :key="type.name"
-        class="flex items-center gap-2 mx-4"
-      >
-        <Icon :icon="type.icon" class="w-12 h-12" />
-        <span class="font-black text-4xl">{{ type.name }}</span>
-      </div>
-    </Marquee>
+  <section id="roles" class="scroll-mt-20">
+    <h2 class="text-3xl lg:text-4xl font-bold text-center">
+      {{ $t('marketing.roles.title') }}
+    </h2>
+    <p class="text-center text-muted-foreground mt-3 mb-8">
+      {{ $t('marketing.roles.subtitle') }}
+    </p>
 
-    <!-- Left Gradient -->
-    <div
-      class="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-linear-to-r from-(--ui-bg) dark:from-(--ui-bg)"
-    />
-
-    <!-- Right Gradient -->
-    <div
-      class="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-linear-to-l from-(--ui-bg) dark:from-(--ui-bg)"
-    />
-  </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <UiCard v-for="role in roles" :key="role.titleKey" class="p-6">
+        <div class="w-fit rounded-lg border p-2 mb-4">
+          <Icon :icon="role.icon" class="size-5" />
+        </div>
+        <h3 class="text-xl font-semibold">
+          {{ $t(role.titleKey) }}
+        </h3>
+        <p class="text-sm text-muted-foreground mt-2 leading-relaxed">
+          {{ $t(role.descriptionKey) }}
+        </p>
+      </UiCard>
+    </div>
+  </section>
 </template>

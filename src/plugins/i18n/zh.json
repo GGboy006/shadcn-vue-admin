@@ -4,97 +4,138 @@
     "UpgradeNow": "现在升级"
   },
   "marketing": {
+    "brand": "小区站长",
+    "nav": {
+      "roles": "角色",
+      "features": "能力",
+      "ai": "AI",
+      "access": "开通"
+    },
+    "apply": "申请开通",
+    "enter": "进入驾驶舱",
     "hero": {
-      "learnPeople": "超过 1K+ 人加入",
-      "getMore": "获取更多",
-      "title": "每个0.01%的进化都在熔铸命运的质变，敢不敢用365天见证脱胎换骨？",
-      "subtitle": "时光沙漏正迸发着惊雷，当量变冲破临界点，你埋首耕耘的每个晨昏都将化作星辰大海！"
+      "title": "把一个小区的运营，收进一个驾驶舱。",
+      "subtitle": "站长看全局，商户管经营，居委会发社区内容。人、店、事、AI 在同一套后台里协同。",
+      "login": "登录后台",
+      "apply": "申请开通",
+      "note": "适用于单小区运营，后续支持一人管多小区"
+    },
+    "preview": {
+      "dashboard": "数据看板",
+      "chat": "聊天工作台",
+      "merchant": "商户概览"
+    },
+    "roles": {
+      "title": "三种工作台，一套体系",
+      "subtitle": "按身份进入对应后台，由站长统一开通和下放。",
+      "station": {
+        "title": "站长",
+        "description": "数据看板、主体管理、小区服务、居民与 AI 运营。"
+      },
+      "merchant": {
+        "title": "商户 / 物业",
+        "description": "概览、订单、商品、活动、常见问题与 AI 工具。"
+      },
+      "committee": {
+        "title": "居委会",
+        "description": "公告、活动、资讯、栏目专题、热线、留言与服务。"
+      }
     },
     "features": {
-      "title": "功能",
+      "title": "已经在跑的能力",
       "feature1": {
-        "title": "使用现代技术",
-        "description": "更加现代化的组件库，自由定制每一个组件"
+        "title": "看清小区",
+        "description": "商户、服务、居委会、待办收在数据看板里，站长一张图掌握。"
       },
       "feature2": {
-        "title": "部署简单",
-        "description": "一键部署到您的服务器，无需复杂的配置"
+        "title": "管好主体",
+        "description": "商户、物业、居委会入驻与分类，站长可代客进入对方后台。"
       },
       "feature3": {
-        "title": "代码开源",
-        "description": "每一行代码都是开源的，您可以自由地修改和扩展"
+        "title": "服务居民",
+        "description": "公告动态知识、指南服务管家电话，加上意见反馈箱。"
       },
       "feature4": {
-        "title": "社区支持",
-        "description": "你可以在社区中找到帮助，也可以分享你的经验"
+        "title": "经营与社区",
+        "description": "店能卖货做活动，委会能发内容办活动，两套工作台分开。"
       }
     },
-    "evaluation": {
-      "title": "评价",
-      "subtitle": "这些评价都是模拟数据，并非实际数据"
-    },
-    "pricingPlans": {
-      "title": "定价计划",
-      "subtitle": "选择最适合你的计划",
-      "buy": "立即购买",
-      "hobby": {
-        "title": "业余爱好者",
-        "description": "三年提高技能",
-        "price": "399",
-        "discount": "599",
-        "unit": "¥",
-        "billing": {
-          "cycle": "",
-          "period": ""
-        },
-        "features": {
-          "feature1": "使用网站部分代码",
-          "feature2": "获取最新的技术更新",
-          "feature3": "超过 100 个组件",
-          "feature4": "超过 100 个页面"
-        }
+    "ai": {
+      "title": "AI 是运营助手，不是无人小区",
+      "subtitle": "数字员工、会话工作台、工具与居民侧能力都已在后台落地。",
+      "item1": {
+        "title": "数字员工",
+        "description": "OPC 组织里的 AI 员工，按部门配置，给运营当助手。"
       },
-      "starter": {
-        "title": "入门计划",
-        "description": "五年提高技能",
-        "price": "599",
-        "discount": "899",
-        "unit": "¥",
-        "billing": {
-          "cycle": "",
-          "period": ""
-        },
-        "features": {
-          "feature1": "使用网站全部代码",
-          "feature2": "阅读精彩的在线文档",
-          "feature3": "获取最新的技术更新",
-          "feature4": "超过 200 个组件",
-          "feature5": "超过 200 个页面"
-        }
+      "item2": {
+        "title": "聊天工作台",
+        "description": "站长查看居民会话与服务记录，跟进咨询而不是代替手打客服。"
       },
-      "business": {
-        "title": "商务计划",
-        "description": "十年提高技能",
-        "price": "199",
-        "discount": "399",
-        "unit": "$",
-        "billing": {
-          "cycle": "",
-          "period": ""
-        },
-        "features": {
-          "feature1": "使用网站全部代码",
-          "feature2": "阅读精彩的在线文档",
-          "feature3": "获取最新的技术更新",
-          "feature4": "超过 200 个组件",
-          "feature5": "超过 200 个页面",
-          "feature6": "私人助理支持"
-        }
+      "item3": {
+        "title": "AI 工具与会话",
+        "description": "站长和商户各有工具与会话列表，技能可按小区配置。"
+      },
+      "item4": {
+        "title": "居民 AI 工具",
+        "description": "站长配置分类与工具，给小区居民在 C 端使用。"
       }
+    },
+    "scenarios": {
+      "title": "谁配置，谁使用",
+      "subtitle": "后台改内容，小区侧就能被居民、商户用上。",
+      "s1": {
+        "title": "内容到居民",
+        "description": "站长发公告、配便民与知识，居民在小区侧看到。"
+      },
+      "s2": {
+        "title": "商户能经营",
+        "description": "商户上架商品、做活动，订单回到商户工作台。"
+      },
+      "s3": {
+        "title": "反馈能闭环",
+        "description": "居民意见与 AI 咨询，站长在反馈箱和聊天工作台处理。"
+      }
+    },
+    "access": {
+      "title": "按小区开通",
+      "subtitle": "不是公开自助注册。一个小区一个站长驾驶舱，下级账号由站长创建。",
+      "open": {
+        "title": "开通",
+        "description": "为小区开通站长主账号，进入驾驶舱。"
+      },
+      "roles": {
+        "title": "包含角色",
+        "description": "站长，以及可开通的商户、物业、居委会账号。"
+      },
+      "next": {
+        "title": "下一步",
+        "description": "填写下方申请，实施同学会联系你；已有账号直接登录。"
+      }
+    },
+    "applyForm": {
+      "title": "联系实施同学开通",
+      "subtitle": "留下小区和联系方式，实施同学会尽快与你确认开通。",
+      "communityName": "小区名称",
+      "communityNamePlaceholder": "例如：桂园小区",
+      "contactName": "联系人",
+      "contactNamePlaceholder": "怎么称呼您",
+      "phone": "手机号",
+      "phonePlaceholder": "11 位手机号",
+      "identity": "您的身份",
+      "identityPlaceholder": "请选择",
+      "remark": "备注",
+      "remarkPlaceholder": "预计入驻商户数、上线时间等，选填",
+      "submit": "提交申请",
+      "successTitle": "申请已记下",
+      "successHint": "实施同学会用这个手机号联系你。",
+      "again": "再填一份"
     },
     "setup": {
-      "title": "快速开始",
-      "subtitle": "只需 3 分钟即可开始使用"
+      "title": "已有账号，进入驾驶舱",
+      "subtitle": "用已开通的站长、商户、物业或居委会账号登录。"
+    },
+    "footer": {
+      "copy": "小区站长驾驶舱"
     }
   },
   "login": "登录",

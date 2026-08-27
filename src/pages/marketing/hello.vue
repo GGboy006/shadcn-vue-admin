@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 </script>
 
 <template>
@@ -7,3 +6,9 @@
     你好
   </div>
 </template>
+
+<route lang="yaml">
+meta:
+  layout: marketing
+  auth: false
+</route>

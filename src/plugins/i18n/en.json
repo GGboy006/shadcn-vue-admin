@@ -4,97 +4,138 @@
     "UpgradeNow": "Upgrade Now"
   },
   "marketing": {
+    "brand": "Community Station",
+    "nav": {
+      "roles": "Roles",
+      "features": "Capabilities",
+      "ai": "AI",
+      "access": "Get access"
+    },
+    "apply": "Request access",
+    "enter": "Open cockpit",
     "hero": {
-      "learnPeople": "More than 1K+ people joined",
-      "getMore": "Get more",
-      "title": "Do you dare to use 365 days to witness a complete transformation?",
-      "subtitle": "The hourglass of time is bursting with thunder. When the quantitative change breaks through the critical point, every morning and evening you work hard will turn into a sea of stars!"
+      "title": "Run one community from a single cockpit.",
+      "subtitle": "Station masters see the whole picture, merchants run the store, neighborhood committees publish community content. People, shops, operations, and AI share one admin.",
+      "login": "Sign in",
+      "apply": "Request access",
+      "note": "Built for one community per station. Multi-community switching is on the roadmap."
+    },
+    "preview": {
+      "dashboard": "Dashboard",
+      "chat": "Chat workbench",
+      "merchant": "Merchant overview"
+    },
+    "roles": {
+      "title": "Three workspaces, one system",
+      "subtitle": "Each identity gets its own admin. The station master provisions accounts.",
+      "station": {
+        "title": "Station master",
+        "description": "Dashboard, organizations, community services, residents, and AI ops."
+      },
+      "merchant": {
+        "title": "Merchant / Property",
+        "description": "Overview, orders, goods, campaigns, FAQs, and AI tools."
+      },
+      "committee": {
+        "title": "Neighborhood committee",
+        "description": "Notices, events, news, columns, hotline, messages, and services."
+      }
     },
     "features": {
-      "title": "Features",
+      "title": "What already ships",
       "feature1": {
-        "title": "Use modern technology",
-        "description": "More modern component library, free to customize each component"
+        "title": "See the community",
+        "description": "Merchants, services, committees, and todos live on one dashboard."
       },
       "feature2": {
-        "title": "Easy to deploy",
-        "description": "One-click deployment to your server, no complicated configuration required"
+        "title": "Manage organizations",
+        "description": "Onboard merchants, property, and committees. Proxy into their admin when needed."
       },
       "feature3": {
-        "title": "Open source code",
-        "description": "Every line of code is open source, you can modify and extend it freely"
+        "title": "Serve residents",
+        "description": "Announcements, guides, steward, phone list, knowledge, and a feedback inbox."
       },
       "feature4": {
-        "title": "Community support",
-        "description": "You can find help in the community and share your experience"
+        "title": "Commerce and community",
+        "description": "Stores sell and run campaigns. Committees publish. Two separate workspaces."
       }
     },
-    "evaluation": {
-      "title": "Evaluation",
-      "subtitle": "These evaluations are simulated data, not actual data"
-    },
-    "pricingPlans": {
-      "title": "Pricing Plans",
-      "subtitle": "Choose the plan that suits you",
-      "buy": "Get it now",
-      "hobby": {
-        "title": "Hobby",
-        "description": "Suitable for beginners",
-        "price": "399",
-        "discount": "599",
-        "unit": "$",
-        "billing": {
-          "cycle": "",
-          "period": ""
-        },
-        "features": {
-          "feature1": "Use part of the website code",
-          "feature2": "Get the latest technology updates",
-          "feature3": "More than 100 components",
-          "feature4": "More than 100 pages"
-        }
+    "ai": {
+      "title": "AI as an operations assistant, not an unmanned community",
+      "subtitle": "Digital employees, a chat workbench, tools, and resident-facing skills are already in the admin.",
+      "item1": {
+        "title": "Digital employees",
+        "description": "OPC-style AI staff, grouped by department, for day-to-day ops."
       },
-      "starter": {
-        "title": "Starter",
-        "description": "Suitable for beginners",
-        "price": "599",
-        "discount": "899",
-        "unit": "$",
-        "billing": {
-          "cycle": "",
-          "period": ""
-        },
-        "features": {
-          "feature1": "Use the entire site's code",
-          "feature2": "Read the excellent online documentation",
-          "feature3": "Get the latest technical updates",
-          "feature4": "Over 200 components",
-          "feature5": "Over 200 pages"
-        }
+      "item2": {
+        "title": "Chat workbench",
+        "description": "Station masters review resident conversations instead of typing as a call center."
       },
-      "business": {
-        "title": "Business",
-        "description": "Suitable for beginners",
-        "price": "199",
-        "discount": "399",
-        "unit": "$",
-        "billing": {
-          "cycle": "",
-          "period": ""
-        },
-        "features": {
-          "feature1": "Use the entire site's code",
-          "feature2": "Read the excellent online documentation",
-          "feature3": "Get the latest technical updates",
-          "feature4": "Over 200 components",
-          "feature5": "Over 200 pages",
-          "feature6": "Private assistant support"
-        }
+      "item3": {
+        "title": "AI tools and sessions",
+        "description": "Station and merchant each get tools and conversation lists, scoped to the community."
+      },
+      "item4": {
+        "title": "Resident AI tools",
+        "description": "Station masters configure categories and tools for residents on the consumer side."
       }
+    },
+    "scenarios": {
+      "title": "Who configures, who uses",
+      "subtitle": "Change it in the admin, and residents or merchants can consume it.",
+      "s1": {
+        "title": "Content reaches residents",
+        "description": "Station masters publish notices and convenience info. Residents see them on the community side."
+      },
+      "s2": {
+        "title": "Merchants can sell",
+        "description": "Merchants list goods and campaigns. Orders come back to their workspace."
+      },
+      "s3": {
+        "title": "Feedback closes the loop",
+        "description": "Resident feedback and AI chats are handled in the inbox and chat workbench."
+      }
+    },
+    "access": {
+      "title": "Provisioned per community",
+      "subtitle": "No public self-serve signup. One station cockpit per community. Downstream accounts are created by the station master.",
+      "open": {
+        "title": "Access",
+        "description": "Provision a station-master account for the community."
+      },
+      "roles": {
+        "title": "Included roles",
+        "description": "Station master, plus merchant, property, and committee accounts you can open."
+      },
+      "next": {
+        "title": "Next step",
+        "description": "Fill in the form below. Your implementation contact will reach out. Sign in if you already have an account."
+      }
+    },
+    "applyForm": {
+      "title": "Request access",
+      "subtitle": "Leave your community and contact details. We will follow up to provision access.",
+      "communityName": "Community name",
+      "communityNamePlaceholder": "e.g. Osmanthus Garden",
+      "contactName": "Contact name",
+      "contactNamePlaceholder": "How should we address you",
+      "phone": "Mobile number",
+      "phonePlaceholder": "11-digit mainland China mobile",
+      "identity": "Your role",
+      "identityPlaceholder": "Select one",
+      "remark": "Notes",
+      "remarkPlaceholder": "Expected merchants, go-live date, optional",
+      "submit": "Submit",
+      "successTitle": "Request saved",
+      "successHint": "Someone will contact you on this number.",
+      "again": "Submit another"
     },
     "setup": {
-      "title": "Setup",
-      "subtitle": "Just 3 minutes to start using"
+      "title": "Already provisioned? Open the cockpit.",
+      "subtitle": "Sign in with a station, merchant, property, or committee account."
+    },
+    "footer": {
+      "copy": "Community Station Cockpit"
     }
   },
   "login": "Login",

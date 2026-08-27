@@ -55,7 +55,7 @@ const createOpen = ref(false)
 </script>
 
 <template>
-  <BasicPage title="FAQ" description="管理商户常见问题">
+  <BasicPage title="常见问题" description="管理商户常见问题">
     <div v-if="!merchantId" class="flex items-center justify-center py-20 text-muted-foreground">
       当前无可操作的商户,请从商户列表进入。
     </div>

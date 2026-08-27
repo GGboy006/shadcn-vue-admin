@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import Ai from '@/components/marketing/ai.vue'
 import Evaluation from '@/components/marketing/evaluation.vue'
 import Features from '@/components/marketing/features.vue'
 import Hero from '@/components/marketing/hero.vue'
@@ -8,33 +9,19 @@ import Setup from '@/components/marketing/setup.vue'
 </script>
 
 <template>
-  <div>
-    <main class="mt-18">
-      <Hero />
-    </main>
-
-    <main class="mt-8">
-      <Logos />
-    </main>
-
-    <main class="mt-18">
-      <Features />
-    </main>
-
-    <main class="mt-18">
-      <Evaluation />
-    </main>
-    <main class="mt-18">
-      <PricingPlans />
-    </main>
-
-    <main class="mt-18">
-      <Setup />
-    </main>
+  <div class="flex flex-col gap-18 pb-16">
+    <Hero />
+    <Logos />
+    <Features />
+    <Ai />
+    <Evaluation />
+    <PricingPlans />
+    <Setup />
   </div>
 </template>
 
 <route lang="yaml">
 meta:
   layout: marketing
+  auth: false
 </route>

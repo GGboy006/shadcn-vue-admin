@@ -56,7 +56,7 @@ function handleReset() {
 
 <template>
   <BasicPage
-    title="社区电话列表"
+    title="社区电话"
     description="管理小区管理员与服务平台电话"
     sticky
   >

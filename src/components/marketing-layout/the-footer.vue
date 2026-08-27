@@ -1,50 +1,21 @@
 <script lang="ts" setup>
-import { Icon } from '@iconify/vue'
 import { useColorMode } from '@vueuse/core'
 
 import { withBase } from '@/utils/with-base'
 
 const mode = useColorMode()
-
-const links = [
-  {
-    name: 'bluesky',
-    icon: 'simple-icons:bluesky',
-    url: 'https://bsky.app/profile/bitmc.bsky.social',
-  },
-  {
-    name: 'github',
-    icon: 'simple-icons:github',
-    url: 'https://www.github.com/whbbit1999/shadcn-vue-admin',
-  },
-  {
-    name: 'bilibili',
-    icon: 'simple-icons:bilibili',
-    url: 'https://space.bilibili.com/104376935',
-  },
-]
+const year = new Date().getFullYear()
 </script>
 
 <template>
-  <footer class="min-h-18 flex items-center justify-between">
-    <UiAvatar>
-      <UiAvatarImage :src="withBase(mode === 'dark' ? '/logo.svg' : '/logo-black.svg')" alt="Logo" />
-    </UiAvatar>
+  <footer class="min-h-18 flex items-center justify-between gap-4 py-6 text-sm text-muted-foreground">
+    <router-link to="/marketing" class="flex items-center gap-2 text-foreground">
+      <UiAvatar class="size-8">
+        <UiAvatarImage :src="withBase(mode === 'dark' ? '/logo.svg' : '/logo-black.svg')" alt="Logo" />
+      </UiAvatar>
+      <span class="font-medium">{{ $t('marketing.brand') }}</span>
+    </router-link>
 
-    <div>© 2025 Whbbit1999</div>
-
-    <div class="flex items-center gap-2">
-      <UiButton
-        v-for="link in links"
-        :key="link.name"
-        variant="outline"
-        size="icon"
-        as="a"
-        :href="link.url"
-        target="_blank"
-      >
-        <Icon :icon="link.icon" />
-      </UiButton>
-    </div>
+    <div>© {{ year }} {{ $t('marketing.footer.copy') }}</div>
   </footer>
 </template>

@@ -1,23 +1,24 @@
 <script setup lang="ts">
 import Ripple from '@/components/inspira-ui/ripple/index.vue'
 import SignInButton from '@/components/sign-in-button.vue'
-import SignUpButton from '@/components/sign-up-button.vue'
 </script>
 
 <template>
   <div
-    class="relative flex h-[450px] w-full flex-col items-center justify-center overflow-hidden rounded-lg lg:w-full md:w-full"
+    class="relative flex h-[450px] w-full flex-col items-center justify-center overflow-hidden rounded-lg"
   >
-    <p class="z-10 whitespace-pre-wrap text-center text-5xl font-medium tracking-tighter text-black dark:text-white">
+    <p class="z-10 text-center text-4xl lg:text-5xl font-medium tracking-tight text-balance px-4">
       {{ $t('marketing.setup.title') }}
     </p>
-    <small class="mt-2">
+    <p class="mt-3 z-10 text-center text-muted-foreground px-4">
       {{ $t('marketing.setup.subtitle') }}
-    </small>
+    </p>
 
-    <div class="flex items-center gap-3 my-2 z-100">
+    <div class="flex items-center gap-3 my-6 z-10">
       <SignInButton />
-      <SignUpButton />
+      <UiButton variant="outline" as-child>
+        <a href="#access">{{ $t('marketing.apply') }}</a>
+      </UiButton>
     </div>
 
     <Ripple
