@@ -5,6 +5,7 @@ import { toast } from 'vue-sonner'
 
 import type { IKnowledgeQuestion, IKnowledgeQuestionSaveDTO } from '@/services/api/knowledge.api'
 
+import ImageUpload from '@/components/image-upload/image-upload.vue'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -43,7 +44,7 @@ const initialValues = reactive<QuestionValidator>({
 })
 
 const formSchema = toTypedSchema(questionValidator)
-const { handleSubmit } = useForm({
+const { handleSubmit, values: formValues, setFieldValue } = useForm({
   validationSchema: formSchema,
   initialValues,
 })
@@ -136,11 +137,15 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
 
       <!-- 图标 -->
-      <FormField v-slot="{ componentField }" name="icon">
+      <FormField name="icon">
         <FormItem>
           <FormLabel>图标</FormLabel>
           <FormControl>
-            <Input type="text" placeholder="图标 URL" v-bind="componentField" />
+            <ImageUpload
+              :model-value="formValues.icon"
+              alt="图标"
+              @update:model-value="(url) => setFieldValue('icon', url)"
+            />
           </FormControl>
           <FormMessage />
         </FormItem>

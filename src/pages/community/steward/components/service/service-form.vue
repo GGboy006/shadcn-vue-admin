@@ -6,6 +6,7 @@ import { toast } from 'vue-sonner'
 
 import type { IHousekeeperService, IHousekeeperServiceSaveDTO } from '@/services/api/housekeeper.api'
 
+import ImageUpload from '@/components/image-upload/image-upload.vue'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -157,11 +158,15 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
 
       <!-- 图标 -->
-      <FormField v-slot="{ componentField }" name="icon">
+      <FormField name="icon">
         <FormItem>
           <FormLabel>图标</FormLabel>
           <FormControl>
-            <Input type="text" placeholder="图标 URL" v-bind="componentField" />
+            <ImageUpload
+              :model-value="formValues.icon"
+              alt="图标"
+              @update:model-value="(url) => setFieldValue('icon', url)"
+            />
           </FormControl>
           <FormMessage />
         </FormItem>

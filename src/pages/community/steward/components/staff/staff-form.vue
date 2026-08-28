@@ -5,6 +5,7 @@ import { toast } from 'vue-sonner'
 
 import type { IHousekeeperStaff, IHousekeeperStaffSaveDTO } from '@/services/api/housekeeper.api'
 
+import ImageUpload from '@/components/image-upload/image-upload.vue'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -50,7 +51,7 @@ const initialValues = reactive<HousekeeperStaffValidator>({
 })
 
 const formSchema = toTypedSchema(housekeeperStaffValidator)
-const { handleSubmit } = useForm({
+const { handleSubmit, values: formValues, setFieldValue } = useForm({
   validationSchema: formSchema,
   initialValues,
 })
@@ -160,11 +161,16 @@ const onSubmit = handleSubmit((values) => {
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="avatar">
+        <FormField name="avatar">
           <FormItem>
             <FormLabel>头像</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="头像 URL" v-bind="componentField" />
+              <ImageUpload
+                :model-value="formValues.avatar"
+                alt="头像"
+                shape="circle"
+                @update:model-value="(url) => setFieldValue('avatar', url)"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
