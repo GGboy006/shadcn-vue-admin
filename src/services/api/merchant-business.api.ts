@@ -63,6 +63,8 @@ export interface IMerchantBusinessVO {
   consumptionPerCapita?: number
   settlementCycle: SettlementCycle
   status: MerchantStatus
+  /** 简介 */
+  intro?: string
   remark: string
   nickname: string
   phone: string
@@ -96,6 +98,8 @@ export interface IMerchantBusinessUpdateDTO {
   businessHours?: string
   consumptionPerCapita?: number
   settlementCycle?: SettlementCycle
+  /** 简介 */
+  intro?: string
   remark?: string
   status?: MerchantStatus
 }

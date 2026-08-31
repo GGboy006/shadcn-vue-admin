@@ -80,6 +80,7 @@ const initialValues = reactive<MerchantValidator>({
   signFee: merchant?.signFee || 0,
   businessHours: merchant?.businessHours || '',
   settlementCycle: merchant?.settlementCycle || 1,
+  intro: merchant?.intro || '',
   remark: merchant?.remark || '',
   status: merchant?.status || 1,
 })
@@ -136,6 +137,7 @@ function buildPayload(values: MerchantValidator): IMerchantAddDTO | IMerchantUpd
     signFee: values.signFee || undefined,
     businessHours: values.businessHours || undefined,
     settlementCycle: values.settlementCycle as 1 | 2 | 3,
+    intro: values.intro || undefined,
     remark: values.remark || undefined,
     status: values.status as 1 | 2,
   }
@@ -528,6 +530,22 @@ const onSubmit = handleSubmit((values) => {
           </FormField>
         </div>
       </template>
+
+      <!-- 简介 -->
+      <div class="space-y-4">
+        <div class="text-sm font-medium text-muted-foreground">
+          简介
+        </div>
+
+        <FormField v-slot="{ componentField }" name="intro">
+          <FormItem>
+            <FormControl>
+              <Textarea v-bind="componentField" placeholder="请输入商户简介" rows="3" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+      </div>
 
       <!-- 备注 -->
       <div class="space-y-4">

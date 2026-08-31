@@ -101,6 +101,15 @@ export const columns: ColumnDef<Merchant>[] = [
   },
 
   {
+    accessorKey: 'intro',
+    header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '简介' }),
+    meta: { title: '简介' },
+    cell: ({ row }) => h('div', { class: 'max-w-[200px] truncate text-sm text-muted-foreground' }, row.getValue('intro') || '-'),
+    enableSorting: false,
+    enableResizing: true,
+  },
+
+  {
     accessorKey: 'remark',
     header: ({ column }) => h(DataTableColumnHeader<Merchant>, { column, title: '备注' }),
     meta: { title: '备注' },

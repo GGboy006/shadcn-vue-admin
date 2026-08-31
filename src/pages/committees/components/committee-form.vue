@@ -12,7 +12,11 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useUpload } from '@/composables/use-upload'
-import { useCreateCommitteeMutation, useUpdateCommitteeMutation } from '@/services/api/merchant.api'
+import {
+  useCreateCommitteeMutation,
+  useGetCityNeighborhoodByRegionQuery,
+  useUpdateCommitteeMutation,
+} from '@/services/api/merchant.api'
 import { showInvalidSubmitToast } from '@/validators/common'
 
 import type { Merchant } from '../../merchants/data/schema'
@@ -87,10 +91,31 @@ async function handleFileUpload(event: Event, field: 'avatar' | 'logo') {
   }
 }
 
+// 新建时拉取本区域可绑定城市居委会列表
+const { data: cityNeighborhoodRes, isLoading: isCityNeighborhoodLoading } = useGetCityNeighborhoodByRegionQuery(
+  computed(() => !isEdit.value),
+)
+const cityNeighborhoodOptions = computed(() => cityNeighborhoodRes.value?.data ?? [])
+
 const { mutate: createMutate, isPending: isCreating } = useCreateCommitteeMutation()
 const { mutate: updateMutate, isPending: isUpdating } = useUpdateCommitteeMutation()
 
 const isSubmitting = computed(() => isCreating.value || isUpdating.value)
+
+/** 选择城市居委会后，若昵称/名称/Logo 仍为空则预填城市库信息 */
+function handleMerchantCodeChange(code: string | number | bigint | Record<string, any> | null) {
+  const merchantCode = typeof code === 'string' ? code : ''
+  setFieldValue('merchantCode', merchantCode)
+  const selected = cityNeighborhoodOptions.value.find(item => item.merchantCode === merchantCode)
+  if (!selected)
+    return
+  if (!formValues.nickname)
+    setFieldValue('nickname', selected.nickName || selected.merchantName || '')
+  if (!formValues.merchantName)
+    setFieldValue('merchantName', selected.merchantName || '')
+  if (!formValues.logo && selected.logo)
+    setFieldValue('logo', selected.logo)
+}
 
 function buildPayload(values: CommitteeValidator): ICommitteeAddDTO | ICommitteeUpdateDTO {
   if (isEdit.value && committee) {
@@ -135,7 +160,7 @@ function buildPayload(values: CommitteeValidator): ICommitteeAddDTO | ICommittee
 const onSubmit = handleSubmit((values) => {
   // 新建时校验 merchantCode 必填(zod 标记为可选,这里手动校验,避免编辑场景误报)
   if (!isEdit.value && !values.merchantCode) {
-    toast.error('城市居委会标识不能为空')
+    toast.error('请选择城市居委会')
     return
   }
 
@@ -168,26 +193,53 @@ const onSubmit = handleSubmit((values) => {
 
 <template>
   <form class="space-y-6" @submit="onSubmit">
-    <!-- 城市居委会标识（新建必填，编辑只读） -->
+    <!-- 城市居委会标识（新建下拉选择，编辑只读） -->
     <FormField v-slot="{ componentField }" name="merchantCode">
       <FormItem>
         <FormLabel :required="!isEdit">
-          城市居委会标识
+          城市居委会
         </FormLabel>
-        <FormControl>
-          <Input
-            type="text"
-            placeholder="请粘贴城市居委会标识"
-            v-bind="componentField"
-            :disabled="isEdit"
-          />
-        </FormControl>
-        <p v-if="isEdit" class="text-xs text-muted-foreground">
-          已绑定，不可修改
-        </p>
-        <p v-else class="text-xs text-muted-foreground">
-          从城市库复制后粘贴，用于绑定居委会
-        </p>
+        <template v-if="isEdit">
+          <FormControl>
+            <Input
+              type="text"
+              :model-value="committee?.merchantName || componentField.modelValue"
+              disabled
+            />
+          </FormControl>
+          <p class="text-xs text-muted-foreground">
+            已绑定，不可修改
+          </p>
+        </template>
+        <template v-else>
+          <Select
+            :model-value="componentField.modelValue"
+            @update:model-value="handleMerchantCodeChange"
+          >
+            <FormControl>
+              <SelectTrigger class="w-full">
+                <SelectValue :placeholder="isCityNeighborhoodLoading ? '加载中...' : '请选择城市居委会'" />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem
+                  v-for="item in cityNeighborhoodOptions"
+                  :key="item.merchantCode"
+                  :value="item.merchantCode"
+                >
+                  {{ item.merchantName || item.nickName || item.merchantCode }}
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <p class="text-xs text-muted-foreground">
+            选择本区域可绑定的城市居委会
+          </p>
+          <p v-if="!isCityNeighborhoodLoading && cityNeighborhoodOptions.length === 0" class="text-xs text-amber-600">
+            暂无可绑定的城市居委会
+          </p>
+        </template>
         <FormMessage />
       </FormItem>
     </FormField>

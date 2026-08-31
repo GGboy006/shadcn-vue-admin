@@ -24,6 +24,7 @@ export interface ProfileFormValues {
   businessHours?: string
   consumptionPerCapita?: number
   settlementCycle?: 1 | 2 | 3
+  intro?: string
   remark?: string
   status?: 1 | 2
 }
@@ -63,6 +64,7 @@ export function buildProfilePayload(values: ProfileFormValues): IMerchantBusines
     'businessHours',
     'consumptionPerCapita',
     'settlementCycle',
+    'intro',
     'remark',
     'status',
   ] as const

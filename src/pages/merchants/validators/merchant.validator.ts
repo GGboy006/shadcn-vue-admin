@@ -22,6 +22,7 @@ export const merchantValidator = z.object({
   signFee: optionalNumber,
   businessHours: optionalString,
   settlementCycle: optionalNumber,
+  intro: optionalString,
   remark: optionalString,
   status: optionalNumber,
 }).refine((data) => {

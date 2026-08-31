@@ -150,6 +150,8 @@ export interface IMerchant {
   serveResidents?: number
   /** 成员数（居委会） */
   members?: number
+  /** 简介 */
+  intro?: string
   /** 备注 */
   remark: string
 }
@@ -194,6 +196,8 @@ export interface IMerchantAddDTO {
   businessHours?: string
   /** 结算周期：1=T+1，2=T+7，3=T+30（商户） */
   settlementCycle?: SettlementCycle
+  /** 简介 */
+  intro?: string
   /** 备注 */
   remark?: string
   /** 状态：1=启用，2=禁用 */
@@ -242,6 +246,8 @@ export interface IMerchantUpdateDTO {
   businessHours?: string
   /** 结算周期：1=T+1，2=T+7，3=T+30（商户） */
   settlementCycle?: SettlementCycle
+  /** 简介 */
+  intro?: string
   /** 备注 */
   remark?: string
   /** 状态：1=启用，2=禁用 */
@@ -254,13 +260,13 @@ export interface IMerchantUpdateDTO {
  * 新增居委会 DTO（对接文档 1.3 BusinessOrgAddDTO）。
  *
  * 与商户通用 AddDTO 的区别:
- * - merchantCode 必填(城市居委会标识,站长手动粘贴)
+ * - merchantCode 必填(城市居委会标识,从 byRegion 下拉选择)
  * - 无 password(后端从城市库拉取手机号生成本地账号)
  * - 无 type(后端固定为 6,前端不传)
  * - 含居委会特有的 serveResidents/members
  */
 export interface ICommitteeAddDTO {
-  /** 城市居委会标识（绑定用,站长手动粘贴输入） */
+  /** 城市居委会标识（绑定用,下拉选择） */
   merchantCode: string
   /** 本地管理员昵称 */
   nickname: string
@@ -537,6 +543,38 @@ export function useUpdateMerchantMutation() {
   })
 }
 
+/** 本区域可绑定的城市居委会候选项（GET /station/neighborhood/byRegion） */
+export interface ICityNeighborhoodOption {
+  /** 城市居委会标识 */
+  merchantCode: string
+  /** 居委会名称 */
+  merchantName: string
+  /** Logo */
+  logo?: string
+  /** 城市侧昵称 */
+  nickName?: string
+}
+
+export type ICityNeighborhoodByRegionResponse = IResponse<ICityNeighborhoodOption[]>
+
+/**
+ * 查询本区域可绑定的城市居委会列表（下拉选项）。
+ *
+ * 新建居委会时使用；通常只返回尚未绑定到当前站长的候选项。
+ */
+export function useGetCityNeighborhoodByRegionQuery(enabled?: Ref<boolean>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<ICityNeighborhoodByRegionResponse, Error>({
+    queryKey: ['cityNeighborhoodByRegion'],
+    queryFn: async () => await apiFetch<ICityNeighborhoodByRegionResponse>('/station/neighborhood/byRegion', {
+      method: 'get',
+    }),
+    enabled: () => enabled?.value ?? true,
+    retry: false,
+  })
+}
+
 /**
  * 新增居委会（对接文档 1.3，`POST /station/neighborhood`）。
  *
@@ -555,6 +593,7 @@ export function useCreateCommitteeMutation() {
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['merchantList'] })
+      queryClient.invalidateQueries({ queryKey: ['cityNeighborhoodByRegion'] })
     },
   })
 }

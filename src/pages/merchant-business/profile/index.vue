@@ -53,6 +53,7 @@ const profileSchema = z.object({
   businessHours: optionalString,
   consumptionPerCapita: optionalNumber,
   settlementCycle: optionalNumber,
+  intro: optionalString,
   remark: optionalString,
   status: optionalNumber,
 })
@@ -96,6 +97,7 @@ watch(info, (val) => {
       businessHours: val.businessHours ?? undefined,
       consumptionPerCapita: val.consumptionPerCapita ?? undefined,
       settlementCycle: val.settlementCycle ?? undefined,
+      intro: val.intro ?? undefined,
       remark: val.remark ?? undefined,
       status: val.status ?? undefined,
     } as ProfileFormValues,
@@ -481,6 +483,21 @@ const onSubmit = handleSubmit((values) => {
             <FormLabel>其他图</FormLabel>
             <FormControl>
               <MultiImageUpload v-model="formValues.otherImages" :max="9" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+      </div>
+
+      <!-- 简介 -->
+      <div class="rounded-lg border p-6 space-y-4">
+        <div class="text-sm font-medium text-muted-foreground">
+          简介
+        </div>
+        <FormField v-slot="{ componentField }" name="intro">
+          <FormItem>
+            <FormControl>
+              <Textarea v-bind="componentField" placeholder="请输入商户简介" rows="3" />
             </FormControl>
             <FormMessage />
           </FormItem>
