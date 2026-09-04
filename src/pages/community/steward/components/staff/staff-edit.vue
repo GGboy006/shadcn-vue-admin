@@ -10,6 +10,7 @@ import StaffForm from './staff-form.vue'
 const props = defineProps<{
   open: boolean
   staff?: IHousekeeperStaff
+  defaultHousekeeperId?: string
 }>()
 
 const emit = defineEmits<{
@@ -73,6 +74,7 @@ function handleClose() {
         <StaffForm
           v-else
           :staff="staffDetail"
+          :fixed-housekeeper-id="isEdit ? undefined : defaultHousekeeperId"
           @close="handleClose"
         />
       </div>

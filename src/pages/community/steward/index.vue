@@ -6,27 +6,79 @@ meta:
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
 
-import type { IHousekeeperCategoryListQuery, IHousekeeperServiceListQuery, IHousekeeperStaffListQuery } from '@/services/api/housekeeper.api'
+import type { IHousekeeperCategoryListQuery } from '@/services/api/housekeeper.api'
 
 import { BasicPage } from '@/components/global-layout'
-import { useGetHousekeeperCategoryPageQuery, useGetHousekeeperServicePageQuery, useGetHousekeeperStaffPageQuery } from '@/services/api/housekeeper.api'
+import { useGetHousekeeperCategoryPageQuery } from '@/services/api/housekeeper.api'
 
+import CategoryAssignSheet from './components/category/category-assign-sheet.vue'
 import CategoryCreate from './components/category/category-create.vue'
 import { columns as categoryColumns } from './components/category/columns'
 import CategoryToolbar from './components/category/data-table-toolbar.vue'
 import CategoryDataTable from './components/category/data-table.vue'
-import { columns as serviceColumns } from './components/service/columns'
-import ServiceToolbar from './components/service/data-table-toolbar.vue'
-import ServiceDataTable from './components/service/data-table.vue'
-import ServiceCreate from './components/service/service-create.vue'
-import { columns as staffColumns } from './components/staff/columns'
-import StaffToolbar from './components/staff/data-table-toolbar.vue'
-import StaffDataTable from './components/staff/data-table.vue'
-import StaffCreate from './components/staff/staff-create.vue'
+import OrgStaffPanel from './components/org-staff/org-staff-panel.vue'
 
-const activeTab = ref<'category' | 'service' | 'staff'>('category')
+type StewardTab = 'org' | 'category'
 
-/* ---------------- 服务分类 §4.3 ---------------- */
+const route = useRoute()
+const router = useRouter()
+
+const activeTab = ref<StewardTab>('org')
+const selectedOrgId = ref<string | undefined>()
+const assignCategoryId = ref<string | undefined>()
+
+const isAssignOpen = computed({
+  get: () => !!assignCategoryId.value,
+  set: (open) => {
+    if (!open)
+      assignCategoryId.value = undefined
+  },
+})
+
+let syncingFromRoute = false
+
+function readRouteQuery() {
+  syncingFromRoute = true
+  activeTab.value = route.query.tab === 'category' ? 'category' : 'org'
+  selectedOrgId.value = typeof route.query.orgId === 'string' ? route.query.orgId : undefined
+  assignCategoryId.value = typeof route.query.assign === 'string' ? route.query.assign : undefined
+  if (assignCategoryId.value)
+    activeTab.value = 'category'
+  nextTick(() => {
+    syncingFromRoute = false
+  })
+}
+
+function writeRouteQuery() {
+  if (syncingFromRoute)
+    return
+  const query: Record<string, string> = {
+    tab: activeTab.value,
+  }
+  if (activeTab.value === 'org' && selectedOrgId.value)
+    query.orgId = selectedOrgId.value
+  if (assignCategoryId.value) {
+    query.tab = 'category'
+    query.assign = assignCategoryId.value
+  }
+  router.replace({ path: '/community/steward', query })
+}
+
+watch(() => route.query, readRouteQuery, { immediate: true })
+watch([activeTab, selectedOrgId, assignCategoryId], writeRouteQuery)
+
+function openCategoryAssign(categoryId: string) {
+  activeTab.value = 'category'
+  assignCategoryId.value = categoryId
+}
+
+function closeCategoryAssign() {
+  assignCategoryId.value = undefined
+}
+
+provide('stewardAssignCategory', openCategoryAssign)
+
+/* ---------------- 展示分类 §4.3 ---------------- */
 const categoryQuery = ref<IHousekeeperCategoryListQuery>({
   pageNum: 1,
   pageSize: 10,
@@ -72,137 +124,36 @@ function handleCategoryReset() {
   categoryQuery.value.status = undefined
   categoryQuery.value.pageNum = 1
 }
-
-/* ---------------- 服务主体 §4.1 ---------------- */
-const serviceQuery = ref<IHousekeeperServiceListQuery>({
-  pageNum: 1,
-  pageSize: 10,
-})
-
-const { data: serviceData, isLoading: isServiceLoading } = useGetHousekeeperServicePageQuery(serviceQuery)
-
-const serviceList = computed(() => serviceData.value?.data?.list ?? [])
-const serviceTotal = computed(() => serviceData.value?.data?.total ?? 0)
-
-const serviceServerPagination = computed(() => ({
-  page: serviceQuery.value.pageNum,
-  pageSize: serviceQuery.value.pageSize,
-  total: serviceTotal.value,
-  onPageChange: (page: number) => {
-    serviceQuery.value.pageNum = page
-  },
-  onPageSizeChange: (pageSize: number) => {
-    serviceQuery.value.pageSize = pageSize
-    serviceQuery.value.pageNum = 1
-  },
-}))
-
-const serviceSearch = ref('')
-const serviceStatusFilter = ref<IHousekeeperServiceListQuery['status']>(undefined)
-
-const debouncedServiceSearch = useDebounceFn((val: string) => {
-  serviceQuery.value.name = val || undefined
-  serviceQuery.value.pageNum = 1
-}, 300)
-
-watch(serviceSearch, val => debouncedServiceSearch(val))
-
-watch(serviceStatusFilter, (val) => {
-  serviceQuery.value.status = val
-  serviceQuery.value.pageNum = 1
-})
-
-function handleServiceReset() {
-  serviceSearch.value = ''
-  serviceStatusFilter.value = undefined
-  serviceQuery.value.name = undefined
-  serviceQuery.value.status = undefined
-  serviceQuery.value.pageNum = 1
-}
-
-/* ---------------- 服务人员 §4.2 ---------------- */
-const staffQuery = ref<IHousekeeperStaffListQuery>({
-  pageNum: 1,
-  pageSize: 10,
-})
-
-const { data: staffData, isLoading: isStaffLoading } = useGetHousekeeperStaffPageQuery(staffQuery)
-
-const staffList = computed(() => staffData.value?.data?.list ?? [])
-const staffTotal = computed(() => staffData.value?.data?.total ?? 0)
-
-const staffServerPagination = computed(() => ({
-  page: staffQuery.value.pageNum,
-  pageSize: staffQuery.value.pageSize,
-  total: staffTotal.value,
-  onPageChange: (page: number) => {
-    staffQuery.value.pageNum = page
-  },
-  onPageSizeChange: (pageSize: number) => {
-    staffQuery.value.pageSize = pageSize
-    staffQuery.value.pageNum = 1
-  },
-}))
-
-const staffSearch = ref('')
-const staffHousekeeperIdFilter = ref<IHousekeeperStaffListQuery['housekeeperId']>(undefined)
-const staffStatusFilter = ref<IHousekeeperStaffListQuery['status']>(undefined)
-
-const debouncedStaffSearch = useDebounceFn((val: string) => {
-  staffQuery.value.staffName = val || undefined
-  staffQuery.value.pageNum = 1
-}, 300)
-
-watch(staffSearch, val => debouncedStaffSearch(val))
-
-watch(staffHousekeeperIdFilter, (val) => {
-  staffQuery.value.housekeeperId = val
-  staffQuery.value.pageNum = 1
-})
-
-watch(staffStatusFilter, (val) => {
-  staffQuery.value.status = val
-  staffQuery.value.pageNum = 1
-})
-
-function handleStaffReset() {
-  staffSearch.value = ''
-  staffHousekeeperIdFilter.value = undefined
-  staffStatusFilter.value = undefined
-  staffQuery.value.staffName = undefined
-  staffQuery.value.housekeeperId = undefined
-  staffQuery.value.status = undefined
-  staffQuery.value.pageNum = 1
-}
 </script>
 
 <template>
   <BasicPage
     title="管家服务"
-    description="管理服务分类、服务主体与服务人员"
+    description="先配置服务机构与人员，再在展示分类中分配居民可见的服务人员"
     sticky
   >
     <template #actions>
       <CategoryCreate v-if="activeTab === 'category'" />
-      <ServiceCreate v-else-if="activeTab === 'service'" />
-      <StaffCreate v-else-if="activeTab === 'staff'" />
     </template>
 
-    <UiTabs v-model="activeTab" default-value="category">
+    <UiTabs v-model="activeTab" default-value="org">
       <UiTabsList>
+        <UiTabsTrigger value="org">
+          机构与人员
+        </UiTabsTrigger>
         <UiTabsTrigger value="category">
-          服务分类
-        </UiTabsTrigger>
-        <UiTabsTrigger value="service">
-          服务主体
-        </UiTabsTrigger>
-        <UiTabsTrigger value="staff">
-          服务人员
+          展示分类与分配
         </UiTabsTrigger>
       </UiTabsList>
 
-      <!-- 服务分类 §4.3 -->
+      <UiTabsContent value="org" class="mt-4">
+        <OrgStaffPanel v-model:org-id="selectedOrgId" />
+      </UiTabsContent>
+
       <UiTabsContent value="category" class="mt-4">
+        <p class="mb-3 text-sm text-muted-foreground">
+          居民端看到的类目在此维护；创建分类后需「分配人员」才会展示具体服务人员。
+        </p>
         <CategoryDataTable
           :loading="isCategoryLoading"
           :data="categoryList"
@@ -221,50 +172,12 @@ function handleStaffReset() {
           </template>
         </CategoryDataTable>
       </UiTabsContent>
-
-      <!-- 服务主体 §4.1 -->
-      <UiTabsContent value="service" class="mt-4">
-        <ServiceDataTable
-          :loading="isServiceLoading"
-          :data="serviceList"
-          :columns="serviceColumns"
-          :server-pagination="serviceServerPagination"
-        >
-          <template #toolbar="{ table }">
-            <ServiceToolbar
-              :table="table"
-              :search="serviceSearch"
-              :status-filter="serviceStatusFilter"
-              @update:search="serviceSearch = $event"
-              @update:status-filter="serviceStatusFilter = $event"
-              @reset="handleServiceReset"
-            />
-          </template>
-        </ServiceDataTable>
-      </UiTabsContent>
-
-      <!-- 服务人员 §4.2 -->
-      <UiTabsContent value="staff" class="mt-4">
-        <StaffDataTable
-          :loading="isStaffLoading"
-          :data="staffList"
-          :columns="staffColumns"
-          :server-pagination="staffServerPagination"
-        >
-          <template #toolbar="{ table }">
-            <StaffToolbar
-              :table="table"
-              :search="staffSearch"
-              :housekeeper-id-filter="staffHousekeeperIdFilter"
-              :status-filter="staffStatusFilter"
-              @update:search="staffSearch = $event"
-              @update:housekeeper-id-filter="staffHousekeeperIdFilter = $event"
-              @update:status-filter="staffStatusFilter = $event"
-              @reset="handleStaffReset"
-            />
-          </template>
-        </StaffDataTable>
-      </UiTabsContent>
     </UiTabs>
+
+    <CategoryAssignSheet
+      v-model:open="isAssignOpen"
+      :category-id="assignCategoryId"
+      @close="closeCategoryAssign"
+    />
   </BasicPage>
 </template>

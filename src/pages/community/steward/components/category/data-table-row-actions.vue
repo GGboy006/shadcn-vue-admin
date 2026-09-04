@@ -23,6 +23,8 @@ const category = computed(() => props.row.original)
 
 const router = useRouter()
 
+const assignCategory = inject<(categoryId: string) => void>('stewardAssignCategory')
+
 const isEditOpen = ref(false)
 
 const isEditOpenRendered = useLazyMount(isEditOpen)
@@ -48,7 +50,14 @@ function handleToggleStatus() {
 }
 
 function handleAssign() {
-  router.push(`/community/steward/${category.value.categoryId}`)
+  if (assignCategory) {
+    assignCategory(category.value.categoryId)
+    return
+  }
+  router.push({
+    path: '/community/steward',
+    query: { tab: 'category', assign: category.value.categoryId },
+  })
 }
 
 function handleAction(key: string) {

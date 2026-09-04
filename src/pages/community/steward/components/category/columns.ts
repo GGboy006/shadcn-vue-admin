@@ -43,7 +43,14 @@ export const columns: ColumnDef<IHousekeeperCategory>[] = [
     accessorKey: 'providerCount',
     header: ({ column }) => h(DataTableColumnHeader<IHousekeeperCategory>, { column, title: '已分配人数' }),
     meta: { title: '已分配人数' },
-    cell: ({ row }) => h('div', { class: 'text-sm tabular-nums' }, row.original.providerCount ?? 0),
+    cell: ({ row }) => {
+      const count = row.original.providerCount ?? 0
+      return h(
+        'div',
+        { class: count === 0 ? 'text-sm tabular-nums text-amber-600' : 'text-sm tabular-nums' },
+        count === 0 ? '0（未分配）' : String(count),
+      )
+    },
     enableSorting: false,
     enableHiding: true,
     enableResizing: true,

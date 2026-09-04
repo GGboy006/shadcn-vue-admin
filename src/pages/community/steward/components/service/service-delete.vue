@@ -18,7 +18,13 @@ const emits = defineEmits<{
 
 const { mutate, isPending } = useDeleteHousekeeperServiceMutation()
 
+const hasStaff = computed(() => (service.staffCount ?? 0) > 0)
+
 function handleRemove() {
+  if (hasStaff.value) {
+    toast.error(`该机构下还有 ${service.staffCount} 名人员，请先移除后再删除`)
+    return
+  }
   mutate(service.housekeeperId, {
     onSuccess: () => {
       toast.success('删除成功')
@@ -36,8 +42,11 @@ function handleRemove() {
         删除服务主体: {{ service.name }} ?
       </ModalTitle>
 
-      <ModalDescription>
-        删除主体不会自动删除其下人员,但会解除相关分配。此操作不可撤销。
+      <ModalDescription v-if="hasStaff">
+        该机构下还有 {{ service.staffCount }} 名人员，请先移除人员后再删除机构。
+      </ModalDescription>
+      <ModalDescription v-else>
+        删除后不可恢复，请确认该机构已不再使用。
       </ModalDescription>
     </ModalHeader>
 
@@ -48,7 +57,7 @@ function handleRemove() {
         </Button>
       </ModalClose>
 
-      <Button variant="destructive" :disabled="isPending" @click="handleRemove">
+      <Button variant="destructive" :disabled="isPending || hasStaff" @click="handleRemove">
         <LoaderIcon v-if="isPending" class="mr-1 size-4 animate-spin" />
         {{ isPending ? '删除中...' : '删除' }}
       </Button>

@@ -17,8 +17,10 @@ import type { HousekeeperStaffValidator } from '../../validators/staff.validator
 
 import { housekeeperStaffValidator } from '../../validators/staff.validator'
 
-const { staff } = defineProps<{
+const { staff, fixedHousekeeperId } = defineProps<{
   staff?: IHousekeeperStaff
+  /** 嵌入机构详情时锁定所属主体 */
+  fixedHousekeeperId?: string
 }>()
 
 const emits = defineEmits<{
@@ -40,7 +42,7 @@ const serviceOptions = computed(() =>
 
 const initialValues = reactive<HousekeeperStaffValidator>({
   staffId: staff?.staffId || undefined,
-  housekeeperId: staff?.housekeeperId ?? '',
+  housekeeperId: staff?.housekeeperId ?? fixedHousekeeperId ?? '',
   staffName: staff?.staffName || '',
   phone: staff?.phone || undefined,
   avatar: staff?.avatar || undefined,
@@ -103,7 +105,7 @@ const onSubmit = handleSubmit((values) => {
   <div class="space-y-6">
     <form class="space-y-6" @submit="onSubmit">
       <!-- 所属主体 -->
-      <FormField v-slot="{ componentField }" name="housekeeperId">
+      <FormField v-if="!fixedHousekeeperId" v-slot="{ componentField }" name="housekeeperId">
         <FormItem>
           <FormLabel required>
             所属主体
