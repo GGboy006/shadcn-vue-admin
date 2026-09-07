@@ -11,7 +11,8 @@ const props = defineProps<Props>()
 const progressPercent = computed(() => {
   if (props.total === 0)
     return 0
-  return Math.round((props.completed.length / props.total) * 100)
+  // 按当前步骤对齐（含正在进行的一步），避免只用 completed 导致进度条落后一格
+  return Math.round(((props.current + 1) / props.total) * 100)
 })
 </script>
 

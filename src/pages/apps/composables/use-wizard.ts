@@ -366,12 +366,55 @@ export function useWizard(skillId: Ref<string>) {
       if (nextIndex !== -1) {
         currentStepCode.value = nextCode
         currentStepIndex.value = nextIndex
+        return
       }
     }
-    else {
-      // 流程结束
-      toast.success('流程完成')
+
+    // 流程结束
+    toast.success('流程完成')
+  }
+
+  /**
+   * 出图成功后进入结果/完成步。
+   * 优先 nextStepCode；若配置缺失则回退到 actionType=4 或顺序下一步，避免停在「生成海报」误导用户。
+   */
+  function goToCompletionAfterImageReady() {
+    if (!currentFlow.value)
+      return
+
+    // 已在完成步
+    if (currentFlow.value.actionType === 4)
+      return
+
+    if (!completedStepCodes.value.includes(currentFlow.value.stepCode)) {
+      completedStepCodes.value = [...completedStepCodes.value, currentFlow.value.stepCode]
     }
+
+    const nextCode = getNextStepCode(currentFlow.value, userChoices.value)
+    if (nextCode) {
+      const nextIndex = flows.value.findIndex(f => f.stepCode === nextCode)
+      if (nextIndex !== -1) {
+        currentStepCode.value = nextCode
+        currentStepIndex.value = nextIndex
+        return
+      }
+    }
+
+    const completionIndex = flows.value.findIndex(f => f.actionType === 4)
+    if (completionIndex !== -1) {
+      currentStepCode.value = flows.value[completionIndex].stepCode
+      currentStepIndex.value = completionIndex
+      return
+    }
+
+    const sequentialIndex = currentStepIndex.value + 1
+    if (sequentialIndex < flows.value.length) {
+      currentStepCode.value = flows.value[sequentialIndex].stepCode
+      currentStepIndex.value = sequentialIndex
+      return
+    }
+
+    toast.success('流程完成')
   }
 
   // 返回上一步
@@ -566,19 +609,15 @@ export function useWizard(skillId: Ref<string>) {
           generationId.value = result.data.imageGenerationId
         }
 
-        // 如果图片已经生成成功（同步返回）
-        if (result.data.imageStatus === 1) {
-          generationStatus.value = 1
-          isGenerating.value = false
-        }
-        // 如果图片生成失败
-        else if (result.data.imageStatus === 2) {
+        // 如果图片已经生成成功（同步返回）：不要立刻把 status 置 1（会禁用轮询），
+        // 保留 generationId 继续查一次拿 imageUrl，由下方 watch 统一跳转完成步
+        if (result.data.imageStatus === 2) {
           generationStatus.value = 2
           generationError.value = '图片生成失败'
           isGenerating.value = false
           toast.error('图片生成失败')
         }
-        // imageStatus === 0 继续轮询
+        // imageStatus === 0 | 1：继续由轮询拿结果 / URL
       }
       else {
         throw new Error(result.msg || '生成失败')
@@ -614,7 +653,7 @@ export function useWizard(skillId: Ref<string>) {
 
     // 生成成功，进入下一步（结果展示页）
     if (generationStatus.value === 1 && generatedImageUrl.value) {
-      goToNextStep()
+      goToCompletionAfterImageReady()
     }
   }
 
@@ -647,16 +686,16 @@ export function useWizard(skillId: Ref<string>) {
       return
 
     const result = data.data
+    const status = Number(result.status)
 
-    if (result.status === 1) {
-      // 生成成功
+    if (status === 1) {
+      // 生成成功：写入图片并立刻进入「完成」步
       generationStatus.value = 1
       generatedImageUrl.value = result.imageUrl
       isGenerating.value = false
-      // 自动生成完成，自动进入下一步（完成页面）
-      goToNextStep()
+      goToCompletionAfterImageReady()
     }
-    else if (result.status === 2) {
+    else if (status === 2) {
       // 生成失败
       generationStatus.value = 2
       generationError.value = '图片生成失败'

@@ -353,6 +353,17 @@ const isCompletionStep = computed(() => {
           :streaming-content="wizard.aiContent.value"
         />
 
+        <!-- 出图已成功但尚未跳步时的兜底（避免空白卡在生成步） -->
+        <ResultPreview
+          v-else-if="isGenerationStep && wizard.generationStatus.value === 1 && wizard.generatedImageUrl.value"
+          :image-url="wizard.generatedImageUrl.value"
+          :prompt="wizard.aiContent.value"
+          :tag="wizard.isStationMode.value ? '站长生成' : undefined"
+          @regenerate="wizard.handleRegenerate()"
+          @download="handleDownload"
+          @contact="handleContact"
+        />
+
         <!-- 生成失败 -->
         <GenerationFailed
           v-else-if="isGenerationStep && wizard.generationStatus.value === 2"
