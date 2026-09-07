@@ -310,7 +310,7 @@ export function useGetImageGenerationQuery(imageGenerationId: Ref<string | undef
       const data = query.state.data
       // 生成中状态(0)时轮询，成功(1)或失败(2)停止
       if (data?.data?.status === 0) {
-        return 3000 // 3秒轮询
+        return 20000 // 20秒轮询
       }
       return false
     },

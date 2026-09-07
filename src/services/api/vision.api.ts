@@ -126,7 +126,7 @@ export function useGetPPTResultQuery(taskId: Ref<string | null>) {
       const status = query.state.data?.data?.status
       // 等待中(0)或生成中(1)时轮询
       if (status === 0 || status === 1)
-        return 3000
+        return 20000
       return false
     },
     retry: false,

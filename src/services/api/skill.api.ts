@@ -278,7 +278,7 @@ export function useGetImageGenerationResultQuery(
       // 只有状态为生成中（0 或 null）时才轮询
       if (id.value === null || status?.value === 1 || status?.value === 2)
         return false
-      return 3000
+      return 20000
     }),
     retry: false,
   })
@@ -341,6 +341,8 @@ export function useFlowCompletionMutation() {
     mutationFn: async data => await apiFetch<IFlowCompletionResponse>('/agentScopeChat/flow/completion', {
       method: 'post',
       body: data,
+      // 海报/流程生成可能超过全局 API_TIMEOUT，单独放宽
+      timeout: 120000,
     }),
   })
 }

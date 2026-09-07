@@ -16,6 +16,7 @@ import AiChatBubble from './components/ai-chat-bubble.vue'
 import ChoiceGrid from './components/choice-grid.vue'
 import ChoiceList from './components/choice-list.vue'
 import GenerationConfirm from './components/generation-confirm.vue'
+import GenerationFailed from './components/generation-failed.vue'
 import GenerationLoading from './components/generation-loading.vue'
 import ResultPreview from './components/result-preview.vue'
 import StepIndicator from './components/step-indicator.vue'
@@ -280,8 +281,9 @@ const isCompletionStep = computed(() => {
 
       <!-- 向导内容 -->
       <div v-else-if="wizard.currentFlow.value" class="space-y-6">
-        <!-- AI 对话气泡 -->
+        <!-- AI 对话气泡：失败态不再展示「请稍候」造成误导 -->
         <AiChatBubble
+          v-if="!(isGenerationStep && wizard.generationStatus.value === 2)"
           :content="wizard.currentFlow.value.description"
           :avatar="wizard.skillDetail.value?.icon"
           :is-typing="wizard.isProcessing.value"
@@ -352,17 +354,13 @@ const isCompletionStep = computed(() => {
         />
 
         <!-- 生成失败 -->
-        <div
+        <GenerationFailed
           v-else-if="isGenerationStep && wizard.generationStatus.value === 2"
-          class="text-center py-8"
-        >
-          <p class="text-destructive mb-4">
-            {{ wizard.generationError.value || '生成失败' }}
-          </p>
-          <Button @click="wizard.handleRegenerate()">
-            重新生成
-          </Button>
-        </div>
+          :is-timeout="(wizard.generationError.value || '').includes('超时')"
+          :message="wizard.generationError.value || '生成失败，请稍后重试'"
+          :step-name="wizard.currentFlow.value.stepName"
+          @regenerate="wizard.handleRegenerate()"
+        />
 
         <!-- 完成步骤 - 结果展示 -->
         <template v-else-if="isCompletionStep">

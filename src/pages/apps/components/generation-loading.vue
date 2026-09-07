@@ -67,7 +67,7 @@ onUnmounted(() => {
 
     <!-- 描述 -->
     <p class="text-sm text-muted-foreground mb-4">
-      AI 正在为您创作，请稍候...
+      AI 正在为您创作，通常需要 1～2 分钟，请稍候...
     </p>
 
     <!-- 流式内容预览 -->

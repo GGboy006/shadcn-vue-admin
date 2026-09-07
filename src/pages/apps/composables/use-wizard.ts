@@ -11,6 +11,30 @@ import type { IChoiceOption, ISkillFlow, IStepConfig, IStepField, IWizardStepFor
 
 import { useSkillFlowDataByBuiltin } from './use-skill-flow-data'
 
+/** 将 ofetch/网络错误转为面向用户的生成失败文案 */
+export function toFriendlyGenerationError(error: unknown): string {
+  const raw = error instanceof Error ? error.message : String(error ?? '')
+  const lower = raw.toLowerCase()
+  const name = error instanceof Error ? error.name : ''
+
+  if (
+    name === 'TimeoutError'
+    || name === 'AbortError'
+    || lower.includes('timeout')
+    || lower.includes('aborted due to timeout')
+    || lower.includes('the operation was aborted')
+  ) {
+    return '生成超时，服务响应较慢，请稍后重试'
+  }
+
+  // 屏蔽 ofetch 原始 [POST] URL 堆栈文案
+  if (raw.includes('[POST]') || raw.includes('<noresponse>') || raw.includes('FetchError')) {
+    return '生成失败，请稍后重试'
+  }
+
+  return raw.trim() || '生成失败，请稍后重试'
+}
+
 /** 解析字段数据源配置 */
 export function parseFieldDataSource(field: IStepField): {
   isDynamic: boolean
@@ -563,7 +587,7 @@ export function useWizard(skillId: Ref<string>) {
     catch (error) {
       isGenerating.value = false
       generationStatus.value = 2
-      generationError.value = error instanceof Error ? error.message : '生成失败'
+      generationError.value = toFriendlyGenerationError(error)
       toast.error(generationError.value)
     }
     finally {
