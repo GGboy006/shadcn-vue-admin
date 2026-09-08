@@ -7,18 +7,18 @@ import type { IMerchantAddDTO, IMerchantUpdateDTO, MerchantType } from '@/servic
 
 import { DatePicker } from '@/components/prop-ui/date-picker'
 import { Button } from '@/components/ui/button'
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useUpload } from '@/composables/use-upload'
 import { useCreateMerchantMutation, useGetMerchantCategoryListQuery, useUpdateMerchantMutation } from '@/services/api/merchant.api'
-import { showInvalidSubmitToast } from '@/validators/common'
+import { CONTACT_PHONE_MAX_LENGTH, PHONE_MAX_LENGTH, showInvalidSubmitToast } from '@/validators/common'
 
 import type { Merchant } from '../data/schema'
 import type { MerchantValidator } from '../validators/merchant.validator'
 
-import { merchantValidator } from '../validators/merchant.validator'
+import { MERCHANT_TYPE_PROPERTY, merchantValidator } from '../validators/merchant.validator'
 
 const { merchant, type } = defineProps<{
   merchant?: Merchant
@@ -111,6 +111,9 @@ async function handleFileUpload(event: Event, field: 'avatar' | 'logo') {
 
 const currentType = computed(() => Number(formValues.type) as 4 | 5 | 6)
 
+/** 物业是外部产品：只靠外部链接跳转，不参与商户分类/商户经营那套字段 */
+const isProperty = computed(() => currentType.value === MERCHANT_TYPE_PROPERTY)
+
 const { data: categoryListRes } = useGetMerchantCategoryListQuery()
 const categoryOptions = computed(() => categoryListRes.value?.data ?? [])
 
@@ -120,26 +123,29 @@ const { mutate: updateMutate, isPending: isUpdating } = useUpdateMerchantMutatio
 const isSubmitting = computed(() => isCreating.value || isUpdating.value)
 
 function buildPayload(values: MerchantValidator): IMerchantAddDTO | IMerchantUpdateDTO {
+  const submitAsProperty = Number(values.type) === MERCHANT_TYPE_PROPERTY
+
   const basePayload = {
     merchantName: values.merchantName,
     nickname: values.nickname,
     phone: values.phone,
     type: values.type as 4 | 5 | 6,
     gender: values.gender as 0 | 1 | 2,
-    categoryCode: values.categoryCode,
     avatar: values.avatar || undefined,
-    logo: values.logo || undefined,
     contactName: values.contactName || undefined,
     contactPhone: values.contactPhone || undefined,
     address: values.address || undefined,
     externalUrl: values.externalUrl || undefined,
     signDate: values.signDate || undefined,
     signFee: values.signFee || undefined,
-    businessHours: values.businessHours || undefined,
-    settlementCycle: values.settlementCycle as 1 | 2 | 3,
     intro: values.intro || undefined,
     remark: values.remark || undefined,
     status: values.status as 1 | 2,
+    // 物业不参与商户分类与经营配置，避免脏值落库
+    categoryCode: submitAsProperty ? undefined : values.categoryCode,
+    logo: submitAsProperty ? undefined : values.logo || undefined,
+    businessHours: submitAsProperty ? undefined : values.businessHours || undefined,
+    settlementCycle: submitAsProperty ? undefined : values.settlementCycle as 1 | 2 | 3,
   }
 
   if (isEdit.value && merchant) {
@@ -275,7 +281,13 @@ const onSubmit = handleSubmit((values) => {
                 手机号
               </FormLabel>
               <FormControl>
-                <Input type="text" v-bind="componentField" />
+                <Input
+                  type="text"
+                  inputmode="numeric"
+                  :maxlength="PHONE_MAX_LENGTH"
+                  placeholder="11 位手机号"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -339,7 +351,7 @@ const onSubmit = handleSubmit((values) => {
             </FormItem>
           </FormField>
 
-          <FormField v-slot="{ componentField }" name="categoryCode">
+          <FormField v-if="!isProperty" v-slot="{ componentField }" name="categoryCode">
             <FormItem>
               <FormLabel required>
                 商户分类
@@ -366,6 +378,30 @@ const onSubmit = handleSubmit((values) => {
         </div>
       </div>
 
+      <!-- 物业专属：外部产品入口，居民点击后跳转该链接。物业最关键字段，故置于基本信息之后 -->
+      <template v-if="isProperty">
+        <div class="space-y-4">
+          <div class="text-sm font-medium text-muted-foreground">
+            物业信息
+          </div>
+
+          <FormField v-slot="{ componentField }" name="externalUrl">
+            <FormItem>
+              <FormLabel required>
+                外部链接
+              </FormLabel>
+              <FormControl>
+                <Input type="text" v-bind="componentField" placeholder="https://example.com" />
+              </FormControl>
+              <FormDescription>
+                物业为外部产品，居民点击入口后跳转此链接
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+      </template>
+
       <!-- 联系信息 -->
       <div class="space-y-4">
         <div class="text-sm font-medium text-muted-foreground">
@@ -387,7 +423,7 @@ const onSubmit = handleSubmit((values) => {
             <FormItem>
               <FormLabel>联系电话</FormLabel>
               <FormControl>
-                <Input type="text" v-bind="componentField" />
+                <Input type="tel" :maxlength="CONTACT_PHONE_MAX_LENGTH" placeholder="支持手机号或固话" v-bind="componentField" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -512,25 +548,6 @@ const onSubmit = handleSubmit((values) => {
         </div>
       </template>
 
-      <!-- 物业专属 -->
-      <template v-if="currentType === 5">
-        <div class="space-y-4">
-          <div class="text-sm font-medium text-muted-foreground">
-            物业信息
-          </div>
-
-          <FormField v-slot="{ componentField }" name="externalUrl">
-            <FormItem>
-              <FormLabel>外部链接</FormLabel>
-              <FormControl>
-                <Input type="text" v-bind="componentField" placeholder="外部链接URL" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-        </div>
-      </template>
-
       <!-- 简介 -->
       <div class="space-y-4">
         <div class="text-sm font-medium text-muted-foreground">
@@ -540,7 +557,7 @@ const onSubmit = handleSubmit((values) => {
         <FormField v-slot="{ componentField }" name="intro">
           <FormItem>
             <FormControl>
-              <Textarea v-bind="componentField" placeholder="请输入商户简介" rows="3" />
+              <Textarea v-bind="componentField" :placeholder="`请输入${typeLabel}简介`" rows="3" />
             </FormControl>
             <FormMessage />
           </FormItem>

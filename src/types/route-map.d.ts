@@ -574,13 +574,6 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/properties/[merchantId]/assign': RouteRecordInfo<
-      '/properties/[merchantId]/assign',
-      '/properties/:merchantId/assign',
-      { merchantId: ParamValue<true> },
-      { merchantId: ParamValue<false> },
-      | never
-    >,
     '/settings/': RouteRecordInfo<
       '/settings/',
       '/settings',
@@ -1095,12 +1088,6 @@ declare module 'vue-router/auto-routes' {
     'src/pages/properties/index.vue': {
       routes:
         | '/properties/'
-      views:
-        | never
-    }
-    'src/pages/properties/[merchantId]/assign.vue': {
-      routes:
-        | '/properties/[merchantId]/assign'
       views:
         | never
     }
