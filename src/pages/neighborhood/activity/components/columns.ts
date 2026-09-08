@@ -4,7 +4,7 @@ import { h } from 'vue'
 
 import type { INeighborhoodActivity } from '@/services/api/neighborhood-activity.api'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 import {
   activityEnableStatusConfig,
@@ -18,12 +18,7 @@ export const columns: ColumnDef<INeighborhoodActivity>[] = [
     accessorKey: 'poster',
     header: ({ column }) => h(DataTableColumnHeader<INeighborhoodActivity>, { column, title: '封面' }),
     meta: { title: '封面' },
-    cell: ({ row }) => {
-      const poster = row.original.poster
-      if (!poster)
-        return h('div', { class: 'text-sm text-muted-foreground' }, '-')
-      return h('img', { src: poster, alt: '封面', class: 'h-10 w-10 rounded border object-cover' })
-    },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.poster, alt: '封面', size: 'size-10' }),
     enableSorting: false,
     enableHiding: false,
     enableResizing: false,

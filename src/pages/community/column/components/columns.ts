@@ -4,7 +4,7 @@ import { h } from 'vue'
 
 import type { ICommunityColumn } from '@/services/api/community-column.api'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 import {
   communityColumnEnableStatusConfig,
@@ -19,17 +19,7 @@ export const columns: ColumnDef<ICommunityColumn>[] = [
     accessorKey: 'logo',
     header: ({ column }) => h(DataTableColumnHeader<ICommunityColumn>, { column, title: 'Logo' }),
     meta: { title: 'Logo' },
-    cell: ({ row }) => {
-      const logo = row.original.logo
-      if (!logo) {
-        return h('div', { class: 'flex size-9 items-center justify-center rounded bg-muted text-xs text-muted-foreground' }, '无')
-      }
-      return h('img', {
-        src: logo,
-        alt: 'Logo',
-        class: 'size-9 rounded object-cover border',
-      })
-    },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.logo, alt: 'Logo' }),
     enableSorting: false,
     enableHiding: true,
     enableResizing: true,

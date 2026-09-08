@@ -2,7 +2,7 @@ import type { ColumnDef } from '@tanstack/vue-table'
 
 import { h } from 'vue'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 
 import type { Activity } from '../data/schema'
@@ -24,12 +24,7 @@ export const columns: ColumnDef<Activity>[] = [
     accessorKey: 'poster',
     header: ({ column }) => h(DataTableColumnHeader<Activity>, { column, title: '封面' }),
     meta: { title: '封面' },
-    cell: ({ row }) => {
-      const poster = row.getValue('poster') as string
-      return poster
-        ? h('img', { src: poster, alt: '封面', class: 'h-10 w-10 rounded object-cover border' })
-        : h('div', { class: 'h-10 w-10 rounded bg-muted flex items-center justify-center text-xs text-muted-foreground' }, '无')
-    },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.getValue('poster') as string, alt: '封面', size: 'size-10' }),
     enableSorting: false,
     enableHiding: false,
     enableResizing: true,

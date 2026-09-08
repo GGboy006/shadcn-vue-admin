@@ -4,7 +4,7 @@ import { h } from 'vue'
 
 import type { INeighborhoodSpecialArticle } from '@/services/api/neighborhood-special-article.api'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import { Copy } from '@/components/prop-ui/copy'
 import Badge from '@/components/ui/badge/Badge.vue'
 import {
@@ -22,12 +22,7 @@ export function createColumns(specialCode: string): ColumnDef<INeighborhoodSpeci
       accessorKey: 'poster',
       header: ({ column }) => h(DataTableColumnHeader<INeighborhoodSpecialArticle>, { column, title: '封面' }),
       meta: { title: '封面' },
-      cell: ({ row }) => {
-        const poster = row.original.poster
-        if (!poster)
-          return h('div', { class: 'text-sm text-muted-foreground' }, '-')
-        return h('img', { src: poster, alt: '封面', class: 'h-10 w-16 rounded border object-cover' })
-      },
+      cell: ({ row }) => h(DataTableImageCell, { src: row.original.poster, alt: '封面', size: 'h-10 w-16' }),
       enableSorting: false,
       enableHiding: false,
       enableResizing: false,

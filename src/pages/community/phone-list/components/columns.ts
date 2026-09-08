@@ -4,7 +4,7 @@ import { h } from 'vue'
 
 import type { ICommunityPhone } from '@/services/api/community-phone.api'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import { Copy } from '@/components/prop-ui/copy'
 import Badge from '@/components/ui/badge/Badge.vue'
 import {
@@ -20,17 +20,7 @@ export const columns: ColumnDef<ICommunityPhone>[] = [
     accessorKey: 'poster',
     header: ({ column }) => h(DataTableColumnHeader<ICommunityPhone>, { column, title: '图片' }),
     meta: { title: '图片' },
-    cell: ({ row }) => {
-      const poster = row.original.poster
-      if (!poster) {
-        return h('div', { class: 'flex size-9 items-center justify-center rounded bg-muted text-xs text-muted-foreground' }, '无')
-      }
-      return h('img', {
-        src: poster,
-        alt: row.original.title,
-        class: 'size-9 rounded object-cover border',
-      })
-    },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.poster, alt: row.original.title }),
     enableSorting: false,
     enableHiding: true,
     enableResizing: true,

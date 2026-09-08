@@ -4,7 +4,7 @@ import { h } from 'vue'
 
 import type { ICommunityServiceGuide } from '@/services/api/community-service-guide.api'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import PropPiCopy from '@/components/prop-ui/copy/Copy.vue'
 import Badge from '@/components/ui/badge/Badge.vue'
 import { serviceGuideEnableStatusConfig } from '@/services/api/community-service-guide.api'
@@ -17,17 +17,7 @@ export const columns: ColumnDef<ICommunityServiceGuide>[] = [
     accessorKey: 'poster',
     header: ({ column }) => h(DataTableColumnHeader<ICommunityServiceGuide>, { column, title: '封面' }),
     meta: { title: '封面' },
-    cell: ({ row }) => {
-      const poster = row.original.poster
-      if (!poster) {
-        return h('div', { class: 'flex size-9 items-center justify-center rounded bg-muted text-xs text-muted-foreground' }, '无')
-      }
-      return h('img', {
-        src: poster,
-        alt: row.original.title,
-        class: 'size-9 rounded object-cover border',
-      })
-    },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.poster, alt: row.original.title }),
     enableSorting: false,
     enableHiding: true,
     enableResizing: true,

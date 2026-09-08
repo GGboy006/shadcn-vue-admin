@@ -4,7 +4,7 @@ import { h } from 'vue'
 
 import type { IResident } from '@/services/api/resident.api'
 
-import { DataTableColumnHeader, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
 import PropPiCopy from '@/components/prop-ui/copy/Copy.vue'
 import Badge from '@/components/ui/badge/Badge.vue'
 import {
@@ -27,17 +27,7 @@ export const columns: ColumnDef<IResident>[] = [
     accessorKey: 'avatar',
     header: ({ column }) => h(DataTableColumnHeader<IResident>, { column, title: '头像' }),
     meta: { title: '头像' },
-    cell: ({ row }) => {
-      const avatar = row.original.avatar
-      if (!avatar) {
-        return h('div', { class: 'flex size-9 items-center justify-center rounded-full bg-muted text-xs text-muted-foreground' }, '无')
-      }
-      return h('img', {
-        src: avatar,
-        alt: row.original.nickname || '头像',
-        class: 'size-9 rounded-full object-cover border',
-      })
-    },
+    cell: ({ row }) => h(DataTableImageCell, { src: row.original.avatar, alt: row.original.nickname || '头像', shape: 'circle' }),
     enableSorting: false,
     enableHiding: true,
     enableResizing: true,
