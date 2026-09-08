@@ -47,6 +47,7 @@ declare global {
   const isUnauthorized: typeof import('../constants/api-status').isUnauthorized
   const logout: typeof import('../composables/use-auth')['logout']
   const markRaw: typeof import('vue').markRaw
+  const mergeStreamText: typeof import('../composables/use-text-stream').mergeStreamText
   const nextTick: typeof import('vue').nextTick
   const onActivated: typeof import('vue').onActivated
   const onBeforeMount: typeof import('vue').onBeforeMount

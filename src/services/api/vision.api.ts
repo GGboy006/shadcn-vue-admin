@@ -3,6 +3,7 @@ import { computed } from 'vue'
 
 import { useApiFetch } from '@/composables/use-fetch'
 import { createStreamUrl, useTextStream } from '@/composables/use-text-stream'
+import { mergeStreamText } from '@/utils/stream-text'
 
 import type { IResponse } from '../types/response.type'
 
@@ -65,7 +66,7 @@ export function useAgentVisionStream() {
       body: JSON.stringify(request),
       onMessage(event) {
         if (event.event === '[DATA]' && event.data.content) {
-          visionContent += event.data.content
+          visionContent = mergeStreamText(visionContent, event.data.content, event.data.fullFlag)
           callbacks.onMessage(visionContent)
         }
       },
@@ -73,7 +74,7 @@ export function useAgentVisionStream() {
       onReasoningEnd() {},
       onDone(event) {
         if (event.event === '[DATA]' && event.data.content) {
-          visionContent += event.data.content
+          visionContent = mergeStreamText(visionContent, event.data.content, event.data.fullFlag)
           callbacks.onMessage(visionContent)
         }
         callbacks.onDone()

@@ -7,6 +7,7 @@ import type { IMessageListQuery, IStreamChatMessage } from '@/services/api/skill
 import { createStreamUrl, useTextStream } from '@/composables/use-text-stream'
 import { convertStreamMessagesToChatMessages } from '@/services/api/conversation.api'
 import { useCreateConversationMutation, useGetMessageListQuery } from '@/services/api/skill.api'
+import { mergeStreamText } from '@/utils/stream-text'
 
 /** 聊天角色 */
 export type ChatRole = 'user' | 'assistant'
@@ -220,9 +221,11 @@ export function useChatStream(
           },
           onReasoning(event) {
             isReasoning.value = true
-            if (event.data.reasoningContent) {
-              reasoningContent.value += event.data.reasoningContent
-            }
+            reasoningContent.value = mergeStreamText(
+              reasoningContent.value,
+              event.data.reasoningContent,
+              event.data.fullFlag,
+            )
           },
           onReasoningEnd(event) {
             isReasoning.value = false
@@ -275,7 +278,7 @@ export function useChatStream(
     if (eventName === '[DATA]') {
       isReasoning.value = false
       if (data.content) {
-        currentStreamContent.value += data.content
+        currentStreamContent.value = mergeStreamText(currentStreamContent.value, data.content, data.fullFlag)
         aiMsg.content = currentStreamContent.value
       }
       if (data.id) {
@@ -335,9 +338,7 @@ export function useChatStream(
     // [REASONING] 推理中
     if (eventName === '[REASONING]') {
       isReasoning.value = true
-      if (data.reasoningContent) {
-        reasoningContent.value += data.reasoningContent
-      }
+      reasoningContent.value = mergeStreamText(reasoningContent.value, data.reasoningContent, data.fullFlag)
       return
     }
 
