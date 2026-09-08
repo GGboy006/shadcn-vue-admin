@@ -6,6 +6,7 @@ import { RouterLink } from 'vue-router'
 import type { INeighborhoodSpecial } from '@/services/api/neighborhood-special.api'
 
 import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
+import { Copy } from '@/components/prop-ui/copy'
 import Badge from '@/components/ui/badge/Badge.vue'
 import { specialEnableStatusConfig } from '@/services/api/neighborhood-special.api'
 
@@ -37,6 +38,29 @@ export const columns: ColumnDef<INeighborhoodSpecial>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
+    enableResizing: true,
+  },
+  {
+    accessorKey: 'uniqueCode',
+    header: ({ column }) => h(DataTableColumnHeader<INeighborhoodSpecial>, { column, title: '专题编码' }),
+    meta: { title: '专题编码' },
+    cell: ({ row }) => {
+      const uniqueCode = row.original.uniqueCode
+      if (!uniqueCode)
+        return h('div', { class: 'text-sm text-muted-foreground' }, '-')
+      return h('div', { class: 'flex items-center gap-1' }, [
+        h('span', { class: 'max-w-[180px] truncate font-mono text-xs text-muted-foreground' }, uniqueCode),
+        h(Copy, {
+          content: uniqueCode,
+          size: 'sm',
+          variant: 'ghost',
+          copyTooltipText: '复制专题编码',
+          copiedTooltipText: '已复制',
+        }),
+      ])
+    },
+    enableSorting: false,
+    enableHiding: true,
     enableResizing: true,
   },
   {
