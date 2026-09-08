@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { optionalNumber, optionalString } from '@/validators/common'
+import { optionalContactPhone, optionalNumber, optionalString } from '@/validators/common'
 
 /** 办事指南表单校验规则(对接文档 8 节,type/parentCode 前端不用) */
 export const communityServiceGuideValidator = z.object({
@@ -9,7 +9,7 @@ export const communityServiceGuideValidator = z.object({
   poster: optionalString,
   unit: optionalString,
   address: optionalString,
-  phone: optionalString,
+  phone: optionalContactPhone,
   describe: optionalString,
   worktime: optionalString,
   acceptanceConditions: optionalString,

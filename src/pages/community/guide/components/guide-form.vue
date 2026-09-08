@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Textarea } from '@/components/ui/textarea'
 import { useUpload } from '@/composables/use-upload'
 import { useCreateServiceGuideMutation, useUpdateServiceGuideMutation } from '@/services/api/community-service-guide.api'
-import { showInvalidSubmitToast } from '@/validators/common'
+import { CONTACT_PHONE_MAX_LENGTH, showInvalidSubmitToast } from '@/validators/common'
 
 import type { CommunityServiceGuideValidator } from '../validators/guide.validator'
 
@@ -181,7 +181,7 @@ const onSubmit = handleSubmit((values) => {
         <FormItem>
           <FormLabel>电话</FormLabel>
           <FormControl>
-            <Input type="text" placeholder="电话" v-bind="componentField" />
+            <Input type="tel" :maxlength="CONTACT_PHONE_MAX_LENGTH" placeholder="支持手机号或固话" v-bind="componentField" />
           </FormControl>
           <FormMessage />
         </FormItem>

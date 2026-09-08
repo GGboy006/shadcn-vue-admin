@@ -18,7 +18,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Textarea } from '@/components/ui/textarea'
 import { useUpload } from '@/composables/use-upload'
 import { useGetMyOrgInfoQuery, useUpdateMyOrgInfoMutation } from '@/services/api/neighborhood-org.api'
-import { optionalNumber, optionalString, showInvalidSubmitToast } from '@/validators/common'
+import { CONTACT_PHONE_MAX_LENGTH, optionalContactPhone, optionalNumber, optionalPhone, optionalString, PHONE_MAX_LENGTH, showInvalidSubmitToast } from '@/validators/common'
 
 import type { OrgInfoFormValues } from './data/payload'
 
@@ -31,7 +31,7 @@ const info = computed(() => data.value?.data)
 const orgInfoSchema = z.object({
   merchantId: z.string(),
   nickname: optionalString,
-  phone: optionalString,
+  phone: optionalPhone,
   password: optionalString,
   avatar: optionalString,
   gender: optionalNumber,
@@ -40,7 +40,7 @@ const orgInfoSchema = z.object({
   bannerImages: z.array(z.string()).optional(),
   otherImages: z.array(z.string()).optional(),
   contactName: optionalString,
-  contactPhone: optionalString,
+  contactPhone: optionalContactPhone,
   address: optionalString,
   signDate: optionalString,
   signFee: optionalNumber,
@@ -205,7 +205,7 @@ const onSubmit = handleSubmit((values) => {
             <FormItem>
               <FormLabel>手机号</FormLabel>
               <FormControl>
-                <Input type="text" v-bind="componentField" />
+                <Input type="text" inputmode="numeric" :maxlength="PHONE_MAX_LENGTH" placeholder="11 位手机号" v-bind="componentField" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -332,7 +332,7 @@ const onSubmit = handleSubmit((values) => {
             <FormItem>
               <FormLabel>联系电话</FormLabel>
               <FormControl>
-                <Input type="text" v-bind="componentField" />
+                <Input type="tel" :maxlength="CONTACT_PHONE_MAX_LENGTH" placeholder="支持手机号或固话" v-bind="componentField" />
               </FormControl>
               <FormMessage />
             </FormItem>

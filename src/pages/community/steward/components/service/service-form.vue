@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { useUpload } from '@/composables/use-upload'
 import { useCreateHousekeeperServiceMutation, useUpdateHousekeeperServiceMutation } from '@/services/api/housekeeper.api'
-import { showInvalidSubmitToast } from '@/validators/common'
+import { CONTACT_PHONE_MAX_LENGTH, showInvalidSubmitToast } from '@/validators/common'
 
 import type { HousekeeperServiceValidator } from '../../validators/service.validator'
 
@@ -199,7 +199,7 @@ const onSubmit = handleSubmit((values) => {
           <FormItem>
             <FormLabel>联系电话</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="联系电话" v-bind="componentField" />
+              <Input type="tel" :maxlength="CONTACT_PHONE_MAX_LENGTH" placeholder="支持手机号或固话" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>

@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { requiredPhone } from '@/validators/common'
+
 export const APPLY_IDENTITY_OPTIONS = [
   { value: 'property', label: '物业 / 社区运营商' },
   { value: 'committee', label: '街道 / 居委会' },
@@ -10,7 +12,7 @@ export const APPLY_IDENTITY_OPTIONS = [
 export const applyValidator = z.object({
   communityName: z.string().trim().min(1, '请填写小区名称').max(40, '小区名称不超过 40 字'),
   contactName: z.string().trim().min(1, '请填写联系人').max(20, '联系人不超过 20 字'),
-  phone: z.string().trim().regex(/^1[3-9]\d{9}$/, '请输入正确的 11 位手机号'),
+  phone: requiredPhone,
   identity: z.enum(['property', 'committee', 'other'], { message: '请选择您的身份' }),
   remark: z.string().trim().max(200, '备注不超过 200 字').optional(),
 })

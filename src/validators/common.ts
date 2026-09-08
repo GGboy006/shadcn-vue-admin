@@ -24,6 +24,33 @@ export const optionalInt = optionalNumber.refine(
 /** 可选字符串字段:兼容后端回显的 null,统一转为 undefined */
 export const optionalString = z.string().nullable().optional().transform(v => v ?? undefined)
 
+/** 中国大陆手机号:11 位,1 开头,第二位 3-9 */
+export const PHONE_REGEX = /^1[3-9]\d{9}$/
+
+/** 手机号最大长度,同时用于输入框 maxlength,避免前后端口径不一致 */
+export const PHONE_MAX_LENGTH = 11
+
+/** 必填手机号(登录账号等场景):长度与号段都要正确,否则账号建出来无法登录 */
+export const requiredPhone = z.string().trim().regex(PHONE_REGEX, '请输入正确的 11 位手机号')
+
+/** 可选手机号:可以不填,但填了就必须是合法的 11 位手机号 */
+export const optionalPhone = optionalString.refine(
+  v => !v || PHONE_REGEX.test(v.trim()),
+  '请输入正确的 11 位手机号',
+)
+
+/** 联系电话最大长度,同时用于输入框 maxlength */
+export const CONTACT_PHONE_MAX_LENGTH = 20
+
+/**
+ * 可选联系电话:面向单位/门店对外电话,允许固话、分机与 110/12345 这类短号,
+ * 只约束字符集与长度,不套手机号号段规则
+ */
+export const optionalContactPhone = optionalString.refine(
+  v => !v || /^[\d\-+()\s]{3,20}$/.test(v.trim()),
+  '请输入正确的联系电话(仅支持数字、空格及 - + ( ) )',
+)
+
 /**
  * handleSubmit 校验失败兜底回调,作为第二个参数传入:
  * `handleSubmit(onValid, showInvalidSubmitToast)`

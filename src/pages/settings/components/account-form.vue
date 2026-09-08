@@ -19,6 +19,7 @@ import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import { useApiFetch } from '@/composables/use-fetch'
 import { useUserInfoStore } from '@/stores/user-info'
+import { PHONE_MAX_LENGTH } from '@/validators/common'
 
 import { accountValidator } from '../validators/account.validator'
 
@@ -172,7 +173,7 @@ const onSubmit = handleSubmit(async (formValues) => {
       <FormItem>
         <FormLabel>联系电话</FormLabel>
         <FormControl>
-          <Input type="tel" placeholder="请输入联系电话" v-bind="componentField" />
+          <Input type="tel" inputmode="numeric" :maxlength="PHONE_MAX_LENGTH" placeholder="11 位手机号" v-bind="componentField" />
         </FormControl>
         <FormMessage />
       </FormItem>

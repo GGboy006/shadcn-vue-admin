@@ -11,7 +11,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useCreateHousekeeperStaffMutation, useGetHousekeeperServiceListQuery, useUpdateHousekeeperStaffMutation } from '@/services/api/housekeeper.api'
-import { showInvalidSubmitToast } from '@/validators/common'
+import { PHONE_MAX_LENGTH, showInvalidSubmitToast } from '@/validators/common'
 
 import type { HousekeeperStaffValidator } from '../../validators/staff.validator'
 
@@ -144,7 +144,7 @@ const onSubmit = handleSubmit((values) => {
           <FormItem>
             <FormLabel>电话</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="联系电话" v-bind="componentField" />
+              <Input type="text" inputmode="numeric" :maxlength="PHONE_MAX_LENGTH" placeholder="11 位手机号" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>

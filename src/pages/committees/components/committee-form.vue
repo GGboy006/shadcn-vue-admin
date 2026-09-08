@@ -17,7 +17,7 @@ import {
   useGetCityNeighborhoodByRegionQuery,
   useUpdateCommitteeMutation,
 } from '@/services/api/merchant.api'
-import { showInvalidSubmitToast } from '@/validators/common'
+import { CONTACT_PHONE_MAX_LENGTH, PHONE_MAX_LENGTH, showInvalidSubmitToast } from '@/validators/common'
 
 import type { Merchant } from '../../merchants/data/schema'
 import type { CommitteeValidator } from '../validators/committee.validator'
@@ -299,7 +299,7 @@ const onSubmit = handleSubmit((values) => {
           <FormItem>
             <FormLabel>登录手机号</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="留空时后端从城市库拉取" v-bind="componentField" :disabled="!isEdit" />
+              <Input type="text" inputmode="numeric" :maxlength="PHONE_MAX_LENGTH" placeholder="留空时后端从城市库拉取" v-bind="componentField" :disabled="!isEdit" />
             </FormControl>
             <p v-if="!isEdit" class="text-xs text-muted-foreground">
               新建时由后端从城市库拉取
@@ -436,7 +436,7 @@ const onSubmit = handleSubmit((values) => {
           <FormItem>
             <FormLabel>联系电话</FormLabel>
             <FormControl>
-              <Input type="text" v-bind="componentField" />
+              <Input type="tel" :maxlength="CONTACT_PHONE_MAX_LENGTH" placeholder="支持手机号或固话" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>

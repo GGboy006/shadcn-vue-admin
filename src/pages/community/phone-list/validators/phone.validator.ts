@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { optionalNumber, optionalString } from '@/validators/common'
+import { optionalContactPhone, optionalNumber, optionalString } from '@/validators/common'
 
 /** 社区电话表单校验规则(对接文档 7 节) */
 export const communityPhoneValidator = z.object({
@@ -9,10 +9,10 @@ export const communityPhoneValidator = z.object({
   poster: optionalString,
   type: optionalNumber,
   isEnable: optionalNumber,
-  regionPhone: optionalString,
+  regionPhone: optionalContactPhone,
   workTime: optionalString,
   contactUser: optionalString,
-  contactPhone: optionalString,
+  contactPhone: optionalContactPhone,
   customerServiceWeixin: optionalString,
   wechatQrcode: optionalString,
 })

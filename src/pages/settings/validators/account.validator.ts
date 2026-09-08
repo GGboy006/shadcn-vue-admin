@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { requiredPhone } from '@/validators/common'
+
 export const accountValidator = z.object({
   stationName: z
     .string()
@@ -12,9 +14,7 @@ export const accountValidator = z.object({
     .string()
     .min(1, '站点地址不能为空')
     .max(200, '站点地址不能超过200个字符'),
-  contactPhone: z
-    .string()
-    .regex(/^1[3-9]\d{9}$/, '请输入有效的手机号'),
+  contactPhone: requiredPhone,
   remark: z
     .string()
     .max(500, '备注不能超过500个字符')

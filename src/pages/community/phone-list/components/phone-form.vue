@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useUpload } from '@/composables/use-upload'
 import { useCreatePhoneMutation, useUpdatePhoneMutation } from '@/services/api/community-phone.api'
-import { showInvalidSubmitToast } from '@/validators/common'
+import { CONTACT_PHONE_MAX_LENGTH, showInvalidSubmitToast } from '@/validators/common'
 
 import type { CommunityPhoneValidator } from '../validators/phone.validator'
 
@@ -211,7 +211,7 @@ const onSubmit = handleSubmit((values) => {
         <FormItem>
           <FormLabel>值班电话</FormLabel>
           <FormControl>
-            <Input type="text" placeholder="值班电话" v-bind="componentField" />
+            <Input type="tel" :maxlength="CONTACT_PHONE_MAX_LENGTH" placeholder="支持手机号、固话或短号" v-bind="componentField" />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -244,7 +244,7 @@ const onSubmit = handleSubmit((values) => {
         <FormItem>
           <FormLabel>联系电话</FormLabel>
           <FormControl>
-            <Input type="text" placeholder="联系电话" v-bind="componentField" />
+            <Input type="tel" :maxlength="CONTACT_PHONE_MAX_LENGTH" placeholder="支持手机号、固话或短号" v-bind="componentField" />
           </FormControl>
           <FormMessage />
         </FormItem>

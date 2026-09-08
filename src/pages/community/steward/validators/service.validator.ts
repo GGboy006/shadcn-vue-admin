@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { optionalInt, optionalNumber, optionalString } from '@/validators/common'
+import { optionalContactPhone, optionalInt, optionalNumber, optionalString } from '@/validators/common'
 
 /** 管家服务主体校验(对接文档 4.1) */
 export const housekeeperServiceValidator = z.object({
@@ -10,7 +10,7 @@ export const housekeeperServiceValidator = z.object({
   icon: optionalString,
   coverImage: optionalString,
   contactName: optionalString,
-  contactPhone: optionalString,
+  contactPhone: optionalContactPhone,
   merchantId: optionalString,
   sortOrder: optionalInt,
   status: optionalNumber,
