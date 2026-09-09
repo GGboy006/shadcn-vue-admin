@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { MedalIcon, StarIcon } from '@lucide/vue'
-import { toast } from 'vue-sonner'
 
 import type { IDigitalEmployee } from '@/services/api/digital-employee.api'
 
@@ -26,12 +25,8 @@ const statusConfig = computed(() => onlineStatusConfig[props.employee.onlineStat
 /** 任务次数千分位格式化 */
 const taskCountText = computed(() => (props.employee.taskCount ?? 0).toLocaleString())
 
-/** 进入对话：aiType 3(AgentSkill) 暂不支持流式对话 */
+/** 进入对话：aiType 3 走 AgentScope 流式，1/2 走现有 LoongAI */
 function handleClick() {
-  if (props.employee.aiType === 3) {
-    toast.info('该数字员工暂不支持对话')
-    return
-  }
   router.push(`/digital-employees/chat?employeeId=${props.employee.employeeId}`)
 }
 </script>

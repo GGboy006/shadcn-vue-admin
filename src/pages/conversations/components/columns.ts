@@ -2,11 +2,11 @@ import type { ColumnDef } from '@tanstack/vue-table'
 
 import { h } from 'vue'
 
-import type { IConversation, ServiceMode, UserTag } from '@/services/api/conversation.api'
+import type { IConversation, UserTag } from '@/services/api/conversation.api'
 
 import { DataTableColumnHeader } from '@/components/data-table'
 import { Badge } from '@/components/ui/badge'
-import { serviceModeConfig, userTagConfig } from '@/services/api/conversation.api'
+import { getConversationModeDisplay, userTagConfig } from '@/services/api/conversation.api'
 import { formatDateTime } from '@/utils/date'
 
 import DataTableRowActions from './data-table-row-actions.vue'
@@ -39,9 +39,8 @@ export const columns: ColumnDef<IConversation>[] = [
     header: ({ column }) => h(DataTableColumnHeader<IConversation>, { column, title: '服务模式' }),
     meta: { title: '服务模式' },
     cell: ({ row }) => {
-      const mode = row.getValue('serviceMode') as ServiceMode
-      const config = serviceModeConfig[mode]
-      return h(Badge, { variant: config?.variant || 'default' }, () => config?.label || '未知')
+      const config = getConversationModeDisplay(row.original.serviceMode, row.original.type)
+      return h(Badge, { variant: config.variant }, () => config.label)
     },
     enableSorting: false,
     enableResizing: true,

@@ -6,25 +6,22 @@ import type { EmployeeAiType } from '@/services/api/digital-employee.api'
 import type { IMessageListQuery } from '@/services/api/skill.api'
 
 import { createStreamUrl, useTextStream } from '@/composables/use-text-stream'
-import { convertStreamMessagesToChatMessages } from '@/services/api/conversation.api'
+import { convertStreamMessagesToChatMessages, useGetConversationDetailQuery } from '@/services/api/conversation.api'
 import { useCreateConversationMutation, useGetMessageListQuery } from '@/services/api/skill.api'
+import { applyAgUiEvent, createAgUiStreamState } from '@/utils/ag-ui-stream'
+import { applyPartsToMessage, hydrateChatMessage } from '@/utils/chat-message-parts'
 import { mergeStreamText } from '@/utils/stream-text'
 
-/** SSE 事件对象 */
 interface SSEEvent {
   event: string
   data: Record<string, any>
 }
 
-/** 发送消息的可选参数（Agent 类型需传入） */
 interface SendMessageOptions {
-  /** Agent 第三方 ID（=aiThirdId） */
   agentId?: string
-  /** Agent MCP 方法名 */
   mcpMethod?: string
 }
 
-/** 创建一条空的 IChatMessage */
 function createMessage(partial: Partial<IChatMessage>): IChatMessage {
   return {
     id: '',
@@ -44,33 +41,20 @@ function createMessage(partial: Partial<IChatMessage>): IChatMessage {
 }
 
 /**
- * 数字员工流式对话状态管理
+ * 数字员工流式对话。
  *
- * 复用现有 createConversation + /aiChat/chat/stream/completion 流式接口，
- * 与 apps/use-chat-stream 的差异：
- * - employeeId 即流式接口中的 skillId
- * - aiType 即 type（1=Coze 传 aiChatType:201，2=Agent）
- * - 支持注入一条本地开场白消息（展示用，不发送给后端）
- * - 传入 initialChatId 时加载该会话历史消息（如从“查看详情”进入），否则为新会话
- *
- * @param employeeId 数字员工ID（=skillId）
- * @param aiType AI类型 1=Coze, 2=Agent
- * @param welcomeContent 开场白内容（可选，作为首条 AI 消息展示）
- * @param initialChatId 初始会话ID（可选，从会话列表/详情进入时传入，用于加载历史）
+ * type=3 AgentScope：AG-UI `/agentScopeChat/chat/stream/completion`，历史走 conversation 详情。
+ * type=1/2：LoongAI `/aiChat/chat/stream/completion`，历史走 messageList。
  */
 export function useEmployeeChatStream(
   employeeId: Ref<string>,
-  aiType: Ref<EmployeeAiType>,
+  aiType: Ref<EmployeeAiType | undefined>,
   welcomeContent?: Ref<string>,
   initialChatId?: Ref<string | null>,
 ) {
-  // ==================== 消息列表 ====================
   const messages = ref<IChatMessage[]>([])
-
-  /** 本地开场白消息ID：仅用于展示，构建历史时排除 */
   const welcomeMessageId = 'welcome-message'
 
-  /** 注入/更新开场白消息 */
   function seedWelcomeMessage() {
     const content = welcomeContent?.value?.trim()
     if (!content)
@@ -78,29 +62,38 @@ export function useEmployeeChatStream(
     const existing = messages.value.find(m => m.id === welcomeMessageId)
     if (existing) {
       existing.content = content
+      applyPartsToMessage(existing, { text: content })
       return
     }
     messages.value.unshift(createMessage({
       id: welcomeMessageId,
       role: 'assistant',
       content,
+      parts: [{ type: 'text', content }],
     }))
   }
 
-  // ==================== 会话状态 ====================
   const chatId = ref<string | null>(initialChatId?.value ?? null)
   const conversationId = ref('')
+  /** 以创建会话返回的 type 为准；历史进入时先用员工 aiType */
+  const sessionType = ref<number | null>(null)
   const isFirstMessage = computed(() => chatId.value === null)
+  const protocolReady = computed(() => aiType.value === 1 || aiType.value === 2 || aiType.value === 3)
+  const isAgentScope = computed(() => (sessionType.value ?? aiType.value) === 3)
 
-  // ==================== 历史消息加载 ====================
   const messageListQuery = ref<IMessageListQuery | null>(null)
 
-  watch(() => chatId.value, (newChatId, oldChatId) => {
-    if (newChatId && newChatId !== oldChatId) {
-      // 只有真正切换会话时才清空消息；
-      // 首次创建会话（oldChatId 为 null/undefined）时不清空，避免刚发送的消息被清掉
-      if (oldChatId) {
+  watch(
+    [chatId, aiType],
+    ([newChatId], oldValues) => {
+      if (!newChatId || !protocolReady.value)
+        return
+      const oldChatId = oldValues?.[0]
+      if (oldChatId && oldChatId !== newChatId)
         messages.value = []
+      if (isAgentScope.value) {
+        messageListQuery.value = null
+        return
       }
       messageListQuery.value = {
         chatId: newChatId,
@@ -108,70 +101,69 @@ export function useEmployeeChatStream(
         pageSize: 100,
         searchCount: false,
       }
-    }
-  }, { immediate: true })
+    },
+    { immediate: true },
+  )
 
   const { data: messageListData } = useGetMessageListQuery(messageListQuery)
 
   watch(() => messageListData.value, (data) => {
-    // 仅在消息列表为空时加载历史，避免聊天过程中覆盖当前消息
-    if (data?.data?.list && messages.value.length === 0) {
+    if (isAgentScope.value)
+      return
+    if (data?.data?.list && messages.value.length === 0)
       messages.value = convertStreamMessagesToChatMessages(data.data.list)
-    }
   }, { immediate: true })
 
-  // ==================== 流式状态 ====================
+  const detailChatId = computed(() => (isAgentScope.value && chatId.value) || '')
+  const detailEnabled = computed(() => isAgentScope.value && !!chatId.value && protocolReady.value)
+  const { data: conversationDetail } = useGetConversationDetailQuery(detailChatId, detailEnabled)
+
+  watch(() => conversationDetail.value, (data) => {
+    if (!isAgentScope.value || messages.value.length > 0)
+      return
+    const list = data?.data?.messages
+    if (list?.length)
+      messages.value = list.map(hydrateChatMessage)
+  }, { immediate: true })
+
   const isStreaming = ref(false)
   const isReasoning = ref(false)
   const currentStreamContent = ref('')
   const reasoningContent = ref('')
-
-  // ==================== 错误消息记录 ====================
   const errorMessageIds = ref<Set<string>>(new Set())
-
-  // ==================== 取消控制器 ====================
   const abortStream = ref<(() => void) | undefined>(undefined)
-
-  // ==================== 创建会话 ====================
   const createConversationMutation = useCreateConversationMutation()
 
-  /**
-   * 发送消息（流式）
-   * @param content 用户输入内容
-   * @param options 可选参数，Agent 类型需传入 agentId 和 mcpMethod
-   */
   async function sendMessage(content: string, options?: SendMessageOptions) {
-    if (!content.trim() || isStreaming.value)
+    if (!content.trim() || isStreaming.value || !protocolReady.value)
       return
 
-    // 添加用户消息
     const userMsg = createMessage({
       id: `user-${Date.now()}`,
       role: 'user',
       content,
+      parts: [{ type: 'text', content }],
     })
     messages.value.push(userMsg)
 
-    // 添加 AI 占位消息（reactive 使内容更新可追踪）
     const aiMsg = reactive<IChatMessage>(createMessage({
       id: `ai-${Date.now()}`,
       role: 'assistant',
     }))
     messages.value.push(aiMsg)
 
-    // 首次对话：先创建会话
     if (isFirstMessage.value) {
       try {
         const result = await createConversationMutation.mutateAsync({
           skillId: employeeId.value,
           role: 'user',
           content,
-          type: String(aiType.value),
         })
 
         if (result.code === 0 && result.data) {
           chatId.value = String(result.data.chatId)
           conversationId.value = result.data.conversationId
+          sessionType.value = result.data.type
         }
         else {
           throw new Error(result.msg || '创建会话失败')
@@ -179,20 +171,16 @@ export function useEmployeeChatStream(
       }
       catch (error) {
         const msg = error instanceof Error ? error.message : '创建会话失败'
-        aiMsg.content = msg
+        applyPartsToMessage(aiMsg, { text: msg })
         errorMessageIds.value.add(aiMsg.id)
         toast.error(msg)
         return
       }
     }
 
-    await doStreamCompletion(aiMsg, options)
+    await doStreamCompletion(aiMsg, content, options)
   }
 
-  /**
-   * 构建发送给后端的对话历史
-   * 排除开场白、错误消息和内容为空的消息
-   */
   function buildChatMessages(): Array<{ role: string, content: string, skillId: string, contentId?: string }> {
     return messages.value
       .filter((msg) => {
@@ -210,12 +198,16 @@ export function useEmployeeChatStream(
       }))
   }
 
-  /**
-   * 执行流式对话
-   */
-  async function doStreamCompletion(aiMsg: IChatMessage, options?: SendMessageOptions) {
+  function syncLoongAiParts(aiMsg: IChatMessage) {
+    applyPartsToMessage(aiMsg, {
+      text: currentStreamContent.value,
+      reasoning: reasoningContent.value,
+    })
+  }
+
+  async function doStreamCompletion(aiMsg: IChatMessage, userContent: string, options?: SendMessageOptions) {
     if (!chatId.value) {
-      aiMsg.content = '会话未创建'
+      applyPartsToMessage(aiMsg, { text: '会话未创建' })
       return
     }
 
@@ -224,6 +216,87 @@ export function useEmployeeChatStream(
     currentStreamContent.value = ''
     reasoningContent.value = ''
 
+    if (isAgentScope.value)
+      await doAgentScopeStream(aiMsg, userContent)
+    else
+      await doLoongAiStream(aiMsg, options)
+  }
+
+  async function doAgentScopeStream(aiMsg: IChatMessage, userContent: string) {
+    const { createJsonSSE } = useTextStream()
+    let agState = createAgUiStreamState()
+
+    try {
+      await new Promise<void>((resolve, reject) => {
+        let settled = false
+        const finish = (error?: Error) => {
+          if (settled)
+            return
+          settled = true
+          isStreaming.value = false
+          isReasoning.value = false
+          abortStream.value = undefined
+          if (error)
+            reject(error)
+          else
+            resolve()
+        }
+
+        const { abort } = createJsonSSE({
+          url: createStreamUrl('/agentScopeChat/chat/stream/completion'),
+          body: JSON.stringify({
+            chatId: chatId.value,
+            content: userContent,
+          }),
+          onEvent(payload) {
+            const result = applyAgUiEvent(agState, payload)
+            agState = result.state
+            applyPartsToMessage(aiMsg, { text: agState.text, reasoning: agState.reasoning })
+            isReasoning.value = agState.isReasoning
+            currentStreamContent.value = agState.text
+            reasoningContent.value = agState.reasoning
+
+            if (result.error) {
+              const msg = agState.errorMessage || '对话失败'
+              applyPartsToMessage(aiMsg, { text: msg, reasoning: agState.reasoning })
+              errorMessageIds.value.add(aiMsg.id)
+              abort()
+              toast.error(msg)
+              finish(new Error(msg))
+              return
+            }
+
+            if (result.done) {
+              abort()
+              finish()
+            }
+          },
+          onClose() {
+            finish()
+          },
+          onError(err) {
+            const msg = err?.message || '请求失败'
+            applyPartsToMessage(aiMsg, { text: aiMsg.content || msg, reasoning: reasoningContent.value })
+            toast.error('对话请求失败')
+            finish(err instanceof Error ? err : new Error(msg))
+          },
+        })
+
+        abortStream.value = abort
+      })
+    }
+    catch {
+      isStreaming.value = false
+      isReasoning.value = false
+      if (!aiMsg.content)
+        applyPartsToMessage(aiMsg, { text: '请求异常', reasoning: reasoningContent.value })
+    }
+    finally {
+      abortStream.value = undefined
+    }
+  }
+
+  async function doLoongAiStream(aiMsg: IChatMessage, options?: SendMessageOptions) {
     const { createTextSSE } = useTextStream()
 
     try {
@@ -247,6 +320,7 @@ export function useEmployeeChatStream(
               event.data.reasoningContent,
               event.data.fullFlag,
             )
+            syncLoongAiParts(aiMsg)
           },
           onReasoningEnd(event) {
             isReasoning.value = false
@@ -261,7 +335,10 @@ export function useEmployeeChatStream(
           onError(err) {
             isStreaming.value = false
             isReasoning.value = false
-            aiMsg.content = err?.data?.content || err?.message || '请求失败'
+            applyPartsToMessage(aiMsg, {
+              text: err?.data?.content || err?.message || '请求失败',
+              reasoning: reasoningContent.value,
+            })
             toast.error('对话请求失败')
             reject(err)
           },
@@ -273,9 +350,8 @@ export function useEmployeeChatStream(
     catch {
       isStreaming.value = false
       isReasoning.value = false
-      if (!aiMsg.content) {
-        aiMsg.content = '请求异常'
-      }
+      if (!aiMsg.content)
+        applyPartsToMessage(aiMsg, { text: '请求异常', reasoning: reasoningContent.value })
       toast.error('对话请求异常')
     }
     finally {
@@ -283,36 +359,27 @@ export function useEmployeeChatStream(
     }
   }
 
-  /**
-   * 处理 SSE 流事件
-   */
   function handleStreamEvent(event: SSEEvent, aiMsg: IChatMessage) {
     const eventName = event.event
     const data = event.data
 
-    if (data.conversationId) {
+    if (data.conversationId)
       conversationId.value = data.conversationId
-    }
 
-    // [DATA] 正常消息内容
     if (eventName === '[DATA]') {
       isReasoning.value = false
       if (data.content) {
         currentStreamContent.value = mergeStreamText(currentStreamContent.value, data.content, data.fullFlag)
-        aiMsg.content = currentStreamContent.value
+        syncLoongAiParts(aiMsg)
       }
-      if (data.id) {
+      if (data.id)
         aiMsg.contentId = String(data.id)
-      }
       return
     }
 
-    // [DONE] 对话完成
     if (eventName === '[DONE]') {
       isStreaming.value = false
       isReasoning.value = false
-      // 把当前 assistant 消息的 contentId 同步给前一条 user 消息
-      // 续聊时后端需要每条历史消息带 contentId,否则 500
       const lastAssistantIndex = messages.value.length - 1
       const lastUserIndex = messages.value.length - 2
       if (
@@ -322,13 +389,11 @@ export function useEmployeeChatStream(
       ) {
         messages.value[lastUserIndex].contentId = messages.value[lastAssistantIndex].contentId
       }
-      // 仅在还没有 chatId 时从 [DONE] 的 content 中解析，避免精度丢失
       if (!chatId.value && data.content) {
         try {
           const doneData = JSON.parse(data.content)
-          if (doneData.chatId) {
+          if (doneData.chatId)
             chatId.value = String(doneData.chatId)
-          }
         }
         catch {
           // ignore
@@ -337,39 +402,28 @@ export function useEmployeeChatStream(
       return
     }
 
-    // [ERROR] / [FAILED] 错误
     if (eventName === '[ERROR]' || eventName === '[FAILED]') {
       isStreaming.value = false
       isReasoning.value = false
-      aiMsg.content = data.content || '请求失败'
+      applyPartsToMessage(aiMsg, { text: data.content || '请求失败', reasoning: reasoningContent.value })
       errorMessageIds.value.add(aiMsg.id)
       return
     }
 
-    // [PARAGRAPH_END] 段落结束，忽略
-    if (eventName === '[PARAGRAPH_END]') {
+    if (eventName === '[PARAGRAPH_END]' || eventName === '[CHAT_MESSAGE]')
       return
-    }
 
-    // [CHAT_MESSAGE] 元数据事件，不显示
-    if (eventName === '[CHAT_MESSAGE]') {
-      return
-    }
-
-    // [REASONING] 推理中
     if (eventName === '[REASONING]') {
       isReasoning.value = true
       reasoningContent.value = mergeStreamText(reasoningContent.value, data.reasoningContent, data.fullFlag)
+      syncLoongAiParts(aiMsg)
       return
     }
 
-    // [REASONING_END] 推理结束
-    if (eventName === '[REASONING_END]') {
+    if (eventName === '[REASONING_END]')
       isReasoning.value = false
-    }
   }
 
-  // ==================== 停止生成 ====================
   function stopGeneration() {
     abortStream.value?.()
     abortStream.value = undefined
@@ -378,7 +432,6 @@ export function useEmployeeChatStream(
   }
 
   return {
-    // 状态
     messages,
     chatId,
     conversationId,
@@ -387,8 +440,6 @@ export function useEmployeeChatStream(
     isReasoning,
     currentStreamContent,
     reasoningContent,
-
-    // 方法
     sendMessage,
     stopGeneration,
     seedWelcomeMessage,

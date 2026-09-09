@@ -11,7 +11,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useApiFetch } from '@/composables/use-fetch'
-import { useGetConversationDetailQuery } from '@/services/api/conversation.api'
+import { getConversationModeDisplay, useGetConversationDetailQuery } from '@/services/api/conversation.api'
+import { hydrateChatMessage } from '@/utils/chat-message-parts'
 import { withBase } from '@/utils/with-base'
 
 const route = useRoute<'/conversations/[chatId]'>()
@@ -29,7 +30,7 @@ const conversation = computed(() => detailData.value?.data)
 
 // 消息列表
 const messages = computed<IChatMessage[]>(() => {
-  return conversation.value?.messages ?? []
+  return (conversation.value?.messages ?? []).map(hydrateChatMessage)
 })
 
 // 返回列表
@@ -100,10 +101,10 @@ function handleKeydown(e: KeyboardEvent) {
             <div class="flex items-center gap-2">
               <span class="text-sm font-medium">{{ conversation.title || '未命名会话' }}</span>
               <Badge
-                :variant="conversation.serviceMode === 0 ? 'default' : 'secondary'"
+                :variant="getConversationModeDisplay(conversation.serviceMode, conversation.type).variant"
                 class="text-xs"
               >
-                {{ conversation.serviceMode === 0 ? 'AI托管' : '人工接管' }}
+                {{ getConversationModeDisplay(conversation.serviceMode, conversation.type).label }}
               </Badge>
             </div>
             <span class="text-xs text-muted-foreground">

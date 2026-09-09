@@ -65,6 +65,7 @@
     "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^14.3.0",
     "@vueuse/integrations": "^14.3.0",
+    "ai": "^7.0.94",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.20",
@@ -79,6 +80,7 @@
     "pinia": "^3.0.4",
     "pinia-plugin-persistedstate": "^4.7.1",
     "reka-ui": "^2.9.7",
+    "shiki": "^4.4.3",
     "streaming-markdown": "^0.2.15",
     "tailwind-merge": "^3.6.0",
     "tailwindcss-animate": "^1.0.7",
@@ -91,6 +93,8 @@
     "vue-input-otp": "^0.3.2",
     "vue-router": "^5.0.7",
     "vue-sonner": "^2.0.9",
+    "vue-stick-to-bottom": "^1.0.1",
+    "vue-stream-markdown": "2.0.0-beta.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {

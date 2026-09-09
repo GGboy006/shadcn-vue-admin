@@ -30,12 +30,13 @@ import { useApiFetch } from '@/composables/use-fetch'
 import { cn } from '@/lib/utils'
 import {
   convertStreamMessagesToChatMessages,
-  serviceModeConfig,
+  getConversationModeDisplay,
   useGetConversationDetailQuery,
   userTagConfig,
 } from '@/services/api/conversation.api'
 import { useGetMessageListQuery } from '@/services/api/skill.api'
 import { useStationRegenerateStore } from '@/stores/station-regenerate'
+import { hydrateChatMessage } from '@/utils/chat-message-parts'
 import { withBase } from '@/utils/with-base'
 
 const router = useRouter()
@@ -183,13 +184,14 @@ const { data: messageListData, isLoading: isMessageListLoading } = useGetMessage
 // 会话元信息：优先从详情接口获取，否则从会话列表获取
 const conversation = computed(() => detailData.value?.data ?? selectedConversation.value)
 
-// 统一消息列表
+// 统一消息列表：type 1/2 走 messageList；type 3 等走 conversation 详情的 parts
 const messages = computed<IChatMessage[]>(() => {
   if (isStreamType.value) {
     const list = messageListData.value?.data?.list ?? []
     return convertStreamMessagesToChatMessages(list)
   }
-  return (conversation.value as IConversationDetail | undefined)?.messages ?? []
+  const list = (conversation.value as IConversationDetail | undefined)?.messages ?? []
+  return list.map(hydrateChatMessage)
 })
 
 // 统一的详情加载状态
@@ -362,9 +364,10 @@ function getInitials(name: string) {
                     item.serviceMode === 0 && 'bg-primary',
                     item.serviceMode === 1 && 'bg-chart-2',
                     item.serviceMode === 2 && 'bg-destructive',
+                    item.serviceMode === 7 && 'bg-chart-3',
                     item.serviceMode === 9 && 'bg-chart-4',
                   )"
-                  :title="serviceModeConfig[item.serviceMode]?.label"
+                  :title="getConversationModeDisplay(item.serviceMode, item.type).label"
                 />
               </div>
 
@@ -384,10 +387,10 @@ function getInitials(name: string) {
                     {{ userTagConfig[item.userTag] || '未知' }}
                   </Badge>
                   <Badge
-                    :variant="serviceModeConfig[item.serviceMode]?.variant || 'default'"
+                    :variant="getConversationModeDisplay(item.serviceMode, item.type).variant"
                     class="text-[10px] px-1 py-0 h-4"
                   >
-                    {{ serviceModeConfig[item.serviceMode]?.label || '未知' }}
+                    {{ getConversationModeDisplay(item.serviceMode, item.type).label }}
                   </Badge>
                 </div>
 
@@ -457,10 +460,10 @@ function getInitials(name: string) {
                 <div class="flex items-center gap-2">
                   <span class="text-sm font-medium">{{ conversation.title || '未命名会话' }}</span>
                   <Badge
-                    :variant="conversation.serviceMode === 0 ? 'default' : 'secondary'"
+                    :variant="getConversationModeDisplay(conversation.serviceMode, conversation.type).variant"
                     class="text-xs"
                   >
-                    {{ conversation.serviceMode === 0 ? 'AI托管' : '人工接管' }}
+                    {{ getConversationModeDisplay(conversation.serviceMode, conversation.type).label }}
                   </Badge>
                   <Badge variant="outline" class="text-xs">
                     {{ userTagConfig[conversation.userTag] || '未知' }}

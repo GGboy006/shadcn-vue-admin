@@ -1,11 +1,15 @@
 import { useQuery } from '@tanstack/vue-query'
 
 import type { IWizardStepForm } from '@/pages/apps/types/wizard.types'
+import type { ServiceMode } from '@/utils/conversation-mode'
 
 import { useApiFetch } from '@/composables/use-fetch'
 
 import type { IPageResult, IResponse } from '../types/response.type'
 import type { IStreamChatMessage } from './skill.api'
+
+export type { ConversationModeBadge, ConversationType, ServiceMode } from '@/utils/conversation-mode'
+export { conversationTypeConfig, getConversationModeDisplay, serviceModeConfig } from '@/utils/conversation-mode'
 
 // ==================== 图片生成结果查询类型 ====================
 
@@ -52,19 +56,8 @@ export interface IAIImageGeneration {
 /** 图片生成结果响应 */
 export type IImageGenerationResponse = IResponse<IAIImageGeneration>
 
-/** 服务模式：0-AI托管 1-人工接管 2-待人工介入 9-数字员工 */
-export type ServiceMode = 0 | 1 | 2 | 9
-
 /** 用户标签：3-站长 4-商户 5-物业 6-居委会 7-居民 */
 export type UserTag = 3 | 4 | 5 | 6 | 7
-
-/** 服务模式映射配置 */
-export const serviceModeConfig: Record<ServiceMode, { label: string, variant: 'default' | 'secondary' | 'destructive' | 'info' }> = {
-  0: { label: 'AI托管', variant: 'default' },
-  1: { label: '人工接管', variant: 'secondary' },
-  2: { label: '待人工介入', variant: 'destructive' },
-  9: { label: '数字员工', variant: 'info' },
-}
 
 /** 用户标签映射配置 */
 export const userTagConfig: Record<UserTag, string> = {
@@ -83,7 +76,7 @@ export interface IConversation {
   title: string
   /** 用户ID */
   userId: number
-  /** 类型 */
+  /** 类型：1=扣子(Coze)，2=Agent，3=AI AgentSkill */
   type: number
   /** 技能ID */
   skillId: string
@@ -91,7 +84,7 @@ export interface IConversation {
   thirdId: string
   /** 小区站长ID */
   orgCode: string
-  /** 服务模式：0-AI托管 1-人工接管 2-待人工介入 9-数字员工 */
+  /** 服务模式：0-AI托管 1-人工接管 2-待人工介入 7-居民 AI 助手 9-数字员工 */
   serviceMode: ServiceMode
   /** 当前接管人ID */
   operatorId: number
@@ -132,14 +125,26 @@ export type IConversationListResponse = IResponse<IPageResult<IConversation>>
 
 // ==================== 会话详情类型定义 ====================
 
+/** 工具调用 VO（AgentScope parts.toolCall） */
+export interface IToolCall {
+  toolCallId?: string
+  toolName?: string
+  display?: string | null
+  arguments?: string | null
+  result?: string | null
+  status?: string
+  error?: string | null
+  duration?: string | number | null
+}
+
 /** 消息部分 VO */
 export interface IMessagePart {
-  /** 部分类型：reasoning(思考过程)/text(文本内容)/tool_call(工具调用)/artifact(创作产物) */
+  /** reasoning / text / tool_call / tool_result / artifact */
   type: string
-  /** 内容文本 */
-  content: string
-  /** 耗时（毫秒） */
-  duration?: number
+  content?: string | null
+  duration?: string | number | null
+  toolCall?: IToolCall | null
+  artifact?: unknown
 }
 
 /** 消息附件 VO */
@@ -230,13 +235,13 @@ export interface IConversationDetail {
   title: string
   /** 用户ID */
   userId: number
-  /** 类型 */
+  /** 类型：1=扣子(Coze)，2=Agent，3=AI AgentSkill */
   type: number
   /** 技能ID */
   skillId: string
   /** 小区站长ID */
   orgCode: string
-  /** 服务模式：0-AI托管 1-人工接管 2-待人工介入 9-数字员工 */
+  /** 服务模式：0-AI托管 1-人工接管 2-待人工介入 7-居民 AI 助手 9-数字员工 */
   serviceMode: ServiceMode
   /** 当前接管人ID */
   operatorId: number
@@ -325,7 +330,9 @@ export function convertStreamMessagesToChatMessages(history: IStreamChatMessage[
     role: msg.role === 'user' ? 'user' : 'assistant',
     content: msg.content || msg.showContent || '',
     finalContent: msg.showContent || msg.content || '',
-    parts: [],
+    parts: msg.reasoningContent
+      ? [{ type: 'reasoning', content: msg.reasoningContent }, { type: 'text', content: msg.content || msg.showContent || '' }].filter(p => p.content)
+      : [{ type: 'text', content: msg.content || msg.showContent || '' }].filter(p => p.content),
     attachments: [],
     createTime: msg.createTime,
     reasoningSegments: msg.reasoningContent

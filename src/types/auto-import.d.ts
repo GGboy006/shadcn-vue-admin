@@ -122,7 +122,7 @@ declare global {
   export type { ProxyEntryResult } from '../composables/use-proxy-entry'
   import('../composables/use-proxy-entry')
   // @ts-ignore
-  export type { TextStreamEvent, TextStreamOptions } from '../composables/use-text-stream'
+  export type { TextStreamEvent, TextStreamOptions, JsonStreamOptions } from '../composables/use-text-stream'
   import('../composables/use-text-stream')
   // @ts-ignore
   export type { UploadOptions } from '../composables/use-upload'

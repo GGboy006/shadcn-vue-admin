@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeftIcon, Loader2Icon, SendIcon } from '@lucide/vue'
+import { ArrowLeftIcon, SendIcon } from '@lucide/vue'
 
 import type { IDigitalEmployee } from '@/services/api/digital-employee.api'
 
@@ -57,7 +57,7 @@ const subtitleParts = computed(() => {
 
 // ==================== 流式对话 ====================
 
-const aiType = computed(() => employee.value?.aiType ?? 1)
+const aiType = computed(() => employee.value?.aiType)
 
 // Agent（type 2）详情：包含开场白、推荐问题、表单模板、mcpMethod
 const aiThirdId = computed(() => employee.value?.aiThirdId ?? '')
@@ -108,13 +108,12 @@ const welcomeContent = computed(() => {
 const {
   messages,
   isStreaming,
-  isReasoning,
   sendMessage,
   stopGeneration,
   seedWelcomeMessage,
 } = useEmployeeChatStream(
   employeeId,
-  aiType as Ref<1 | 2>,
+  aiType,
   welcomeContent,
   initialChatId,
 )
@@ -270,15 +269,6 @@ watch(inputText, autoResize)
 
       <!-- 底部输入区 -->
       <div class="border-t bg-background p-3 sm:p-4 shrink-0">
-        <!-- 推理中提示 -->
-        <div
-          v-if="isReasoning"
-          class="mb-2 flex items-center gap-2 px-1 text-xs text-muted-foreground"
-        >
-          <Loader2Icon class="size-3 animate-spin" />
-          <span>正在思考...</span>
-        </div>
-
         <div class="flex items-end gap-2 rounded-lg border border-input bg-card px-3 py-2 focus-within:ring-1 focus-within:ring-ring">
           <textarea
             ref="inputRef"
@@ -286,7 +276,7 @@ watch(inputText, autoResize)
             :placeholder="employee ? `向 ${employee.employeeName} 发送消息...` : '输入消息...'"
             rows="1"
             class="min-h-[36px] max-h-[120px] flex-1 resize-none bg-transparent py-2 text-sm outline-none"
-            :disabled="isStreaming"
+            :disabled="isStreaming || !employee"
             @keydown="handleKeydown"
           />
 
