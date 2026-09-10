@@ -29,6 +29,7 @@ const hasTextPart = computed(() => parts.value.some(part => part.type === 'text'
       <AiElementsTool
         v-if="part.type === 'tool_call'"
         :part="part"
+        :tool-calls="message.toolCalls"
         :is-streaming="isStreaming"
       />
       <AiElementsReasoning

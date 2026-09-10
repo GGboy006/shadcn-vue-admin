@@ -66,7 +66,7 @@ function handleReset() {
 <template>
   <BasicPage
     title="小区分类"
-    description="管理小区各类资源分类(社区服务/居委会/物业/生活/服务/商品/AI助手)"
+    description="管理小区各类资源分类(社区服务/办事指南/便民/门店/服务/社区商品/AI助手)"
     sticky
   >
     <template #actions>

@@ -191,6 +191,8 @@ export interface IChatMessage {
   createTime: string
   /** 分段思考内容列表 */
   reasoningSegments: IReasoningSegment[]
+  /** 本条消息关联的工具调用汇总（展示名常在此，parts 内可能是原始方法名） */
+  toolCalls?: IToolCall[] | null
   /** 关联的图片生成记录ID(雪花 Long,按字符串处理) */
   imageGenerationId: string
   /** 流程步骤数据（用户选择记录） */

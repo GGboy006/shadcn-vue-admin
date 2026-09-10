@@ -157,6 +157,44 @@ describe('toAiToolView', () => {
     expect(view?.input).toEqual({ redacted: true, message: '敏感内容已隐藏' })
   })
 
+  it('按 toolCallId 用消息级 toolCalls 补齐中文名', () => {
+    const view = toAiToolView(
+      {
+        type: 'tool_call',
+        content: null,
+        duration: '6639',
+        toolCall: {
+          toolCallId: 'call_61ae',
+          toolName: 'execute',
+          display: null,
+          status: 'completed',
+          duration: '6639',
+        },
+      },
+      false,
+      [{ toolCallId: 'call_61ae', toolName: '执行命令', status: 'completed' }],
+    )
+    expect(view?.toolName).toBe('执行命令')
+    expect(view?.title).toBe('执行命令 · 6.6秒')
+  })
+
+  it('parts.display 优先于 catalog', () => {
+    const view = toAiToolView(
+      {
+        type: 'tool_call',
+        toolCall: {
+          toolCallId: 'call_1',
+          toolName: 'execute',
+          display: '自定义展示',
+          status: 'completed',
+        },
+      },
+      false,
+      [{ toolCallId: 'call_1', toolName: '执行命令' }],
+    )
+    expect(view?.toolName).toBe('自定义展示')
+  })
+
   it('error 映射为失败', () => {
     expect(toAiToolState({ status: 'completed', error: 'boom' })).toBe('output-error')
   })

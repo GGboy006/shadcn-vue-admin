@@ -32,7 +32,7 @@ const delegatedProps = reactiveOmit(props, 'class', 'ariaLabel')
   <StickToBottom
     v-bind="delegatedProps"
     :aria-label="props.ariaLabel"
-    :class="cn('relative min-h-0 flex-1 overflow-y-hidden', props.class)"
+    :class="cn('relative min-h-0 min-w-0 flex-1 overflow-y-hidden', props.class)"
     role="log"
   >
     <slot />

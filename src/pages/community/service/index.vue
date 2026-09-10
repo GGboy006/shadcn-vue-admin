@@ -43,6 +43,7 @@ const serverPagination = computed(() => ({
 
 const search = ref('')
 const typeFilter = ref<ICommunityServiceListQuery['type']>(undefined)
+const cateFilter = ref('')
 
 const debouncedUpdateSearch = useDebounceFn((val: string) => {
   query.value.keyword = val || undefined
@@ -56,11 +57,18 @@ watch(typeFilter, (val) => {
   query.value.pageNum = 1
 })
 
+watch(cateFilter, (val) => {
+  query.value.cateCode = val || undefined
+  query.value.pageNum = 1
+})
+
 function handleReset() {
   search.value = ''
   typeFilter.value = undefined
+  cateFilter.value = ''
   query.value.keyword = undefined
   query.value.type = undefined
+  query.value.cateCode = undefined
   query.value.pageNum = 1
 }
 </script>
@@ -85,8 +93,10 @@ function handleReset() {
           :table="table"
           :search="search"
           :type-filter="typeFilter"
+          :cate-filter="cateFilter"
           @update:search="search = $event"
           @update:type-filter="typeFilter = $event"
+          @update:cate-filter="cateFilter = $event"
           @reset="handleReset"
         />
       </template>

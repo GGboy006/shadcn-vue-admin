@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-
-import type { IMessagePart } from '@/services/api/conversation.api'
+import type { IMessagePart, IToolCall } from '@/services/api/conversation.api'
 
 import {
   Tool,
@@ -15,13 +13,16 @@ import { toAiToolView } from '@/utils/chat-message-parts'
 const props = withDefaults(defineProps<{
   part: IMessagePart
   isStreaming?: boolean
+  /** 消息级 toolCalls，用于补齐中文展示名 */
+  toolCalls?: IToolCall[] | null
 }>(), {
   isStreaming: false,
+  toolCalls: null,
 })
 
 const DYNAMIC_TOOL_TYPE = 'dynamic-tool' as const
 
-const view = computed(() => toAiToolView(props.part, props.isStreaming))
+const view = computed(() => toAiToolView(props.part, props.isStreaming, props.toolCalls))
 </script>
 
 <template>

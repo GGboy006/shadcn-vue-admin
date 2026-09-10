@@ -76,13 +76,13 @@ const lineNumberClasses = cn(
 </script>
 
 <template>
-  <div class="relative overflow-auto">
+  <div class="relative max-w-full overflow-auto">
     <pre
-      :class="cn('dark:bg-(--shiki-dark-bg)! dark:text-(--shiki-dark)! m-0 p-4 text-sm')"
+      :class="cn('dark:bg-(--shiki-dark-bg)! dark:text-(--shiki-dark)! m-0 max-w-full overflow-x-auto whitespace-pre-wrap break-all p-4 text-sm')"
       :style="preStyle"
     ><code
         :class="cn(
-          'font-mono text-sm',
+          'block max-w-full font-mono text-sm',
           showLineNumbers && '[counter-increment:line_0] [counter-reset:line]',
         )"
       ><template v-for="line in keyedLines" :key="line.key"><!-- Line rendering component --><span :class="showLineNumbers ? lineNumberClasses : 'block'"><template v-if="line.tokens.length === 0">{{ '\n' }}</template><template v-else><!-- Token rendering component --><span

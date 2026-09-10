@@ -17,6 +17,7 @@ import { showInvalidSubmitToast } from '@/validators/common'
 import type { CommunityServiceValidator } from '../validators/service.validator'
 
 import { communityServiceValidator } from '../validators/service.validator'
+import CateCascader from './cate-cascader.vue'
 
 const { service } = defineProps<{
   service?: ICommunityService
@@ -26,7 +27,7 @@ const emits = defineEmits<{
   (e: 'close'): void
 }>()
 
-// 服务类型选项(对接文档 14 节 · 小区服务 type)
+// 类型选项(对接文档 14 节 · 小区服务 type)
 const typeList = [
   { value: 1, label: '小程序' },
   { value: 2, label: 'H5网页' },
@@ -96,6 +97,11 @@ const isH5 = computed(() => currentType.value === 2)
 const isReadingRoom = computed(() => currentType.value === 3)
 const isMerchant = computed(() => currentType.value === 14)
 const isAiTool = computed(() => currentType.value === 15 || currentType.value === 17)
+
+function handleCateSelect(payload: { cateCode: string, cateName: string }) {
+  setFieldValue('cateCode', payload.cateCode)
+  setFieldValue('cateName', payload.cateName)
+}
 
 const { upload } = useUpload()
 async function handleFileUpload(event: Event, field: 'poster' | 'backgroundPoster') {
@@ -189,7 +195,7 @@ const onSubmit = handleSubmit((values) => {
 
 <template>
   <form class="space-y-6" @submit="onSubmit">
-    <!-- 名称 + 服务类型 -->
+    <!-- 名称 + 类型 -->
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <FormField v-slot="{ componentField }" name="name">
         <FormItem>
@@ -206,12 +212,12 @@ const onSubmit = handleSubmit((values) => {
       <FormField v-slot="{ componentField }" name="type">
         <FormItem>
           <FormLabel required>
-            服务类型
+            类型
           </FormLabel>
           <Select v-bind="componentField">
             <FormControl>
               <SelectTrigger class="w-full">
-                <SelectValue placeholder="选择服务类型" />
+                <SelectValue placeholder="选择类型" />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
@@ -227,28 +233,20 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
     </div>
 
-    <!-- 分类编码 + 分类名称 -->
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-      <FormField v-slot="{ componentField }" name="cateCode">
-        <FormItem>
-          <FormLabel>分类编码</FormLabel>
-          <FormControl>
-            <Input type="text" placeholder="关联分类编码" v-bind="componentField" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <FormField v-slot="{ componentField }" name="cateName">
-        <FormItem>
-          <FormLabel>分类名称</FormLabel>
-          <FormControl>
-            <Input type="text" placeholder="分类名称" v-bind="componentField" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-    </div>
+    <!-- 所属分类:级联选二级叶子,提交 cateCode + cateName -->
+    <FormField name="cateCode">
+      <FormItem>
+        <FormLabel>所属分类</FormLabel>
+        <FormControl>
+          <CateCascader
+            :model-value="formValues.cateCode ?? undefined"
+            :display-name="formValues.cateName ?? undefined"
+            @select="handleCateSelect"
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
 
     <!-- 封面 -->
     <FormField name="poster">
@@ -442,15 +440,15 @@ const onSubmit = handleSubmit((values) => {
       </FormItem>
     </FormField>
 
-    <!-- 服务大类 + 位置 -->
+    <!-- 服务类型 + 位置 -->
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <FormField v-slot="{ componentField }" name="serviceType">
         <FormItem>
-          <FormLabel>服务大类</FormLabel>
+          <FormLabel>服务类型</FormLabel>
           <Select v-bind="componentField">
             <FormControl>
               <SelectTrigger class="w-full">
-                <SelectValue placeholder="选择" />
+                <SelectValue placeholder="选择服务类型" />
               </SelectTrigger>
             </FormControl>
             <SelectContent>

@@ -154,6 +154,8 @@ export interface IMerchant {
   intro?: string
   /** 备注 */
   remark: string
+  /** 联系我们(富文本 HTML，居委会) */
+  contactUs?: string
 }
 
 /** 新增商户/物业 DTO */
@@ -290,6 +292,8 @@ export interface ICommitteeAddDTO {
   members?: number
   /** 简介；为空时用城市库简介 */
   remark?: string
+  /** 联系我们(富文本 HTML) */
+  contactUs?: string
   /** 1=启用，2=禁用 */
   status?: MerchantStatus
 }
@@ -333,6 +337,8 @@ export interface ICommitteeUpdateDTO {
   members?: number
   /** 简介（同步城市 instruction） */
   remark?: string
+  /** 联系我们(富文本 HTML) */
+  contactUs?: string
   /** 1=启用，2=禁用 */
   status?: MerchantStatus
 }

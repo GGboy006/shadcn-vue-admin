@@ -25,14 +25,14 @@ const emits = defineEmits<{
   (e: 'close'): void
 }>()
 
-// 分类类型选项(对接文档 14 节 · 小区分类 type)
+// 分类类型选项(与 communityCateTypeConfig 对齐)
 const typeList = [
   { value: 1, label: '社区服务' },
-  { value: 2, label: '居委会' },
-  { value: 3, label: '物业' },
-  { value: 4, label: '生活' },
+  { value: 2, label: '办事指南' },
+  { value: 3, label: '便民' },
+  { value: 4, label: '门店' },
   { value: 5, label: '服务' },
-  { value: 9, label: '商品' },
+  { value: 9, label: '社区商品' },
   { value: 10, label: 'AI助手' },
 ] as const
 

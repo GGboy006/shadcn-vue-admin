@@ -36,7 +36,7 @@ const formattedOutput = computed(() => {
 <template>
   <div
     v-if="showOutput"
-    :class="cn('space-y-2 p-4', props.class)"
+    :class="cn('min-w-0 space-y-2 overflow-hidden p-4', props.class)"
     v-bind="$attrs"
   >
     <h4
@@ -47,7 +47,7 @@ const formattedOutput = computed(() => {
     <div
       :class="
         cn(
-          'overflow-x-auto rounded-md text-xs [&_table]:w-full',
+          'max-h-80 min-w-0 overflow-auto rounded-md text-xs [&_table]:w-full',
           props.errorText
             ? 'bg-destructive/10 text-destructive'
             : 'bg-muted/50 text-foreground',
@@ -55,7 +55,7 @@ const formattedOutput = computed(() => {
       "
     >
       <!-- Error text -->
-      <div v-if="errorText">
+      <div v-if="errorText" class="whitespace-pre-wrap break-all p-3">
         {{ props.errorText }}
       </div>
 

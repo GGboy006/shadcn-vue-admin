@@ -85,8 +85,29 @@ export function formatToolPreview(value?: string | null, maxLen = 400): string {
   return text
 }
 
-export function getToolCallLabel(toolCall?: IToolCall | null): string {
-  return toolCall?.display || toolCall?.toolName || '工具调用'
+/**
+ * 工具展示名：优先 display；再按 toolCallId 对齐消息级 toolCalls（常有中文名）；
+ * 最后才用 parts 内原始 toolName。
+ */
+export function getToolCallLabel(
+  toolCall?: IToolCall | null,
+  catalog?: IToolCall[] | null,
+): string {
+  const display = toolCall?.display?.trim()
+  if (display)
+    return display
+
+  const matched = toolCall?.toolCallId
+    ? catalog?.find(item => item.toolCallId === toolCall.toolCallId)
+    : undefined
+  const matchedDisplay = matched?.display?.trim()
+  if (matchedDisplay)
+    return matchedDisplay
+  const matchedName = matched?.toolName?.trim()
+  if (matchedName)
+    return matchedName
+
+  return toolCall?.toolName?.trim() || '工具调用'
 }
 
 /** AI Elements Message 的 from：客户端当 user，其余当 assistant */
@@ -165,11 +186,15 @@ export function parseToolPayload(value?: string | null, maxLen = 800): unknown {
   return parsed
 }
 
-export function toAiToolView(part: IMessagePart, isStreaming = false): AiToolView | null {
+export function toAiToolView(
+  part: IMessagePart,
+  isStreaming = false,
+  catalog?: IToolCall[] | null,
+): AiToolView | null {
   if (part.type !== 'tool_call' && !part.toolCall)
     return null
   const toolCall = part.toolCall
-  const toolName = getToolCallLabel(toolCall)
+  const toolName = getToolCallLabel(toolCall, catalog)
   const durationText = formatDurationMs(toolCall?.duration ?? part.duration)
   return {
     toolName,
@@ -221,6 +246,7 @@ export function hydrateChatMessage(msg: IChatMessage): IChatMessage {
     parts: msg.parts ?? [],
     attachments: msg.attachments ?? [],
     reasoningSegments: msg.reasoningSegments ?? [],
+    toolCalls: msg.toolCalls ?? null,
     content: msg.content ?? '',
     finalContent: msg.finalContent ?? msg.content ?? '',
   }

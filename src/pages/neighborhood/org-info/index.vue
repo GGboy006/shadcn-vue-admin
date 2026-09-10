@@ -11,6 +11,7 @@ import { z } from 'zod'
 
 import MultiImageUpload from '@/components/merchant-business/multi-image-upload.vue'
 import { DatePicker } from '@/components/prop-ui/date-picker'
+import { RichTextEditor } from '@/components/prop-ui/rich-text'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -47,6 +48,7 @@ const orgInfoSchema = z.object({
   serveResidents: optionalNumber,
   members: optionalNumber,
   remark: optionalString,
+  contactUs: optionalString,
   status: optionalNumber,
 })
 
@@ -85,6 +87,7 @@ watch(info, (val) => {
       serveResidents: val.serveResidents ?? undefined,
       members: val.members ?? undefined,
       remark: val.remark ?? undefined,
+      contactUs: val.contactUs ?? undefined,
       status: val.status ?? undefined,
     } as OrgInfoFormValues,
   })
@@ -413,6 +416,26 @@ const onSubmit = handleSubmit((values) => {
           <FormItem>
             <FormControl>
               <Textarea v-bind="componentField" placeholder="请输入居委会简介" rows="3" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+      </div>
+
+      <!-- 联系我们 -->
+      <div class="rounded-lg border p-6 space-y-4">
+        <div class="text-sm font-medium text-muted-foreground">
+          联系我们
+        </div>
+        <FormField name="contactUs">
+          <FormItem>
+            <FormControl>
+              <RichTextEditor
+                :model-value="formValues.contactUs ?? ''"
+                placeholder="请输入联系我们内容"
+                :min-height="240"
+                @update:model-value="setFieldValue('contactUs', $event ?? '')"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>

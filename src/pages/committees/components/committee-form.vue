@@ -6,6 +6,7 @@ import { toast } from 'vue-sonner'
 import type { ICommitteeAddDTO, ICommitteeUpdateDTO } from '@/services/api/merchant.api'
 
 import { DatePicker } from '@/components/prop-ui/date-picker'
+import { RichTextEditor } from '@/components/prop-ui/rich-text'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -64,6 +65,7 @@ const initialValues = reactive<CommitteeValidator>({
   serveResidents: committee?.serveResidents ?? undefined,
   members: committee?.members ?? undefined,
   remark: committee?.remark || '',
+  contactUs: committee?.contactUs || '',
   status: committee?.status ?? 1,
 })
 
@@ -136,6 +138,7 @@ function buildPayload(values: CommitteeValidator): ICommitteeAddDTO | ICommittee
       serveResidents: values.serveResidents ?? undefined,
       members: values.members ?? undefined,
       remark: values.remark || undefined,
+      contactUs: values.contactUs || undefined,
       status: values.status as 1 | 2 | undefined,
     } as ICommitteeUpdateDTO
   }
@@ -153,6 +156,7 @@ function buildPayload(values: CommitteeValidator): ICommitteeAddDTO | ICommittee
     serveResidents: values.serveResidents ?? undefined,
     members: values.members ?? undefined,
     remark: values.remark || undefined,
+    contactUs: values.contactUs || undefined,
     status: values.status as 1 | 2 | undefined,
   } as ICommitteeAddDTO
 }
@@ -493,6 +497,27 @@ const onSubmit = handleSubmit((values) => {
         <FormItem>
           <FormControl>
             <Textarea v-bind="componentField" placeholder="请输入居委会简介" rows="3" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+    </div>
+
+    <!-- 联系我们 -->
+    <div class="space-y-4">
+      <div class="text-sm font-medium text-muted-foreground">
+        联系我们
+      </div>
+
+      <FormField name="contactUs">
+        <FormItem>
+          <FormControl>
+            <RichTextEditor
+              :model-value="formValues.contactUs ?? ''"
+              placeholder="请输入联系我们内容"
+              :min-height="200"
+              @update:model-value="setFieldValue('contactUs', $event ?? '')"
+            />
           </FormControl>
           <FormMessage />
         </FormItem>

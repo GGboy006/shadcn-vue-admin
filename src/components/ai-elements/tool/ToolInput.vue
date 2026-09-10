@@ -24,7 +24,7 @@ const formattedInput = computed(() => {
 
 <template>
   <div
-    :class="cn('space-y-2 overflow-hidden p-4', props.class)"
+    :class="cn('min-w-0 space-y-2 overflow-hidden p-4', props.class)"
     v-bind="$attrs"
   >
     <h4
@@ -32,7 +32,7 @@ const formattedInput = computed(() => {
     >
       参数
     </h4>
-    <div class="rounded-md bg-muted/50">
+    <div class="max-h-80 min-w-0 overflow-auto rounded-md bg-muted/50">
       <CodeBlock :code="formattedInput" language="json" />
     </div>
   </div>

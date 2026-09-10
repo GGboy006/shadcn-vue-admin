@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import {
   communityServiceEnableStatusConfig,
   communityServiceLocationConfig,
+  communityServiceServiceTypeConfig,
   communityServiceTypeConfig,
 } from '@/services/api/community-service.api'
 
@@ -38,6 +39,13 @@ const typeConfig = computed(() => {
   if (type === undefined || type === null)
     return undefined
   return communityServiceTypeConfig[type]
+})
+
+const serviceTypeConfig = computed(() => {
+  const serviceType = detail.value?.serviceType
+  if (serviceType === undefined || serviceType === null)
+    return undefined
+  return communityServiceServiceTypeConfig[serviceType]
 })
 
 const locationConfig = computed(() => {
@@ -95,6 +103,10 @@ const enableConfig = computed(() => {
             <div>
               <span class="text-muted-foreground">分类:</span>
               <span>{{ detail.cateName || detail.cateCode || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground">服务类型:</span>
+              <span>{{ serviceTypeConfig?.label || '-' }}</span>
             </div>
             <div>
               <span class="text-muted-foreground">外部标识:</span>

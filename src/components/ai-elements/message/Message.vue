@@ -23,7 +23,7 @@ const alignEnd = computed(() => props.align === 'end' || (props.align == null &&
   <div
     :class="
       cn(
-        'group flex w-full max-w-[80%] gap-2',
+        'group flex w-full min-w-0 max-w-[80%] gap-2',
         isUser ? 'is-user' : 'is-assistant',
         alignEnd ? 'ml-auto flex-row-reverse' : '',
         props.class,

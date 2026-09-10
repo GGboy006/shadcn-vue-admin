@@ -17,7 +17,7 @@ const style: CSSProperties = {
 <template>
   <div
     :class="cn(
-      'group relative w-full overflow-hidden rounded-md border bg-background text-foreground',
+      'group relative w-full min-w-0 max-w-full overflow-hidden rounded-md border bg-background text-foreground',
       props.class,
     )"
     :data-language="props.language"

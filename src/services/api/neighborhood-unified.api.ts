@@ -15,10 +15,10 @@ export type UnifiedType
     | 29
     | 31
     | 32
+    | 33
     | 35
     | 36
     | 37
-    | 38
     | 41
     | 42
     | 61
@@ -34,10 +34,10 @@ export const unifiedTypeConfig: Record<UnifiedType, { label: string }> = {
   29: { label: '企业文章' },
   31: { label: '企业简介' },
   32: { label: '联系我们' },
+  33: { label: '公告通知' },
   35: { label: '加入企业' },
   36: { label: '企业招聘' },
   37: { label: '在线留言' },
-  38: { label: '视频课程' },
   41: { label: '企业认证' },
   42: { label: '企业文章详情' },
   61: { label: '社区服务热线' },

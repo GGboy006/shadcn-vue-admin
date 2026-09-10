@@ -9,9 +9,11 @@ import Badge from '@/components/ui/badge/Badge.vue'
 import {
   communityServiceEnableStatusConfig,
   communityServiceLocationConfig,
+  communityServiceServiceTypeConfig,
   communityServiceTypeConfig,
 } from '@/services/api/community-service.api'
 
+import CatePathCell from './cate-path-cell.vue'
 import DataTableRowActions from './data-table-row-actions.vue'
 
 export const columns: ColumnDef<ICommunityService>[] = [
@@ -37,9 +39,22 @@ export const columns: ColumnDef<ICommunityService>[] = [
   },
 
   {
+    accessorKey: 'cateName',
+    header: ({ column }) => h(DataTableColumnHeader<ICommunityService>, { column, title: '分类' }),
+    meta: { title: '分类' },
+    cell: ({ row }) => h(CatePathCell, {
+      cateCode: row.original.cateCode,
+      cateName: row.original.cateName,
+    }),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: true,
+  },
+
+  {
     accessorKey: 'type',
-    header: ({ column }) => h(DataTableColumnHeader<ICommunityService>, { column, title: '服务类型' }),
-    meta: { title: '服务类型' },
+    header: ({ column }) => h(DataTableColumnHeader<ICommunityService>, { column, title: '类型' }),
+    meta: { title: '类型' },
     cell: ({ row }) => {
       const type = row.original.type
       if (type === undefined || type === null)
@@ -48,6 +63,24 @@ export const columns: ColumnDef<ICommunityService>[] = [
       if (!config)
         return h('div', { class: 'text-sm text-muted-foreground' }, '-')
       return h(Badge, { variant: config.variant }, () => config.label)
+    },
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: true,
+  },
+
+  {
+    accessorKey: 'serviceType',
+    header: ({ column }) => h(DataTableColumnHeader<ICommunityService>, { column, title: '服务类型' }),
+    meta: { title: '服务类型' },
+    cell: ({ row }) => {
+      const serviceType = row.original.serviceType
+      if (serviceType === undefined || serviceType === null)
+        return h('div', { class: 'text-sm text-muted-foreground' }, '-')
+      const config = communityServiceServiceTypeConfig[serviceType]
+      if (!config)
+        return h('div', { class: 'text-sm text-muted-foreground' }, '-')
+      return h('div', { class: 'text-sm text-muted-foreground' }, config.label)
     },
     enableSorting: false,
     enableHiding: true,

@@ -22,6 +22,7 @@ export const committeeValidator = z.object({
   serveResidents: optionalInt,
   members: optionalInt,
   remark: optionalString,
+  contactUs: optionalString,
   status: optionalNumber,
 })
 

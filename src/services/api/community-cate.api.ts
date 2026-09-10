@@ -7,9 +7,10 @@ import type { IPageParam, IPageResult, IResponse } from '../types/response.type'
 // ==================== 类型 ====================
 
 /**
- * 小区分类 type(对接文档 14 节 / 枚举速查 · 小区分类 type)。
+ * 小区分类 type。
  * 用于下拉 `/community/cate/list?type=` 必填筛选。
  * 注意:居民 AI 工具分类(type=10)请优先使用 `/resident/ai-tool/cate/*`,后端已固定。
+ * 取值:1社区服务 / 2办事指南 / 3便民 / 4门店 / 5服务 / 9社区商品 / 10AI助手
  */
 export type CommunityCateType = 1 | 2 | 3 | 4 | 5 | 9 | 10
 
@@ -19,14 +20,14 @@ export type CommunityCateTempType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 /** 启用状态:1=启用,2=禁用 */
 export type CommunityCateEnableStatus = 1 | 2
 
-/** 小区分类 type 映射配置(对接文档 14 节) */
+/** 小区分类 type 映射配置 */
 export const communityCateTypeConfig: Record<CommunityCateType, { label: string }> = {
   1: { label: '社区服务' },
-  2: { label: '居委会' },
-  3: { label: '物业' },
-  4: { label: '生活' },
+  2: { label: '办事指南' },
+  3: { label: '便民' },
+  4: { label: '门店' },
   5: { label: '服务' },
-  9: { label: '商品' },
+  9: { label: '社区商品' },
   10: { label: 'AI助手' },
 }
 
@@ -58,7 +59,7 @@ export interface ICommunityCateListQuery extends IPageParam {
 
 /** 下拉列表查询参数(type 必填) */
 export interface ICommunityCateDropdownQuery {
-  /** 分类类型(必填):1社区服务/2居委会/3物业/4生活/5服务/9商品/10AI助手 */
+  /** 分类类型(必填):1社区服务/2办事指南/3便民/4门店/5服务/9社区商品/10AI助手 */
   type: CommunityCateType
 }
 
@@ -118,6 +119,17 @@ export type ICommunityCateListResponse = IResponse<IPageResult<ICommunityCate>>
 /** 下拉列表响应(启用项) */
 export type ICommunityCateDropdownResponse = IResponse<ICommunityCate[]>
 
+/** 小区分类-社区服务分类树节点(`/community/cate/serviceTree`) */
+export interface ICommunityCateTreeNode {
+  uniqueCode: string
+  parentCode?: string
+  name: string
+  type?: number
+  children?: ICommunityCateTreeNode[]
+}
+
+export type ICommunityCateServiceTreeResponse = IResponse<ICommunityCateTreeNode[]>
+
 // ==================== API 封装 ====================
 
 /**
@@ -169,7 +181,21 @@ export function useCreateCateMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['communityCateList'] })
       queryClient.invalidateQueries({ queryKey: ['communityCateDropdown'] })
+      queryClient.invalidateQueries({ queryKey: ['communityCateServiceTree'] })
     },
+  })
+}
+
+/** 小区分类-社区服务分类树(两级,用于服务表单级联) */
+export function useGetCateServiceTreeQuery() {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<ICommunityCateServiceTreeResponse, Error>({
+    queryKey: ['communityCateServiceTree'],
+    queryFn: async () => await apiFetch<ICommunityCateServiceTreeResponse>('/community/cate/serviceTree', {
+      method: 'get',
+    }),
+    retry: false,
   })
 }
 
@@ -187,6 +213,7 @@ export function useUpdateCateMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['communityCateList'] })
       queryClient.invalidateQueries({ queryKey: ['communityCateDropdown'] })
+      queryClient.invalidateQueries({ queryKey: ['communityCateServiceTree'] })
     },
   })
 }
@@ -204,6 +231,7 @@ export function useDeleteCateMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['communityCateList'] })
       queryClient.invalidateQueries({ queryKey: ['communityCateDropdown'] })
+      queryClient.invalidateQueries({ queryKey: ['communityCateServiceTree'] })
     },
   })
 }

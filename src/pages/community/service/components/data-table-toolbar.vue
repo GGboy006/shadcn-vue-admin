@@ -12,19 +12,23 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { communityServiceTypeConfig } from '@/services/api/community-service.api'
 
+import CateCascader from './cate-cascader.vue'
+
 interface DataTableToolbarProps {
   table: Table<ICommunityService>
   search?: string
   typeFilter?: ICommunityServiceListQuery['type']
+  cateFilter?: string
 }
 const props = defineProps<DataTableToolbarProps>()
 const emits = defineEmits<{
   (e: 'update:search', value: string): void
   (e: 'update:typeFilter', value: ICommunityServiceListQuery['type']): void
+  (e: 'update:cateFilter', value: string): void
   (e: 'reset'): void
 }>()
 
-const isFiltered = computed(() => !!props.search || props.typeFilter !== undefined)
+const isFiltered = computed(() => !!props.search || props.typeFilter !== undefined || !!props.cateFilter)
 
 const searchModel = computed({
   get: () => props.search ?? '',
@@ -43,6 +47,10 @@ const typeOptions = Object.entries(communityServiceTypeConfig).map(
 function handleReset() {
   emits('reset')
 }
+
+function handleCateSelect(payload: { cateCode: string, cateName: string }) {
+  emits('update:cateFilter', payload.cateCode)
+}
 </script>
 
 <template>
@@ -54,9 +62,16 @@ function handleReset() {
         class="h-8 w-[150px] lg:w-[220px]"
       />
 
+      <CateCascader
+        :model-value="cateFilter"
+        placeholder="分类"
+        trigger-class="h-8 w-[180px] lg:w-[240px]"
+        @select="handleCateSelect"
+      />
+
       <Select v-model="typeModel">
         <SelectTrigger class="h-8 w-[120px]">
-          <SelectValue placeholder="服务类型" />
+          <SelectValue placeholder="类型" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem v-for="t in typeOptions" :key="t.value" :value="t.value">

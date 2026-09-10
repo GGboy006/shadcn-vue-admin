@@ -82,6 +82,8 @@ export interface INeighborhoodOrgVO {
   members: number
   /** 简介 */
   remark: string
+  /** 联系我们(富文本 HTML) */
+  contactUs?: string
 }
 
 /**
@@ -123,6 +125,8 @@ export interface INeighborhoodOrgUpdateDTO {
   members?: number
   /** 简介(同步城市 instruction) */
   remark?: string
+  /** 联系我们(富文本 HTML) */
+  contactUs?: string
   /** 1=启用,2=禁用 */
   status?: OrgStatus
 }

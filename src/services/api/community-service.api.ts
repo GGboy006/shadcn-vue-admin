@@ -23,10 +23,10 @@ export type CommunityServiceType
 export type CommunityServiceEnableStatus = 1 | 2
 /** 位置:1=顶,2=中,3=底 */
 export type CommunityServiceLocation = 1 | 2 | 3
-/** 服务大类:1=社区服务,2=阅读服务 */
+/** 服务类型:1=社区服务,2=阅读服务 */
 export type CommunityServiceServiceType = 1 | 2
 
-/** 小区服务 type 映射配置(对接文档 14 节) */
+/** 类型映射配置(对接文档 14 节,字段 type) */
 export const communityServiceTypeConfig: Record<CommunityServiceType, { label: string, variant: 'default' | 'info' | 'success' | 'warning' | 'secondary' | 'destructive' }> = {
   1: { label: '小程序', variant: 'default' },
   2: { label: 'H5网页', variant: 'info' },
@@ -35,6 +35,12 @@ export const communityServiceTypeConfig: Record<CommunityServiceType, { label: s
   15: { label: 'AI助手', variant: 'secondary' },
   16: { label: '社区商品', variant: 'destructive' },
   17: { label: '社区AI助手', variant: 'info' },
+}
+
+/** 服务类型映射配置(字段 serviceType) */
+export const communityServiceServiceTypeConfig: Record<CommunityServiceServiceType, { label: string }> = {
+  1: { label: '社区服务' },
+  2: { label: '阅读服务' },
 }
 
 /** 位置映射配置 */
@@ -56,7 +62,7 @@ export interface ICommunityServiceListQuery extends IPageParam {
   keyword?: string
   /** 分类编码 */
   cateCode?: string
-  /** 服务类型(可选,如 17=居民AI工具) */
+  /** 类型(可选,如 17=居民AI工具) */
   type?: CommunityServiceType
 }
 
@@ -82,13 +88,13 @@ export interface ICommunityService {
   isEnable?: CommunityServiceEnableStatus
   /** 位置:1=顶,2=中,3=底 */
   location?: CommunityServiceLocation
-  /** 服务类型(见枚举) */
+  /** 类型(见枚举) */
   type?: CommunityServiceType
   /** 分类编码 */
   cateCode?: string
   /** 分类名称 */
   cateName?: string
-  /** 服务大类:1=社区服务,2=阅读服务 */
+  /** 服务类型:1=社区服务,2=阅读服务 */
   serviceType?: CommunityServiceServiceType
   /** 微信小程序 APPID */
   appId?: string
@@ -136,13 +142,13 @@ export interface ICommunityServiceAddDTO {
   isEnable?: CommunityServiceEnableStatus
   /** 位置:1=顶,2=中,3=底 */
   location?: CommunityServiceLocation
-  /** 服务类型(见枚举) */
+  /** 类型(见枚举) */
   type?: CommunityServiceType
   /** 分类编码 */
   cateCode?: string
   /** 分类名称 */
   cateName?: string
-  /** 服务大类:1=社区服务,2=阅读服务 */
+  /** 服务类型:1=社区服务,2=阅读服务 */
   serviceType?: CommunityServiceServiceType
   /** 外部标识(商户码/thirdId 等) */
   otherCode?: string

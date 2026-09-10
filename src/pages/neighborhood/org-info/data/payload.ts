@@ -22,6 +22,8 @@ export interface OrgInfoFormValues {
   /** 成员数(居委会特有) */
   members?: number
   remark?: string
+  /** 联系我们(富文本 HTML) */
+  contactUs?: string
   status?: 1 | 2
 }
 
@@ -55,6 +57,7 @@ export function buildOrgInfoPayload(values: OrgInfoFormValues): INeighborhoodOrg
     'serveResidents',
     'members',
     'remark',
+    'contactUs',
     'status',
   ] as const
 

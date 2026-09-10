@@ -17,7 +17,7 @@ const props = defineProps<Props>()
 
 <template>
   <Collapsible
-    v-bind="{ ...props, ...$attrs, class: cn('group not-prose mb-4 w-full rounded-md border', props.class) }"
+    v-bind="{ ...props, ...$attrs, class: cn('group not-prose mb-4 w-full min-w-0 max-w-full overflow-hidden rounded-md border', props.class) }"
   >
     <slot />
   </Collapsible>
