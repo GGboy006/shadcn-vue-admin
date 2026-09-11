@@ -1,4 +1,6 @@
-import { isMerchantBusinessUser, UserType } from '@/constants/user-type'
+import { toast } from 'vue-sonner'
+
+import { isMerchantBusinessUser, isPropertyUser, PROPERTY_ACCESS_DENIED, UserType } from '@/constants/user-type'
 import { useAuthStore } from '@/stores/auth'
 import { useUserInfoStore } from '@/stores/user-info'
 
@@ -43,11 +45,16 @@ export function useAuth() {
         body: { phone, password },
       })
 
+      const userType = res.data.user?.userType
+      if (isPropertyUser(userType)) {
+        toast.error(PROPERTY_ACCESS_DENIED)
+        return
+      }
+
       authStore.setToken(res.data.token)
       authStore.setUserInfo(res.data.user)
 
       // 根据用户类型获取详细信息
-      const userType = res.data.user?.userType
       if (userType === 3) {
         const stationRes = await apiFetch('/station/myStationInfo')
         userInfoStore.setStationInfo(stationRes.data)

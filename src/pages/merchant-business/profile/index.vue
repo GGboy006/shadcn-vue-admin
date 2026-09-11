@@ -1,6 +1,6 @@
 <route lang="yaml">
 meta:
-  roles: [4, 5]
+  roles: [4]
 </route>
 
 <script setup lang="ts">
@@ -27,7 +27,7 @@ import type { ProfileFormValues } from './data/payload'
 
 import { buildProfilePayload } from './data/payload'
 
-// 仅商户/物业自身可访问(站长代客菜单已隐藏此项;meta.roles 限定 4/5)
+// 仅商户自身可访问(站长代客菜单已隐藏此项;meta.roles 限定 4)
 const { data, isLoading } = useGetMyMerchantInfoQuery()
 const info = computed(() => data.value?.data)
 

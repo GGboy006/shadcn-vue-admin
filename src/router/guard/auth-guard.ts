@@ -2,9 +2,10 @@ import type { Router } from 'vue-router'
 
 import { storeToRefs } from 'pinia'
 
-import { UserType } from '@/constants/user-type'
+import { isPropertyUser, UserType } from '@/constants/user-type'
 import pinia from '@/plugins/pinia/setup'
 import { useAuthStore } from '@/stores/auth'
+import { useUserInfoStore } from '@/stores/user-info'
 
 import { isPublicPath, MARKETING_HOME } from './public-path'
 
@@ -19,6 +20,14 @@ export function setupAuthGuard(router: Router) {
     const isFromAuthPage = from.path.startsWith('/auth')
 
     const userType = authStore.userInfo?.userType
+
+    // 物业是外部产品:已有会话也清掉,避免旧 token 继续进后台
+    if (isLogin.value && isPropertyUser(userType)) {
+      authStore.clearAuth()
+      useUserInfoStore(pinia).clearUserInfo()
+      if (!isAuthPage && !isPublicPath(to.path))
+        return { path: '/auth/sign-in' }
+    }
 
     // 已登录用户访问登录页 -> 重定向到首页或之前页面
     if (isLogin.value && isAuthPage) {

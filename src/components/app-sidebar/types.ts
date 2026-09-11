@@ -7,7 +7,7 @@ interface BaseNavItem {
   title: string
   icon?: NavIcon
   roles?: number[]
-  /** 仅商户/物业自身可见,站长代客模式隐藏(如「商户资料」) */
+  /** 仅商户自身可见,站长代客模式隐藏(如「商户资料」) */
   selfOnly?: boolean
 }
 

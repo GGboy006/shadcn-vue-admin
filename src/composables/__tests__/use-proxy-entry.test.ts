@@ -112,6 +112,24 @@ describe('useProxyEntry', () => {
     expect(useAuthStore().token).toBe('')
   })
 
+  it('物业账号:返回 property,不写 token 不跳转,并清中转', async () => {
+    writeProxyAuth({
+      ...fakePayload,
+      user: { ...fakePayload.user, userType: 5 },
+    }, 'abc')
+
+    const { consume } = useProxyEntry()
+    const result = await consume('abc')
+
+    expect(result).toEqual({ ok: false, reason: 'property' })
+    expect(useAuthStore().token).toBe('')
+    expect(replaceMock).not.toHaveBeenCalled()
+    expect(fetchUserInfoMock).not.toHaveBeenCalled()
+
+    const { readProxyAuth } = await import('@/utils/proxy-auth')
+    expect(readProxyAuth('abc')).toBeNull()
+  })
+
   it('中转读取后一次性清除', async () => {
     writeProxyAuth(fakePayload, 'abc')
     fetchUserInfoMock.mockResolvedValue(undefined)

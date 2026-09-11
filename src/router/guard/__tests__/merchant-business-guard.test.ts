@@ -16,7 +16,7 @@ describe('resolveMerchantBusinessRoute', () => {
     setActivePinia(createPinia())
   })
 
-  describe('商户/物业(userType=4/5)进入商户后台', () => {
+  describe('商户(userType=4)进入商户后台', () => {
     it('有 merchantId -> 放行', () => {
       const authStore = useAuthStore()
       authStore.setToken('merchant-token')
@@ -37,14 +37,14 @@ describe('resolveMerchantBusinessRoute', () => {
       expect(result).toBe('/errors/403')
     })
 
-    it('物业(userType=5)同样放行', () => {
+    it('物业(userType=5)不再放行,回 /merchants', () => {
       const authStore = useAuthStore()
       authStore.setToken('prop-token')
       authStore.setUserInfo({ userType: 5 } as any)
       useUserInfoStore().setMerchantInfo({ merchantId: 'P_SELF' } as any)
 
       const result = resolveMerchantBusinessRoute(makeRoute('/merchant-business/goods'))
-      expect(result).toBeUndefined()
+      expect(result).toBe('/merchants')
     })
 
     it('代客标签页(userType=4,merchantInfo 由换 token 写入)同样放行', () => {

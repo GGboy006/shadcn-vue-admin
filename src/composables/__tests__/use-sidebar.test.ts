@@ -22,12 +22,6 @@ function setUser(userType: number) {
   } as LoginUserVO)
 }
 
-/** 提取菜单结构(忽略 icon 函数引用),便于深比较身份间是否一致 */
-function snapshot(nav: unknown): string {
-  return JSON.stringify(nav, (_key, value) =>
-    typeof value === 'function' ? undefined : value)
-}
-
 /** 递归收集某分组下所有叶子菜单项的 title */
 function leafTitles(group: { items: unknown[] }): string[] {
   return (group.items as Array<{ title: string, items?: unknown[] }>)
@@ -62,14 +56,12 @@ describe('useSidebar navData', () => {
     expect(leafTitles(navData.value[2])).toEqual(['个人资料'])
   })
 
-  it('物业(userType=5)菜单与商户自身一致', () => {
-    setUser(4)
-    const merchantSnapshot = snapshot(useSidebar().navData.value)
-
+  it('物业(userType=5)不再走商户后台菜单', () => {
     setUser(5)
-    const propertySnapshot = snapshot(useSidebar().navData.value)
+    const { navData } = useSidebar()
 
-    expect(propertySnapshot).toEqual(merchantSnapshot)
+    expect(navData.value.map(g => g.title)).toEqual(['工作台', '主体管理', 'AI运营', '小区服务', '居民', '设置'])
+    expect(navData.value.some(g => g.title === '经营')).toBe(false)
   })
 
   it('居委会(userType=6):走居委会专属菜单,与商户菜单不同', () => {

@@ -1,6 +1,6 @@
 <route lang="yaml">
 meta:
-  roles: [3, 4, 5]
+  roles: [3, 4]
 </route>
 
 <script setup lang="ts">

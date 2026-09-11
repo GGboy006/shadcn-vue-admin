@@ -16,6 +16,7 @@ declare global {
   const EffectScope: typeof import('vue').EffectScope
   const MERCHANT_BUSINESS_USER_TYPES: typeof import('../constants/user-type').MERCHANT_BUSINESS_USER_TYPES
   const PAGE_SIZES: typeof import('../constants/pagination').PAGE_SIZES
+  const PROPERTY_ACCESS_DENIED: typeof import('../constants/user-type').PROPERTY_ACCESS_DENIED
   const RADIUS: typeof import('../constants/themes').RADIUS
   const RouterPath: typeof import('../constants/route-path').RouterPath
   const THEMES: typeof import('../constants/themes').THEMES
@@ -38,6 +39,7 @@ declare global {
   const h: typeof import('vue').h
   const inject: typeof import('vue').inject
   const isMerchantBusinessUser: typeof import('../constants/user-type').isMerchantBusinessUser
+  const isPropertyUser: typeof import('../constants/user-type').isPropertyUser
   const isProxy: typeof import('vue').isProxy
   const isReactive: typeof import('vue').isReactive
   const isReadonly: typeof import('vue').isReadonly

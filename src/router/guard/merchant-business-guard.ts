@@ -10,7 +10,7 @@ const MERCHANT_BUSINESS_PREFIX = '/merchant-business'
  * 商户后台路由守卫逻辑:返回重定向目标或 undefined(放行)。
  *
  * 新方案(新标签页换商户 token):
- * - 商户/物业(userType=4/5,含代客标签页,已换商户 token):需有 merchantId,否则 /errors/403
+ * - 商户/居委会(userType=4/6,含代客标签页,已换商户 token):需有 merchantId,否则 /errors/403
  * - 站长(userType=3)不应直接进商户后台(代客走新标签页,已是商户态)-> 回 /merchants
  * - 未登录/非商户后台路由:交给 auth-guard / 放行
  *
@@ -28,7 +28,7 @@ export function resolveMerchantBusinessRoute(to: RouteLocationNormalized): Route
   if (!to.path.startsWith(MERCHANT_BUSINESS_PREFIX))
     return undefined
 
-  // 商户后台用户(商户/物业/居委会,含代客标签页):需有 merchantId
+  // 商户后台用户(商户/居委会,含代客标签页):需有 merchantId
   if (isMerchantBusinessUser(userType)) {
     if (!userInfoStore.merchantInfo?.merchantId)
       return '/errors/403'

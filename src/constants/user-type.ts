@@ -15,14 +15,21 @@ export enum UserType {
   committee = 6,
 }
 
-/** 商户后台用户类型:商户/物业/居委会(三者同级,共用商户后台) */
+/** 商户后台用户类型:商户/居委会。物业是外部产品,不进本后台 */
 export const MERCHANT_BUSINESS_USER_TYPES: readonly number[] = [
   UserType.merchant,
-  UserType.property,
   UserType.committee,
 ] as const
 
-/** 是否为商户后台用户类型(商户/物业/居委会) */
+/** 物业账号不可登录本后台时的提示 */
+export const PROPERTY_ACCESS_DENIED = '物业为外部系统，请使用物业产品登录。本后台不支持物业账号。'
+
+/** 是否为商户后台用户类型(商户/居委会) */
 export function isMerchantBusinessUser(userType: number | undefined | null): boolean {
   return userType !== undefined && userType !== null && MERCHANT_BUSINESS_USER_TYPES.includes(userType)
+}
+
+/** 是否为物业账号(userType=5) */
+export function isPropertyUser(userType: number | undefined | null): boolean {
+  return userType === UserType.property
 }

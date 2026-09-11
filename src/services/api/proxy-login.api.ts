@@ -11,8 +11,8 @@ import type { IResponse } from '../types/response.type'
  * merchantInfo 由前端拿到 token 后另行调用 /merchant/myMerchantInfo 获取
  * (与正常 password 登录的两步流程一致,以便复用 myMerchantInfo 逻辑、保证字段一致)。
  *
- * 注意:userType 由后端按 merchantId 查出的商户 type 透传(4=商户 / 5=物业 / 6=居委会),
- * 不固定为 4。前端不硬编码,直接 setUserInfo 透传。
+ * 注意:userType 由后端按 merchantId 查出的主体 type 透传(4=商户 / 6=居委会)。
+ * 物业(5)是外部产品,代客入口会拒绝,不进本后台。
  *
  * refreshToken / expireTime 为后端附带字段,当前前端未使用(项目暂无刷新 token 机制),
  * 标记为可选以便将来启用。

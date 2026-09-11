@@ -29,11 +29,10 @@ describe('filterMerchantBusinessItems', () => {
     ])
   })
 
-  it('should keep all items for property (userType=5) self mode', () => {
+  it('should hide selfOnly items for property (userType=5), no longer a merchant-backend user', () => {
     const result = filterMerchantBusinessItems(items, { userType: 5, proxyMode: false })
 
-    expect(result.map(i => i.title)).toHaveLength(7)
-    expect(result.map(i => i.title)).toContain('商户资料')
+    expect(result.map(i => i.title)).not.toContain('商户资料')
   })
 
   it('should keep all items for committee (userType=6) self mode', () => {

@@ -16,6 +16,7 @@ onMounted(async () => {
       'no-key': '代客参数缺失,请从商户列表重新进入',
       'timeout': '代客登录超时或失败,请关闭此标签页后重试',
       'fetch-info': '获取商户信息失败,请关闭此标签页后重试',
+      'property': '物业为外部系统，无法进入本后台',
     }[result.reason]
   }
   // 成功时 consume 内已 router.replace 到商户概览
