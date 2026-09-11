@@ -127,7 +127,8 @@ export function useSidebar() {
     { title: '居委会信息', url: '/neighborhood/org-info', icon: Building2Icon },
     { title: '服务热线', url: '/neighborhood/service-guide', icon: PhoneIcon },
     { title: '在线留言', url: '/neighborhood/leave-message', icon: MessageSquareIcon },
-    { title: '居委会服务', url: '/neighborhood/service', icon: LifeBuoyIcon },
+    // 居委会服务 /neighborhood/service 暂不开放
+
   ]
 
   const allSettingsNavItems = [
