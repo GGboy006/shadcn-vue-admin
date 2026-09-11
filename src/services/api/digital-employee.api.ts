@@ -3,6 +3,18 @@ import { useQuery } from '@tanstack/vue-query'
 import { useApiFetch } from '@/composables/use-fetch'
 
 import type { IResponse } from '../types/response.type'
+import type { IAgentScopeAgentDetail } from './agent-scope-agent-detail'
+
+import { agentScopeAgentDetailPath } from './agent-scope-agent-detail'
+
+export type {
+  IAgentScopeAgentDetail,
+  IAgentScopeAgentInfo,
+  IAgentScopeModel,
+  IAgentScopePresentation,
+  IAgentScopeRecommendedQuestion,
+} from './agent-scope-agent-detail'
+export { agentScopeAgentDetailPath, mapAgentScopePresentation } from './agent-scope-agent-detail'
 
 // ==================== 枚举与映射 ====================
 
@@ -92,6 +104,22 @@ export function useGetDepartmentEmployeeListQuery() {
     queryFn: async () => await apiFetch<IDepartmentEmployeeListResponse>('/digital-employee/department/list', {
       method: 'get',
     }),
+    retry: false,
+  })
+}
+
+export type IAgentScopeAgentDetailResponse = IResponse<IAgentScopeAgentDetail>
+
+/** AgentScope 智能体运行配置详情（aiType=3，agentId 用员工 aiThirdId） */
+export function useGetAgentScopeAgentDetailQuery(agentId: Ref<string>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<IAgentScopeAgentDetailResponse, Error>({
+    queryKey: ['agentScopeAgentDetail', agentId],
+    queryFn: async () => await apiFetch<IAgentScopeAgentDetailResponse>(
+      agentScopeAgentDetailPath(agentId.value),
+    ),
+    enabled: computed(() => !!agentId.value),
     retry: false,
   })
 }

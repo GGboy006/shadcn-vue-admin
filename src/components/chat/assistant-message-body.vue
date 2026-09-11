@@ -44,8 +44,8 @@ function displayText(content: string): string {
         :is-streaming="isStreaming"
       />
       <AiElementsReasoning
-        v-else-if="part.type === 'reasoning' && part.content"
-        :content="part.content"
+        v-else-if="part.type === 'reasoning' && (part.content || isStreaming)"
+        :content="part.content || ''"
         :is-streaming="isStreaming && !getMessageText(message)"
         :duration="durationSeconds(part.duration)"
       />

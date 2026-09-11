@@ -22,6 +22,7 @@ withDefaults(defineProps<{
   >
     <ReasoningTrigger class="text-current/70 hover:text-current" />
     <ReasoningContent
+      v-if="content"
       :content="content"
       class="text-current/70"
     />

@@ -39,6 +39,14 @@ describe('applyAgUiEvent', () => {
     expect(state.reasoning).toBe('先想一步')
   })
 
+  it('只有 START、没有 CONTENT 时仍保持思考态', () => {
+    let state = createAgUiStreamState()
+    state = applyAgUiEvent(state, { type: 'REASONING_MESSAGE_START' }).state
+    state = applyAgUiEvent(state, { type: 'CUSTOM', name: 'stream_keepalive', value: { ts: '1' } }).state
+    expect(state.isReasoning).toBe(true)
+    expect(state.reasoning).toBe('')
+  })
+
   it('兼容旧 THINKING_* 事件名', () => {
     let state = createAgUiStreamState()
     state = applyAgUiEvent(state, { type: 'THINKING_TEXT_MESSAGE_CONTENT', delta: '旧协议' }).state

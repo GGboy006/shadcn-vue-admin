@@ -34,10 +34,15 @@ export function getMessageToolCalls(msg: IChatMessage): IMessagePart[] {
   return (msg.parts ?? []).filter(part => part.type === 'tool_call' && part.toolCall)
 }
 
+export function hasReasoningPart(msg: IChatMessage): boolean {
+  return (msg.parts ?? []).some(part => part.type === 'reasoning')
+}
+
 export function hasAssistantVisualContent(msg: IChatMessage): boolean {
   return Boolean(
     getMessageText(msg)
     || getMessageReasoning(msg)
+    || hasReasoningPart(msg)
     || getMessageToolCalls(msg).length,
   )
 }
@@ -218,12 +223,12 @@ export function durationSeconds(duration?: string | number | null): number | und
  */
 export function applyPartsToMessage(
   msg: IChatMessage,
-  input: { text?: string, reasoning?: string },
+  input: { text?: string, reasoning?: string, reasoningPending?: boolean },
 ) {
   const text = input.text ?? ''
   const reasoning = input.reasoning ?? ''
   const parts: IMessagePart[] = []
-  if (reasoning)
+  if (reasoning || input.reasoningPending)
     parts.push({ type: 'reasoning', content: reasoning })
   if (text)
     parts.push({ type: 'text', content: text })

@@ -44,6 +44,29 @@ describe('applyPartsToMessage', () => {
     expect(getMessageText(msg)).toBe('答案')
     expect(msg.content).toBe('答案')
   })
+
+  it('思考中但还没正文时挂空 reasoning part，用来展示「思考中…」', () => {
+    const msg = emptyMessage()
+    applyPartsToMessage(msg, { reasoningPending: true })
+    expect(msg.parts.map(p => p.type)).toEqual(['reasoning'])
+    expect(getMessageReasoning(msg)).toBe('')
+    expect(hasAssistantVisualContent(msg)).toBe(true)
+  })
+
+  it('正文未到时即使不在 REASONING 态也保留思考占位', () => {
+    const msg = emptyMessage()
+    applyPartsToMessage(msg, { reasoningPending: true })
+    applyPartsToMessage(msg, { text: '', reasoning: '', reasoningPending: true })
+    expect(msg.parts.map(p => p.type)).toEqual(['reasoning'])
+  })
+
+  it('思考结束后若仍无推理正文则去掉空占位', () => {
+    const msg = emptyMessage()
+    applyPartsToMessage(msg, { reasoningPending: true })
+    applyPartsToMessage(msg, { text: '答案', reasoning: '' })
+    expect(msg.parts.map(p => p.type)).toEqual(['text'])
+    expect(hasAssistantVisualContent(msg)).toBe(true)
+  })
 })
 
 describe('hydrateChatMessage', () => {

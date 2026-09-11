@@ -8,7 +8,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { onlineStatusConfig, useGetDepartmentEmployeeListQuery } from '@/services/api/digital-employee.api'
+import {
+  mapAgentScopePresentation,
+  onlineStatusConfig,
+  useGetAgentScopeAgentDetailQuery,
+  useGetDepartmentEmployeeListQuery,
+} from '@/services/api/digital-employee.api'
 import { useGetAgentDetailQuery } from '@/services/api/skill.api'
 
 import AgentPromptTemplateForm from '../apps/components/AgentPromptTemplateForm.vue'
@@ -59,11 +64,16 @@ const subtitleParts = computed(() => {
 
 const aiType = computed(() => employee.value?.aiType)
 
-// Agent（type 2）详情：包含开场白、推荐问题、表单模板、mcpMethod
+// type 2：LoongAI Agent 详情（开场白 / 推荐问题 / 表单 / mcpMethod）
+// type 3：AgentScope 专用运行配置（presentation.welcomeMessage / recommendedQuestions）
 const aiThirdId = computed(() => employee.value?.aiThirdId ?? '')
 const { data: agentDetail, isLoading: isAgentLoading } = useGetAgentDetailQuery(
   computed(() => (aiType.value === 2 ? aiThirdId.value : '')),
 )
+const { data: agentScopeDetail, isLoading: isAgentScopeLoading } = useGetAgentScopeAgentDetailQuery(
+  computed(() => (aiType.value === 3 ? aiThirdId.value : '')),
+)
+const agentScopePresentation = computed(() => mapAgentScopePresentation(agentScopeDetail.value?.data))
 
 /** Agent 是否有表单模板 */
 const hasPromptTemplate = computed(() => {
@@ -76,10 +86,14 @@ const hasPromptTemplate = computed(() => {
 /** 第一个表单模板 */
 const firstPromptTemplate = computed(() => agentDetail.value?.data?.promptTemplateList?.[0])
 
-/** 推荐问题（type 2 才有） */
-const suggestedQuestions = computed(() =>
-  aiType.value === 2 ? (agentDetail.value?.data?.promptGuideList ?? []) : [],
-)
+/** 推荐问题：type 2 走 LoongAI 详情，type 3 走 AgentScope presentation */
+const suggestedQuestions = computed(() => {
+  if (aiType.value === 2)
+    return agentDetail.value?.data?.promptGuideList ?? []
+  if (aiType.value === 3)
+    return agentScopePresentation.value.recommendedQuestions
+  return []
+})
 
 /** Agent 流式对话需携带的参数 */
 const agentSendOptions = computed(() =>
@@ -90,11 +104,13 @@ const agentSendOptions = computed(() =>
 
 // ==================== 开场白 ====================
 
-// 优先使用 detail 接口返回的 greeting 问候语（开场白），无则本地拼接兼底
+// type 3 用 AgentScope welcomeMessage；type 2 用 LoongAI greeting；无则本地拼接
 const welcomeContent = computed(() => {
   const emp = employee.value
   if (!emp)
     return ''
+  if (aiType.value === 3 && agentScopePresentation.value.welcomeMessage)
+    return agentScopePresentation.value.welcomeMessage
   const greeting = agentDetail.value?.data?.greeting?.trim()
   if (greeting)
     return greeting
@@ -131,7 +147,7 @@ watchEffect(() => {
     welcomeSeeded.value = true
     return
   }
-  // type 2 需等详情返回后再决定是否注入欢迎气泡
+  // type 2 / 3 需等各自详情返回后再决定是否注入欢迎气泡
   if (aiType.value === 2) {
     if (isAgentLoading.value)
       return
@@ -140,6 +156,8 @@ watchEffect(() => {
       return
     }
   }
+  if (aiType.value === 3 && isAgentScopeLoading.value)
+    return
   if (welcomeContent.value) {
     seedWelcomeMessage()
     welcomeSeeded.value = true

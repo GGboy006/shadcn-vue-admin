@@ -119,7 +119,7 @@ function avatarSrc(msg: IChatMessage) {
                   :fly-cards="flyCardsByMessageId.get(msg.id)"
                 />
                 <div
-                  v-if="!hasAssistantVisualContent(msg) && !hasFlyCards(flyCardsByMessageId.get(msg.id))"
+                  v-if="!hasAssistantVisualContent(msg) && !hasFlyCards(flyCardsByMessageId.get(msg.id)) && !(streaming && index === lastAssistantIndex)"
                   class="flex items-center gap-1.5 py-1"
                   aria-label="AI 正在输入"
                 >

@@ -151,6 +151,8 @@ export function useEmployeeChatStream(
       role: 'assistant',
     }))
     messages.value.push(aiMsg)
+    isStreaming.value = true
+    applyPartsToMessage(aiMsg, { reasoningPending: true })
 
     if (isFirstMessage.value) {
       try {
@@ -170,6 +172,7 @@ export function useEmployeeChatStream(
         }
       }
       catch (error) {
+        isStreaming.value = false
         const msg = error instanceof Error ? error.message : '创建会话失败'
         applyPartsToMessage(aiMsg, { text: msg })
         errorMessageIds.value.add(aiMsg.id)
@@ -202,6 +205,7 @@ export function useEmployeeChatStream(
     applyPartsToMessage(aiMsg, {
       text: currentStreamContent.value,
       reasoning: reasoningContent.value,
+      reasoningPending: !currentStreamContent.value && !reasoningContent.value,
     })
   }
 
@@ -251,7 +255,11 @@ export function useEmployeeChatStream(
           onEvent(payload) {
             const result = applyAgUiEvent(agState, payload)
             agState = result.state
-            applyPartsToMessage(aiMsg, { text: agState.text, reasoning: agState.reasoning })
+            applyPartsToMessage(aiMsg, {
+              text: agState.text,
+              reasoning: agState.reasoning,
+              reasoningPending: !agState.text && !agState.reasoning,
+            })
             isReasoning.value = agState.isReasoning
             currentStreamContent.value = agState.text
             reasoningContent.value = agState.reasoning
