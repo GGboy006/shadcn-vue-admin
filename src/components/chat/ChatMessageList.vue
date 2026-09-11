@@ -26,6 +26,7 @@ import { cn } from '@/lib/utils'
 import { useGetImageGenerationQuery } from '@/services/api/conversation.api'
 import { getMessageText, hasAssistantVisualContent, toMessageAlign, toMessageUiFrom, visibleChatMessages } from '@/utils/chat-message-parts'
 import { downloadImage } from '@/utils/download-image'
+import { hasFlyCards, mapFlyCardsByMessageId } from '@/utils/feizhu'
 import { withBase } from '@/utils/with-base'
 
 import AssistantMessageBody from './assistant-message-body.vue'
@@ -56,6 +57,7 @@ const emit = defineEmits<{
 const slots = useSlots()
 const hasHeaderSlot = computed(() => !!slots.header)
 const displayMessages = computed(() => visibleChatMessages(props.messages))
+const flyCardsByMessageId = computed(() => mapFlyCardsByMessageId(props.messages))
 const isEmpty = computed(() => displayMessages.value.length === 0 && !hasHeaderSlot.value)
 const { copy, copied } = useClipboard()
 
@@ -200,11 +202,17 @@ function showBubble(msg: IChatMessage) {
               :name="getInitials(avatarName(msg))"
             />
             <div class="flex min-w-0 flex-col overflow-hidden">
-              <MessageContent v-if="showBubble(msg)">
+              <MessageContent
+                v-if="showBubble(msg)"
+                :class="hasFlyCards(flyCardsByMessageId.get(msg.id)) ? 'w-full' : undefined"
+              >
                 <template v-if="isAssistant(msg)">
-                  <AssistantMessageBody :message="msg" />
+                  <AssistantMessageBody
+                    :message="msg"
+                    :fly-cards="flyCardsByMessageId.get(msg.id)"
+                  />
                   <div
-                    v-if="!hasAssistantVisualContent(msg)"
+                    v-if="!hasAssistantVisualContent(msg) && !hasFlyCards(flyCardsByMessageId.get(msg.id))"
                     class="flex items-center gap-1.5 py-1"
                     aria-label="AI 正在输入"
                   >

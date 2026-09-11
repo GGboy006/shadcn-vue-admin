@@ -22,6 +22,7 @@ import {
 } from '@/components/ai-elements/message'
 import { cn } from '@/lib/utils'
 import { getMessageText, hasAssistantVisualContent, toMessageAlign, toMessageUiFrom, visibleChatMessages } from '@/utils/chat-message-parts'
+import { hasFlyCards, mapFlyCardsByMessageId } from '@/utils/feizhu'
 import { withBase } from '@/utils/with-base'
 
 import AssistantMessageBody from './assistant-message-body.vue'
@@ -40,6 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
 const slots = useSlots()
 const hasHeaderSlot = computed(() => !!slots.header)
 const displayMessages = computed(() => visibleChatMessages(props.messages))
+const flyCardsByMessageId = computed(() => mapFlyCardsByMessageId(props.messages))
 const isEmpty = computed(() => displayMessages.value.length === 0 && !hasHeaderSlot.value)
 const { copy, copied } = useClipboard()
 
@@ -104,7 +106,7 @@ function avatarSrc(msg: IChatMessage) {
             :name="isUser(msg) ? '用户' : 'AI'"
           />
           <div class="flex min-w-0 flex-col overflow-hidden">
-            <MessageContent>
+            <MessageContent :class="!isUser(msg) && hasFlyCards(flyCardsByMessageId.get(msg.id)) ? 'w-full' : undefined">
               <template v-if="isUser(msg)">
                 <p v-if="getMessageText(msg)" class="whitespace-pre-wrap">
                   {{ getMessageText(msg) }}
@@ -114,9 +116,10 @@ function avatarSrc(msg: IChatMessage) {
                 <AssistantMessageBody
                   :message="msg"
                   :is-streaming="streaming && index === lastAssistantIndex"
+                  :fly-cards="flyCardsByMessageId.get(msg.id)"
                 />
                 <div
-                  v-if="!hasAssistantVisualContent(msg)"
+                  v-if="!hasAssistantVisualContent(msg) && !hasFlyCards(flyCardsByMessageId.get(msg.id))"
                   class="flex items-center gap-1.5 py-1"
                   aria-label="AI 正在输入"
                 >
