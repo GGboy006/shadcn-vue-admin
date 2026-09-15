@@ -184,6 +184,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/community/capability/': RouteRecordInfo<
+      '/community/capability/',
+      '/community/capability',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/community/cate/': RouteRecordInfo<
       '/community/cate/',
       '/community/cate',
@@ -273,6 +280,13 @@ declare module 'vue-router/auto-routes' {
       '/community/steward/:categoryId',
       { categoryId: ParamValue<true> },
       { categoryId: ParamValue<false> },
+      | never
+    >,
+    '/community/steward-orders/': RouteRecordInfo<
+      '/community/steward-orders/',
+      '/community/steward-orders',
+      Record<never, never>,
+      Record<never, never>,
       | never
     >,
     '/conversations/': RouteRecordInfo<
@@ -755,6 +769,12 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
+    'src/pages/community/capability/index.vue': {
+      routes:
+        | '/community/capability/'
+      views:
+        | never
+    }
     'src/pages/community/cate/index.vue': {
       routes:
         | '/community/cate/'
@@ -830,6 +850,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/community/steward/[categoryId].vue': {
       routes:
         | '/community/steward/[categoryId]'
+      views:
+        | never
+    }
+    'src/pages/community/steward-orders/index.vue': {
+      routes:
+        | '/community/steward-orders/'
       views:
         | never
     }

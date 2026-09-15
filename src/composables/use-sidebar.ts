@@ -1,4 +1,4 @@
-import { BookmarkIcon, BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, CalendarDaysIcon, CalendarRangeIcon, Columns3Icon, ConciergeBellIcon, FolderTreeIcon, HeadsetIcon, HelpCircleIcon, HomeIcon, ImageIcon, LandmarkIcon, LayoutDashboardIcon, LayoutGridIcon, LifeBuoyIcon, LightbulbIcon, MegaphoneIcon, MessageSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, ShoppingCartIcon, StoreIcon, TagIcon, TagsIcon, UserIcon, UsersIcon, WrenchIcon } from '@lucide/vue'
+import { BookmarkIcon, BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, CalendarDaysIcon, CalendarRangeIcon, Columns3Icon, ConciergeBellIcon, FolderTreeIcon, HeadsetIcon, HelpCircleIcon, HomeIcon, ImageIcon, LandmarkIcon, LayoutDashboardIcon, LayoutGridIcon, LibraryIcon, LifeBuoyIcon, LightbulbIcon, ListOrderedIcon, MegaphoneIcon, MessageSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, ShoppingCartIcon, StoreIcon, TagIcon, TagsIcon, UserIcon, UsersIcon, WrenchIcon } from '@lucide/vue'
 
 import type { NavGroup, NavItem } from '@/components/app-sidebar/types'
 
@@ -76,6 +76,7 @@ export function useSidebar() {
         { title: '办事指南', url: '/community/guide', icon: BookOpenIcon, roles: [3] },
         { title: '小区服务', url: '/community/service', icon: LifeBuoyIcon, roles: [3] },
         { title: '管家服务', url: '/community/steward', icon: ConciergeBellIcon, roles: [3] },
+        { title: '服务订单', url: '/community/steward-orders', icon: ListOrderedIcon, roles: [3] },
         { title: '社区电话', url: '/community/phone-list', icon: PhoneIcon, roles: [3] },
       ],
     },
@@ -99,6 +100,7 @@ export function useSidebar() {
   const stationAiNavItems: NavItem[] = [
     { title: '聊天工作台', url: '/admin/chat-workbench', icon: HeadsetIcon, roles: [3] },
     { title: '数字员工', url: '/digital-employees', icon: BotIcon, roles: [3] },
+    { title: '能力目录', url: '/community/capability', icon: LibraryIcon, roles: [3] },
     { title: 'AI工具管理', url: '/apps', icon: BoxesIcon, roles: [3] },
     { title: '会话列表', url: '/conversations', icon: MessageSquareIcon, roles: [3] },
   ]

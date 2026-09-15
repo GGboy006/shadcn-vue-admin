@@ -105,6 +105,7 @@ describe('useSidebar navData', () => {
     expect(leafTitles(navData.value[2])).toEqual([
       '聊天工作台',
       '数字员工',
+      '能力目录',
       'AI工具管理',
       '会话列表',
     ])
@@ -123,6 +124,7 @@ describe('useSidebar navData', () => {
       '办事指南',
       '小区服务',
       '管家服务',
+      '服务订单',
       '社区电话',
       '意见反馈',
       '小区栏目',
