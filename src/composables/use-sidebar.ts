@@ -1,4 +1,4 @@
-import { BookmarkIcon, BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, CalendarDaysIcon, CalendarRangeIcon, Columns3Icon, ConciergeBellIcon, FolderTreeIcon, HeadsetIcon, HelpCircleIcon, HomeIcon, ImageIcon, LandmarkIcon, LayoutDashboardIcon, LayoutGridIcon, LibraryIcon, LifeBuoyIcon, LightbulbIcon, ListOrderedIcon, MegaphoneIcon, MessageSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, ShoppingCartIcon, StoreIcon, TagIcon, TagsIcon, UserIcon, UsersIcon, WrenchIcon } from '@lucide/vue'
+import { BookmarkIcon, BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, CalendarDaysIcon, CalendarRangeIcon, Columns3Icon, ConciergeBellIcon, CreditCardIcon, FolderTreeIcon, HeadsetIcon, HelpCircleIcon, HomeIcon, ImageIcon, LandmarkIcon, LayoutDashboardIcon, LayoutGridIcon, LibraryIcon, LifeBuoyIcon, LightbulbIcon, ListOrderedIcon, MegaphoneIcon, MessageSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, ReceiptIcon, ShoppingCartIcon, StoreIcon, TagIcon, TagsIcon, UserIcon, UsersIcon, WrenchIcon } from '@lucide/vue'
 
 import type { NavGroup, NavItem } from '@/components/app-sidebar/types'
 
@@ -94,6 +94,8 @@ export function useSidebar() {
 
   const residentNavItems: NavItem[] = [
     { title: '居民管理', url: '/community/resident', icon: UsersIcon, roles: [3] },
+    { title: '会员套餐', url: '/community/member-package', icon: CreditCardIcon, roles: [3] },
+    { title: '会员订单', url: '/community/member-orders', icon: ReceiptIcon, roles: [3] },
     { title: '居民AI工具', url: '/community/ai-tool', icon: BotIcon, roles: [3] },
   ]
 

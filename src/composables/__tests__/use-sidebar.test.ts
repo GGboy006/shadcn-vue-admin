@@ -131,7 +131,7 @@ describe('useSidebar navData', () => {
       '小区分类',
     ])
 
-    expect(leafTitles(navData.value[4])).toEqual(['居民管理', '居民AI工具'])
+    expect(leafTitles(navData.value[4])).toEqual(['居民管理', '会员套餐', '会员订单', '居民AI工具'])
 
     expect(leafTitles(navData.value[5])).toEqual(['个人资料', '站长信息'])
   })

@@ -240,6 +240,20 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/community/member-orders/': RouteRecordInfo<
+      '/community/member-orders/',
+      '/community/member-orders',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/community/member-package/': RouteRecordInfo<
+      '/community/member-package/',
+      '/community/member-package',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/community/news/': RouteRecordInfo<
       '/community/news/',
       '/community/news',
@@ -814,6 +828,18 @@ declare module 'vue-router/auto-routes' {
     'src/pages/community/knowledge/articles.vue': {
       routes:
         | '/community/knowledge/articles'
+      views:
+        | never
+    }
+    'src/pages/community/member-orders/index.vue': {
+      routes:
+        | '/community/member-orders/'
+      views:
+        | never
+    }
+    'src/pages/community/member-package/index.vue': {
+      routes:
+        | '/community/member-package/'
       views:
         | never
     }
