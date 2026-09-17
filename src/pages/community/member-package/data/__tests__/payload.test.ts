@@ -5,30 +5,47 @@ import type { CommunityMemberPriceValidator } from '../../validators/member-pric
 import { buildMemberPricePayload } from '../payload'
 
 const values: CommunityMemberPriceValidator = {
-  uniqueCode: undefined,
-  priceName: ' 年卡 ',
+  packageId: undefined,
+  packageName: ' 年卡 ',
   price: 0,
   effectiveDays: 365,
+  iosProductId: '  com.demo.year  ',
   remark: ' 试用 ',
-  isEnable: 1,
-  sortOrder: 2,
+  status: 1,
+  sort: 2,
 }
 
 describe('buildMemberPricePayload', () => {
-  it('does not send partnerId or regionCode', () => {
+  it('does not send station or partner fields', () => {
     const payload = buildMemberPricePayload(values)
     expect(payload).not.toHaveProperty('partnerId')
     expect(payload).not.toHaveProperty('regionCode')
-    expect(payload.priceName).toBe('年卡')
+    expect(payload).not.toHaveProperty('stationId')
+    expect(payload).not.toHaveProperty('stationCode')
+    expect(payload).not.toHaveProperty('stationRegionCode')
+    expect(payload.packageName).toBe('年卡')
     expect(payload.price).toBe(0)
+    expect(payload.iosProductId).toBe('com.demo.year')
     expect(payload.remark).toBe('试用')
+    expect(payload.status).toBe(1)
+    expect(payload.sort).toBe(2)
   })
 
-  it('includes uniqueCode only when updating', () => {
+  it('coerces string status 2 to disabled', () => {
+    const payload = buildMemberPricePayload({ ...values, status: '2' as unknown as number })
+    expect(payload.status).toBe(2)
+  })
+
+  it('includes packageId only when updating', () => {
     const created = buildMemberPricePayload(values)
-    expect(created).not.toHaveProperty('uniqueCode')
+    expect(created).not.toHaveProperty('packageId')
 
     const updated = buildMemberPricePayload(values, 'abc')
-    expect(updated).toMatchObject({ uniqueCode: 'abc', priceName: '年卡' })
+    expect(updated).toMatchObject({ packageId: 'abc', packageName: '年卡' })
+  })
+
+  it('omits empty iosProductId', () => {
+    const payload = buildMemberPricePayload({ ...values, iosProductId: '  ' })
+    expect(payload).not.toHaveProperty('iosProductId')
   })
 })

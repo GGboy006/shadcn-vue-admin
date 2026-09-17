@@ -3,14 +3,14 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 
-import type { ICommunityMemberPrice, ICommunityMemberPriceAddDTO, ICommunityMemberPriceUpdateDTO } from '@/services/api/community-member-price.api'
+import type { ICommunityMemberPackage, ICommunityMemberPackageAddDTO, ICommunityMemberPackageUpdateDTO } from '@/services/api/community-member-price.api'
 
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { useCreateMemberPriceMutation, useUpdateMemberPriceMutation } from '@/services/api/community-member-price.api'
+import { useCreateMemberPackageMutation, useUpdateMemberPackageMutation } from '@/services/api/community-member-price.api'
 import { showInvalidSubmitToast } from '@/validators/common'
 
 import type { CommunityMemberPriceValidator } from '../validators/member-price.validator'
@@ -18,29 +18,30 @@ import type { CommunityMemberPriceValidator } from '../validators/member-price.v
 import { buildMemberPricePayload } from '../data/payload'
 import { communityMemberPriceValidator } from '../validators/member-price.validator'
 
-const { price } = defineProps<{
-  price?: ICommunityMemberPrice
+const { pkg } = defineProps<{
+  pkg?: ICommunityMemberPackage
 }>()
 
 const emits = defineEmits<{
   (e: 'close'): void
 }>()
 
-const enableList = [
+const statusList = [
   { value: 1, label: '启用' },
   { value: 2, label: '禁用' },
 ] as const
 
-const isEdit = computed(() => !!price?.uniqueCode)
+const isEdit = computed(() => !!pkg?.packageId)
 
 const initialValues = reactive<CommunityMemberPriceValidator>({
-  uniqueCode: price?.uniqueCode || undefined,
-  priceName: price?.priceName || '',
-  price: price?.price ?? undefined,
-  effectiveDays: price?.effectiveDays ?? undefined,
-  remark: price?.remark || '',
-  isEnable: price?.isEnable ?? 1,
-  sortOrder: price?.sortOrder ?? 0,
+  packageId: pkg?.packageId || undefined,
+  packageName: pkg?.packageName || '',
+  price: pkg?.price ?? undefined,
+  effectiveDays: pkg?.effectiveDays ?? undefined,
+  iosProductId: pkg?.iosProductId || '',
+  remark: pkg?.remark || '',
+  status: pkg?.status ?? 1,
+  sort: pkg?.sort ?? 0,
 })
 
 const formSchema = toTypedSchema(communityMemberPriceValidator)
@@ -49,16 +50,16 @@ const { handleSubmit } = useForm({
   initialValues,
 })
 
-const { mutate: createMutate, isPending: isCreating } = useCreateMemberPriceMutation()
-const { mutate: updateMutate, isPending: isUpdating } = useUpdateMemberPriceMutation()
+const { mutate: createMutate, isPending: isCreating } = useCreateMemberPackageMutation()
+const { mutate: updateMutate, isPending: isUpdating } = useUpdateMemberPackageMutation()
 
 const isSubmitting = computed(() => isCreating.value || isUpdating.value)
 
 const onSubmit = handleSubmit((values) => {
-  const payload = buildMemberPricePayload(values, isEdit.value ? price?.uniqueCode : undefined)
+  const payload = buildMemberPricePayload(values, isEdit.value ? pkg?.packageId : undefined)
 
-  if (isEdit.value && price) {
-    updateMutate(payload as ICommunityMemberPriceUpdateDTO, {
+  if (isEdit.value && pkg) {
+    updateMutate(payload as ICommunityMemberPackageUpdateDTO, {
       onSuccess: () => {
         toast.success('更新成功')
         emits('close')
@@ -69,7 +70,7 @@ const onSubmit = handleSubmit((values) => {
     })
   }
   else {
-    createMutate(payload as ICommunityMemberPriceAddDTO, {
+    createMutate(payload as ICommunityMemberPackageAddDTO, {
       onSuccess: () => {
         toast.success('创建成功')
         emits('close')
@@ -84,7 +85,7 @@ const onSubmit = handleSubmit((values) => {
 
 <template>
   <form class="space-y-6" @submit="onSubmit">
-    <FormField v-slot="{ componentField }" name="priceName">
+    <FormField v-slot="{ componentField }" name="packageName">
       <FormItem>
         <FormLabel required>
           套餐名称
@@ -122,8 +123,18 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
     </div>
 
+    <FormField v-slot="{ componentField }" name="iosProductId">
+      <FormItem>
+        <FormLabel>iOS 商品 ID</FormLabel>
+        <FormControl>
+          <Input type="text" placeholder="选填,用于 iOS 内购" maxlength="100" v-bind="componentField" />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-      <FormField v-slot="{ componentField }" name="sortOrder">
+      <FormField v-slot="{ componentField }" name="sort">
         <FormItem>
           <FormLabel>排序</FormLabel>
           <FormControl>
@@ -133,7 +144,7 @@ const onSubmit = handleSubmit((values) => {
         </FormItem>
       </FormField>
 
-      <FormField v-slot="{ componentField }" name="isEnable">
+      <FormField v-slot="{ componentField }" name="status">
         <FormItem>
           <FormLabel>启用状态</FormLabel>
           <Select v-bind="componentField">
@@ -144,7 +155,7 @@ const onSubmit = handleSubmit((values) => {
             </FormControl>
             <SelectContent>
               <SelectGroup>
-                <SelectItem v-for="s in enableList" :key="s.value" :value="s.value">
+                <SelectItem v-for="s in statusList" :key="s.value" :value="s.value">
                   {{ s.label }}
                 </SelectItem>
               </SelectGroup>

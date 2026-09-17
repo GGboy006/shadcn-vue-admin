@@ -1,5 +1,11 @@
 import type { IPageResult } from '../types/response.type'
 
+export function stringifyMemberId(value: string | number | null | undefined): string | undefined {
+  if (value == null || value === '')
+    return undefined
+  return String(value)
+}
+
 /** 后端 PageResult 里 pageNum/total 等可能是字符串,列表先收口成 number */
 export type LooseMemberPage<T> = Partial<Omit<IPageResult<T>, 'pageNum' | 'pageSize' | 'total' | 'pages' | 'list'>> & {
   pageNum?: number | string

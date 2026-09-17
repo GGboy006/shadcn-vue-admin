@@ -10,7 +10,7 @@ function errorOf(result: ReturnType<typeof communityMemberPriceValidator.safePar
 
 function baseValues(overrides: Record<string, unknown> = {}) {
   return {
-    priceName: '年卡',
+    packageName: '年卡',
     price: 99,
     effectiveDays: 365,
     ...overrides,
@@ -24,9 +24,9 @@ describe('communityMemberPriceValidator', () => {
   })
 
   it('rejects empty name', () => {
-    const result = communityMemberPriceValidator.safeParse(baseValues({ priceName: '  ' }))
+    const result = communityMemberPriceValidator.safeParse(baseValues({ packageName: '  ' }))
     expect(result.success).toBe(false)
-    expect(errorOf(result, 'priceName')).toBe('套餐名称不能为空')
+    expect(errorOf(result, 'packageName')).toBe('套餐名称不能为空')
   })
 
   it('rejects negative price', () => {
@@ -45,5 +45,11 @@ describe('communityMemberPriceValidator', () => {
     const result = communityMemberPriceValidator.safeParse(baseValues({ effectiveDays: 0 }))
     expect(result.success).toBe(false)
     expect(errorOf(result, 'effectiveDays')).toBe('有效天数至少 1 天')
+  })
+
+  it('rejects iosProductId over 100 chars', () => {
+    const result = communityMemberPriceValidator.safeParse(baseValues({ iosProductId: 'x'.repeat(101) }))
+    expect(result.success).toBe(false)
+    expect(errorOf(result, 'iosProductId')).toBe('iOS 商品 ID 不超过 100 字')
   })
 })

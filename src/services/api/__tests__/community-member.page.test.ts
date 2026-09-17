@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { normalizeMemberPage } from '@/services/api/community-member.page'
+import { normalizeMemberPage, stringifyMemberId } from '@/services/api/community-member.page'
 
 describe('normalizeMemberPage', () => {
   it('coerces string page fields', () => {
@@ -31,5 +31,15 @@ describe('normalizeMemberPage', () => {
     expect(empty.list).toEqual([])
     expect(empty.total).toBe(0)
     expect(empty.emptyFlag).toBe(true)
+  })
+})
+
+describe('stringifyMemberId', () => {
+  it('keeps snowflake ids as strings', () => {
+    expect(stringifyMemberId(12)).toBe('12')
+    expect(stringifyMemberId('abc')).toBe('abc')
+    expect(stringifyMemberId(null)).toBeUndefined()
+    expect(stringifyMemberId(undefined)).toBeUndefined()
+    expect(stringifyMemberId('')).toBeUndefined()
   })
 })

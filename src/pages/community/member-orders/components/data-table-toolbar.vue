@@ -57,7 +57,7 @@ const statusModel = computed({
     <div class="flex flex-1 flex-wrap items-center gap-2">
       <Input
         v-model="searchModel"
-        placeholder="手机号 / 姓名 / 订单号"
+        placeholder="订单号 / 套餐名称"
         class="h-8 w-[180px] lg:w-[240px]"
       />
 

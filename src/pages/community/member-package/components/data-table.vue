@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import type { DataTableProps } from '@/components/data-table'
-import type { ICommunityMemberPrice } from '@/services/api/community-member-price.api'
+import type { ICommunityMemberPackage } from '@/services/api/community-member-price.api'
 
 import { DataTable, useGenerateVueTable } from '@/components/data-table'
 
 import DataTableToolbar from './data-table-toolbar.vue'
 
-const props = defineProps<DataTableProps<ICommunityMemberPrice>>()
+const props = defineProps<DataTableProps<ICommunityMemberPackage>>()
 
-const table = useGenerateVueTable<ICommunityMemberPrice>(props, {
+const table = useGenerateVueTable<ICommunityMemberPackage>(props, {
   initialColumnVisibility: {},
 })
 </script>

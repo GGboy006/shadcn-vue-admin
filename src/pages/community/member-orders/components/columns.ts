@@ -10,6 +10,7 @@ import {
   communityMemberOrderPayStatusConfig,
   communityMemberOrderStatusConfig,
   memberOrderPayStatusText,
+  memberOrderPayWayText,
   memberOrderStatusText,
 } from '@/services/api/community-member-order.api'
 
@@ -18,40 +19,43 @@ import DataTableRowActions from './data-table-row-actions.vue'
 
 export const columns: ColumnDef<ICommunityMemberOrder>[] = [
   {
-    accessorKey: 'orderid',
-    header: ({ column }) => h(DataTableColumnHeader<ICommunityMemberOrder>, { column, title: '商户订单号' }),
-    meta: { title: '商户订单号' },
-    cell: ({ row }) => h('div', { class: 'font-medium tabular-nums' }, row.original.orderid || row.original.uniqueCode || '-'),
+    accessorKey: 'orderNo',
+    header: ({ column }) => h(DataTableColumnHeader<ICommunityMemberOrder>, { column, title: '订单号' }),
+    meta: { title: '订单号' },
+    cell: ({ row }) => h('div', { class: 'font-medium tabular-nums' }, row.original.orderNo || row.original.orderId || '-'),
     enableSorting: false,
     enableHiding: false,
     enableResizing: true,
   },
   {
-    accessorKey: 'priceName',
+    accessorKey: 'packageName',
     header: ({ column }) => h(DataTableColumnHeader<ICommunityMemberOrder>, { column, title: '套餐' }),
     meta: { title: '套餐' },
-    cell: ({ row }) => h('div', { class: 'text-sm' }, row.original.priceName || '-'),
+    cell: ({ row }) => h('div', { class: 'text-sm' }, row.original.packageName || '-'),
     enableSorting: false,
     enableResizing: true,
   },
   {
-    accessorKey: 'userName',
-    header: ({ column }) => h(DataTableColumnHeader<ICommunityMemberOrder>, { column, title: '居民' }),
-    meta: { title: '居民' },
-    cell: ({ row }) => h('div', { class: 'text-sm' }, [
-      h('div', {}, row.original.userName || '-'),
-      row.original.phone
-        ? h('div', { class: 'text-xs text-muted-foreground tabular-nums' }, row.original.phone)
-        : null,
-    ]),
+    accessorKey: 'userId',
+    header: ({ column }) => h(DataTableColumnHeader<ICommunityMemberOrder>, { column, title: '用户 ID' }),
+    meta: { title: '用户 ID' },
+    cell: ({ row }) => h('div', { class: 'text-sm tabular-nums text-muted-foreground' }, row.original.userId || '-'),
     enableSorting: false,
     enableResizing: true,
   },
   {
-    accessorKey: 'price',
+    accessorKey: 'amount',
     header: ({ column }) => h(DataTableColumnHeader<ICommunityMemberOrder>, { column, title: '金额' }),
     meta: { title: '金额' },
-    cell: ({ row }) => h('div', { class: 'text-sm tabular-nums' }, formatYuan(row.original.price)),
+    cell: ({ row }) => h('div', { class: 'text-sm tabular-nums' }, formatYuan(row.original.amount ?? row.original.payAmount)),
+    enableSorting: false,
+    enableResizing: true,
+  },
+  {
+    accessorKey: 'payWay',
+    header: ({ column }) => h(DataTableColumnHeader<ICommunityMemberOrder>, { column, title: '支付方式' }),
+    meta: { title: '支付方式' },
+    cell: ({ row }) => h('div', { class: 'text-sm' }, memberOrderPayWayText(row.original.payWay) ?? '-'),
     enableSorting: false,
     enableResizing: true,
   },

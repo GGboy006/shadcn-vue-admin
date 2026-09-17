@@ -73,7 +73,7 @@ function handleReset() {
 <template>
   <BasicPage
     title="会员订单"
-    description="查看本小区会员订单;购买、支付与退款仍走城市 App"
+    description="查看本小区会员订单;待支付可取消,购买与退款仍走城市 App"
     sticky
   >
     <DataTable

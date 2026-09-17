@@ -23,7 +23,7 @@ const query = ref<IResidentListQuery>({
 const { data, isLoading } = useGetResidentPageQuery(query)
 
 const list = computed(() => data.value?.data?.list ?? [])
-const total = computed(() => data.value?.data?.total ?? 0)
+const total = computed(() => Number(data.value?.data?.total ?? 0))
 
 const serverPagination = computed(() => ({
   page: query.value.pageNum,
@@ -81,7 +81,7 @@ function handleReset() {
 <template>
   <BasicPage
     title="居民管理"
-    description="查看小区居民信息(只读)"
+    description="查看小区居民;认证中可审核住房/身份申请"
     sticky
   >
     <DataTable

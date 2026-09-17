@@ -10,9 +10,12 @@ import Badge from '@/components/ui/badge/Badge.vue'
 import {
   residentEnableStatusConfig,
   residentIdentityTypeConfig,
+  residentMemberStatusConfig,
+  residentMemberStatusText,
   residentVerifyStatusConfig,
 } from '@/services/api/resident.api'
 
+import { formatDateTime } from '../data/format'
 import DataTableRowActions from './data-table-row-actions.vue'
 
 /** 拼接楼栋-单元-房间地址 */
@@ -98,6 +101,32 @@ export const columns: ColumnDef<IResident>[] = [
         return h('div', { class: 'text-sm text-muted-foreground' }, '-')
       return h(Badge, { variant: config.variant }, () => config.label)
     },
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: true,
+  },
+
+  {
+    accessorKey: 'memberStatus',
+    header: ({ column }) => h(DataTableColumnHeader<IResident>, { column, title: '会员状态' }),
+    meta: { title: '会员状态' },
+    cell: ({ row }) => {
+      const memberStatus = row.original.memberStatus
+      if (memberStatus === undefined || memberStatus === null)
+        return h('div', { class: 'text-sm text-muted-foreground' }, '-')
+      const config = residentMemberStatusConfig[memberStatus]
+      return h(Badge, { variant: config?.variant ?? 'secondary' }, () => residentMemberStatusText(memberStatus))
+    },
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: true,
+  },
+
+  {
+    accessorKey: 'memberExpireTime',
+    header: ({ column }) => h(DataTableColumnHeader<IResident>, { column, title: '会员到期' }),
+    meta: { title: '会员到期' },
+    cell: ({ row }) => h('div', { class: 'text-sm tabular-nums text-muted-foreground' }, formatDateTime(row.original.memberExpireTime)),
     enableSorting: false,
     enableHiding: true,
     enableResizing: true,

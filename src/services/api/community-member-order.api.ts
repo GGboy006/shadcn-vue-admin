@@ -1,28 +1,26 @@
-import { useQuery } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import { useApiFetch } from '@/composables/use-fetch'
 
+import type { IResponse } from '../types/response.type'
 import type {
   ICommunityMemberOrderDetailResponse,
   ICommunityMemberOrderPageQuery,
   ICommunityMemberOrderPageResponse,
 } from './community-member-order.model'
 
-import {
-  normalizeMemberOrder,
-} from './community-member-order.model'
+import { normalizeMemberOrder } from './community-member-order.model'
 import { normalizeMemberPage } from './community-member.page'
 
 export * from './community-member-order.model'
 
-/** 本站会员订单分页,只读 */
 export function useGetMemberOrderPageQuery(query: Ref<ICommunityMemberOrderPageQuery>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<ICommunityMemberOrderPageResponse, Error>({
     queryKey: ['communityMemberOrderList', query],
     queryFn: async () => {
-      const res = await apiFetch<ICommunityMemberOrderPageResponse>('/community/memberOrder/page', {
+      const res = await apiFetch<ICommunityMemberOrderPageResponse>('/member/order/page', {
         method: 'get',
         query: query.value,
       })
@@ -35,23 +33,38 @@ export function useGetMemberOrderPageQuery(query: Ref<ICommunityMemberOrderPageQ
   })
 }
 
-/** 订单详情;uniqueCode 或商户订单号 orderid 均可 */
-export function useGetMemberOrderDetailQuery(uniqueCode: Ref<string | undefined>, enabled?: Ref<boolean>) {
+export function useGetMemberOrderDetailQuery(orderId: Ref<string | undefined>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<ICommunityMemberOrderDetailResponse, Error>({
-    queryKey: ['communityMemberOrderDetail', uniqueCode],
+    queryKey: ['communityMemberOrderDetail', orderId],
     queryFn: async () => {
-      const res = await apiFetch<ICommunityMemberOrderDetailResponse>('/community/memberOrder/detail', {
+      const res = await apiFetch<ICommunityMemberOrderDetailResponse>(`/member/order/${orderId.value}`, {
         method: 'get',
-        query: { uniqueCode: uniqueCode.value },
       })
       return {
         ...res,
         data: normalizeMemberOrder(res.data),
       }
     },
-    enabled: () => (enabled?.value ?? true) && !!uniqueCode.value,
+    enabled: () => (enabled?.value ?? true) && !!orderId.value,
     retry: false,
+  })
+}
+
+/** 仅待支付可取消,无 Body */
+export function useCancelMemberOrderMutation() {
+  const { apiFetch } = useApiFetch()
+  const queryClient = useQueryClient()
+
+  return useMutation<IResponse<boolean>, Error, string>({
+    mutationKey: ['cancelCommunityMemberOrder'],
+    mutationFn: async orderId => await apiFetch<IResponse<boolean>>(`/member/order/${orderId}/cancel`, {
+      method: 'put',
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['communityMemberOrderList'] })
+      queryClient.invalidateQueries({ queryKey: ['communityMemberOrderDetail'] })
+    },
   })
 }

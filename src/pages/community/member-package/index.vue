@@ -6,22 +6,22 @@ meta:
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
 
-import type { ICommunityMemberPricePageQuery } from '@/services/api/community-member-price.api'
+import type { CommunityMemberPackageStatus, ICommunityMemberPackagePageQuery } from '@/services/api/community-member-price.api'
 
 import { BasicPage } from '@/components/global-layout'
-import { useGetMemberPricePageQuery } from '@/services/api/community-member-price.api'
+import { useGetMemberPackagePageQuery } from '@/services/api/community-member-price.api'
 
 import { columns } from './components/columns'
 import DataTableToolbar from './components/data-table-toolbar.vue'
 import DataTable from './components/data-table.vue'
 import PackageCreate from './components/package-create.vue'
 
-const query = ref<ICommunityMemberPricePageQuery>({
+const query = ref<ICommunityMemberPackagePageQuery>({
   pageNum: 1,
   pageSize: 10,
 })
 
-const { data, isLoading } = useGetMemberPricePageQuery(query)
+const { data, isLoading } = useGetMemberPackagePageQuery(query)
 
 const list = computed(() => data.value?.data?.list ?? [])
 const total = computed(() => Number(data.value?.data?.total ?? 0))
@@ -40,17 +40,25 @@ const serverPagination = computed(() => ({
 }))
 
 const search = ref('')
+const statusFilter = ref('all')
 
 const debouncedUpdateSearch = useDebounceFn((val: string) => {
-  query.value.keyword = val || undefined
+  query.value.packageName = val || undefined
   query.value.pageNum = 1
 }, 300)
 
 watch(search, val => debouncedUpdateSearch(val))
 
+watch(statusFilter, (val) => {
+  query.value.status = val === 'all' ? undefined : Number(val) as CommunityMemberPackageStatus
+  query.value.pageNum = 1
+})
+
 function handleReset() {
   search.value = ''
-  query.value.keyword = undefined
+  statusFilter.value = 'all'
+  query.value.packageName = undefined
+  query.value.status = undefined
   query.value.pageNum = 1
 }
 </script>
@@ -74,7 +82,9 @@ function handleReset() {
         <DataTableToolbar
           :table="table"
           :search="search"
+          :status-filter="statusFilter"
           @update:search="search = $event"
+          @update:status-filter="statusFilter = $event"
           @reset="handleReset"
         />
       </template>

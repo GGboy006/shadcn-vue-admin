@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Sheet,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useLazyMount } from '@/composables/use-lazy-mount'
 import {
+  canCancelMemberOrder,
   communityMemberOrderPayStatusConfig,
   communityMemberOrderStatusConfig,
-  memberOrderPayPlatformText,
   memberOrderPayStatusText,
   memberOrderPayWayText,
   memberOrderStatusText,
@@ -22,11 +25,12 @@ import {
 import type { OrderDetailField } from './order-detail-fields.vue'
 
 import { formatDateTime, formatYuan } from '../data/format'
+import OrderCancelDialog from './order-cancel-dialog.vue'
 import OrderDetailFields from './order-detail-fields.vue'
 
 const props = defineProps<{
   open: boolean
-  uniqueCode?: string
+  orderId?: string
 }>()
 
 const emit = defineEmits<{
@@ -38,9 +42,12 @@ const isOpen = computed({
   set: value => emit('update:open', value),
 })
 
-const uniqueCodeRef = computed(() => props.uniqueCode)
-const { data, isLoading } = useGetMemberOrderDetailQuery(uniqueCodeRef, isOpen)
+const orderIdRef = computed(() => props.orderId)
+const { data, isLoading } = useGetMemberOrderDetailQuery(orderIdRef, isOpen)
 const detail = computed(() => data.value?.data)
+const isCancelOpen = ref(false)
+const isCancelOpenRendered = useLazyMount(isCancelOpen)
+const showCancel = computed(() => !!detail.value && canCancelMemberOrder(detail.value))
 
 function display(value?: string | number | null) {
   if (value == null || value === '')
@@ -87,19 +94,20 @@ const sections = computed(() => {
   const groups: { title: string, items: OrderDetailField[] }[] = []
 
   const order = pack([
-    field('订单标识', item.uniqueCode),
-    field('商户订单号', item.orderid),
-    field('套餐', item.priceName),
-    field('金额', item.price != null ? formatYuan(item.price) : undefined),
+    field('订单 ID', item.orderId),
+    field('订单号', item.orderNo),
+    field('套餐', item.packageName),
+    field('套餐 ID', item.packageId),
+    field('金额', item.amount != null ? formatYuan(item.amount) : undefined),
+    field('实付', item.payAmount != null ? formatYuan(item.payAmount) : undefined),
     field('有效天数', item.effectiveDays),
-    field('套餐标识', item.priceCode, 2),
   ])
   if (order.length)
     groups.push({ title: '订单与套餐', items: order })
 
   const validity = pack([
     field('会员开始', optionalDateTime(item.startTime)),
-    field('会员到期', optionalDateTime(item.endTime)),
+    field('会员到期', optionalDateTime(item.expireTime)),
   ])
   if (validity.length)
     groups.push({ title: '有效期', items: validity })
@@ -108,25 +116,20 @@ const sections = computed(() => {
     field('支付状态', memberOrderPayStatusText(item.payStatus)),
     field('支付时间', optionalDateTime(item.payTime)),
     field('支付方式', memberOrderPayWayText(item.payWay)),
-    field('支付平台', memberOrderPayPlatformText(item.payPlatform)),
-    field('第三方交易号', item.tradeCode, 2),
+    field('第三方交易号', item.tradeNo, 2),
   ])
   if (pay.length)
     groups.push({ title: '支付', items: pay })
 
   const user = pack([
-    field('姓名', item.userName),
-    field('手机号', item.phone),
-    field('用户标识', item.userUniqueCode, 2),
+    field('用户 ID', item.userId),
+    field('会员 ID', item.memberId),
   ])
   if (user.length)
     groups.push({ title: '居民', items: user })
 
   const extra = pack([
     field('订单状态', memberOrderStatusText(item.status)),
-    field('本站标识', item.businessCode),
-    field('小区编号', item.regionCode),
-    field('城市合伙人', item.partnerId),
     field('创建时间', optionalDateTime(item.createTime)),
     field('备注', item.remark, 2),
   ])
@@ -145,7 +148,7 @@ const sections = computed(() => {
     >
       <SheetHeader class="border-b px-4 py-3 pr-12">
         <SheetTitle class="text-base">
-          {{ detail?.priceName || '会员订单' }}
+          {{ detail?.packageName || '会员订单' }}
         </SheetTitle>
         <SheetDescription v-if="detail" class="flex flex-wrap items-center gap-1.5 text-left">
           <Badge v-if="statusConfig" :variant="statusConfig.variant">
@@ -154,10 +157,10 @@ const sections = computed(() => {
           <Badge v-if="payStatusConfig" :variant="payStatusConfig.variant">
             {{ payStatusConfig.label }}
           </Badge>
-          <span v-if="detail.orderid" class="tabular-nums">{{ detail.orderid }}</span>
+          <span v-if="detail.orderNo" class="tabular-nums">{{ detail.orderNo }}</span>
         </SheetDescription>
         <SheetDescription v-else class="sr-only">
-          查看本小区会员订单,只读
+          查看本小区会员订单
         </SheetDescription>
       </SheetHeader>
 
@@ -187,6 +190,18 @@ const sections = computed(() => {
       <div v-else class="py-16 text-center text-sm text-muted-foreground">
         会员订单不存在
       </div>
+
+      <SheetFooter v-if="showCancel" class="border-t px-4 py-3 sm:justify-start">
+        <Button variant="destructive" size="sm" @click="isCancelOpen = true">
+          取消订单
+        </Button>
+      </SheetFooter>
     </SheetContent>
   </Sheet>
+
+  <OrderCancelDialog
+    v-if="isCancelOpenRendered && detail"
+    v-model:open="isCancelOpen"
+    :order="detail"
+  />
 </template>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ICommunityMemberPrice } from '@/services/api/community-member-price.api'
+import type { ICommunityMemberPackage } from '@/services/api/community-member-price.api'
 
 import {
   Modal,
@@ -11,15 +11,15 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
-  communityMemberPriceEnableConfig,
-  useGetMemberPriceDetailQuery,
+  communityMemberPackageStatusConfig,
+  useGetMemberPackageDetailQuery,
 } from '@/services/api/community-member-price.api'
 
 import { formatDateTime, formatYuan } from '../data/format'
 
 const props = defineProps<{
   open: boolean
-  price?: ICommunityMemberPrice
+  pkg?: ICommunityMemberPackage
 }>()
 
 const emit = defineEmits<{
@@ -31,15 +31,15 @@ const isOpen = computed({
   set: value => emit('update:open', value),
 })
 
-const uniqueCode = computed(() => props.price?.uniqueCode)
-const { data, isLoading } = useGetMemberPriceDetailQuery(uniqueCode, isOpen)
+const packageId = computed(() => props.pkg?.packageId)
+const { data, isLoading } = useGetMemberPackageDetailQuery(packageId, isOpen)
 const detail = computed(() => data.value?.data)
 
-const enableConfig = computed(() => {
-  const status = detail.value?.isEnable
+const statusConfig = computed(() => {
+  const status = detail.value?.status
   if (status === undefined || status === null)
     return undefined
-  return communityMemberPriceEnableConfig[status]
+  return communityMemberPackageStatusConfig[status]
 })
 </script>
 
@@ -63,11 +63,11 @@ const enableConfig = computed(() => {
       <div v-else-if="detail" class="space-y-6">
         <div class="space-y-2">
           <h2 class="text-lg font-semibold">
-            {{ detail.priceName }}
+            {{ detail.packageName }}
           </h2>
           <div class="flex flex-wrap items-center gap-2">
-            <Badge v-if="enableConfig" :variant="enableConfig.variant">
-              {{ enableConfig.label }}
+            <Badge v-if="statusConfig" :variant="statusConfig.variant">
+              {{ statusConfig.label }}
             </Badge>
             <span class="text-sm tabular-nums">
               {{ formatYuan(detail.price) }} · {{ detail.effectiveDays }} 天
@@ -77,24 +77,16 @@ const enableConfig = computed(() => {
 
         <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
           <div>
-            <span class="text-muted-foreground">套餐标识:</span>
-            <span class="ml-1 break-all tabular-nums">{{ detail.uniqueCode }}</span>
+            <span class="text-muted-foreground">套餐 ID:</span>
+            <span class="ml-1 break-all tabular-nums">{{ detail.packageId }}</span>
           </div>
           <div>
             <span class="text-muted-foreground">排序:</span>
-            <span class="ml-1">{{ detail.sortOrder ?? '-' }}</span>
+            <span class="ml-1">{{ detail.sort ?? '-' }}</span>
           </div>
           <div>
-            <span class="text-muted-foreground">本站标识:</span>
-            <span class="ml-1">{{ detail.businessCode || '-' }}</span>
-          </div>
-          <div>
-            <span class="text-muted-foreground">小区编号:</span>
-            <span class="ml-1">{{ detail.regionCode || '-' }}</span>
-          </div>
-          <div>
-            <span class="text-muted-foreground">城市合伙人:</span>
-            <span class="ml-1">{{ detail.partnerId || '-' }}</span>
+            <span class="text-muted-foreground">iOS 商品 ID:</span>
+            <span class="ml-1 break-all">{{ detail.iosProductId || '-' }}</span>
           </div>
           <div>
             <span class="text-muted-foreground">创建时间:</span>

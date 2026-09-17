@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ICommunityMemberPrice } from '@/services/api/community-member-price.api'
+import type { ICommunityMemberPackage } from '@/services/api/community-member-price.api'
 
 import {
   FormSheet,
@@ -10,13 +10,13 @@ import {
   FormSheetTitle,
 } from '@/components/prop-ui/form-sheet'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useGetMemberPriceDetailQuery } from '@/services/api/community-member-price.api'
+import { useGetMemberPackageDetailQuery } from '@/services/api/community-member-price.api'
 
 import PackageForm from './package-form.vue'
 
 const props = defineProps<{
   open: boolean
-  price?: ICommunityMemberPrice
+  pkg?: ICommunityMemberPackage
 }>()
 
 const emit = defineEmits<{
@@ -29,20 +29,20 @@ const isOpen = computed({
   set: value => emit('update:open', value),
 })
 
-const isEdit = computed(() => !!props.price?.uniqueCode)
-const uniqueCode = computed(() => props.price?.uniqueCode)
-const { data: detailData, isLoading: isDetailLoading } = useGetMemberPriceDetailQuery(uniqueCode, isOpen)
+const isEdit = computed(() => !!props.pkg?.packageId)
+const packageId = computed(() => props.pkg?.packageId)
+const { data: detailData, isLoading: isDetailLoading } = useGetMemberPackageDetailQuery(packageId, isOpen)
 
-const priceDetail = computed(() => {
+const packageDetail = computed(() => {
   if (!isEdit.value)
     return undefined
-  return detailData.value?.data ?? props.price
+  return detailData.value?.data ?? props.pkg
 })
 
 const title = computed(() => (isEdit.value ? '编辑套餐' : '新建套餐'))
 
 const description = computed(() => {
-  const name = priceDetail.value?.priceName ?? props.price?.priceName
+  const name = packageDetail.value?.packageName ?? props.pkg?.packageName
   return isEdit.value ? `编辑 ${name}` : '为本小区新增一个会员套餐'
 })
 
@@ -76,7 +76,7 @@ function handleClose() {
 
         <PackageForm
           v-else
-          :price="priceDetail"
+          :pkg="packageDetail"
           @close="handleClose"
         />
       </div>

@@ -2,7 +2,7 @@
 import { LoaderIcon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
-import type { ICommunityMemberPrice } from '@/services/api/community-member-price.api'
+import type { ICommunityMemberPackage } from '@/services/api/community-member-price.api'
 
 import {
   AlertDialog,
@@ -14,11 +14,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { useDeleteMemberPriceMutation } from '@/services/api/community-member-price.api'
+import { useDeleteMemberPackageMutation } from '@/services/api/community-member-price.api'
 
 const props = defineProps<{
   open: boolean
-  price?: ICommunityMemberPrice
+  pkg?: ICommunityMemberPackage
 }>()
 
 const emit = defineEmits<{
@@ -31,12 +31,12 @@ const isOpen = computed({
   set: value => emit('update:open', value),
 })
 
-const { mutate, isPending } = useDeleteMemberPriceMutation()
+const { mutate, isPending } = useDeleteMemberPackageMutation()
 
 function handleRemove() {
-  if (!props.price)
+  if (!props.pkg?.packageId)
     return
-  mutate(props.price.uniqueCode, {
+  mutate(props.pkg.packageId, {
     onSuccess: () => {
       toast.success('删除成功')
       emit('close')
@@ -54,7 +54,7 @@ function handleRemove() {
     <AlertDialogContent>
       <AlertDialogHeader>
         <AlertDialogTitle>
-          删除套餐: {{ price?.priceName }} ?
+          删除套餐: {{ pkg?.packageName }} ?
         </AlertDialogTitle>
         <AlertDialogDescription>
           仅能删除本站套餐,此操作不可撤销。居民端购买走城市 App,删除不影响已成交订单。
