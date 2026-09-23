@@ -4,12 +4,13 @@ import { computed } from 'vue'
 import type { IChatMessage } from '@/services/api/conversation.api'
 import type { FlyCardsAfterText } from '@/utils/feizhu'
 
-import { durationSeconds, getMessageReasoning, getMessageText } from '@/utils/chat-message-parts'
+import { durationSeconds, getImageGenerationCards, getMessageReasoning, getMessageText } from '@/utils/chat-message-parts'
 import { normalizeChatMarkdown } from '@/utils/feizhu'
 
 import AiElementsReasoning from './ai-elements-reasoning.vue'
 import AiElementsTool from './ai-elements-tool.vue'
 import FlyCards from './fly/fly-cards.vue'
+import ImageGenerationCardView from './image-generation-card.vue'
 import StreamMarkdownContent from './StreamMarkdownContent.vue'
 
 const props = withDefaults(defineProps<{
@@ -22,6 +23,7 @@ const props = withDefaults(defineProps<{
 })
 
 const parts = computed(() => props.message.parts ?? [])
+const imageCards = computed(() => getImageGenerationCards(props.message))
 const hasStructuredParts = computed(() => parts.value.some(part =>
   part.type === 'tool_call' || part.type === 'reasoning' || part.type === 'text',
 ))
@@ -73,5 +75,10 @@ function displayText(content: string): string {
       :is-streaming="isStreaming"
     />
   </template>
+  <ImageGenerationCardView
+    v-for="card in imageCards"
+    :key="card.imageGenerationId"
+    :card="card"
+  />
   <FlyCards :cards="flyCards" />
 </template>

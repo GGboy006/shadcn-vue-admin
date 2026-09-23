@@ -2,8 +2,10 @@ import { useQuery } from '@tanstack/vue-query'
 
 import type { IWizardStepForm } from '@/pages/apps/types/wizard.types'
 import type { ServiceMode } from '@/utils/conversation-mode'
+import type { ImageGenerationPollResult } from '@/utils/image-generation-card'
 
 import { useApiFetch } from '@/composables/use-fetch'
+import { normalizeImageGenerationPoll } from '@/utils/image-generation-card'
 
 import type { IPageResult, IResponse } from '../types/response.type'
 import type { IStreamChatMessage } from './skill.api'
@@ -320,6 +322,31 @@ export function useGetImageGenerationQuery(imageGenerationId: Ref<string | undef
         return 20000 // 20秒轮询
       }
       return false
+    },
+  })
+}
+
+/** 对话流生图卡片轮询：GET /aiImage/generations/{id}，生成中每 5 秒查一次 */
+export function useGetAiImageGenerationCardQuery(imageGenerationId: Ref<string | undefined>, fallbackSize = '') {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<ImageGenerationPollResult, Error>({
+    queryKey: ['aiImageGenerationCard', imageGenerationId],
+    queryFn: async () => {
+      const raw = await apiFetch<unknown>(`/aiImage/generations/${imageGenerationId.value}`, {
+        method: 'get',
+      })
+      return normalizeImageGenerationPoll(raw, fallbackSize)
+    },
+    enabled: computed(() => !!imageGenerationId.value),
+    retry: false,
+    refetchInterval: (query) => {
+      if (query.state.status === 'error')
+        return false
+      const status = query.state.data?.status
+      if (status === 1 || status === 2)
+        return false
+      return 5000
     },
   })
 }

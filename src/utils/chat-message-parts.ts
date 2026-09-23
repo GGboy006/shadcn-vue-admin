@@ -1,4 +1,7 @@
 import type { IChatMessage, IMessagePart, IToolCall } from '@/services/api/conversation.api'
+import type { ImageGenerationCard } from '@/utils/image-generation-card'
+
+import { isImageGenerationCard, parseImageGenerationArtifact } from '@/utils/image-generation-card'
 
 const VISIBLE_ROLES = new Set(['user', 'assistant', 'station_master', 'station_merchant'])
 
@@ -38,12 +41,27 @@ export function hasReasoningPart(msg: IChatMessage): boolean {
   return (msg.parts ?? []).some(part => part.type === 'reasoning')
 }
 
+export function getImageGenerationCards(msg: IChatMessage): ImageGenerationCard[] {
+  const cards: ImageGenerationCard[] = []
+  for (const part of msg.parts ?? []) {
+    if (part.type !== 'artifact')
+      continue
+    const card = isImageGenerationCard(part.artifact)
+      ? part.artifact
+      : parseImageGenerationArtifact(part.artifact)
+    if (card && !cards.some(item => item.imageGenerationId === card.imageGenerationId))
+      cards.push(card)
+  }
+  return cards
+}
+
 export function hasAssistantVisualContent(msg: IChatMessage): boolean {
   return Boolean(
     getMessageText(msg)
     || getMessageReasoning(msg)
     || hasReasoningPart(msg)
-    || getMessageToolCalls(msg).length,
+    || getMessageToolCalls(msg).length
+    || getImageGenerationCards(msg).length,
   )
 }
 
@@ -233,12 +251,24 @@ export function applyPartsToMessage(
   if (text)
     parts.push({ type: 'text', content: text })
 
-  msg.parts = parts
+  const artifacts = (msg.parts ?? []).filter(part => part.type === 'artifact')
+  msg.parts = [...parts, ...artifacts]
   msg.content = text
   msg.finalContent = text
   msg.reasoningSegments = reasoning
     ? [{ messageId: msg.id, content: reasoning }]
     : []
+}
+
+/** 用本轮收集到的生图卡片替换消息上的 artifact parts */
+export function syncImageCards(msg: IChatMessage, cards: ImageGenerationCard[]) {
+  const rest = (msg.parts ?? []).filter(part => part.type !== 'artifact')
+  const artifacts: IMessagePart[] = cards.map(card => ({
+    type: 'artifact',
+    content: card.summary,
+    artifact: card,
+  }))
+  msg.parts = [...rest, ...artifacts]
 }
 
 /** 历史消息没有 parts 时，用 content / reasoningSegments 补齐 */

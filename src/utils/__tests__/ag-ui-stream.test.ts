@@ -80,6 +80,33 @@ describe('applyAgUiEvent', () => {
     expect(result.state.chatId).toBe('123')
   })
 
+  it('cUSTOM artifact 收集生图卡片，同一 id 不重复', () => {
+    const artifact = {
+      type: 'CUSTOM',
+      name: 'artifact',
+      value: {
+        artifactId: 'card_211',
+        artifactType: 'card',
+        title: '中秋节假期氛围海报',
+        summary: '海报生成中，比例 3:4',
+        payload: {
+          title: '中秋节假期氛围海报',
+          body: JSON.stringify({ imageGenerationId: '211', status: 0, size: '3:4' }),
+          summary: '海报生成中，比例 3:4',
+          bizType: 'imageGeneration',
+          bizId: '211',
+          actions: [{ label: '查看海报', action: 'pollImage', target: '/aiImage/generations/211' }],
+        },
+      },
+    }
+    let state = applyAgUiEvent(createAgUiStreamState(), artifact).state
+    state = applyAgUiEvent(state, artifact).state
+    expect(state.imageCards).toHaveLength(1)
+    expect(state.imageCards[0]?.imageGenerationId).toBe('211')
+    expect(state.imageCards[0]?.pollTarget).toBe('/aiImage/generations/211')
+    expect(state.imageCards[0]?.size).toBe('3:4')
+  })
+
   it('工具调用事件不影响正文', () => {
     let state = createAgUiStreamState()
     state = applyAgUiEvent(state, { type: 'TEXT_MESSAGE_CONTENT', delta: '正文' }).state

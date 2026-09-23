@@ -4,12 +4,15 @@ import { toast } from 'vue-sonner'
 import type { IChatMessage } from '@/services/api/conversation.api'
 import type { EmployeeAiType } from '@/services/api/digital-employee.api'
 import type { IMessageListQuery } from '@/services/api/skill.api'
+import type { AgUiStreamState } from '@/utils/ag-ui-stream'
+import type { ImageGenerationCard } from '@/utils/image-generation-card'
 
 import { createStreamUrl, useTextStream } from '@/composables/use-text-stream'
 import { convertStreamMessagesToChatMessages, useGetConversationDetailQuery } from '@/services/api/conversation.api'
 import { useCreateConversationMutation, useGetMessageListQuery } from '@/services/api/skill.api'
 import { applyAgUiEvent, createAgUiStreamState } from '@/utils/ag-ui-stream'
-import { applyPartsToMessage, hydrateChatMessage } from '@/utils/chat-message-parts'
+import { applyPartsToMessage, getImageGenerationCards, hydrateChatMessage, syncImageCards } from '@/utils/chat-message-parts'
+import { parseImageGenerationArtifact } from '@/utils/image-generation-card'
 import { mergeStreamText } from '@/utils/stream-text'
 
 interface SSEEvent {
@@ -118,12 +121,30 @@ export function useEmployeeChatStream(
   const detailEnabled = computed(() => isAgentScope.value && !!chatId.value && protocolReady.value)
   const { data: conversationDetail } = useGetConversationDetailQuery(detailChatId, detailEnabled)
 
+  function attachHistoryImageCards(list: IChatMessage[], artifacts: unknown[] | undefined) {
+    const incoming = (artifacts ?? [])
+      .map(item => parseImageGenerationArtifact(item))
+      .filter((card): card is ImageGenerationCard => card != null)
+    if (!incoming.length)
+      return list
+    const last = [...list].reverse().find(msg => msg.role === 'assistant')
+    if (!last)
+      return list
+    const merged = [...getImageGenerationCards(last)]
+    for (const card of incoming) {
+      if (!merged.some(item => item.imageGenerationId === card.imageGenerationId))
+        merged.push(card)
+    }
+    syncImageCards(last, merged)
+    return list
+  }
+
   watch(() => conversationDetail.value, (data) => {
     if (!isAgentScope.value || messages.value.length > 0)
       return
     const list = data?.data?.messages
     if (list?.length)
-      messages.value = list.map(hydrateChatMessage)
+      messages.value = attachHistoryImageCards(list.map(hydrateChatMessage), data?.data?.artifacts)
   }, { immediate: true })
 
   const isStreaming = ref(false)
@@ -201,6 +222,15 @@ export function useEmployeeChatStream(
       }))
   }
 
+  function renderAgentMessage(
+    aiMsg: IChatMessage,
+    agState: AgUiStreamState,
+    input: { text?: string, reasoning?: string, reasoningPending?: boolean },
+  ) {
+    applyPartsToMessage(aiMsg, input)
+    syncImageCards(aiMsg, agState.imageCards)
+  }
+
   function syncLoongAiParts(aiMsg: IChatMessage) {
     applyPartsToMessage(aiMsg, {
       text: currentStreamContent.value,
@@ -255,7 +285,7 @@ export function useEmployeeChatStream(
           onEvent(payload) {
             const result = applyAgUiEvent(agState, payload)
             agState = result.state
-            applyPartsToMessage(aiMsg, {
+            renderAgentMessage(aiMsg, agState, {
               text: agState.text,
               reasoning: agState.reasoning,
               reasoningPending: !agState.text && !agState.reasoning,
@@ -266,7 +296,7 @@ export function useEmployeeChatStream(
 
             if (result.error) {
               const msg = agState.errorMessage || '对话失败'
-              applyPartsToMessage(aiMsg, { text: msg, reasoning: agState.reasoning })
+              renderAgentMessage(aiMsg, agState, { text: msg, reasoning: agState.reasoning })
               errorMessageIds.value.add(aiMsg.id)
               abort()
               toast.error(msg)
@@ -284,7 +314,7 @@ export function useEmployeeChatStream(
           },
           onError(err) {
             const msg = err?.message || '请求失败'
-            applyPartsToMessage(aiMsg, { text: aiMsg.content || msg, reasoning: reasoningContent.value })
+            renderAgentMessage(aiMsg, agState, { text: aiMsg.content || msg, reasoning: reasoningContent.value })
             toast.error('对话请求失败')
             finish(err instanceof Error ? err : new Error(msg))
           },
@@ -297,7 +327,7 @@ export function useEmployeeChatStream(
       isStreaming.value = false
       isReasoning.value = false
       if (!aiMsg.content)
-        applyPartsToMessage(aiMsg, { text: '请求异常', reasoning: reasoningContent.value })
+        renderAgentMessage(aiMsg, agState, { text: '请求异常', reasoning: reasoningContent.value })
     }
     finally {
       abortStream.value = undefined

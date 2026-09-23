@@ -6,6 +6,10 @@
  * 字段名在网关里可能是 camelCase 或嵌在 data 里，这里统一抽出来。
  */
 
+import type { ImageGenerationCard } from '@/utils/image-generation-card'
+
+import { parseImageGenerationArtifact } from '@/utils/image-generation-card'
+
 export interface AgUiStreamState {
   text: string
   reasoning: string
@@ -13,6 +17,7 @@ export interface AgUiStreamState {
   title?: string
   chatId?: string
   errorMessage?: string
+  imageCards: ImageGenerationCard[]
 }
 
 export interface AgUiApplyResult {
@@ -28,6 +33,7 @@ export function createAgUiStreamState(): AgUiStreamState {
     text: '',
     reasoning: '',
     isReasoning: false,
+    imageCards: [],
   }
 }
 
@@ -123,8 +129,9 @@ export function applyAgUiEvent(state: AgUiStreamState, payload: unknown): AgUiAp
       return { state: next, done: false, error: false }
 
     case 'CUSTOM': {
-      if (getCustomName(payload) === 'conversation_title') {
-        const value = getCustomValue(payload)
+      const customName = getCustomName(payload)
+      const value = getCustomValue(payload)
+      if (customName === 'conversation_title') {
         if (isRecord(value)) {
           const title = readString(value.title)
           const chatId = value.chatId ?? value.chat_id
@@ -135,6 +142,13 @@ export function applyAgUiEvent(state: AgUiStreamState, payload: unknown): AgUiAp
         }
         else if (typeof value === 'string') {
           next.title = value
+        }
+      }
+      if (customName === 'artifact') {
+        const card = parseImageGenerationArtifact(value)
+        if (card) {
+          const rest = state.imageCards.filter(item => item.imageGenerationId !== card.imageGenerationId)
+          next.imageCards = [...rest, card]
         }
       }
       return { state: next, done: false, error: false }

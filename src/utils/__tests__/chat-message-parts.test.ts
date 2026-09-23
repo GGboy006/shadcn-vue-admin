@@ -6,11 +6,13 @@ import {
   applyPartsToMessage,
   formatDurationMs,
   formatToolPreview,
+  getImageGenerationCards,
   getMessageReasoning,
   getMessageText,
   hasAssistantVisualContent,
   hydrateChatMessage,
   parseToolPayload,
+  syncImageCards,
   toAiToolState,
   toAiToolView,
   toMessageAlign,
@@ -58,6 +60,23 @@ describe('applyPartsToMessage', () => {
     applyPartsToMessage(msg, { reasoningPending: true })
     applyPartsToMessage(msg, { text: '', reasoning: '', reasoningPending: true })
     expect(msg.parts.map(p => p.type)).toEqual(['reasoning'])
+  })
+
+  it('重写正文时保留已挂上的生图卡片', () => {
+    const msg = emptyMessage()
+    syncImageCards(msg, [{
+      artifactId: 'card_211',
+      title: '中秋节假期氛围海报',
+      summary: '海报生成中，比例 3:4',
+      imageGenerationId: '211',
+      size: '3:4',
+      pollTarget: '/aiImage/generations/211',
+      actionLabel: '查看海报',
+    }])
+    applyPartsToMessage(msg, { text: '已提交海报' })
+    expect(msg.parts.map(part => part.type)).toEqual(['text', 'artifact'])
+    expect(getImageGenerationCards(msg)).toHaveLength(1)
+    expect(hasAssistantVisualContent(msg)).toBe(true)
   })
 
   it('思考结束后若仍无推理正文则去掉空占位', () => {
