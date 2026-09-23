@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ArrowLeftIcon, Loader2Icon, SendIcon } from '@lucide/vue'
+import { ArrowLeftIcon, Loader2Icon } from '@lucide/vue'
 
 import type { AgentDetailResp, CityQuickCommand, CozeBotDetailResp } from '@/services/api/skill.api'
 
-import StreamChatMessageList from '@/components/chat/StreamChatMessageList.vue'
+import ChatPanel from '@/components/chat/ChatPanel.vue'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -112,6 +112,12 @@ const firstPromptTemplate = computed(() => {
   return agentDetail.value?.data?.promptTemplateList[0]
 })
 
+const visibleSuggestions = computed(() => {
+  if (messages.value.length > 0 || hasPromptTemplate.value)
+    return []
+  return suggestedQuestions.value
+})
+
 /** 处理表单提交 */
 function handleTemplateSubmit(content: string) {
   sendMessage(content, {
@@ -166,7 +172,6 @@ watch(isStreaming, (streaming) => {
 // ==================== 输入框 ====================
 
 const inputText = ref('')
-const inputRef = ref<HTMLTextAreaElement>()
 
 async function handleSend() {
   if (!inputText.value.trim() || isStreaming.value)
@@ -177,29 +182,10 @@ async function handleSend() {
   await sendMessage(content)
 }
 
-function handleKeydown(e: KeyboardEvent) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault()
-    handleSend()
-  }
-}
-
-// 自动调整输入框高度
-function autoResize() {
-  const el = inputRef.value
-  if (!el)
-    return
-  el.style.height = 'auto'
-  el.style.height = `${Math.min(el.scrollHeight, 120)}px`
-}
-
-watch(inputText, autoResize)
-
 // ==================== 快捷操作 ====================
 
 function handleSelectQuestion(question: string) {
   inputText.value = question
-  handleSend()
 }
 
 function handleQuickCommand(command: CityQuickCommand) {
@@ -247,26 +233,28 @@ function handleQuickCommand(command: CityQuickCommand) {
       <div class="flex flex-1 overflow-hidden">
         <!-- 聊天区 -->
         <div class="flex flex-1 flex-col overflow-hidden">
-          <!-- 消息列表：始终显示，欢迎区通过 header 插槽放在顶部 -->
-          <StreamChatMessageList
+          <ChatPanel
+            v-model:input="inputText"
             :messages="messages"
             :streaming="isStreaming"
+            :suggestions="visibleSuggestions"
+            placeholder="输入消息..."
             empty-text=""
+            @submit="handleSend"
+            @stop="stopGeneration"
+            @select-suggestion="handleSelectQuestion"
           >
             <template #header>
-              <!-- Agent 表单模板：有模板且无消息时展示 -->
               <AgentPromptTemplateForm
                 v-if="skillType === 2 && hasPromptTemplate && messages.length === 0 && firstPromptTemplate"
                 :template="firstPromptTemplate"
                 @submit="handleTemplateSubmit"
               />
 
-              <!-- 欢迎区 -->
               <div
                 v-else
                 class="flex flex-col items-center justify-center px-4 py-8"
               >
-                <!-- 头像 -->
                 <Avatar class="size-16 mb-4">
                   <AvatarImage :src="skillIcon" :alt="skillName" />
                   <AvatarFallback class="text-2xl">
@@ -274,36 +262,14 @@ function handleQuickCommand(command: CityQuickCommand) {
                   </AvatarFallback>
                 </Avatar>
 
-                <!-- 名称 -->
                 <h2 class="text-lg font-semibold mb-2">
                   {{ skillName }}
                 </h2>
 
-                <!-- 开场白 -->
-                <p v-if="prologue" class="text-sm text-muted-foreground text-center max-w-md mb-6">
+                <p v-if="prologue" class="text-sm text-muted-foreground text-center max-w-md">
                   {{ prologue }}
                 </p>
 
-                <!-- 推荐问题 -->
-                <div v-if="suggestedQuestions.length > 0" class="w-full max-w-md space-y-2">
-                  <p class="text-xs text-muted-foreground text-center mb-3">
-                    推荐问题
-                  </p>
-                  <div class="flex flex-wrap gap-2 justify-center">
-                    <Button
-                      v-for="question in suggestedQuestions"
-                      :key="question"
-                      variant="outline"
-                      size="sm"
-                      class="text-xs"
-                      @click="handleSelectQuestion(question)"
-                    >
-                      {{ question }}
-                    </Button>
-                  </div>
-                </div>
-
-                <!-- 快捷指令 -->
                 <div v-if="quickCommands.length > 0" class="w-full max-w-md mt-6 space-y-2">
                   <p class="text-xs text-muted-foreground text-center mb-3">
                     快捷指令
@@ -324,51 +290,16 @@ function handleQuickCommand(command: CityQuickCommand) {
                 </div>
               </div>
             </template>
-          </StreamChatMessageList>
-
-          <!-- 底部输入区 -->
-          <div class="border-t bg-background p-3 sm:p-4 shrink-0">
-            <!-- 推理中提示 -->
-            <div
-              v-if="isReasoning"
-              class="flex items-center gap-2 text-xs text-muted-foreground mb-2 px-1"
-            >
-              <Loader2Icon class="size-3 animate-spin" />
-              <span>正在思考...</span>
-            </div>
-
-            <div class="flex items-end gap-2 rounded-lg border border-input bg-card px-3 py-2 focus-within:ring-1 focus-within:ring-ring">
-              <textarea
-                ref="inputRef"
-                v-model="inputText"
-                placeholder="输入消息..."
-                rows="1"
-                class="min-h-[36px] max-h-[120px] flex-1 resize-none bg-transparent py-2 text-sm outline-none"
-                :disabled="isStreaming"
-                @keydown="handleKeydown"
-              />
-
-              <Button
-                v-if="isStreaming"
-                variant="destructive"
-                size="icon"
-                class="size-8 rounded-full shrink-0"
-                @click="stopGeneration"
+            <template #composer>
+              <div
+                v-if="isReasoning"
+                class="flex items-center gap-2 text-xs text-muted-foreground px-1"
               >
-                <span class="size-2.5 rounded-full bg-white" />
-              </Button>
-              <Button
-                v-else
-                variant="default"
-                size="icon"
-                class="size-8 rounded-full shrink-0"
-                :disabled="!inputText.trim()"
-                @click="handleSend"
-              >
-                <SendIcon class="size-4" />
-              </Button>
-            </div>
-          </div>
+                <Loader2Icon class="size-3 animate-spin" />
+                <span>正在思考...</span>
+              </div>
+            </template>
+          </ChatPanel>
         </div>
 
         <!-- 可视化输出抽屉 -->

@@ -4,7 +4,6 @@ import {
   Loader2Icon,
   MessageSquareIcon,
   MoreVerticalIcon,
-  SendIcon,
 } from '@lucide/vue'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query'
 import { useEventListener } from '@vueuse/core'
@@ -14,7 +13,7 @@ import { toast } from 'vue-sonner'
 import type { IChatMessage, IConversation, IConversationDetail, IConversationListQuery } from '@/services/api/conversation.api'
 import type { IResponse } from '@/services/types/response.type'
 
-import ChatMessageList from '@/components/chat/ChatMessageList.vue'
+import ChatPanel from '@/components/chat/ChatPanel.vue'
 import { FlipClock } from '@/components/prop-ui/flip-clock'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -236,13 +235,6 @@ async function handleSend() {
   }
   finally {
     isSending.value = false
-  }
-}
-
-function handleKeydown(e: KeyboardEvent) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault()
-    handleSend()
   }
 }
 
@@ -491,47 +483,19 @@ function getInitials(name: string) {
           </div>
         </div>
 
-        <!-- 消息区域 -->
-        <ChatMessageList
+        <ChatPanel
+          v-model:input="inputText"
           :messages="messages"
           user-position="left"
-          :show-steps="true"
-          :show-regenerate="true"
+          show-steps
+          show-regenerate
+          show-date
+          :input-disabled="isInputDisabled || isSending"
+          :placeholder="isInputDisabled ? '该会话为AI流式会话，仅可查看' : '输入消息...'"
           empty-text="该会话暂无消息"
+          @submit="handleSend"
           @regenerate="handleRegenerate"
         />
-
-        <!-- 输入框 -->
-        <div class="border-t bg-background p-3 sm:p-4 shrink-0">
-          <div
-            :class="cn(
-              'flex items-end gap-2 rounded-lg border border-input bg-card px-3 py-2',
-              !isInputDisabled && 'focus-within:ring-1 focus-within:ring-ring',
-            )"
-          >
-            <textarea
-              v-model="inputText"
-              :placeholder="isInputDisabled ? '该会话为AI流式会话，仅可查看' : '输入消息...'"
-              rows="1"
-              :disabled="isInputDisabled"
-              :class="cn(
-                'min-h-[36px] max-h-[120px] flex-1 resize-none bg-transparent py-2 text-sm outline-none',
-                isInputDisabled && 'cursor-not-allowed opacity-60',
-              )"
-              @keydown="handleKeydown"
-            />
-
-            <Button
-              variant="default"
-              size="icon"
-              class="size-8 rounded-full shrink-0"
-              :disabled="isInputDisabled || !inputText.trim()"
-              @click="handleSend"
-            >
-              <SendIcon class="size-4" />
-            </Button>
-          </div>
-        </div>
       </template>
     </div>
   </div>

@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { ArrowLeftIcon, SendIcon } from '@lucide/vue'
+import { ArrowLeftIcon, XIcon } from '@lucide/vue'
+import { toast } from 'vue-sonner'
 
+import type { IUploadedChatFile } from '@/services/api/chat-upload.api'
 import type { IDigitalEmployee } from '@/services/api/digital-employee.api'
 
-import StreamChatMessageList from '@/components/chat/StreamChatMessageList.vue'
+import ChatPanel from '@/components/chat/ChatPanel.vue'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useChatUploadFile } from '@/services/api/chat-upload.api'
 import {
   mapAgentScopePresentation,
   onlineStatusConfig,
@@ -15,6 +18,7 @@ import {
   useGetDepartmentEmployeeListQuery,
 } from '@/services/api/digital-employee.api'
 import { useGetAgentDetailQuery } from '@/services/api/skill.api'
+import { chatStreamFileType } from '@/utils/chat-upload-file'
 
 import AgentPromptTemplateForm from '../apps/components/AgentPromptTemplateForm.vue'
 import { useEmployeeChatStream } from './composables/use-employee-chat-stream'
@@ -74,6 +78,7 @@ const { data: agentScopeDetail, isLoading: isAgentScopeLoading } = useGetAgentSc
   computed(() => (aiType.value === 3 ? aiThirdId.value : '')),
 )
 const agentScopePresentation = computed(() => mapAgentScopePresentation(agentScopeDetail.value?.data))
+const aiChatTypeCode = computed(() => agentScopeDetail.value?.data?.aiChatTypeCode ?? null)
 
 /** Agent 是否有表单模板 */
 const hasPromptTemplate = computed(() => {
@@ -137,6 +142,12 @@ const {
 /** 是否已有用户消息（用于控制表单/推荐问题展示） */
 const hasUserMessage = computed(() => messages.value.some(m => m.role === 'user'))
 
+const visibleSuggestions = computed(() => {
+  if (isHistoryMode.value || hasUserMessage.value || hasPromptTemplate.value)
+    return []
+  return suggestedQuestions.value
+})
+
 // 注入开场白：历史会话不注入；type 2 有表单时不注入欢迎气泡，改为展示表单
 const welcomeSeeded = ref(false)
 watchEffect(() => {
@@ -167,14 +178,64 @@ watchEffect(() => {
 // ==================== 输入框 ====================
 
 const inputText = ref('')
-const inputRef = ref<HTMLTextAreaElement>()
+const fileInputRef = ref<HTMLInputElement | null>(null)
+const pendingFiles = ref<IUploadedChatFile[]>([])
+const uploading = ref(false)
+const { uploadChatFile } = useChatUploadFile()
+
+function handlePickAttachments() {
+  if (aiType.value !== 3)
+    return
+  if (aiChatTypeCode.value == null) {
+    toast.error('当前模型不支持上传文件')
+    return
+  }
+  fileInputRef.value?.click()
+}
+
+async function handleFileChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  const files = [...(input.files ?? [])]
+  input.value = ''
+  const fileType = aiChatTypeCode.value
+  if (fileType == null || !files.length)
+    return
+
+  uploading.value = true
+  try {
+    for (const file of files) {
+      const uploaded = await uploadChatFile(file, fileType)
+      pendingFiles.value.push(uploaded)
+    }
+  }
+  catch {
+    // 失败提示由请求层弹出
+  }
+  finally {
+    uploading.value = false
+  }
+}
+
+function removePendingFile(chatFileId: string) {
+  pendingFiles.value = pendingFiles.value.filter(file => file.chatFileId !== chatFileId)
+}
 
 async function handleSend() {
-  if (!inputText.value.trim() || isStreaming.value)
+  if (uploading.value || isStreaming.value)
     return
   const content = inputText.value.trim()
+  const files = pendingFiles.value.map(file => ({
+    fileId: file.chatFileId,
+    fileType: chatStreamFileType(file.mime),
+    fileName: file.fileName,
+    fileUrl: file.fileUrl,
+    fileSize: file.bytes,
+  }))
+  if (!content && !files.length)
+    return
   inputText.value = ''
-  await sendMessage(content, agentSendOptions.value)
+  pendingFiles.value = []
+  await sendMessage(content, { ...agentSendOptions.value, files })
 }
 
 /** 表单模板提交 */
@@ -182,28 +243,10 @@ function handleTemplateSubmit(content: string) {
   sendMessage(content, agentSendOptions.value)
 }
 
-/** 点击推荐问题 */
+/** 点击推荐问题：只填入输入框 */
 function handleSelectQuestion(question: string) {
   inputText.value = question
-  handleSend()
 }
-
-function handleKeydown(e: KeyboardEvent) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault()
-    handleSend()
-  }
-}
-
-function autoResize() {
-  const el = inputRef.value
-  if (!el)
-    return
-  el.style.height = 'auto'
-  el.style.height = `${Math.min(el.scrollHeight, 120)}px`
-}
-
-watch(inputText, autoResize)
 </script>
 
 <template>
@@ -248,77 +291,63 @@ watch(inputText, autoResize)
 
     <!-- 内容区 -->
     <div class="flex flex-1 flex-col overflow-hidden">
-      <StreamChatMessageList
+      <input
+        ref="fileInputRef"
+        type="file"
+        class="sr-only"
+        multiple
+        :disabled="uploading"
+        @change="handleFileChange"
+      >
+      <ChatPanel
+        v-model:input="inputText"
         :messages="messages"
         :streaming="isStreaming"
+        :suggestions="visibleSuggestions"
+        :placeholder="employee ? `向 ${employee.employeeName} 发送消息...` : '输入消息...'"
+        :input-disabled="!employee"
+        :attachment="aiType === 3"
+        :can-submit-extra="pendingFiles.length > 0 && !uploading"
         empty-text="发送消息开始对话"
+        @submit="handleSend"
+        @stop="stopGeneration"
+        @pick-attachments="handlePickAttachments"
+        @select-suggestion="handleSelectQuestion"
       >
         <template #header>
-          <!-- Agent 表单模板：有模板且无用户消息时展示 -->
           <AgentPromptTemplateForm
             v-if="!isHistoryMode && aiType === 2 && hasPromptTemplate && !hasUserMessage && firstPromptTemplate"
             :template="firstPromptTemplate"
             @submit="handleTemplateSubmit"
           />
-
-          <!-- 推荐问题：Agent 无表单且无用户消息时展示 -->
-          <div
-            v-else-if="!isHistoryMode && suggestedQuestions.length > 0 && !hasUserMessage"
-            class="flex flex-col items-center gap-3 px-4 pt-6 pb-2"
-          >
-            <p class="text-xs text-muted-foreground">
-              推荐问题
-            </p>
-            <div class="flex flex-wrap justify-center gap-2">
-              <Button
-                v-for="question in suggestedQuestions"
-                :key="question"
-                variant="outline"
-                size="sm"
-                class="text-xs"
-                @click="handleSelectQuestion(question)"
+        </template>
+        <template v-if="pendingFiles.length || uploading" #input-header>
+          <div class="flex flex-wrap gap-2">
+            <div
+              v-for="file in pendingFiles"
+              :key="file.chatFileId"
+              class="flex max-w-full items-center gap-2 rounded-md border px-2 py-1 text-xs"
+            >
+              <img
+                v-if="chatStreamFileType(file.mime) === 'image' && file.fileUrl"
+                :src="file.fileUrl"
+                :alt="file.fileName"
+                class="size-8 rounded object-cover"
               >
-                {{ question }}
-              </Button>
+              <span class="max-w-40 truncate">{{ file.fileName }}</span>
+              <button
+                type="button"
+                class="text-muted-foreground"
+                aria-label="移除文件"
+                @click="removePendingFile(file.chatFileId)"
+              >
+                <XIcon class="size-3" />
+              </button>
             </div>
+            <span v-if="uploading" class="text-xs text-muted-foreground">正在上传...</span>
           </div>
         </template>
-      </StreamChatMessageList>
-
-      <!-- 底部输入区 -->
-      <div class="border-t bg-background p-3 sm:p-4 shrink-0">
-        <div class="flex items-end gap-2 rounded-lg border border-input bg-card px-3 py-2 focus-within:ring-1 focus-within:ring-ring">
-          <textarea
-            ref="inputRef"
-            v-model="inputText"
-            :placeholder="employee ? `向 ${employee.employeeName} 发送消息...` : '输入消息...'"
-            rows="1"
-            class="min-h-[36px] max-h-[120px] flex-1 resize-none bg-transparent py-2 text-sm outline-none"
-            :disabled="isStreaming || !employee"
-            @keydown="handleKeydown"
-          />
-
-          <Button
-            v-if="isStreaming"
-            variant="destructive"
-            size="icon"
-            class="size-8 shrink-0 rounded-full"
-            @click="stopGeneration"
-          >
-            <span class="size-2.5 rounded-full bg-white" />
-          </Button>
-          <Button
-            v-else
-            variant="default"
-            size="icon"
-            class="size-8 shrink-0 rounded-full"
-            :disabled="!inputText.trim()"
-            @click="handleSend"
-          >
-            <SendIcon class="size-4" />
-          </Button>
-        </div>
-      </div>
+      </ChatPanel>
     </div>
   </div>
 </template>

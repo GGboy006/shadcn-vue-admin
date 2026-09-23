@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ArrowLeftIcon, MoreVerticalIcon, SendIcon } from '@lucide/vue'
+import { ArrowLeftIcon, MoreVerticalIcon } from '@lucide/vue'
 import { useQueryClient } from '@tanstack/vue-query'
 import { toast } from 'vue-sonner'
 
 import type { IChatMessage } from '@/services/api/conversation.api'
 
-import ChatMessageList from '@/components/chat/ChatMessageList.vue'
+import ChatPanel from '@/components/chat/ChatPanel.vue'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -69,13 +69,6 @@ async function handleSend() {
     isSending.value = false
   }
 }
-
-function handleKeydown(e: KeyboardEvent) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault()
-    handleSend()
-  }
-}
 </script>
 
 <template>
@@ -129,44 +122,17 @@ function handleKeydown(e: KeyboardEvent) {
       </div>
     </div>
 
-    <!-- 消息区域 -->
-    <ChatMessageList
+    <ChatPanel
+      v-model:input="inputText"
       show-steps
+      show-date
       :messages="messages"
       user-position="right"
+      :input-disabled="isSending"
+      placeholder="输入消息..."
       empty-text="发送消息开始与AI助手对话"
+      @submit="handleSend"
     />
-
-    <!-- 输入框 -->
-    <div class="shrink-0 border-t bg-background p-4">
-      <div class="flex items-end gap-2 rounded-lg border border-input bg-card px-3 py-2 focus-within:ring-1 focus-within:ring-ring">
-        <!-- 附件按钮展示没有开发 -->
-        <!-- <div class="flex items-center gap-1 pb-1">
-          <Button variant="ghost" size="icon" class="size-8 rounded-md">
-            <PaperclipIcon class="size-4 text-muted-foreground" />
-          </Button>
-        </div> -->
-
-        <textarea
-          v-model="inputText"
-          placeholder="输入消息..."
-          rows="1"
-          class="min-h-[36px] max-h-[120px] flex-1 resize-none bg-transparent py-2 text-sm outline-none"
-          @keydown="handleKeydown"
-        />
-
-        <Button
-          variant="default"
-          size="icon"
-          class="size-8 rounded-full shrink-0"
-          :disabled="!inputText.trim() || isSending"
-          :loading="isSending"
-          @click="handleSend"
-        >
-          <SendIcon class="size-4" />
-        </Button>
-      </div>
-    </div>
   </div>
 </template>
 

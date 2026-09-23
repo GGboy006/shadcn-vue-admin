@@ -24,12 +24,13 @@ import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useGetImageGenerationQuery } from '@/services/api/conversation.api'
-import { getMessageText, hasAssistantVisualContent, toMessageAlign, toMessageUiFrom, visibleChatMessages } from '@/utils/chat-message-parts'
+import { getImageGenerationCards, getMessageText, hasAssistantVisualContent, toMessageAlign, toMessageUiFrom, visibleChatMessages } from '@/utils/chat-message-parts'
 import { downloadImage } from '@/utils/download-image'
 import { hasFlyCards, mapFlyCardsByMessageId } from '@/utils/feizhu'
 import { withBase } from '@/utils/with-base'
 
 import AssistantMessageBody from './assistant-message-body.vue'
+import MessageAttachments from './message-attachments.vue'
 
 interface Props {
   messages: IChatMessage[]
@@ -41,6 +42,10 @@ interface Props {
   showRegenerate?: boolean
   /** 空状态提示文案 */
   emptyText?: string
+  /** 按天插入日期 */
+  showDate?: boolean
+  /** 最后一条助手消息处于流式输出 */
+  streaming?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -48,6 +53,8 @@ const props = withDefaults(defineProps<Props>(), {
   showSteps: false,
   showRegenerate: false,
   emptyText: '暂无消息',
+  showDate: false,
+  streaming: false,
 })
 
 const emit = defineEmits<{
@@ -75,6 +82,23 @@ const messageGroups = computed(() => {
       last.messages.push(msg)
   }
   return groups
+})
+
+const messageRows = computed(() => {
+  if (!props.showDate)
+    return [{ date: '', messages: displayMessages.value }]
+  return messageGroups.value
+})
+
+const lastStreamingId = computed(() => {
+  if (!props.streaming)
+    return ''
+  const list = messageRows.value.flatMap(group => group.messages)
+  for (let index = list.length - 1; index >= 0; index -= 1) {
+    if (list[index]?.role === 'assistant')
+      return list[index].id
+  }
+  return ''
 })
 
 function getInitials(name: string) {
@@ -164,7 +188,7 @@ function isLeftSide(msg: IChatMessage) {
 }
 
 function showBubble(msg: IChatMessage) {
-  return (hasAssistantVisualContent(msg) || msg.imageGenerationId || msg.role === 'assistant')
+  return (hasAssistantVisualContent(msg) || msg.imageGenerationId || !!msg.attachments?.length || msg.role === 'assistant')
     && !(msg.role === 'user' && msg.steps && msg.steps.length > 0)
 }
 </script>
@@ -182,13 +206,16 @@ function showBubble(msg: IChatMessage) {
     </ConversationEmptyState>
 
     <Conversation v-else>
-      <ConversationContent class="gap-4 py-4">
+      <ConversationContent
+        :aria-busy="streaming"
+        class="gap-4 py-4"
+      >
         <div v-if="hasHeaderSlot" class="shrink-0">
           <slot name="header" />
         </div>
 
-        <template v-for="group in messageGroups" :key="group.date">
-          <div class="shrink-0 py-2 text-center text-xs text-muted-foreground">
+        <template v-for="group in messageRows" :key="group.date || 'messages'">
+          <div v-if="showDate && group.date" class="shrink-0 py-2 text-center text-xs text-muted-foreground">
             {{ group.date }}
           </div>
           <Message
@@ -209,10 +236,11 @@ function showBubble(msg: IChatMessage) {
                 <template v-if="isAssistant(msg)">
                   <AssistantMessageBody
                     :message="msg"
+                    :is-streaming="msg.id === lastStreamingId"
                     :fly-cards="flyCardsByMessageId.get(msg.id)"
                   />
                   <div
-                    v-if="!hasAssistantVisualContent(msg) && !hasFlyCards(flyCardsByMessageId.get(msg.id))"
+                    v-if="!hasAssistantVisualContent(msg) && !hasFlyCards(flyCardsByMessageId.get(msg.id)) && msg.id !== lastStreamingId"
                     class="flex items-center gap-1.5 py-1"
                     aria-label="AI 正在输入"
                   >
@@ -222,11 +250,14 @@ function showBubble(msg: IChatMessage) {
                     <span class="size-1.5 animate-bounce rounded-full bg-current" style="animation-delay: 300ms" />
                   </div>
                 </template>
-                <p v-else-if="getMessageText(msg)" class="whitespace-pre-wrap">
-                  {{ getMessageText(msg) }}
-                </p>
+                <template v-else>
+                  <p v-if="getMessageText(msg)" class="whitespace-pre-wrap">
+                    {{ getMessageText(msg) }}
+                  </p>
+                  <MessageAttachments :attachments="msg.attachments" />
+                </template>
 
-                <div v-if="msg.imageGenerationId" class="mt-2 space-y-2">
+                <div v-if="msg.imageGenerationId && !getImageGenerationCards(msg).length" class="mt-2 space-y-2">
                   <div
                     v-if="getImageStatus(msg.imageGenerationId).status === 0 || getImageStatus(msg.imageGenerationId).isLoading"
                     class="flex items-center gap-2 text-xs text-muted-foreground"

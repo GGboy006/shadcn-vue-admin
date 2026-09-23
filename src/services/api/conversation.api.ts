@@ -152,7 +152,7 @@ export interface IMessagePart {
 /** 消息附件 VO */
 export interface IFileAttachment {
   /** 文件ID */
-  fileId: number
+  fileId: string | number
   /** 文件名 */
   fileName: string
   /** 文件类型 */

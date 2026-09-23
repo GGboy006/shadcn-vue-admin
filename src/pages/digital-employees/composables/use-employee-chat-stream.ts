@@ -11,7 +11,7 @@ import { createStreamUrl, useTextStream } from '@/composables/use-text-stream'
 import { convertStreamMessagesToChatMessages, useGetConversationDetailQuery } from '@/services/api/conversation.api'
 import { useCreateConversationMutation, useGetMessageListQuery } from '@/services/api/skill.api'
 import { applyAgUiEvent, createAgUiStreamState } from '@/utils/ag-ui-stream'
-import { applyPartsToMessage, getImageGenerationCards, hydrateChatMessage, syncImageCards } from '@/utils/chat-message-parts'
+import { applyPartsToMessage, getImageGenerationCards, hydrateChatMessage, syncImageCards, syncToolCalls } from '@/utils/chat-message-parts'
 import { parseImageGenerationArtifact } from '@/utils/image-generation-card'
 import { mergeStreamText } from '@/utils/stream-text'
 
@@ -23,6 +23,13 @@ interface SSEEvent {
 interface SendMessageOptions {
   agentId?: string
   mcpMethod?: string
+  files?: Array<{
+    fileId: string
+    fileType: 'image' | 'file'
+    fileName: string
+    fileUrl: string
+    fileSize: number
+  }>
 }
 
 function createMessage(partial: Partial<IChatMessage>): IChatMessage {
@@ -156,14 +163,22 @@ export function useEmployeeChatStream(
   const createConversationMutation = useCreateConversationMutation()
 
   async function sendMessage(content: string, options?: SendMessageOptions) {
-    if (!content.trim() || isStreaming.value || !protocolReady.value)
+    const files = options?.files ?? []
+    if ((!content.trim() && files.length === 0) || isStreaming.value || !protocolReady.value)
       return
 
     const userMsg = createMessage({
       id: `user-${Date.now()}`,
       role: 'user',
       content,
-      parts: [{ type: 'text', content }],
+      parts: content ? [{ type: 'text', content }] : [],
+      attachments: files.map(file => ({
+        fileId: file.fileId,
+        fileName: file.fileName,
+        fileType: file.fileType,
+        fileSize: file.fileSize,
+        fileUrl: file.fileUrl,
+      })),
     })
     messages.value.push(userMsg)
 
@@ -228,6 +243,7 @@ export function useEmployeeChatStream(
     input: { text?: string, reasoning?: string, reasoningPending?: boolean },
   ) {
     applyPartsToMessage(aiMsg, input)
+    syncToolCalls(aiMsg, agState.toolCalls)
     syncImageCards(aiMsg, agState.imageCards)
   }
 
@@ -251,12 +267,16 @@ export function useEmployeeChatStream(
     reasoningContent.value = ''
 
     if (isAgentScope.value)
-      await doAgentScopeStream(aiMsg, userContent)
+      await doAgentScopeStream(aiMsg, userContent, options?.files ?? [])
     else
       await doLoongAiStream(aiMsg, options)
   }
 
-  async function doAgentScopeStream(aiMsg: IChatMessage, userContent: string) {
+  async function doAgentScopeStream(
+    aiMsg: IChatMessage,
+    userContent: string,
+    files: NonNullable<SendMessageOptions['files']>,
+  ) {
     const { createJsonSSE } = useTextStream()
     let agState = createAgUiStreamState()
 
@@ -281,6 +301,10 @@ export function useEmployeeChatStream(
           body: JSON.stringify({
             chatId: chatId.value,
             content: userContent,
+            messageType: 'text',
+            ...(files.length
+              ? { files: files.map(file => ({ fileId: file.fileId, fileType: file.fileType })) }
+              : {}),
           }),
           onEvent(payload) {
             const result = applyAgUiEvent(agState, payload)

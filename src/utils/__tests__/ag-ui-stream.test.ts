@@ -112,5 +112,42 @@ describe('applyAgUiEvent', () => {
     state = applyAgUiEvent(state, { type: 'TEXT_MESSAGE_CONTENT', delta: '正文' }).state
     state = applyAgUiEvent(state, { type: 'TOOL_CALL_START', toolCallId: 't1' }).state
     expect(state.text).toBe('正文')
+    expect(state.toolCalls).toHaveLength(1)
+  })
+
+  it('工具步骤用展示名，脱敏参数不进入正文', () => {
+    let state = createAgUiStreamState()
+    state = applyAgUiEvent(state, {
+      type: 'TOOL_CALL_ARGS',
+      toolCallId: 'call_skill',
+      delta: '',
+      toolCallName: 'load_skill_through_path',
+      toolDisplayName: '技能加载',
+      redacted: true,
+    }).state
+    state = applyAgUiEvent(state, {
+      type: 'TOOL_CALL_ARGS',
+      toolCallId: 'call_exec',
+      delta: '印',
+      toolCallName: 'execute',
+      toolDisplayName: '执行命令',
+    }).state
+    state = applyAgUiEvent(state, {
+      type: 'TOOL_CALL_ARGS',
+      toolCallId: 'call_exec',
+      delta: '脏',
+      toolCallName: 'execute',
+      toolDisplayName: '执行命令',
+    }).state
+
+    expect(state.text).toBe('')
+    expect(state.isReasoning).toBe(false)
+    expect(state.toolCalls.map(call => call.display)).toEqual(['技能加载', '执行命令'])
+    expect(state.toolCalls[0]?.arguments).toContain('redacted')
+    expect(state.toolCalls[1]).toMatchObject({ arguments: '印脏', status: 'running' })
+
+    state = applyAgUiEvent(state, { type: 'TEXT_MESSAGE_CONTENT', delta: '已提交' }).state
+    expect(state.text).toBe('已提交')
+    expect(state.toolCalls.every(call => call.status === 'completed')).toBe(true)
   })
 })

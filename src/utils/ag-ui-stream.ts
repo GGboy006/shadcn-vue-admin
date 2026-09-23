@@ -10,6 +10,15 @@ import type { ImageGenerationCard } from '@/utils/image-generation-card'
 
 import { parseImageGenerationArtifact } from '@/utils/image-generation-card'
 
+export interface AgUiToolCall {
+  toolCallId: string
+  toolName: string
+  display: string
+  arguments: string
+  result: string
+  status: 'running' | 'completed' | 'failed'
+}
+
 export interface AgUiStreamState {
   text: string
   reasoning: string
@@ -18,6 +27,7 @@ export interface AgUiStreamState {
   chatId?: string
   errorMessage?: string
   imageCards: ImageGenerationCard[]
+  toolCalls: AgUiToolCall[]
 }
 
 export interface AgUiApplyResult {
@@ -34,6 +44,90 @@ export function createAgUiStreamState(): AgUiStreamState {
     reasoning: '',
     isReasoning: false,
     imageCards: [],
+    toolCalls: [],
+  }
+}
+
+const REDACTED_TOOL_PAYLOAD = '{"redacted":true,"reason":"sensitive_tool_payload"}'
+
+function completeRunningTools(calls: AgUiToolCall[]): AgUiToolCall[] {
+  if (!calls.some(call => call.status === 'running'))
+    return calls
+  return calls.map(call => call.status === 'running' ? { ...call, status: 'completed' } : call)
+}
+
+function readToolId(payload: Record<string, unknown>): string {
+  const nested = isRecord(payload.data) ? payload.data : undefined
+  return readString(payload.toolCallId, payload.tool_call_id, nested?.toolCallId, nested?.tool_call_id) ?? ''
+}
+
+function upsertToolCall(calls: AgUiToolCall[], incoming: AgUiToolCall): AgUiToolCall[] {
+  const index = calls.findIndex(item => item.toolCallId === incoming.toolCallId)
+  if (index < 0)
+    return [...calls, incoming]
+  const next = [...calls]
+  next[index] = incoming
+  return next
+}
+
+/** 流式工具步骤：用 toolDisplayName 展示，脱敏参数不拼进正文 */
+function applyToolCall(
+  state: AgUiStreamState,
+  payload: Record<string, unknown>,
+  phase: 'start' | 'args' | 'end' | 'result',
+): AgUiStreamState {
+  const toolCallId = readToolId(payload)
+  if (!toolCallId)
+    return { ...state, isReasoning: false }
+
+  const nested = isRecord(payload.data) ? payload.data : undefined
+  const current = state.toolCalls.find(item => item.toolCallId === toolCallId)
+  const toolName = readString(
+    payload.toolCallName,
+    payload.tool_call_name,
+    nested?.toolCallName,
+    current?.toolName,
+  ) ?? ''
+  const display = readString(
+    payload.toolDisplayName,
+    payload.tool_display_name,
+    nested?.toolDisplayName,
+    current?.display,
+    toolName,
+  ) || '工具调用'
+  const redacted = payload.redacted === true
+    || nested?.redacted === true
+    || current?.arguments === REDACTED_TOOL_PAYLOAD
+  const delta = getAgUiDelta(payload)
+
+  let args = current?.arguments ?? ''
+  let result = current?.result ?? ''
+  let status = current?.status ?? 'running'
+
+  if (phase === 'args') {
+    status = 'running'
+    if (redacted)
+      args = REDACTED_TOOL_PAYLOAD
+    else if (delta)
+      args += delta
+  }
+  if (phase === 'result') {
+    const rawResult = readString(payload.content, payload.result, nested?.content, nested?.result, delta)
+    result = redacted ? REDACTED_TOOL_PAYLOAD : (rawResult || result)
+    status = payload.error || nested?.error ? 'failed' : 'completed'
+  }
+
+  return {
+    ...state,
+    isReasoning: false,
+    toolCalls: upsertToolCall(state.toolCalls, {
+      toolCallId,
+      toolName: toolName || '工具调用',
+      display,
+      arguments: args,
+      result,
+      status,
+    }),
   }
 }
 
@@ -116,10 +210,12 @@ export function applyAgUiEvent(state: AgUiStreamState, payload: unknown): AgUiAp
 
     case 'TEXT_MESSAGE_START':
       next.isReasoning = false
+      next.toolCalls = completeRunningTools(state.toolCalls)
       return { state: next, done: false, error: false }
 
     case 'TEXT_MESSAGE_CONTENT':
       next.isReasoning = false
+      next.toolCalls = completeRunningTools(state.toolCalls)
       if (delta)
         next.text += delta
       return { state: next, done: false, error: false }
@@ -154,8 +250,23 @@ export function applyAgUiEvent(state: AgUiStreamState, payload: unknown): AgUiAp
       return { state: next, done: false, error: false }
     }
 
+    case 'TOOL_CALL_START':
+      return { state: applyToolCall(state, payload, 'start'), done: false, error: false }
+
+    case 'TOOL_CALL_ARGS':
+    case 'TOOL_CALL_CHUNK':
+      return { state: applyToolCall(state, payload, 'args'), done: false, error: false }
+
+    case 'TOOL_CALL_END':
+      return { state: applyToolCall(state, payload, 'end'), done: false, error: false }
+
+    case 'TOOL_CALL_RESULT':
+    case 'TOOL_RESULT':
+      return { state: applyToolCall(state, payload, 'result'), done: false, error: false }
+
     case 'RUN_FINISHED':
       next.isReasoning = false
+      next.toolCalls = completeRunningTools(state.toolCalls)
       return { state: next, done: true, error: false }
 
     case 'RUN_ERROR': {

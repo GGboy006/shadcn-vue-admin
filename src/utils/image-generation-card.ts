@@ -55,12 +55,38 @@ function pollTargetFor(id: string, actionTarget: string): string {
   return `/aiImage/generations/${id}`
 }
 
-/** 从 CUSTOM artifact.value 抽出生图卡片；其他卡片返回 null */
+function parseJsonRecord(value: string): Record<string, unknown> | null {
+  try {
+    const parsed = JSON.parse(value) as unknown
+    return isRecord(parsed) ? parsed : null
+  }
+  catch {
+    return null
+  }
+}
+
+/**
+ * 流式 CUSTOM 的 payload 是对象。
+ * 会话详情 parts[].artifact.payload 是 JSON 字符串，解析失败时再把整段 artifact 当卡。
+ */
+function resolveCardPayload(value: Record<string, unknown>): Record<string, unknown> {
+  if (typeof value.payload === 'string')
+    return parseJsonRecord(value.payload) ?? value
+  if (isRecord(value.payload))
+    return value.payload
+  return value
+}
+
+/** 从流式 artifact 或历史 parts.artifact 抽出生图卡片；其他卡片返回 null */
 export function parseImageGenerationArtifact(value: unknown): ImageGenerationCard | null {
   if (!isRecord(value))
     return null
 
-  const payload = isRecord(value.payload) ? value.payload : value
+  const artifactType = readString(value.artifactType)
+  if (artifactType && artifactType !== 'card')
+    return null
+
+  const payload = resolveCardPayload(value)
   const bizType = readString(payload.bizType)
   const actions = Array.isArray(payload.actions) ? payload.actions : []
   const pollAction = actions.find((item) => {
@@ -70,13 +96,18 @@ export function parseImageGenerationArtifact(value: unknown): ImageGenerationCar
     return null
 
   const body = readBody(payload.body)
-  const imageGenerationId = readString(payload.bizId) || readString(body?.imageGenerationId)
+  const imageGenerationId = readString(payload.imageGenerationId)
+    || readString(payload.bizId)
+    || readString(body?.imageGenerationId)
   if (!imageGenerationId)
     return null
 
   const actionTarget = isRecord(pollAction) ? readString(pollAction.target) : ''
   const tags = Array.isArray(payload.tags) ? payload.tags.map(readString).filter(Boolean) : []
-  const size = readString(body?.size) || tags.find(tag => /^\d+\s*[:x×*]\s*\d+$/i.test(tag)) || ''
+  const size = readString(payload.size)
+    || readString(body?.size)
+    || tags.find(tag => /^\d+\s*[:x×*]\s*\d+$/i.test(tag))
+    || ''
 
   return {
     artifactId: readString(value.artifactId) || `imageGeneration:${imageGenerationId}`,

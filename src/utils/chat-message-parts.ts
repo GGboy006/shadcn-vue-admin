@@ -1,4 +1,5 @@
 import type { IChatMessage, IMessagePart, IToolCall } from '@/services/api/conversation.api'
+import type { AgUiToolCall } from '@/utils/ag-ui-stream'
 import type { ImageGenerationCard } from '@/utils/image-generation-card'
 
 import { isImageGenerationCard, parseImageGenerationArtifact } from '@/utils/image-generation-card'
@@ -49,7 +50,14 @@ export function getImageGenerationCards(msg: IChatMessage): ImageGenerationCard[
     const card = isImageGenerationCard(part.artifact)
       ? part.artifact
       : parseImageGenerationArtifact(part.artifact)
-    if (card && !cards.some(item => item.imageGenerationId === card.imageGenerationId))
+    if (!card)
+      continue
+    const index = cards.findIndex(item =>
+      item.artifactId === card.artifactId || item.imageGenerationId === card.imageGenerationId,
+    )
+    if (index >= 0)
+      cards.splice(index, 1, card)
+    else
       cards.push(card)
   }
   return cards
@@ -258,6 +266,26 @@ export function applyPartsToMessage(
   msg.reasoningSegments = reasoning
     ? [{ messageId: msg.id, content: reasoning }]
     : []
+}
+
+/** 用本轮工具步骤替换消息上的 tool_call parts，放在正文前面 */
+export function syncToolCalls(msg: IChatMessage, calls: AgUiToolCall[]) {
+  const rest = (msg.parts ?? []).filter(part => part.type !== 'tool_call')
+  const toolParts: IMessagePart[] = calls.map(call => ({
+    type: 'tool_call',
+    toolCall: {
+      toolCallId: call.toolCallId,
+      toolName: call.toolName,
+      display: call.display,
+      arguments: call.arguments || null,
+      result: call.result || null,
+      status: call.status,
+    },
+  }))
+  const textIndex = rest.findIndex(part => part.type === 'text')
+  msg.parts = textIndex >= 0
+    ? [...rest.slice(0, textIndex), ...toolParts, ...rest.slice(textIndex)]
+    : [...rest, ...toolParts]
 }
 
 /** 用本轮收集到的生图卡片替换消息上的 artifact parts */

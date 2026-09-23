@@ -31,6 +31,46 @@ describe('parseImageGenerationArtifact', () => {
     })
   })
 
+  it('历史回放的 payload 是 JSON 字符串，ID 可以在 bizId 或 body 里', () => {
+    const card = parseImageGenerationArtifact({
+      artifactId: 'card_212',
+      artifactType: 'card',
+      title: '外壳标题',
+      payload: JSON.stringify({
+        bizType: 'imageGeneration',
+        bizId: '212',
+        title: '中秋海报',
+        summary: '海报生成中',
+        body: JSON.stringify({ imageGenerationId: '212', status: 0, size: '3:4' }),
+      }),
+    })
+    expect(card).toMatchObject({
+      artifactId: 'card_212',
+      title: '中秋海报',
+      summary: '海报生成中',
+      imageGenerationId: '212',
+      size: '3:4',
+      pollTarget: '/aiImage/generations/212',
+    })
+  })
+
+  it('历史回放优先读 payload.imageGenerationId 和 payload.size', () => {
+    const card = parseImageGenerationArtifact({
+      artifactType: 'card',
+      payload: JSON.stringify({
+        bizType: 'imageGeneration',
+        imageGenerationId: '88',
+        size: '1:1',
+        body: JSON.stringify({ imageGenerationId: '99', size: '9:16' }),
+      }),
+    })
+    expect(card).toMatchObject({
+      imageGenerationId: '88',
+      size: '1:1',
+      pollTarget: '/aiImage/generations/88',
+    })
+  })
+
   it('忽略非生图卡片，并拒绝卡片上的任意地址', () => {
     expect(parseImageGenerationArtifact({ artifactType: 'card', payload: { bizType: 'train' } })).toBeNull()
     const card = parseImageGenerationArtifact({

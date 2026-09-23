@@ -40,6 +40,8 @@ export interface IAgentScopeAgentDetail {
   models: IAgentScopeModel[]
   skills: unknown[]
   knowledge: unknown[]
+  /** 上传文件用的模型类型；为空表示当前模型不能上传 */
+  aiChatTypeCode?: number | null
 }
 
 export function agentScopeAgentDetailPath(agentId: string) {

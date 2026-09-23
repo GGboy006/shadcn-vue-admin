@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { DownloadIcon, Loader2Icon } from '@lucide/vue'
+import { DownloadIcon } from '@lucide/vue'
 import { computed } from 'vue'
 
 import type { ImageGenerationCard } from '@/utils/image-generation-card'
 
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useGetAiImageGenerationCardQuery } from '@/services/api/conversation.api'
 import { downloadImage } from '@/utils/download-image'
 
@@ -56,12 +57,16 @@ function onDownload() {
       {{ card.title }}
     </p>
 
-    <div
-      v-if="generating"
-      class="flex items-center gap-2 text-xs text-muted-foreground"
-    >
-      <Loader2Icon class="size-4 animate-spin" />
-      <span>{{ card.summary || '海报生成中' }}</span>
+    <div v-if="generating" class="space-y-2">
+      <AspectRatio
+        :ratio="parseAspectRatio(size)"
+        class="overflow-hidden rounded-md"
+      >
+        <Skeleton class="size-full rounded-md" />
+      </AspectRatio>
+      <p class="text-xs text-muted-foreground">
+        {{ card.summary || '海报生成中' }}
+      </p>
     </div>
 
     <AspectRatio

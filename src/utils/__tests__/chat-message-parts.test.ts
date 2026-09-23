@@ -13,6 +13,7 @@ import {
   hydrateChatMessage,
   parseToolPayload,
   syncImageCards,
+  syncToolCalls,
   toAiToolState,
   toAiToolView,
   toMessageAlign,
@@ -60,6 +61,21 @@ describe('applyPartsToMessage', () => {
     applyPartsToMessage(msg, { reasoningPending: true })
     applyPartsToMessage(msg, { text: '', reasoning: '', reasoningPending: true })
     expect(msg.parts.map(p => p.type)).toEqual(['reasoning'])
+  })
+
+  it('工具步骤写在正文前面', () => {
+    const msg = emptyMessage()
+    applyPartsToMessage(msg, { text: '已提交海报' })
+    syncToolCalls(msg, [{
+      toolCallId: 'call_skill',
+      toolName: 'load_skill_through_path',
+      display: '技能加载',
+      arguments: '',
+      result: '',
+      status: 'running',
+    }])
+    expect(msg.parts.map(part => part.type)).toEqual(['tool_call', 'text'])
+    expect(msg.parts[0]?.toolCall?.display).toBe('技能加载')
   })
 
   it('重写正文时保留已挂上的生图卡片', () => {
@@ -245,5 +261,49 @@ describe('toAiToolView', () => {
     const parsed = parseToolPayload(JSON.stringify({ data: 'x'.repeat(2000) }), 40)
     expect(typeof parsed).toBe('string')
     expect(String(parsed).endsWith('…')).toBe(true)
+  })
+})
+
+describe('getImageGenerationCards', () => {
+  it('从历史 parts 的字符串 payload 抽出出图卡，后到的同卡覆盖先到的', () => {
+    const msg = hydrateChatMessage(emptyMessage({
+      parts: [
+        { type: 'text', content: '已提交海报' },
+        {
+          type: 'artifact',
+          artifact: {
+            artifactId: 'card_212',
+            artifactType: 'card',
+            payload: JSON.stringify({
+              bizType: 'imageGeneration',
+              bizId: '212',
+              title: '旧标题',
+              body: JSON.stringify({ imageGenerationId: '212', size: '3:4' }),
+            }),
+          },
+        },
+        {
+          type: 'artifact',
+          artifact: {
+            artifactId: 'card_212',
+            artifactType: 'card',
+            payload: JSON.stringify({
+              bizType: 'imageGeneration',
+              imageGenerationId: '212',
+              title: '新标题',
+              size: '1:1',
+            }),
+          },
+        },
+      ],
+    }))
+    expect(getImageGenerationCards(msg)).toEqual([
+      expect.objectContaining({
+        artifactId: 'card_212',
+        title: '新标题',
+        imageGenerationId: '212',
+        size: '1:1',
+      }),
+    ])
   })
 })
