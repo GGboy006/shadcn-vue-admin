@@ -4,13 +4,6 @@ import { useApiFetch } from '@/composables/use-fetch'
 
 import type { IPageParam, IPageResult, IResponse } from '../types/response.type'
 
-import {
-  isHousekeeperOrderMockEnabled,
-  mockCancelHousekeeperOrder,
-  mockHousekeeperOrderDetail,
-  mockHousekeeperOrderPage,
-  mockReassignHousekeeperOrder,
-} from './housekeeper-order.mock'
 import { normalizeHousekeeperOrderPage } from './housekeeper-order.page'
 
 /** 订单状态(对接文档 §9 / §11) */
@@ -202,9 +195,6 @@ export function useGetHousekeeperOrderPageQuery(query: Ref<IHousekeeperOrderPage
   return useQuery<IHousekeeperOrderPageResponse, Error>({
     queryKey: ['housekeeperOrderList', query],
     queryFn: async () => {
-      if (isHousekeeperOrderMockEnabled())
-        return await mockHousekeeperOrderPage(query.value)
-
       const res = await apiFetch<IHousekeeperOrderPageResponse>('/housekeeper/order/page', {
         method: 'get',
         query: query.value,
@@ -225,8 +215,6 @@ export function useGetHousekeeperOrderDetailQuery(orderId: Ref<string | undefine
   return useQuery<IHousekeeperOrderDetailResponse, Error>({
     queryKey: ['housekeeperOrderDetail', orderId],
     queryFn: async () => {
-      if (isHousekeeperOrderMockEnabled())
-        return await mockHousekeeperOrderDetail(orderId.value)
       return await apiFetch<IHousekeeperOrderDetailResponse>(`/housekeeper/order/${orderId.value}`)
     },
     enabled: () => (enabled?.value ?? true) && orderId.value !== undefined,
@@ -243,8 +231,6 @@ export function useCancelHousekeeperOrderMutation() {
     mutationKey: ['cancelHousekeeperOrder'],
     mutationFn: async ({ orderId, cancelReason }) => {
       const trimmed = cancelReason?.trim()
-      if (isHousekeeperOrderMockEnabled())
-        return await mockCancelHousekeeperOrder(orderId, { cancelReason: trimmed })
       return await apiFetch<IResponse<boolean>>(`/housekeeper/order/${orderId}/cancel`, {
         method: 'put',
         body: trimmed ? { cancelReason: trimmed } : {},
@@ -271,8 +257,6 @@ export function useReassignHousekeeperOrderMutation() {
         body.appointmentTime = appointmentTime
       if (trimmedRemark)
         body.remark = trimmedRemark
-      if (isHousekeeperOrderMockEnabled())
-        return await mockReassignHousekeeperOrder(orderId, body)
       return await apiFetch<IResponse<boolean>>(`/housekeeper/order/${orderId}/reassign`, {
         method: 'put',
         body,

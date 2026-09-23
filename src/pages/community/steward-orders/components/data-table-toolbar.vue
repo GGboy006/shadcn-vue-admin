@@ -10,7 +10,6 @@ import { DatePicker } from '@/components/prop-ui/date-picker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { listMockHousekeeperServices } from '@/services/api/housekeeper-order.mock'
 import { useGetHousekeeperServiceListQuery } from '@/services/api/housekeeper.api'
 
 import { housekeeperOrderPayStatusFilterOptions, housekeeperOrderStatusFilterOptions } from '../data/status'
@@ -23,7 +22,6 @@ interface DataTableToolbarProps {
   housekeeperIdFilter?: string
   dateBegin?: string
   dateEnd?: string
-  useMock?: boolean
 }
 
 const props = withDefaults(defineProps<DataTableToolbarProps>(), {
@@ -44,8 +42,6 @@ const emits = defineEmits<{
 
 const { data: serviceListData } = useGetHousekeeperServiceListQuery()
 const serviceOptions = computed(() => {
-  if (props.useMock)
-    return listMockHousekeeperServices().map(item => ({ value: item.housekeeperId, label: item.name }))
   return (serviceListData.value?.data ?? []).map(item => ({ value: item.housekeeperId, label: item.name }))
 })
 

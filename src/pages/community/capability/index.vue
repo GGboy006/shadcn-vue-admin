@@ -5,19 +5,15 @@ meta:
 
 <script setup lang="ts">
 import { LibraryIcon } from '@lucide/vue'
-import { useQueryClient } from '@tanstack/vue-query'
 
 import type { CapabilityAccessType, ICapability, ICapabilityListQuery } from '@/services/api/capability.api'
 
 import { BasicPage } from '@/components/global-layout'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
-import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Switch } from '@/components/ui/switch'
 import { useLazyMount } from '@/composables/use-lazy-mount'
 import { useGetCapabilityListQuery } from '@/services/api/capability.api'
-import { isCapabilityMockEnabled, setCapabilityMockEnabled } from '@/services/api/capability.mock'
 
 import CapabilityCard from './components/capability-card.vue'
 import CapabilityDetailSheet from './components/capability-detail-sheet.vue'
@@ -26,18 +22,6 @@ import { capabilityCategoryFilterOptions } from './data/status'
 const query = ref<ICapabilityListQuery>({})
 const { data, isLoading, isError, error } = useGetCapabilityListQuery(query)
 const list = computed(() => data.value?.data ?? [])
-
-const isDev = import.meta.env.DEV
-const mockEnabled = ref(isCapabilityMockEnabled())
-const queryClient = useQueryClient()
-
-function handleMockToggle(enabled: boolean | 'indeterminate') {
-  const on = enabled === true
-  mockEnabled.value = on
-  setCapabilityMockEnabled(on)
-  queryClient.invalidateQueries({ queryKey: ['capabilityList'] })
-  queryClient.invalidateQueries({ queryKey: ['capabilityDetail'] })
-}
 
 const accessTypeFilter = ref('all')
 const categoryFilter = ref('all')
@@ -69,18 +53,9 @@ function handleSelect(item: ICapability) {
 <template>
   <BasicPage
     title="能力目录"
-    :description="mockEnabled ? '当前为演示数据（文档 §12 七条种子），关闭后走接口' : '本站已接入的 MCP / Skill，只读展示'"
+    description="本站已接入的 MCP / Skill，只读展示"
     sticky
   >
-    <template v-if="isDev" #actions>
-      <div class="flex items-center gap-2">
-        <Switch :model-value="mockEnabled" @update:model-value="handleMockToggle" />
-        <Label class="text-sm font-normal text-muted-foreground">
-          演示数据
-        </Label>
-      </div>
-    </template>
-
     <div class="mb-4 flex flex-wrap items-center gap-2">
       <Select v-model="accessTypeFilter">
         <SelectTrigger class="h-8 w-[120px]">
@@ -147,7 +122,7 @@ function handleSelect(item: ICapability) {
         </EmptyMedia>
         <EmptyTitle>暂无启用能力</EmptyTitle>
         <EmptyDescription>
-          后端跑过种子后会出现卡片；开发环境可打开右上角演示数据
+          本站还没有启用的能力
         </EmptyDescription>
       </EmptyHeader>
     </Empty>

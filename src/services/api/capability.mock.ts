@@ -3,8 +3,6 @@ import type { ICapability, ICapabilityListQuery } from './capability.api'
 
 import { filterCapabilityList, normalizeCapability } from './capability.list'
 
-const MOCK_FLAG_KEY = 'capability-catalog-mock'
-
 /** 文档 §12 种子(Web VO,无 remark/status) */
 export const MOCK_CAPABILITIES: ICapability[] = [
   {
@@ -99,28 +97,6 @@ export const MOCK_CAPABILITIES: ICapability[] = [
     sortOrder: 7,
   },
 ]
-
-function readSession(key: string): string | null {
-  if (typeof sessionStorage === 'undefined')
-    return null
-  return sessionStorage.getItem(key)
-}
-
-function writeSession(key: string, value: string) {
-  if (typeof sessionStorage === 'undefined')
-    return
-  sessionStorage.setItem(key, value)
-}
-
-export function isCapabilityMockEnabled(): boolean {
-  if (!import.meta.env.DEV)
-    return false
-  return readSession(MOCK_FLAG_KEY) === '1'
-}
-
-export function setCapabilityMockEnabled(enabled: boolean) {
-  writeSession(MOCK_FLAG_KEY, enabled ? '1' : '0')
-}
 
 export async function mockCapabilityList(query: ICapabilityListQuery = {}): Promise<IResponse<ICapability[]>> {
   return {

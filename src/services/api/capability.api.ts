@@ -5,7 +5,6 @@ import { useApiFetch } from '@/composables/use-fetch'
 import type { IResponse } from '../types/response.type'
 
 import { normalizeCapability, normalizeCapabilityList } from './capability.list'
-import { isCapabilityMockEnabled, mockCapabilityDetail, mockCapabilityList } from './capability.mock'
 
 /** 接入方式:1 MCP / 2 Skill(对接文档 §11) */
 export type CapabilityAccessType = 1 | 2
@@ -41,9 +40,6 @@ export function useGetCapabilityListQuery(query: Ref<ICapabilityListQuery>) {
   return useQuery<ICapabilityListResponse, Error>({
     queryKey: ['capabilityList', query],
     queryFn: async () => {
-      if (isCapabilityMockEnabled())
-        return await mockCapabilityList(query.value)
-
       const res = await apiFetch<ICapabilityListResponse>('/capability/list', {
         method: 'get',
         query: query.value,
@@ -64,9 +60,6 @@ export function useGetCapabilityDetailQuery(capabilityId: Ref<string | undefined
   return useQuery<ICapabilityDetailResponse, Error>({
     queryKey: ['capabilityDetail', capabilityId],
     queryFn: async () => {
-      if (isCapabilityMockEnabled())
-        return await mockCapabilityDetail(capabilityId.value)
-
       const res = await apiFetch<ICapabilityDetailResponse>(`/capability/${capabilityId.value}`)
       return {
         ...res,

@@ -11,7 +11,6 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useReassignHousekeeperOrderMutation } from '@/services/api/housekeeper-order.api'
-import { isHousekeeperOrderMockEnabled, listMockHousekeeperStaff } from '@/services/api/housekeeper-order.mock'
 import { useGetHousekeeperStaffListQuery } from '@/services/api/housekeeper.api'
 
 const props = defineProps<{
@@ -32,17 +31,9 @@ const staffId = ref<string | undefined>()
 const appointmentTime = ref<string | undefined>()
 const remark = ref('')
 
-const housekeeperId = computed(() => {
-  if (isHousekeeperOrderMockEnabled())
-    return undefined
-  return props.order.housekeeperId
-})
+const housekeeperId = computed(() => props.order.housekeeperId)
 const { data: staffListData, isLoading: isStaffLoading } = useGetHousekeeperStaffListQuery(housekeeperId)
-const staffOptions = computed(() => {
-  if (isHousekeeperOrderMockEnabled())
-    return listMockHousekeeperStaff(props.order.housekeeperId)
-  return staffListData.value?.data ?? []
-})
+const staffOptions = computed(() => staffListData.value?.data ?? [])
 
 const { mutate, isPending } = useReassignHousekeeperOrderMutation()
 

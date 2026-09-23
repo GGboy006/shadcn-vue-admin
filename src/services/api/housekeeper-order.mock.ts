@@ -1,4 +1,4 @@
-import type { IHousekeeperService, IHousekeeperStaff } from '@/services/api/housekeeper.api'
+import type { IHousekeeperStaff } from '@/services/api/housekeeper.api'
 
 import type { IPageResult, IResponse } from '../types/response.type'
 import type {
@@ -12,20 +12,7 @@ import type {
 import { normalizeHousekeeperOrderPage } from './housekeeper-order.page'
 import { canCancelHousekeeperOrder, canReassignHousekeeperOrder } from './housekeeper-order.rules'
 
-const MOCK_FLAG_KEY = 'housekeeper-order-mock'
 const MOCK_STATE_KEY = 'housekeeper-order-mock-state'
-
-/** 有数据账号的 `/housekeeper/service/list`(筛选用) */
-export const MOCK_HOUSEKEEPER_SERVICES: Pick<IHousekeeperService, 'housekeeperId' | 'name'>[] = [
-  { housekeeperId: '2087730522010886145', name: '开锁服务公司' },
-  { housekeeperId: '2087730522010886146', name: '电脑维修公司' },
-  { housekeeperId: '2087730522010886147', name: '家教服务机构' },
-  { housekeeperId: '2087730522010886148', name: '家政服务公司' },
-  { housekeeperId: '2087730522010886149', name: '保洁服务公司' },
-  { housekeeperId: '2087730522010886150', name: '陪诊服务中心' },
-  { housekeeperId: '2087730522010886151', name: '打印服务中心' },
-  { housekeeperId: '2087730522010886152', name: '管道疏通公司' },
-]
 
 /** 改派下拉:真实单里出现的师傅 + 同馆一名备用师傅 */
 const MOCK_STAFF: IHousekeeperStaff[] = [
@@ -337,28 +324,6 @@ function toListItem(detail: IHousekeeperOrderDetail): IHousekeeperOrder {
     ...list
   } = detail
   return list
-}
-
-export function isHousekeeperOrderMockEnabled(): boolean {
-  if (!import.meta.env.DEV)
-    return false
-  return readSession(MOCK_FLAG_KEY) === '1'
-}
-
-export function setHousekeeperOrderMockEnabled(enabled: boolean) {
-  writeSession(MOCK_FLAG_KEY, enabled ? '1' : '0')
-  if (enabled)
-    resetMockHousekeeperOrders()
-}
-
-export function listMockHousekeeperServices() {
-  return MOCK_HOUSEKEEPER_SERVICES
-}
-
-export function listMockHousekeeperStaff(housekeeperId?: string): IHousekeeperStaff[] {
-  if (!housekeeperId)
-    return []
-  return MOCK_STAFF.filter(item => item.housekeeperId === housekeeperId)
 }
 
 export async function mockHousekeeperOrderPage(query: IHousekeeperOrderPageQuery): Promise<IResponse<IPageResult<IHousekeeperOrder>>> {

@@ -4,16 +4,12 @@ meta:
 </route>
 
 <script setup lang="ts">
-import { useQueryClient } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
 
 import type { HousekeeperOrderPayStatus, HousekeeperOrderStatus, IHousekeeperOrderPageQuery } from '@/services/api/housekeeper-order.api'
 
 import { BasicPage } from '@/components/global-layout'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
 import { useGetHousekeeperOrderPageQuery } from '@/services/api/housekeeper-order.api'
-import { isHousekeeperOrderMockEnabled, setHousekeeperOrderMockEnabled } from '@/services/api/housekeeper-order.mock'
 
 import { columns } from './components/columns'
 import DataTableToolbar from './components/data-table-toolbar.vue'
@@ -25,21 +21,9 @@ const query = ref<IHousekeeperOrderPageQuery>({
 })
 
 const { data, isLoading } = useGetHousekeeperOrderPageQuery(query)
-const queryClient = useQueryClient()
 
 const list = computed(() => data.value?.data?.list ?? [])
 const total = computed(() => Number(data.value?.data?.total ?? 0))
-
-const isDev = import.meta.env.DEV
-const mockEnabled = ref(isHousekeeperOrderMockEnabled())
-
-function handleMockToggle(enabled: boolean | 'indeterminate') {
-  const on = enabled === true
-  mockEnabled.value = on
-  setHousekeeperOrderMockEnabled(on)
-  queryClient.invalidateQueries({ queryKey: ['housekeeperOrderList'] })
-  queryClient.invalidateQueries({ queryKey: ['housekeeperOrderDetail'] })
-}
 
 const serverPagination = computed(() => ({
   page: query.value.pageNum,
@@ -113,17 +97,9 @@ function handleReset() {
 <template>
   <BasicPage
     title="服务订单"
-    :description="mockEnabled ? '当前为演示数据（来自有订单账号的真实列表），关闭后走接口' : '查看本站家政订单，取消未支付本地单或改派师傅'"
+    description="查看本站家政订单，取消未支付本地单或改派师傅"
     sticky
   >
-    <template v-if="isDev" #actions>
-      <div class="flex items-center gap-2">
-        <Switch :model-value="mockEnabled" @update:model-value="handleMockToggle" />
-        <Label class="text-sm font-normal text-muted-foreground">
-          演示数据
-        </Label>
-      </div>
-    </template>
     <DataTable
       :loading="isLoading"
       :data="list"
@@ -139,7 +115,6 @@ function handleReset() {
           :housekeeper-id-filter="housekeeperIdFilter"
           :date-begin="dateBegin"
           :date-end="dateEnd"
-          :use-mock="mockEnabled"
           @update:search="search = $event"
           @update:order-status-filter="orderStatusFilter = $event"
           @update:pay-status-filter="payStatusFilter = $event"
