@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
 
-import { BadgeCheckIcon, EyeIcon } from '@lucide/vue'
+import { EyeIcon, UserCheckIcon } from '@lucide/vue'
 
 import type { RowActionItem } from '@/components/data-table'
 import type { IResident } from '@/services/api/resident.api'
@@ -25,7 +25,7 @@ const items = computed(() => {
     { key: 'view', label: '查看', icon: EyeIcon },
   ]
   if (canAuditResidentVerify(resident.value))
-    actions.push({ key: 'verify', label: '审核', icon: BadgeCheckIcon })
+    actions.push({ key: 'verify', label: '审核', icon: UserCheckIcon })
   return actions
 })
 
