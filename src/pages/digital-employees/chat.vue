@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ArrowLeftIcon, XIcon } from '@lucide/vue'
+import { ArrowLeftIcon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
 import type { IUploadedChatFile } from '@/services/api/chat-upload.api'
 import type { IDigitalEmployee } from '@/services/api/digital-employee.api'
 
+import { FileAttachment } from '@/components/agent-elements'
 import ChatPanel from '@/components/chat/ChatPanel.vue'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -322,28 +323,17 @@ function handleSelectQuestion(question: string) {
           />
         </template>
         <template v-if="pendingFiles.length || uploading" #input-header>
-          <div class="flex flex-wrap gap-2">
-            <div
+          <div class="flex flex-wrap items-center gap-2">
+            <FileAttachment
               v-for="file in pendingFiles"
+              :id="file.chatFileId"
               :key="file.chatFileId"
-              class="flex max-w-full items-center gap-2 rounded-md border px-2 py-1 text-xs"
-            >
-              <img
-                v-if="chatStreamFileType(file.mime) === 'image' && file.fileUrl"
-                :src="file.fileUrl"
-                :alt="file.fileName"
-                class="size-8 rounded object-cover"
-              >
-              <span class="max-w-40 truncate">{{ file.fileName }}</span>
-              <button
-                type="button"
-                class="text-muted-foreground"
-                aria-label="移除文件"
-                @click="removePendingFile(file.chatFileId)"
-              >
-                <XIcon class="size-3" />
-              </button>
-            </div>
+              :filename="file.fileName"
+              :size="file.bytes || undefined"
+              :is-image="chatStreamFileType(file.mime) === 'image'"
+              :url="file.fileUrl"
+              @remove="removePendingFile(file.chatFileId)"
+            />
             <span v-if="uploading" class="text-xs text-muted-foreground">正在上传...</span>
           </div>
         </template>

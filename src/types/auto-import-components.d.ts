@@ -12,6 +12,8 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AgentElementsFileAttachment: typeof import('./../components/agent-elements/file-attachment.vue')['default']
+    AgentElementsImageLightbox: typeof import('./../components/agent-elements/image-lightbox.vue')['default']
     AiElementsCodeBlock: typeof import('./../components/ai-elements/code-block/CodeBlock.vue')['default']
     AiElementsCodeBlockActions: typeof import('./../components/ai-elements/code-block/CodeBlockActions.vue')['default']
     AiElementsCodeBlockContainer: typeof import('./../components/ai-elements/code-block/CodeBlockContainer.vue')['default']
@@ -513,6 +515,8 @@ declare module 'vue' {
 
 // For TSX support
 declare global {
+  const AgentElementsFileAttachment: typeof import('./../components/agent-elements/file-attachment.vue')['default']
+  const AgentElementsImageLightbox: typeof import('./../components/agent-elements/image-lightbox.vue')['default']
   const AiElementsCodeBlock: typeof import('./../components/ai-elements/code-block/CodeBlock.vue')['default']
   const AiElementsCodeBlockActions: typeof import('./../components/ai-elements/code-block/CodeBlockActions.vue')['default']
   const AiElementsCodeBlockContainer: typeof import('./../components/ai-elements/code-block/CodeBlockContainer.vue')['default']
