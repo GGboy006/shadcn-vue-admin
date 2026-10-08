@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 
-import { capabilityAccessTypeLabel, categoryText } from '../data/status'
+import { accessTypeBadgeVariant, capabilityAccessTypeLabel, categoryText } from '../data/status'
 
 defineProps<{
   item: ICapability
@@ -39,7 +39,7 @@ const emit = defineEmits<{
           </p>
         </div>
         <Badge
-          :variant="item.accessType === 1 ? 'info' : 'secondary'"
+          :variant="accessTypeBadgeVariant(item.accessType)"
           class="shrink-0"
         >
           {{ capabilityAccessTypeLabel[item.accessType] }}

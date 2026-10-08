@@ -52,8 +52,8 @@ function handleSelect(item: ICapability) {
 
 <template>
   <BasicPage
-    title="能力目录"
-    description="本站已接入的 MCP / Skill，只读展示"
+    title="居民AI服务"
+    description="本站已接入的 MCP / Skill / 智能体，只读展示"
     sticky
   >
     <div class="mb-4 flex flex-wrap items-center gap-2">
@@ -71,11 +71,14 @@ function handleSelect(item: ICapability) {
           <SelectItem value="2">
             Skill
           </SelectItem>
+          <SelectItem value="3">
+            智能体
+          </SelectItem>
         </SelectContent>
       </Select>
 
       <Select v-model="categoryFilter">
-        <SelectTrigger class="h-8 w-[140px]">
+        <SelectTrigger class="h-8 w-[10.5rem]">
           <SelectValue placeholder="业务分类" />
         </SelectTrigger>
         <SelectContent>

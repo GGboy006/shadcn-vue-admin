@@ -6,8 +6,8 @@ import type { IResponse } from '../types/response.type'
 
 import { normalizeCapability, normalizeCapabilityList } from './capability.list'
 
-/** 接入方式:1 MCP / 2 Skill(对接文档 §11) */
-export type CapabilityAccessType = 1 | 2
+/** 接入方式:1 MCP / 2 Skill / 3 智能体 */
+export type CapabilityAccessType = 1 | 2 | 3
 
 /** Web 启用项 VO(对接文档 §9 / §11,无 remark/status) */
 export interface ICapability {

@@ -12,7 +12,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useGetCapabilityDetailQuery } from '@/services/api/capability.api'
 
-import { capabilityAccessTypeLabel, categoryText } from '../data/status'
+import { accessTypeBadgeVariant, capabilityAccessTypeLabel, categoryText } from '../data/status'
 
 const props = defineProps<{
   open: boolean
@@ -44,7 +44,7 @@ const detail = computed(() => data.value?.data)
           {{ detail?.capabilityName || '能力详情' }}
         </SheetTitle>
         <SheetDescription v-if="detail" class="flex flex-wrap items-center gap-1.5 text-left">
-          <Badge :variant="detail.accessType === 1 ? 'info' : 'secondary'">
+          <Badge :variant="accessTypeBadgeVariant(detail.accessType)">
             {{ capabilityAccessTypeLabel[detail.accessType] }}
           </Badge>
           <span>{{ categoryText(detail.category) }}</span>

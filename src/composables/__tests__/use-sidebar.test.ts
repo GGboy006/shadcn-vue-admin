@@ -60,7 +60,7 @@ describe('useSidebar navData', () => {
     setUser(5)
     const { navData } = useSidebar()
 
-    expect(navData.value.map(g => g.title)).toEqual(['工作台', '主体管理', 'AI运营', '小区服务', '居民', '设置'])
+    expect(navData.value.map(g => g.title)).toEqual(['工作台', '主体管理', 'AI运营', '居民', '小区服务', '设置'])
     expect(navData.value.some(g => g.title === '经营')).toBe(false)
   })
 
@@ -87,11 +87,11 @@ describe('useSidebar navData', () => {
     ])
   })
 
-  it('站长(userType=3):工作台 + 主体管理 + AI运营 + 小区服务 + 居民 + 设置', () => {
+  it('站长(userType=3):工作台 + 主体管理 + AI运营 + 居民 + 小区服务 + 设置', () => {
     setUser(3)
     const { navData } = useSidebar()
 
-    expect(navData.value.map(g => g.title)).toEqual(['工作台', '主体管理', 'AI运营', '小区服务', '居民', '设置'])
+    expect(navData.value.map(g => g.title)).toEqual(['工作台', '主体管理', 'AI运营', '居民', '小区服务', '设置'])
 
     expect(leafTitles(navData.value[0])).toEqual(['数据看板'])
 
@@ -105,19 +105,21 @@ describe('useSidebar navData', () => {
     expect(leafTitles(navData.value[2])).toEqual([
       '聊天工作台',
       '数字员工',
-      '能力目录',
+      '居民AI服务',
       'AI工具管理',
       '会话列表',
     ])
 
-    expect(navData.value[3].items.map(item => item.title)).toEqual([
+    expect(leafTitles(navData.value[3])).toEqual(['居民管理', '会员套餐', '会员订单', '居民AI工具'])
+
+    expect(navData.value[4].items.map(item => item.title)).toEqual([
       '内容',
       '便民',
       '意见反馈',
       '配置',
     ])
 
-    expect(leafTitles(navData.value[3])).toEqual([
+    expect(leafTitles(navData.value[4])).toEqual([
       '小区公告',
       '小区动态',
       '知识服务',
@@ -130,8 +132,6 @@ describe('useSidebar navData', () => {
       '小区栏目',
       '小区分类',
     ])
-
-    expect(leafTitles(navData.value[4])).toEqual(['居民管理', '会员套餐', '会员订单', '居民AI工具'])
 
     expect(leafTitles(navData.value[5])).toEqual(['个人资料', '站长信息'])
   })

@@ -10,7 +10,7 @@ describe('capability list helpers', () => {
       capabilityCode: 'flyai',
       capabilityName: '飞猪酒旅',
       accessType: '2' as unknown as 2,
-      category: 'travel',
+      category: '酒旅',
     })
     expect(item.capabilityId).toBe('1')
     expect(item.accessType).toBe(2)
@@ -24,9 +24,19 @@ describe('capability list helpers', () => {
     expect(list.every(item => item.accessType === 1)).toBe(true)
   })
 
-  it('filters by category', () => {
-    const list = filterCapabilityList(MOCK_CAPABILITIES, { category: 'travel' })
+  it('filters agent access type', () => {
+    const list = filterCapabilityList(MOCK_CAPABILITIES, { accessType: 3 })
+    expect(list).toEqual([])
+  })
+
+  it('filters by Chinese category', () => {
+    const list = filterCapabilityList(MOCK_CAPABILITIES, { category: '酒旅' })
     expect(list.map(item => item.capabilityCode)).toEqual(['flyai'])
+  })
+
+  it('does not match legacy English category codes', () => {
+    const list = filterCapabilityList(MOCK_CAPABILITIES, { category: 'travel' })
+    expect(list).toEqual([])
   })
 
   it('sorts by sortOrder then id', () => {

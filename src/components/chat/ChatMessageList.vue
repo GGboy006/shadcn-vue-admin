@@ -68,12 +68,18 @@ const flyCardsByMessageId = computed(() => mapFlyCardsByMessageId(props.messages
 const isEmpty = computed(() => displayMessages.value.length === 0 && !hasHeaderSlot.value)
 const { copy, copied } = useClipboard()
 
+function messageTime(msg: IChatMessage) {
+  const value = dayjs(msg.createTime).valueOf()
+  return Number.isFinite(value) ? value : 0
+}
+
+const sortedMessages = computed(() =>
+  [...displayMessages.value].sort((a, b) => messageTime(a) - messageTime(b)),
+)
+
 const messageGroups = computed(() => {
-  const sorted = [...displayMessages.value].sort((a, b) =>
-    dayjs(a.createTime).valueOf() - dayjs(b.createTime).valueOf(),
-  )
   const groups: { date: string, messages: IChatMessage[] }[] = []
-  for (const msg of sorted) {
+  for (const msg of sortedMessages.value) {
     const date = dayjs(msg.createTime).format('YYYY年MM月DD日')
     const last = groups[groups.length - 1]
     if (!last || last.date !== date)
@@ -86,7 +92,7 @@ const messageGroups = computed(() => {
 
 const messageRows = computed(() => {
   if (!props.showDate)
-    return [{ date: '', messages: displayMessages.value }]
+    return [{ date: '', messages: sortedMessages.value }]
   return messageGroups.value
 })
 

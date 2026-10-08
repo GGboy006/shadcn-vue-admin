@@ -102,7 +102,7 @@ export function useSidebar() {
   const stationAiNavItems: NavItem[] = [
     { title: '聊天工作台', url: '/admin/chat-workbench', icon: HeadsetIcon, roles: [3] },
     { title: '数字员工', url: '/digital-employees', icon: BotIcon, roles: [3] },
-    { title: '能力目录', url: '/community/capability', icon: LibraryIcon, roles: [3] },
+    { title: '居民AI服务', url: '/community/capability', icon: LibraryIcon, roles: [3] },
     { title: 'AI工具管理', url: '/apps', icon: BoxesIcon, roles: [3] },
     { title: '会话列表', url: '/conversations', icon: MessageSquareIcon, roles: [3] },
   ]
@@ -174,8 +174,8 @@ export function useSidebar() {
     { title: '工作台', items: filterNavItemsByRoles(stationWorkbenchNavItems, userType.value) },
     { title: '主体管理', items: filterNavItemsByRoles(stationEntityNavItems, userType.value) },
     { title: 'AI运营', items: filterNavItemsByRoles(stationAiNavItems, userType.value) },
-    { title: '小区服务', items: filterNavItemsByRoles(communityServiceNavItems, userType.value) },
     { title: '居民', items: filterNavItemsByRoles(residentNavItems, userType.value) },
+    { title: '小区服务', items: filterNavItemsByRoles(communityServiceNavItems, userType.value) },
     settingsGroup(),
   ])
 

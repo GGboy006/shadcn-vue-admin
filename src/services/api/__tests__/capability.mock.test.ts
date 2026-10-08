@@ -13,6 +13,11 @@ describe('capability mock', () => {
     expect(res.data.map(item => item.capabilityCode)).toEqual(['flyai', 'owner-ai-assistant'])
   })
 
+  it('filters Chinese travel category', async () => {
+    const res = await mockCapabilityList({ category: '酒旅' })
+    expect(res.data.map(item => item.capabilityCode)).toEqual(['flyai'])
+  })
+
   it('returns detail by id', async () => {
     const res = await mockCapabilityDetail('3')
     expect(res.data.capabilityCode).toBe('moji_weather')
