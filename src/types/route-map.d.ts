@@ -303,6 +303,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/community/steward-orders/order-browser': RouteRecordInfo<
+      '/community/steward-orders/order-browser',
+      '/community/steward-orders/order-browser',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/conversations/': RouteRecordInfo<
       '/conversations/',
       '/conversations',
@@ -395,6 +402,27 @@ declare module 'vue-router/auto-routes' {
     '/help-center': RouteRecordInfo<
       '/help-center',
       '/help-center',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/housekeeper/orders': RouteRecordInfo<
+      '/housekeeper/orders',
+      '/housekeeper/orders',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/housekeeper/profile': RouteRecordInfo<
+      '/housekeeper/profile',
+      '/housekeeper/profile',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/housekeeper/staff': RouteRecordInfo<
+      '/housekeeper/staff',
+      '/housekeeper/staff',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -885,6 +913,12 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
+    'src/pages/community/steward-orders/order-browser.vue': {
+      routes:
+        | '/community/steward-orders/order-browser'
+      views:
+        | never
+    }
     'src/pages/conversations/index.vue': {
       routes:
         | '/conversations/'
@@ -966,6 +1000,24 @@ declare module 'vue-router/auto-routes' {
     'src/pages/help-center.vue': {
       routes:
         | '/help-center'
+      views:
+        | never
+    }
+    'src/pages/housekeeper/orders.vue': {
+      routes:
+        | '/housekeeper/orders'
+      views:
+        | never
+    }
+    'src/pages/housekeeper/profile.vue': {
+      routes:
+        | '/housekeeper/profile'
+      views:
+        | never
+    }
+    'src/pages/housekeeper/staff.vue': {
+      routes:
+        | '/housekeeper/staff'
       views:
         | never
     }

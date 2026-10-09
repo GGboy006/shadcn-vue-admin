@@ -7,7 +7,7 @@ import ArticleEdit from './article-edit.vue'
 
 const props = defineProps<{
   /** 钻取页传入:锁定分类新建 */
-  lockCategoryId?: number
+  lockCategoryId?: string
 }>()
 
 const isOpen = ref(false)

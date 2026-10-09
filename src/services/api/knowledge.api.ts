@@ -32,7 +32,7 @@ export const knowledgeEnableStatusConfig: Record<KnowledgeEnableStatus, { label:
 /** 知识分类 VO(对接文档 3.1 KnowledgeCategoryVO) */
 export interface IKnowledgeCategory {
   /** 分类ID */
-  categoryId: number
+  categoryId: string
   /** 分类名称 */
   categoryName: string
   /** 分类类型:1=安法治,2=科普 */
@@ -46,7 +46,7 @@ export interface IKnowledgeCategory {
   /** 启用状态:1=启用,2=禁用 */
   status?: KnowledgeEnableStatus
   /** 站长ID */
-  stationId?: number
+  stationId?: string
   /** 是否可编辑(本站可改删,全站通用不可改) */
   editable?: boolean
   /** 文章数 */
@@ -70,7 +70,7 @@ export interface IKnowledgeCategoryListQuery extends IPageParam {
 /** 分类新增/更新请求体(对接文档 3.1) */
 export interface IKnowledgeCategorySaveDTO {
   /** 分类ID(更新必填) */
-  categoryId?: number
+  categoryId?: string
   /** 分类名称 */
   categoryName: string
   /** 分类类型:1=安法治,2=科普 */
@@ -118,7 +118,7 @@ export function useGetKnowledgeCategoryListQuery() {
 }
 
 /** 获取知识分类详情(对接文档 3.1,`/knowledge/category/{categoryId}`) */
-export function useGetKnowledgeCategoryDetailQuery(categoryId: Ref<number | undefined>, enabled?: Ref<boolean>) {
+export function useGetKnowledgeCategoryDetailQuery(categoryId: Ref<string | undefined>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IKnowledgeCategoryDetailResponse, Error>({
@@ -171,7 +171,7 @@ export function useUpdateKnowledgeCategoryStatusMutation() {
   const { apiFetch } = useApiFetch()
   const queryClient = useQueryClient()
 
-  return useMutation<IResponse<boolean>, Error, { categoryId: number, status: KnowledgeEnableStatus }>({
+  return useMutation<IResponse<boolean>, Error, { categoryId: string, status: KnowledgeEnableStatus }>({
     mutationKey: ['updateKnowledgeCategoryStatus'],
     mutationFn: async ({ categoryId, status }) => await apiFetch<IResponse<boolean>>(`/knowledge/category/${categoryId}/status`, {
       method: 'put',
@@ -189,7 +189,7 @@ export function useDeleteKnowledgeCategoryMutation() {
   const { apiFetch } = useApiFetch()
   const queryClient = useQueryClient()
 
-  return useMutation<IResponse<boolean>, Error, number>({
+  return useMutation<IResponse<boolean>, Error, string>({
     mutationKey: ['deleteKnowledgeCategory'],
     mutationFn: async categoryId => await apiFetch<IResponse<boolean>>(`/knowledge/category/${categoryId}`, {
       method: 'delete',
@@ -220,9 +220,9 @@ export const knowledgePublishStatusConfig: Record<KnowledgePublishStatus, { labe
 /** 知识文章 VO(对接文档 3.2 KnowledgeArticleVO) */
 export interface IKnowledgeArticle {
   /** 文章ID */
-  articleId: number
+  articleId: string
   /** 分类ID */
-  categoryId: number
+  categoryId: string
   /** 分类名称 */
   categoryName?: string
   /** 标题 */
@@ -252,7 +252,7 @@ export interface IKnowledgeArticle {
   /** 发布时间 */
   publishTime?: string
   /** 站长ID */
-  stationId?: number
+  stationId?: string
   /** 是否可编辑(本站可改删) */
   editable?: boolean
   /** 创建时间 */
@@ -264,7 +264,7 @@ export interface IKnowledgeArticle {
 /** 文章分页查询参数(对接文档 3.2) */
 export interface IKnowledgeArticleListQuery extends IPageParam {
   /** 分类ID */
-  categoryId?: number
+  categoryId?: string
   /** 关键词 */
   keyword?: string
   /** 发布状态:0=草稿,1=已发布,2=已下架 */
@@ -276,9 +276,9 @@ export interface IKnowledgeArticleListQuery extends IPageParam {
 /** 文章新增/更新请求体(对接文档 3.2) */
 export interface IKnowledgeArticleSaveDTO {
   /** 文章ID(更新必填) */
-  articleId?: number
+  articleId?: string
   /** 分类ID */
-  categoryId: number
+  categoryId: string
   /** 标题 */
   title: string
   /** 正文 */
@@ -321,7 +321,7 @@ export function useGetKnowledgeArticlePageQuery(query: Ref<IKnowledgeArticleList
 }
 
 /** 获取知识文章详情(对接文档 3.2,`/knowledge/article/{articleId}`) */
-export function useGetKnowledgeArticleDetailQuery(articleId: Ref<number | undefined>, enabled?: Ref<boolean>) {
+export function useGetKnowledgeArticleDetailQuery(articleId: Ref<string | undefined>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IKnowledgeArticleDetailResponse, Error>({
@@ -372,7 +372,7 @@ export function useUpdateKnowledgeArticlePublishStatusMutation() {
   const { apiFetch } = useApiFetch()
   const queryClient = useQueryClient()
 
-  return useMutation<IResponse<boolean>, Error, { articleId: number, publishStatus: KnowledgePublishStatus }>({
+  return useMutation<IResponse<boolean>, Error, { articleId: string, publishStatus: KnowledgePublishStatus }>({
     mutationKey: ['updateKnowledgeArticlePublishStatus'],
     mutationFn: async ({ articleId, publishStatus }) => await apiFetch<IResponse<boolean>>(`/knowledge/article/${articleId}/publish-status`, {
       method: 'put',
@@ -390,7 +390,7 @@ export function useUpdateKnowledgeArticleTopMutation() {
   const { apiFetch } = useApiFetch()
   const queryClient = useQueryClient()
 
-  return useMutation<IResponse<boolean>, Error, { articleId: number, topFlag: KnowledgeTopFlag }>({
+  return useMutation<IResponse<boolean>, Error, { articleId: string, topFlag: KnowledgeTopFlag }>({
     mutationKey: ['updateKnowledgeArticleTop'],
     mutationFn: async ({ articleId, topFlag }) => await apiFetch<IResponse<boolean>>(`/knowledge/article/${articleId}/top`, {
       method: 'put',
@@ -408,7 +408,7 @@ export function useDeleteKnowledgeArticleMutation() {
   const { apiFetch } = useApiFetch()
   const queryClient = useQueryClient()
 
-  return useMutation<IResponse<boolean>, Error, number>({
+  return useMutation<IResponse<boolean>, Error, string>({
     mutationKey: ['deleteKnowledgeArticle'],
     mutationFn: async articleId => await apiFetch<IResponse<boolean>>(`/knowledge/article/${articleId}`, {
       method: 'delete',
@@ -426,7 +426,7 @@ export function useDeleteKnowledgeArticleMutation() {
 /** 快捷问答 VO(对接文档 3.3 KnowledgeQuickQuestionVO) */
 export interface IKnowledgeQuestion {
   /** 问答ID */
-  questionId: number
+  questionId: string
   /** 问答名称 */
   questionName: string
   /** 关键词 */
@@ -440,7 +440,7 @@ export interface IKnowledgeQuestion {
   /** 启用状态:1=启用,2=禁用 */
   status?: KnowledgeEnableStatus
   /** 站长ID */
-  stationId?: number
+  stationId?: string
   /** 是否可编辑(本站可改删) */
   editable?: boolean
   /** 创建时间 */
@@ -452,7 +452,7 @@ export interface IKnowledgeQuestion {
 /** 问答新增/更新请求体(对接文档 3.3) */
 export interface IKnowledgeQuestionSaveDTO {
   /** 问答ID(更新必填) */
-  questionId?: number
+  questionId?: string
   /** 问答名称 */
   questionName: string
   /** 关键词 */
@@ -506,7 +506,7 @@ export function useGetKnowledgeQuestionListQuery() {
 }
 
 /** 获取快捷问答详情(对接文档 3.3,`/knowledge/question/{questionId}`) */
-export function useGetKnowledgeQuestionDetailQuery(questionId: Ref<number | undefined>, enabled?: Ref<boolean>) {
+export function useGetKnowledgeQuestionDetailQuery(questionId: Ref<string | undefined>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IKnowledgeQuestionDetailResponse, Error>({
@@ -559,7 +559,7 @@ export function useUpdateKnowledgeQuestionStatusMutation() {
   const { apiFetch } = useApiFetch()
   const queryClient = useQueryClient()
 
-  return useMutation<IResponse<boolean>, Error, { questionId: number, status: KnowledgeEnableStatus }>({
+  return useMutation<IResponse<boolean>, Error, { questionId: string, status: KnowledgeEnableStatus }>({
     mutationKey: ['updateKnowledgeQuestionStatus'],
     mutationFn: async ({ questionId, status }) => await apiFetch<IResponse<boolean>>(`/knowledge/question/${questionId}/status`, {
       method: 'put',
@@ -577,7 +577,7 @@ export function useDeleteKnowledgeQuestionMutation() {
   const { apiFetch } = useApiFetch()
   const queryClient = useQueryClient()
 
-  return useMutation<IResponse<boolean>, Error, number>({
+  return useMutation<IResponse<boolean>, Error, string>({
     mutationKey: ['deleteKnowledgeQuestion'],
     mutationFn: async questionId => await apiFetch<IResponse<boolean>>(`/knowledge/question/${questionId}`, {
       method: 'delete',

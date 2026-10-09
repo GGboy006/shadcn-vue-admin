@@ -11,7 +11,7 @@ const props = defineProps<{
   open: boolean
   article?: IKnowledgeArticle
   /** 钻取页传入:锁定分类 */
-  lockCategoryId?: number
+  lockCategoryId?: string
 }>()
 
 const emit = defineEmits<{

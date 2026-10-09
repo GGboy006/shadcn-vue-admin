@@ -37,7 +37,9 @@ declare global {
   const getCurrentScope: typeof import('vue').getCurrentScope
   const getCurrentWatcher: typeof import('vue').getCurrentWatcher
   const h: typeof import('vue').h
+  const homePathForUser: typeof import('../constants/user-type').homePathForUser
   const inject: typeof import('vue').inject
+  const isHousekeeperUser: typeof import('../constants/user-type').isHousekeeperUser
   const isMerchantBusinessUser: typeof import('../constants/user-type').isMerchantBusinessUser
   const isPropertyUser: typeof import('../constants/user-type').isPropertyUser
   const isProxy: typeof import('vue').isProxy
@@ -93,6 +95,7 @@ declare global {
   const useLazyMount: typeof import('../composables/use-lazy-mount').useLazyMount
   const useLink: typeof import('vue-router')['useLink']
   const useModel: typeof import('vue').useModel
+  const useOwnHousekeeperService: typeof import('../composables/use-own-housekeeper').useOwnHousekeeperService
   const useProxyEntry: typeof import('../composables/use-proxy-entry').useProxyEntry
   const useRoute: typeof import('vue-router').useRoute
   const useRouter: typeof import('vue-router').useRouter

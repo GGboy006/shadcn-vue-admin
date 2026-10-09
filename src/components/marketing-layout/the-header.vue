@@ -3,7 +3,7 @@ import { useColorMode } from '@vueuse/core'
 
 import SignInButton from '@/components/sign-in-button.vue'
 import ToggleTheme from '@/components/toggle-theme.vue'
-import { isMerchantBusinessUser, UserType } from '@/constants/user-type'
+import { homePathForUser, isMerchantBusinessUser, UserType } from '@/constants/user-type'
 import { useAuthStore } from '@/stores/auth'
 import { withBase } from '@/utils/with-base'
 
@@ -19,8 +19,8 @@ const navItems = [
 
 const homePath = computed(() => {
   const userType = authStore.userInfo?.userType
-  if (userType === UserType.committee)
-    return '/neighborhood/home'
+  if (userType === UserType.committee || userType === UserType.housekeeper)
+    return homePathForUser(userType)
   if (isMerchantBusinessUser(userType))
     return '/merchant-business/overview'
   return '/dashboard'

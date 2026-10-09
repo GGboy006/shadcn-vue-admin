@@ -4,8 +4,8 @@ import { optionalNumber, optionalString } from '@/validators/common'
 
 // 知识文章表单校验规则(对接文档 3.2)
 export const articleValidator = z.object({
-  articleId: optionalNumber,
-  categoryId: optionalNumber,
+  articleId: optionalString,
+  categoryId: optionalString,
   title: z.string().min(1, '标题不能为空'),
   content: z.string().min(1, '正文不能为空'),
   summary: optionalString,

@@ -13,8 +13,9 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useUpload } from '@/composables/use-upload'
-import { useCreateHousekeeperServiceMutation, useUpdateHousekeeperServiceMutation } from '@/services/api/housekeeper.api'
-import { CONTACT_PHONE_MAX_LENGTH, showInvalidSubmitToast } from '@/validators/common'
+import { buildStationHousekeeperSavePayload, HOUSEKEEPER_PROVIDER_LOCAL, HOUSEKEEPER_PROVIDER_THIRD_PARTY, isHousekeeperAccountOpened } from '@/services/api/housekeeper-account'
+import { useCreateHousekeeperServiceMutation, useGetHousekeeperFulfillProvidersQuery, useUpdateHousekeeperServiceMutation } from '@/services/api/housekeeper.api'
+import { CONTACT_PHONE_MAX_LENGTH, PHONE_MAX_LENGTH, showInvalidSubmitToast } from '@/validators/common'
 
 import type { HousekeeperServiceValidator } from '../../validators/service.validator'
 
@@ -34,6 +35,11 @@ const enableStatusList = [
 ] as const
 
 const isEdit = computed(() => !!service?.housekeeperId)
+const accountOpened = computed(() => isHousekeeperAccountOpened(service))
+const providerOptions = [
+  { value: HOUSEKEEPER_PROVIDER_LOCAL, label: '本地馆' },
+  { value: HOUSEKEEPER_PROVIDER_THIRD_PARTY, label: '第三方网点' },
+] as const
 
 const initialValues = reactive<HousekeeperServiceValidator>({
   housekeeperId: service?.housekeeperId || undefined,
@@ -46,6 +52,11 @@ const initialValues = reactive<HousekeeperServiceValidator>({
   merchantId: service?.merchantId ?? undefined,
   sortOrder: service?.sortOrder ?? undefined,
   status: service?.status ?? 1,
+  providerType: service?.providerType === HOUSEKEEPER_PROVIDER_THIRD_PARTY ? HOUSEKEEPER_PROVIDER_THIRD_PARTY : HOUSEKEEPER_PROVIDER_LOCAL,
+  providerCode: service?.providerCode || undefined,
+  loginPhone: service?.loginPhone || undefined,
+  password: undefined,
+  accountOpened: isHousekeeperAccountOpened(service),
 })
 
 const formSchema = toTypedSchema(housekeeperServiceValidator)
@@ -81,8 +92,12 @@ async function handleCoverUpload(event: Event) {
   }
 }
 
+const isThirdParty = computed(() => Number(formValues.providerType) === HOUSEKEEPER_PROVIDER_THIRD_PARTY)
+const { data: fulfillProviders } = useGetHousekeeperFulfillProvidersQuery(isThirdParty)
+const channelOptions = computed(() => fulfillProviders.value?.data ?? [])
+
 function buildPayload(values: HousekeeperServiceValidator): IHousekeeperServiceSaveDTO {
-  return {
+  return buildStationHousekeeperSavePayload({
     housekeeperId: isEdit.value ? service?.housekeeperId : undefined,
     name: values.name,
     description: values.description || undefined,
@@ -93,7 +108,11 @@ function buildPayload(values: HousekeeperServiceValidator): IHousekeeperServiceS
     merchantId: values.merchantId ?? undefined,
     sortOrder: values.sortOrder ?? undefined,
     status: values.status as 1 | 2 | undefined,
-  }
+    providerType: Number(values.providerType) === HOUSEKEEPER_PROVIDER_THIRD_PARTY ? HOUSEKEEPER_PROVIDER_THIRD_PARTY : HOUSEKEEPER_PROVIDER_LOCAL,
+    providerCode: values.providerCode,
+    loginPhone: values.loginPhone,
+    password: values.password,
+  })
 }
 
 const onSubmit = handleSubmit((values) => {
@@ -135,6 +154,76 @@ const onSubmit = handleSubmit((values) => {
           <FormMessage />
         </FormItem>
       </FormField>
+
+      <FormField v-slot="{ componentField }" name="providerType">
+        <FormItem>
+          <FormLabel required>
+            网点类型
+          </FormLabel>
+          <Select v-bind="componentField" :disabled="accountOpened">
+            <FormControl>
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="请选择网点类型" />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              <SelectItem v-for="item in providerOptions" :key="item.value" :value="item.value">
+                {{ item.label }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <p class="text-xs text-muted-foreground">
+            {{ accountOpened ? '已开通登录账号的馆不能改为第三方网点' : '第三方网点不开登录账号，也不能添加师傅' }}
+          </p>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <FormField v-if="isThirdParty" v-slot="{ componentField }" name="providerCode">
+        <FormItem>
+          <FormLabel required>
+            第三方渠道
+          </FormLabel>
+          <Select v-bind="componentField">
+            <FormControl>
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="请选择已授权渠道" />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              <SelectItem v-for="item in channelOptions" :key="item.providerCode" :value="item.providerCode">
+                {{ item.providerName }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+        <FormField v-slot="{ componentField }" name="loginPhone">
+          <FormItem>
+            <FormLabel :required="!isEdit">
+              登录手机号
+            </FormLabel>
+            <FormControl>
+              <Input type="tel" :maxlength="PHONE_MAX_LENGTH" placeholder="管家登录本后台的手机号" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        <FormField v-slot="{ componentField }" name="password">
+          <FormItem>
+            <FormLabel :required="!isEdit">
+              登录密码
+            </FormLabel>
+            <FormControl>
+              <Input type="password" autocomplete="new-password" placeholder="不修改请留空" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+      </div>
 
       <!-- 封面图 -->
       <FormField name="coverImage">
@@ -212,7 +301,7 @@ const onSubmit = handleSubmit((values) => {
           <FormItem>
             <FormLabel>商户ID</FormLabel>
             <FormControl>
-              <Input type="number" placeholder="关联商户ID" v-bind="componentField" />
+              <Input type="text" placeholder="关联商户ID" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>

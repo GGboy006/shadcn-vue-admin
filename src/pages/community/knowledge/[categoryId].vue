@@ -18,7 +18,7 @@ import DataTable from './components/article/data-table.vue'
 
 const route = useRoute()
 const router = useRouter()
-const categoryId = computed(() => Number((route.params as Record<string, string>).categoryId))
+const categoryId = computed(() => String((route.params as Record<string, string>).categoryId ?? ''))
 
 // 拉分类详情拿名称(标题用)
 const { data: categoryData } = useGetKnowledgeCategoryDetailQuery(categoryId)

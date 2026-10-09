@@ -120,7 +120,7 @@ function handleToggle(staff: IHousekeeperStaff, val: boolean | string | number) 
               @update:model-value="(val) => handleToggle(staff, val)"
             />
             <span class="flex-1 font-medium">{{ staff.staffName }}</span>
-            <span v-if="staff.title" class="text-xs text-muted-foreground">{{ staff.title }}</span>
+            <span v-if="staff.serviceSkills?.length" class="text-xs text-muted-foreground">{{ staff.serviceSkills.join('、') }}</span>
             <span v-if="staff.phone" class="text-xs text-muted-foreground">{{ staff.phone }}</span>
           </label>
         </div>

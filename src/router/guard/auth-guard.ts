@@ -2,7 +2,7 @@ import type { Router } from 'vue-router'
 
 import { storeToRefs } from 'pinia'
 
-import { isPropertyUser, UserType } from '@/constants/user-type'
+import { homePathForUser, isPropertyUser, UserType } from '@/constants/user-type'
 import pinia from '@/plugins/pinia/setup'
 import { useAuthStore } from '@/stores/auth'
 import { useUserInfoStore } from '@/stores/user-info'
@@ -34,8 +34,10 @@ export function setupAuthGuard(router: Router) {
       if (from.path && from.path !== to.path && !isFromAuthPage) {
         return from
       }
-      // 居委会后台首页是 /neighborhood/home,其余身份回 /dashboard
-      return { path: userType === UserType.committee ? '/neighborhood/home' : '/dashboard' }
+      // 居委会、管家各自回自己的首页；站长和商户仍回数据看板
+      if (userType === UserType.committee || userType === UserType.housekeeper)
+        return { path: homePathForUser(userType) }
+      return { path: '/dashboard' }
     }
 
     // 未登录访问根路径 -> 官网

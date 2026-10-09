@@ -13,6 +13,8 @@ export enum UserType {
   property = 5,
   /** 居委会 */
   committee = 6,
+  /** 管家服务(本馆账号) */
+  housekeeper = 9,
 }
 
 /** 商户后台用户类型:商户/居委会。物业是外部产品,不进本后台 */
@@ -32,4 +34,20 @@ export function isMerchantBusinessUser(userType: number | undefined | null): boo
 /** 是否为物业账号(userType=5) */
 export function isPropertyUser(userType: number | undefined | null): boolean {
   return userType === UserType.property
+}
+
+/** 是否为管家服务账号(userType=9) */
+export function isHousekeeperUser(userType: number | undefined | null): boolean {
+  return userType === UserType.housekeeper
+}
+
+/** 登录后的首页。商户仍进经营概览；站长进数据看板；管家进本馆资料 */
+export function homePathForUser(userType: number | undefined | null): string {
+  if (userType === UserType.committee)
+    return '/neighborhood/home'
+  if (userType === UserType.housekeeper)
+    return '/housekeeper/profile'
+  if (isMerchantBusinessUser(userType))
+    return '/merchant-business/overview'
+  return '/dashboard'
 }

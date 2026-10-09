@@ -22,7 +22,7 @@ import { articleValidator } from '../../validators/article.validator'
 const { article, lockCategoryId } = defineProps<{
   article?: IKnowledgeArticle
   /** 钻取页传入:锁定分类,不允许切换 */
-  lockCategoryId?: number
+  lockCategoryId?: string
 }>()
 
 const emits = defineEmits<{
@@ -45,8 +45,7 @@ const isEdit = computed(() => !!article?.articleId)
 // 分类下拉(§3.1 list 接口)
 const { data: categoryListData } = useGetKnowledgeCategoryListQuery()
 const categoryOptions = computed(() =>
-  // 强制统一为 number，避免后端 categoryId 为字符串导致 Select 严格匹配失败
-  (categoryListData.value?.data ?? []).map(c => ({ value: Number(c.categoryId), label: c.categoryName })),
+  (categoryListData.value?.data ?? []).map(c => ({ value: String(c.categoryId), label: c.categoryName })),
 )
 
 const initialValues = reactive<ArticleValidator>({
@@ -92,7 +91,7 @@ async function handleCoverUpload(event: Event) {
   }
 }
 
-function buildPayload(values: ArticleValidator, categoryId: number): IKnowledgeArticleSaveDTO {
+function buildPayload(values: ArticleValidator, categoryId: string): IKnowledgeArticleSaveDTO {
   return {
     articleId: isEdit.value ? article?.articleId : undefined,
     categoryId,

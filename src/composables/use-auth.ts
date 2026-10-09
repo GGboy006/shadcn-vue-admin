@@ -1,6 +1,6 @@
 import { toast } from 'vue-sonner'
 
-import { isMerchantBusinessUser, isPropertyUser, PROPERTY_ACCESS_DENIED, UserType } from '@/constants/user-type'
+import { homePathForUser, isHousekeeperUser, isMerchantBusinessUser, isPropertyUser, PROPERTY_ACCESS_DENIED, UserType } from '@/constants/user-type'
 import { useAuthStore } from '@/stores/auth'
 import { useUserInfoStore } from '@/stores/user-info'
 
@@ -29,9 +29,9 @@ export function useAuth() {
   }
 
   function toHome() {
-    // 居委会后台首页是 /neighborhood/home,其余身份回 /dashboard
-    if (authStore.userInfo?.userType === UserType.committee) {
-      router.push({ path: '/neighborhood/home' })
+    const userType = authStore.userInfo?.userType
+    if (userType === UserType.committee || isHousekeeperUser(userType)) {
+      router.push({ path: homePathForUser(userType) })
       return
     }
     router.push({ path: '/dashboard' })
@@ -65,7 +65,9 @@ export function useAuth() {
       }
 
       const redirect = router.currentRoute.value.query.redirect as string
-      if (!redirect || redirect.startsWith('//')) {
+      const redirectIsSafe = !!redirect && !redirect.startsWith('//')
+      const housekeeperLeavesOwnArea = isHousekeeperUser(userType) && !redirect?.startsWith('/housekeeper')
+      if (!redirectIsSafe || housekeeperLeavesOwnArea) {
         toHome()
       }
       else {

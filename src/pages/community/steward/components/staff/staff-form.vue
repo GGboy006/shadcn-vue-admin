@@ -10,12 +10,13 @@ import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 import { useCreateHousekeeperStaffMutation, useGetHousekeeperServiceListQuery, useUpdateHousekeeperStaffMutation } from '@/services/api/housekeeper.api'
 import { PHONE_MAX_LENGTH, showInvalidSubmitToast } from '@/validators/common'
 
 import type { HousekeeperStaffValidator } from '../../validators/staff.validator'
 
-import { housekeeperStaffValidator } from '../../validators/staff.validator'
+import { housekeeperStaffValidator, joinStaffSkills, splitStaffSkills } from '../../validators/staff.validator'
 
 const { staff, fixedHousekeeperId } = defineProps<{
   staff?: IHousekeeperStaff
@@ -44,10 +45,14 @@ const initialValues = reactive<HousekeeperStaffValidator>({
   staffId: staff?.staffId || undefined,
   housekeeperId: staff?.housekeeperId ?? fixedHousekeeperId ?? '',
   staffName: staff?.staffName || '',
-  phone: staff?.phone || undefined,
+  phone: staff?.phone || '',
   avatar: staff?.avatar || undefined,
-  title: staff?.title || undefined,
-  userId: staff?.userId ?? undefined,
+  serviceScope: staff?.serviceScope || undefined,
+  serviceTime: staff?.serviceTime || undefined,
+  serviceSkillsText: joinStaffSkills(staff?.serviceSkills),
+  description: staff?.description || undefined,
+  unitPrice: staff?.unitPrice ?? undefined,
+  priceUnit: staff?.priceUnit || '次',
   sortOrder: staff?.sortOrder ?? undefined,
   status: staff?.status ?? 1,
 })
@@ -70,8 +75,12 @@ function buildPayload(values: HousekeeperStaffValidator): IHousekeeperStaffSaveD
     staffName: values.staffName,
     phone: values.phone || undefined,
     avatar: values.avatar || undefined,
-    title: values.title || undefined,
-    userId: values.userId ?? undefined,
+    serviceScope: values.serviceScope || undefined,
+    serviceTime: values.serviceTime || undefined,
+    serviceSkills: splitStaffSkills(values.serviceSkillsText),
+    description: values.description || undefined,
+    unitPrice: values.unitPrice,
+    priceUnit: values.priceUnit || '次',
     sortOrder: values.sortOrder ?? undefined,
     status: values.status as 1 | 2 | undefined,
   }
@@ -142,7 +151,9 @@ const onSubmit = handleSubmit((values) => {
 
         <FormField v-slot="{ componentField }" name="phone">
           <FormItem>
-            <FormLabel>电话</FormLabel>
+            <FormLabel required>
+              电话
+            </FormLabel>
             <FormControl>
               <Input type="text" inputmode="numeric" :maxlength="PHONE_MAX_LENGTH" placeholder="11 位手机号" v-bind="componentField" />
             </FormControl>
@@ -151,41 +162,79 @@ const onSubmit = handleSubmit((values) => {
         </FormField>
       </div>
 
-      <!-- 职称 与 头像 -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-        <FormField v-slot="{ componentField }" name="title">
+        <FormField v-slot="{ componentField }" name="serviceScope">
           <FormItem>
-            <FormLabel>职称</FormLabel>
+            <FormLabel>服务范围</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="如:高级家政师" v-bind="componentField" />
+              <Input type="text" placeholder="如：本小区及周边" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
 
-        <FormField name="avatar">
+        <FormField v-slot="{ componentField }" name="serviceTime">
           <FormItem>
-            <FormLabel>头像</FormLabel>
+            <FormLabel>服务时间</FormLabel>
             <FormControl>
-              <ImageUpload
-                :model-value="formValues.avatar"
-                alt="头像"
-                shape="circle"
-                @update:model-value="(url) => setFieldValue('avatar', url)"
-              />
+              <Input type="text" placeholder="如：08:00 - 22:00" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
       </div>
 
-      <!-- 用户ID、排序 与 状态 -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-        <FormField v-slot="{ componentField }" name="userId">
+      <FormField v-slot="{ componentField }" name="serviceSkillsText">
+        <FormItem>
+          <FormLabel>服务技能</FormLabel>
+          <FormControl>
+            <Input type="text" placeholder="多个技能用顿号分隔，如：紧急开锁、汽车钥匙" v-bind="componentField" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <FormField v-slot="{ componentField }" name="description">
+        <FormItem>
+          <FormLabel>简介</FormLabel>
+          <FormControl>
+            <Textarea rows="2" placeholder="从业经验、擅长说明" v-bind="componentField" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <FormField name="avatar">
+        <FormItem>
+          <FormLabel>头像</FormLabel>
+          <FormControl>
+            <ImageUpload
+              :model-value="formValues.avatar"
+              alt="头像"
+              shape="circle"
+              @update:model-value="(url) => setFieldValue('avatar', url)"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <div class="grid grid-cols-1 gap-4 items-start md:grid-cols-2">
+        <FormField v-slot="{ componentField }" name="unitPrice">
           <FormItem>
-            <FormLabel>用户ID</FormLabel>
+            <FormLabel>单价</FormLabel>
             <FormControl>
-              <Input type="number" placeholder="关联用户ID" v-bind="componentField" />
+              <Input type="number" min="0" step="0.01" placeholder="0.00" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="priceUnit">
+          <FormItem>
+            <FormLabel>计价单位</FormLabel>
+            <FormControl>
+              <Input type="text" placeholder="次" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>

@@ -22,12 +22,14 @@ interface DataTableToolbarProps {
   housekeeperIdFilter?: string
   dateBegin?: string
   dateEnd?: string
+  showHousekeeperFilter?: boolean
 }
 
 const props = withDefaults(defineProps<DataTableToolbarProps>(), {
   orderStatusFilter: 'all',
   payStatusFilter: 'all',
   housekeeperIdFilter: 'all',
+  showHousekeeperFilter: true,
 })
 
 const emits = defineEmits<{
@@ -40,7 +42,8 @@ const emits = defineEmits<{
   (e: 'reset'): void
 }>()
 
-const { data: serviceListData } = useGetHousekeeperServiceListQuery()
+const showHousekeeperFilter = computed(() => props.showHousekeeperFilter)
+const { data: serviceListData } = useGetHousekeeperServiceListQuery(showHousekeeperFilter)
 const serviceOptions = computed(() => {
   return (serviceListData.value?.data ?? []).map(item => ({ value: item.housekeeperId, label: item.name }))
 })
@@ -49,7 +52,7 @@ const isFiltered = computed(() =>
   !!props.search
   || props.orderStatusFilter !== 'all'
   || props.payStatusFilter !== 'all'
-  || props.housekeeperIdFilter !== 'all'
+  || (props.showHousekeeperFilter && props.housekeeperIdFilter !== 'all')
   || !!props.dateBegin
   || !!props.dateEnd,
 )
@@ -130,7 +133,7 @@ const dateEndModel = computed({
         </SelectContent>
       </Select>
 
-      <Select v-model="housekeeperIdModel">
+      <Select v-if="showHousekeeperFilter" v-model="housekeeperIdModel">
         <SelectTrigger class="h-8 w-[140px]">
           <SelectValue placeholder="服务馆" />
         </SelectTrigger>

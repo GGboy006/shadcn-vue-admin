@@ -41,19 +41,43 @@ export const staffPanelColumns: ColumnDef<IHousekeeperStaff>[] = [
     enableResizing: true,
   },
   {
-    accessorKey: 'title',
-    header: ({ column }) => h(DataTableColumnHeader<IHousekeeperStaff>, { column, title: '职称' }),
-    meta: { title: '职称' },
-    cell: ({ row }) => h('div', { class: 'text-sm text-muted-foreground' }, row.original.title || '-'),
+    accessorKey: 'serviceSkills',
+    header: ({ column }) => h(DataTableColumnHeader<IHousekeeperStaff>, { column, title: '技能' }),
+    meta: { title: '技能' },
+    cell: ({ row }) => h('div', { class: 'text-sm text-muted-foreground' }, row.original.serviceSkills?.join('、') || '-'),
     enableSorting: false,
     enableHiding: true,
     enableResizing: true,
   },
   {
-    accessorKey: 'sortOrder',
-    header: ({ column }) => h(DataTableColumnHeader<IHousekeeperStaff>, { column, title: '排序' }),
-    meta: { title: '排序' },
-    cell: ({ row }) => h('div', { class: 'text-sm text-muted-foreground' }, row.original.sortOrder ?? '-'),
+    accessorKey: 'serviceScope',
+    header: ({ column }) => h(DataTableColumnHeader<IHousekeeperStaff>, { column, title: '服务范围' }),
+    meta: { title: '服务范围' },
+    cell: ({ row }) => h('div', { class: 'max-w-40 truncate text-sm text-muted-foreground' }, row.original.serviceScope || '-'),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: true,
+  },
+  {
+    accessorKey: 'unitPrice',
+    header: ({ column }) => h(DataTableColumnHeader<IHousekeeperStaff>, { column, title: '单价' }),
+    meta: { title: '单价' },
+    cell: ({ row }) => {
+      const price = row.original.unitPrice
+      if (price == null)
+        return h('div', { class: 'text-sm text-muted-foreground' }, '-')
+      const unit = row.original.priceUnit || '次'
+      return h('div', { class: 'text-sm text-muted-foreground whitespace-nowrap' }, `${price} / ${unit}`)
+    },
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: true,
+  },
+  {
+    accessorKey: 'score',
+    header: ({ column }) => h(DataTableColumnHeader<IHousekeeperStaff>, { column, title: '评分' }),
+    meta: { title: '评分' },
+    cell: ({ row }) => h('div', { class: 'text-sm text-muted-foreground' }, row.original.score ?? '-'),
     enableSorting: false,
     enableHiding: true,
     enableResizing: true,

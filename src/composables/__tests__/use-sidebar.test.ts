@@ -56,6 +56,15 @@ describe('useSidebar navData', () => {
     expect(leafTitles(navData.value[2])).toEqual(['个人资料'])
   })
 
+  it('管家(userType=9):本馆资料 + 服务人员 + 服务订单 + 设置', () => {
+    setUser(9)
+    const { navData } = useSidebar()
+
+    expect(navData.value.map(g => g.title)).toEqual(['本馆', '设置'])
+    expect(leafTitles(navData.value[0])).toEqual(['本馆资料', '服务人员', '服务订单'])
+    expect(leafTitles(navData.value[1])).toEqual(['个人资料'])
+  })
+
   it('物业(userType=5)不再走商户后台菜单', () => {
     setUser(5)
     const { navData } = useSidebar()

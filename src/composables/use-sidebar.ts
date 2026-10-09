@@ -4,7 +4,7 @@ import type { NavGroup, NavItem } from '@/components/app-sidebar/types'
 
 import { filterMerchantBusinessItems } from '@/composables/filter-merchant-business-items'
 import { filterNavItemsByRoles } from '@/composables/filter-nav-items-by-roles'
-import { isMerchantBusinessUser, UserType } from '@/constants/user-type'
+import { isHousekeeperUser, isMerchantBusinessUser, UserType } from '@/constants/user-type'
 
 export function useSidebar() {
   const authStore = useAuthStore()
@@ -107,6 +107,12 @@ export function useSidebar() {
     { title: '会话列表', url: '/conversations', icon: MessageSquareIcon, roles: [3] },
   ]
 
+  const housekeeperNavItems: NavItem[] = [
+    { title: '本馆资料', url: '/housekeeper/profile', icon: StoreIcon },
+    { title: '服务人员', url: '/housekeeper/staff', icon: UsersIcon },
+    { title: '服务订单', url: '/housekeeper/orders', icon: ListOrderedIcon },
+  ]
+
   const neighborhoodNavItems: NavItem[] = [
     { title: '首页', url: '/neighborhood/home', icon: HomeIcon },
     { title: '公告管理', url: '/neighborhood/notice', icon: MegaphoneIcon },
@@ -179,7 +185,14 @@ export function useSidebar() {
     settingsGroup(),
   ])
 
+  const housekeeperNavData = computed<NavGroup[]>(() => [
+    { title: '本馆', items: housekeeperNavItems },
+    settingsGroup(),
+  ])
+
   const navData = computed<NavGroup[]>(() => {
+    if (isHousekeeperUser(userType.value))
+      return housekeeperNavData.value
     if (isMerchantBusinessUser(userType.value))
       return merchantSelfNavData.value
     return stationNavData.value

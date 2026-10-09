@@ -5,10 +5,12 @@ import { toast } from 'vue-sonner'
 
 import type { IHousekeeperStaffListQuery } from '@/services/api/housekeeper.api'
 
+import { Copy } from '@/components/prop-ui/copy'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useLazyMount } from '@/composables/use-lazy-mount'
+import { canStationManageStaff, housekeeperAccountLabel } from '@/services/api/housekeeper-account'
 import {
   useGetHousekeeperServiceDetailQuery,
   useGetHousekeeperStaffPageQuery,
@@ -22,10 +24,14 @@ import StaffEdit from '../staff/staff-edit.vue'
 import { staffPanelColumns } from './staff-panel-columns'
 import StaffPanelToolbar from './staff-panel-toolbar.vue'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   orgId?: string
   showBack?: boolean
-}>()
+  /** station=站长管全站；self=管家只看本馆人员 */
+  manageMode?: 'station' | 'self'
+}>(), {
+  manageMode: 'station',
+})
 
 const emit = defineEmits<{
   back: []
@@ -35,6 +41,13 @@ const orgIdRef = computed(() => props.orgId)
 
 const { data: detailData, isLoading: isDetailLoading } = useGetHousekeeperServiceDetailQuery(orgIdRef)
 const org = computed(() => detailData.value?.data)
+const isSelf = computed(() => props.manageMode === 'self')
+const staffWritable = computed(() => isSelf.value || canStationManageStaff(org.value))
+const staffLockHint = computed(() => {
+  if (staffWritable.value || !org.value)
+    return ''
+  return '第三方网点不能添加师傅'
+})
 
 const staffQuery = ref<IHousekeeperStaffListQuery>({
   pageNum: 1,
@@ -67,6 +80,12 @@ watch(orgIdRef, (id) => {
 }, { immediate: true })
 
 const { data: staffData, isLoading: isStaffLoading } = useGetHousekeeperStaffPageQuery(staffQuery)
+
+const staffColumns = computed(() => {
+  if (staffWritable.value)
+    return staffPanelColumns
+  return staffPanelColumns.filter(column => column.id !== 'actions')
+})
 
 const staffList = computed(() => staffData.value?.data?.list ?? [])
 const staffTotal = computed(() => staffData.value?.data?.total ?? 0)
@@ -143,10 +162,23 @@ const isDesktop = useMediaQuery('(min-width: 1024px)')
               <Skeleton class="h-3.5 w-48" />
             </div>
             <template v-else-if="org">
-              <div class="flex min-w-0 items-baseline gap-2">
+              <div class="flex min-w-0 items-center gap-2">
                 <h3 class="truncate text-base font-semibold">
                   {{ org.name }}
                 </h3>
+                <span v-if="!isSelf" class="inline-flex shrink-0 items-center gap-0.5 text-xs text-muted-foreground">
+                  {{ housekeeperAccountLabel(org) }}
+                  <template v-if="org.loginPhone">
+                    · {{ org.loginPhone }}
+                    <Copy
+                      :content="org.loginPhone"
+                      variant="ghost"
+                      class="size-6"
+                      copy-tooltip-text="复制账号"
+                      copied-tooltip-text="已复制"
+                    />
+                  </template>
+                </span>
                 <span class="shrink-0 text-xs text-muted-foreground">
                   <template v-if="org.contactName || org.contactPhone">
                     <span v-if="org.contactName">{{ org.contactName }}</span>
@@ -163,7 +195,7 @@ const isDesktop = useMediaQuery('(min-width: 1024px)')
             </template>
           </div>
 
-          <div v-if="org" class="flex shrink-0 items-center gap-1.5">
+          <div v-if="org && !isSelf" class="flex shrink-0 items-center gap-1.5">
             <Button size="sm" variant="outline" class="h-8" :disabled="isToggling" @click="handleToggleStatus">
               <BanIcon v-if="org.status === 1" class="size-3.5" />
               <CircleCheckIcon v-else class="size-3.5" />
@@ -193,16 +225,19 @@ const isDesktop = useMediaQuery('(min-width: 1024px)')
           <div class="text-sm font-medium">
             本机构人员
           </div>
-          <Button size="sm" @click="isStaffCreateOpen = true">
+          <Button v-if="staffWritable" size="sm" @click="isStaffCreateOpen = true">
             <PlusIcon class="size-4" />
             添加人员
           </Button>
         </div>
+        <p v-if="staffLockHint" class="mb-3 text-xs text-muted-foreground">
+          {{ staffLockHint }}
+        </p>
 
         <StaffDataTable
           :loading="isStaffLoading"
           :data="staffList"
-          :columns="staffPanelColumns"
+          :columns="staffColumns"
           :server-pagination="staffServerPagination"
         >
           <template #toolbar="{ table }">

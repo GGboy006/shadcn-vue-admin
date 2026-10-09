@@ -9,6 +9,9 @@ import type { IPageParam, IPageResult, IResponse } from '../types/response.type'
 /** 通用启停(对接文档 14 节):1=启用,2=禁用 */
 export type HousekeeperEnableStatus = 1 | 2
 
+/** 履约类型:1 本地馆 / 2 第三方网点 */
+export type HousekeeperProviderType = 1 | 2
+
 /** 启用状态映射配置 */
 export const housekeeperEnableStatusConfig: Record<HousekeeperEnableStatus, { label: string, variant: 'default' | 'secondary' }> = {
   1: { label: '启用', variant: 'default' },
@@ -24,7 +27,7 @@ export interface IHousekeeperService {
   /** 管家服务ID */
   housekeeperId: string
   /** 站长ID */
-  stationId?: number
+  stationId?: string
   /** 名称 */
   name: string
   /** 描述 */
@@ -37,6 +40,14 @@ export interface IHousekeeperService {
   contactName?: string
   /** 联系电话 */
   contactPhone?: string
+  /** 登录账号。空=未开户或第三方网点 */
+  userId?: string
+  /** 登录手机号。空同上 */
+  loginPhone?: string
+  /** 履约类型:1 本地馆 / 2 第三方网点 */
+  providerType?: HousekeeperProviderType
+  /** 第三方渠道编码 */
+  providerCode?: string
   /** 商户ID */
   merchantId?: string
   /** 排序 */
@@ -75,6 +86,14 @@ export interface IHousekeeperServiceSaveDTO {
   contactName?: string
   /** 联系电话 */
   contactPhone?: string
+  /** 登录手机号。本地馆开户或改登录号时传 */
+  loginPhone?: string
+  /** 登录密码。空则不改密码 */
+  password?: string
+  /** 履约类型:1 本地馆 / 2 第三方网点 */
+  providerType?: HousekeeperProviderType
+  /** 第三方渠道编码。providerType=2 时必填 */
+  providerCode?: string
   /** 商户ID */
   merchantId?: string
   /** 排序 */
@@ -83,12 +102,46 @@ export interface IHousekeeperServiceSaveDTO {
   status?: HousekeeperEnableStatus
 }
 
+/** 已授权第三方渠道 */
+export interface IHousekeeperFulfillProvider {
+  providerCode: string
+  providerName: string
+}
+
 /** 主体分页响应 */
 export type IHousekeeperServiceListResponse = IResponse<IPageResult<IHousekeeperService>>
 /** 主体启用列表响应(下拉用) */
 export type IHousekeeperServiceListAllResponse = IResponse<IHousekeeperService[]>
 /** 主体详情响应 */
 export type IHousekeeperServiceDetailResponse = IResponse<IHousekeeperService>
+/** 已授权第三方渠道响应 */
+export type IHousekeeperFulfillProviderListResponse = IResponse<IHousekeeperFulfillProvider[]>
+
+function normalizeFulfillProvider(raw: IHousekeeperFulfillProvider | string): IHousekeeperFulfillProvider {
+  if (typeof raw === 'string')
+    return { providerCode: raw, providerName: raw }
+  const providerCode = String(raw.providerCode ?? '')
+  const providerName = String(raw.providerName || providerCode)
+  return { providerCode, providerName }
+}
+
+/** 已授权第三方渠道(`GET /housekeeper/fulfill/providers`) */
+export function useGetHousekeeperFulfillProvidersQuery(enabled?: Ref<boolean>) {
+  const { apiFetch } = useApiFetch()
+
+  return useQuery<IHousekeeperFulfillProviderListResponse, Error>({
+    queryKey: ['housekeeperFulfillProviders'],
+    queryFn: async () => {
+      const res = await apiFetch<IHousekeeperFulfillProviderListResponse>('/housekeeper/fulfill/providers')
+      return {
+        ...res,
+        data: (Array.isArray(res.data) ? res.data : []).map(normalizeFulfillProvider).filter(item => item.providerCode),
+      }
+    },
+    enabled: () => enabled?.value ?? true,
+    retry: false,
+  })
+}
 
 /** 获取管家服务主体分页列表(对接文档 4.1,`/housekeeper/service/page`) */
 export function useGetHousekeeperServicePageQuery(query: Ref<IHousekeeperServiceListQuery>) {
@@ -105,12 +158,13 @@ export function useGetHousekeeperServicePageQuery(query: Ref<IHousekeeperService
 }
 
 /** 获取启用管家服务列表(下拉用,对接文档 4.1,`/housekeeper/service/list`) */
-export function useGetHousekeeperServiceListQuery() {
+export function useGetHousekeeperServiceListQuery(enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IHousekeeperServiceListAllResponse, Error>({
     queryKey: ['housekeeperServiceAll'],
     queryFn: async () => await apiFetch<IHousekeeperServiceListAllResponse>('/housekeeper/service/list'),
+    enabled: () => enabled?.value ?? true,
     retry: false,
   })
 }
@@ -178,6 +232,7 @@ export function useUpdateHousekeeperServiceStatusMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['housekeeperServiceList'] })
       queryClient.invalidateQueries({ queryKey: ['housekeeperServiceAll'] })
+      queryClient.invalidateQueries({ queryKey: ['housekeeperServiceDetail'] })
     },
   })
 }
@@ -212,17 +267,29 @@ export interface IHousekeeperStaff {
   /** 管家服务名称 */
   housekeeperName?: string
   /** 站长ID */
-  stationId?: number
+  stationId?: string
   /** 人员姓名 */
   staffName: string
   /** 手机 */
   phone?: string
   /** 头像 */
   avatar?: string
-  /** 职称 */
-  title?: string
-  /** 用户ID */
-  userId?: number
+  /** 服务范围 */
+  serviceScope?: string
+  /** 服务时间 */
+  serviceTime?: string
+  /** 服务技能 */
+  serviceSkills?: string[]
+  /** 简介 */
+  description?: string
+  /** 单价 */
+  unitPrice?: number
+  /** 计价单位，默认次 */
+  priceUnit?: string
+  /** 评分，只读 */
+  score?: number
+  /** 用户ID。雪花 ID，由后端同步师傅账号后回写 */
+  userId?: string
   /** 排序 */
   sortOrder?: number
   /** 启用状态:1=启用,2=禁用 */
@@ -255,10 +322,18 @@ export interface IHousekeeperStaffSaveDTO {
   phone?: string
   /** 头像 */
   avatar?: string
-  /** 职称 */
-  title?: string
-  /** 用户ID */
-  userId?: number
+  /** 服务范围 */
+  serviceScope?: string
+  /** 服务时间 */
+  serviceTime?: string
+  /** 服务技能 */
+  serviceSkills?: string[]
+  /** 简介 */
+  description?: string
+  /** 单价 */
+  unitPrice?: number
+  /** 计价单位，默认次 */
+  priceUnit?: string
   /** 排序 */
   sortOrder?: number
   /** 启用状态:1=启用,2=禁用 */
@@ -406,7 +481,7 @@ export interface IHousekeeperCategory {
   /** 启用状态:1=启用,2=禁用 */
   status?: HousekeeperEnableStatus
   /** 站长ID */
-  stationId?: number
+  stationId?: string
   /** 供应商数量 */
   providerCount?: number
   /** 创建时间 */

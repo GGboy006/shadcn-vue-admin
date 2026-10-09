@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { isMerchantBusinessUser, isPropertyUser, MERCHANT_BUSINESS_USER_TYPES, PROPERTY_ACCESS_DENIED, UserType } from '@/constants/user-type'
+import { homePathForUser, isHousekeeperUser, isMerchantBusinessUser, isPropertyUser, MERCHANT_BUSINESS_USER_TYPES, PROPERTY_ACCESS_DENIED, UserType } from '@/constants/user-type'
 
 describe('user-type', () => {
   it('userType 枚举值正确', () => {
@@ -8,6 +8,7 @@ describe('user-type', () => {
     expect(UserType.merchant).toBe(4)
     expect(UserType.property).toBe(5)
     expect(UserType.committee).toBe(6)
+    expect(UserType.housekeeper).toBe(9)
   })
 
   it('mERCHANT_BUSINESS_USER_TYPES 含 4/6,不含物业 5', () => {
@@ -32,9 +33,18 @@ describe('user-type', () => {
       expect(isMerchantBusinessUser(userType)).toBe(true)
     })
 
-    it('站长(3)与物业(5)返回 false', () => {
+    it('站长(3)、物业(5)与管家(9)返回 false', () => {
       expect(isMerchantBusinessUser(3)).toBe(false)
       expect(isMerchantBusinessUser(5)).toBe(false)
+      expect(isMerchantBusinessUser(9)).toBe(false)
+      expect(isHousekeeperUser(9)).toBe(true)
+      expect(isHousekeeperUser(3)).toBe(false)
+    })
+
+    it('管家登录后进入本馆资料', () => {
+      expect(homePathForUser(9)).toBe('/housekeeper/profile')
+      expect(homePathForUser(6)).toBe('/neighborhood/home')
+      expect(homePathForUser(3)).toBe('/dashboard')
     })
 
     it('其他值返回 false', () => {

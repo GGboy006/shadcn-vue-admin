@@ -19,7 +19,7 @@ import ArticleEdit from './article-edit.vue'
 interface DataTableRowActionsProps {
   row: Row<IKnowledgeArticle>
   /** 钻取页传入:锁定分类 */
-  lockCategoryId?: number
+  lockCategoryId?: string
 }
 const props = defineProps<DataTableRowActionsProps>()
 const article = computed(() => props.row.original)

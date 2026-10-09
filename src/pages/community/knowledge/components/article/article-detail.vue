@@ -15,7 +15,7 @@ import { knowledgePublishStatusConfig, useGetKnowledgeArticleDetailQuery } from 
 
 const props = defineProps<{
   open: boolean
-  articleId?: number
+  articleId?: string
 }>()
 
 const emit = defineEmits<{
