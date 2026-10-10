@@ -12,6 +12,9 @@ export type HousekeeperEnableStatus = 1 | 2
 /** 履约类型:1 本地馆 / 2 第三方网点 */
 export type HousekeeperProviderType = 1 | 2
 
+/** 本地馆支付方式:1 线上 / 2 线下 */
+export type HousekeeperPayMode = 1 | 2
+
 /** 启用状态映射配置 */
 export const housekeeperEnableStatusConfig: Record<HousekeeperEnableStatus, { label: string, variant: 'default' | 'secondary' }> = {
   1: { label: '启用', variant: 'default' },
@@ -48,6 +51,8 @@ export interface IHousekeeperService {
   providerType?: HousekeeperProviderType
   /** 第三方渠道编码 */
   providerCode?: string
+  /** 支付方式:1 线上 / 2 线下。空=第三方或未设置 */
+  payMode?: HousekeeperPayMode
   /** 商户ID */
   merchantId?: string
   /** 排序 */
@@ -94,6 +99,8 @@ export interface IHousekeeperServiceSaveDTO {
   providerType?: HousekeeperProviderType
   /** 第三方渠道编码。providerType=2 时必填 */
   providerCode?: string
+  /** 支付方式。仅本地馆提交；第三方不传 */
+  payMode?: HousekeeperPayMode
   /** 商户ID */
   merchantId?: string
   /** 排序 */

@@ -29,6 +29,7 @@ import {
   TimelineSeparator,
   TimelineTitle,
 } from '@/components/ui/timeline'
+import { housekeeperPayModeLabel } from '@/services/api/housekeeper-account'
 import { useGetHousekeeperOrderDetailQuery } from '@/services/api/housekeeper-order.api'
 
 import type { OrderDetailField } from './order-detail-fields.vue'
@@ -131,6 +132,7 @@ const serviceSections = computed(() => {
     field('单价', item.unitPrice != null ? formatYuan(item.unitPrice) : undefined),
     field('数量', item.quantity != null ? `${item.quantity}${item.unit ? ` ${item.unit}` : ''}` : undefined),
     field('订单金额', item.totalAmount != null ? formatYuan(item.totalAmount) : undefined),
+    field('支付方式', housekeeperPayModeLabel(item.payMode)),
     field('实付金额', item.payAmount != null ? formatYuan(item.payAmount) : undefined),
     field('成交金额', item.actualAmount != null ? formatYuan(item.actualAmount) : undefined),
     field('下单备注', item.remark, 2),
@@ -212,6 +214,12 @@ function dimensionScores(evaluation: IHousekeeperOrderEvaluation) {
               :class="housekeeperOrderStatusStyle[detail.orderStatus]"
             >
               {{ detail.orderStatusLabel || orderStatusText(detail.orderStatus) }}
+            </Badge>
+            <Badge
+              v-if="housekeeperPayModeLabel(detail.payMode)"
+              variant="outline"
+            >
+              {{ housekeeperPayModeLabel(detail.payMode) }}支付
             </Badge>
             <Badge
               v-if="detail.payStatus != null"

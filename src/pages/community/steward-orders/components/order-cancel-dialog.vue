@@ -58,7 +58,9 @@ function handleSubmit() {
           取消订单
         </ModalTitle>
         <ModalDescription>
-          将取消 {{ order.orderNo }}。已支付且有金额的订单请引导居民在 App 取消以走退款。
+          {{ order.payMode === 2
+            ? `将取消 ${order.orderNo}。这是线下支付，平台没有收款，取消后不退款。`
+            : `将取消 ${order.orderNo}。已支付且有金额的订单请引导居民在 App 取消以走退款。` }}
         </ModalDescription>
       </ModalHeader>
 

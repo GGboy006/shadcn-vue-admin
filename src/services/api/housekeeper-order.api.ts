@@ -99,6 +99,8 @@ export interface IHousekeeperOrder {
   orderStatusLabel?: string
   /** 履约方:`LOCAL` 本站,其它为第三方编码 */
   fulfillProviderCode?: string
+  /** 下单时的支付方式:1 线上 / 2 线下。空=第三方或历史单 */
+  payMode?: 1 | 2 | null
   /** 下单时间 */
   createTime?: string
 }

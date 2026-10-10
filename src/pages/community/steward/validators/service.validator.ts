@@ -20,6 +20,7 @@ export const housekeeperServiceValidator = z.object({
   loginPhone: optionalString,
   password: optionalString,
   accountOpened: z.boolean().optional(),
+  payMode: optionalNumber,
 }).superRefine((values, ctx) => {
   const providerType = values.providerType === 2 ? 2 : 1
   for (const issue of stationHousekeeperAccountIssues({

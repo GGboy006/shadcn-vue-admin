@@ -56,10 +56,23 @@ describe('housekeeper account', () => {
       providerCode: 'ZMN',
       loginPhone: '13800138000',
       password: 'abc12345',
+      payMode: 2,
     })
     expect(payload.providerCode).toBe('ZMN')
     expect(payload.loginPhone).toBeUndefined()
     expect(payload.password).toBeUndefined()
+    expect(payload.payMode).toBeUndefined()
+  })
+
+  it('本地馆保存带上支付方式', () => {
+    const payload = buildStationHousekeeperSavePayload({
+      name: '西小营家政',
+      providerType: 1,
+      payMode: 2,
+      loginPhone: '13800138000',
+      password: 'abc12345',
+    })
+    expect(payload.payMode).toBe(2)
   })
 
   it('管家资料只保留本馆展示字段', () => {

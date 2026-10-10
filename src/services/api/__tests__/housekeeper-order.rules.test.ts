@@ -65,6 +65,25 @@ describe('housekeeper order action rules', () => {
       expect(canCancelHousekeeperOrder(order({ orderStatus: 1, payStatus: 2, payAmount: 80 }))).toBe(false)
     })
 
+    it('allows offline orders even when marked paid with a service amount', () => {
+      expect(canCancelHousekeeperOrder(order({
+        orderStatus: 1,
+        payStatus: 2,
+        payAmount: 0,
+        totalAmount: 80,
+        payMode: 2,
+      }))).toBe(true)
+    })
+
+    it('does not treat a missing payMode as offline', () => {
+      expect(canCancelHousekeeperOrder(order({
+        orderStatus: 1,
+        payStatus: 2,
+        payAmount: 80,
+        payMode: undefined,
+      }))).toBe(false)
+    })
+
     it('hides cancel for finished / cancelled / rejected', () => {
       expect(canCancelHousekeeperOrder(order({ orderStatus: 4, payStatus: 0 }))).toBe(false)
       expect(canCancelHousekeeperOrder(order({ orderStatus: 5, payStatus: 0 }))).toBe(false)

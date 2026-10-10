@@ -10,7 +10,7 @@ import { Modal, ModalContent } from '@/components/prop-ui/modal'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useLazyMount } from '@/composables/use-lazy-mount'
-import { canStationManageStaff, housekeeperAccountLabel } from '@/services/api/housekeeper-account'
+import { canStationManageStaff, housekeeperAccountLabel, housekeeperPayModeLabel } from '@/services/api/housekeeper-account'
 import {
   useGetHousekeeperServiceDetailQuery,
   useGetHousekeeperStaffPageQuery,
@@ -178,6 +178,9 @@ const isDesktop = useMediaQuery('(min-width: 1024px)')
                       copied-tooltip-text="已复制"
                     />
                   </template>
+                </span>
+                <span v-if="housekeeperPayModeLabel(org.payMode)" class="shrink-0 text-xs text-muted-foreground">
+                  {{ housekeeperPayModeLabel(org.payMode) }}支付
                 </span>
                 <span class="shrink-0 text-xs text-muted-foreground">
                   <template v-if="org.contactName || org.contactPhone">

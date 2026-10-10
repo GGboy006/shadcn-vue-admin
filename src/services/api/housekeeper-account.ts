@@ -27,6 +27,14 @@ export function canStationManageStaff(service?: AccountFields | null): boolean {
   return true
 }
 
+export function housekeeperPayModeLabel(payMode?: number | null) {
+  if (payMode === 1)
+    return '线上'
+  if (payMode === 2)
+    return '线下'
+  return undefined
+}
+
 export function housekeeperAccountLabel(service?: AccountFields | null): string {
   if (isThirdPartyHousekeeper(service))
     return '第三方网点'
@@ -111,6 +119,9 @@ export function buildStationHousekeeperSavePayload(values: IHousekeeperServiceSa
     payload.providerCode = values.providerCode?.trim() || undefined
     return payload
   }
+
+  if (values.payMode === 1 || values.payMode === 2)
+    payload.payMode = values.payMode
 
   const loginPhone = values.loginPhone?.trim()
   if (loginPhone)

@@ -36,6 +36,10 @@ const enableStatusList = [
 
 const isEdit = computed(() => !!service?.housekeeperId)
 const accountOpened = computed(() => isHousekeeperAccountOpened(service))
+const payModeOptions = [
+  { value: 1, label: '线上支付' },
+  { value: 2, label: '线下支付' },
+] as const
 const providerOptions = [
   { value: HOUSEKEEPER_PROVIDER_LOCAL, label: '本地馆' },
   { value: HOUSEKEEPER_PROVIDER_THIRD_PARTY, label: '第三方网点' },
@@ -57,6 +61,7 @@ const initialValues = reactive<HousekeeperServiceValidator>({
   loginPhone: service?.loginPhone || undefined,
   password: undefined,
   accountOpened: isHousekeeperAccountOpened(service),
+  payMode: service?.payMode === 2 ? 2 : 1,
 })
 
 const formSchema = toTypedSchema(housekeeperServiceValidator)
@@ -112,6 +117,7 @@ function buildPayload(values: HousekeeperServiceValidator): IHousekeeperServiceS
     providerCode: values.providerCode,
     loginPhone: values.loginPhone,
     password: values.password,
+    payMode: Number(values.payMode) === 2 ? 2 : 1,
   })
 }
 
@@ -174,6 +180,28 @@ const onSubmit = handleSubmit((values) => {
           </Select>
           <p class="text-xs text-muted-foreground">
             {{ accountOpened ? '已开通登录账号的馆不能改为第三方网点' : '第三方网点不开登录账号，也不能添加师傅' }}
+          </p>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <FormField v-if="!isThirdParty" v-slot="{ componentField }" name="payMode">
+        <FormItem>
+          <FormLabel>支付方式</FormLabel>
+          <Select v-bind="componentField">
+            <FormControl>
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="请选择支付方式" />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              <SelectItem v-for="item in payModeOptions" :key="item.value" :value="item.value">
+                {{ item.label }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <p class="text-xs text-muted-foreground">
+            下单时会抄到订单上。之后改这里，已经下的单不变。
           </p>
           <FormMessage />
         </FormItem>

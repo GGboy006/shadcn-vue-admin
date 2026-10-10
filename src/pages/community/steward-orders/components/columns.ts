@@ -6,6 +6,7 @@ import type { IHousekeeperOrder } from '@/services/api/housekeeper-order.api'
 
 import { DataTableColumnHeader } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
+import { housekeeperPayModeLabel } from '@/services/api/housekeeper-account'
 
 import { formatDateTime, formatYuan } from '../data/format'
 import { housekeeperOrderPayStatusStyle, housekeeperOrderStatusStyle } from '../data/status'
@@ -83,6 +84,14 @@ export const columns: ColumnDef<IHousekeeperOrder>[] = [
       const style = payStatus != null ? housekeeperOrderPayStatusStyle[payStatus] : undefined
       return h(Badge, { class: style ?? 'text-muted-foreground' }, () => row.original.payStatusLabel || '-')
     },
+    enableSorting: false,
+    enableResizing: true,
+  },
+  {
+    accessorKey: 'payMode',
+    header: ({ column }) => h(DataTableColumnHeader<IHousekeeperOrder>, { column, title: '支付方式' }),
+    meta: { title: '支付方式' },
+    cell: ({ row }) => h('div', { class: 'text-sm text-muted-foreground' }, housekeeperPayModeLabel(row.original.payMode) || '-'),
     enableSorting: false,
     enableResizing: true,
   },

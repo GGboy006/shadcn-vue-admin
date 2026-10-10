@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
+import { housekeeperPayModeLabel } from '@/services/api/housekeeper-account'
 import { housekeeperEnableStatusConfig } from '@/services/api/housekeeper.api'
 
 const props = defineProps<{
@@ -75,6 +76,9 @@ const searchModel = computed({
             >
               {{ housekeeperEnableStatusConfig[org.status]?.label }}
             </Badge>
+            <span v-if="housekeeperPayModeLabel(org.payMode)">
+              {{ housekeeperPayModeLabel(org.payMode) }}
+            </span>
           </div>
         </div>
       </button>
