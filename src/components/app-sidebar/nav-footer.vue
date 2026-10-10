@@ -25,11 +25,11 @@ const { isMobile, open } = useSidebar()
                 {{ userInfo?.nickname?.slice(0, 1) || '用户' }}
               </UiAvatarFallback>
             </UiAvatar>
-            <div class="grid flex-1 text-sm leading-tight text-left">
-              <span class="font-semibold truncate">{{ userInfo?.nickname }}</span>
-              <span class="text-xs truncate">{{ userInfo?.phone }}</span>
+            <div class="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
+              <span class="truncate font-semibold">{{ userInfo?.nickname }}</span>
+              <span class="truncate text-xs">{{ userInfo?.phone }}</span>
             </div>
-            <ChevronsUpDownIcon class="ml-auto size-4" />
+            <ChevronsUpDownIcon class="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
           </UiSidebarMenuButton>
         </UiDropdownMenuTrigger>
         <UiDropdownMenuContent

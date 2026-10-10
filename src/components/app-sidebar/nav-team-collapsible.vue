@@ -70,7 +70,7 @@ function isPathActive(pathname: string, url?: string): boolean {
                   <component :is="menu.icon" v-if="menu.icon" />
                   <span>{{ menu.title }}</span>
                   <ChevronRightIcon
-                    class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
+                    class="ml-auto transition-transform duration-200 group-data-[collapsible=icon]:hidden group-data-[state=open]/collapsible:rotate-90"
                   />
                 </UiSidebarMenuButton>
               </UiCollapsibleTrigger>

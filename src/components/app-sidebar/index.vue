@@ -43,12 +43,12 @@ const sidebarTitle = computed(() => {
       </template>
       <template v-else>
         <!-- 当前阶段占位：根据用户角色展示名称，后续可替换/并入多小区切换器 -->
-        <div class="flex items-center gap-2 px-2 h-12">
-          <div class="flex items-center justify-center rounded-lg aspect-square size-8 bg-sidebar-primary text-sidebar-primary-foreground">
+        <div class="flex h-12 items-center gap-2 px-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+          <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
             <span class="text-sm font-bold">{{ sidebarTitle.charAt(0) }}</span>
           </div>
-          <div class="grid flex-1 text-sm leading-tight text-left">
-            <span class="font-semibold truncate">{{ sidebarTitle }}</span>
+          <div class="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
+            <span class="truncate font-semibold">{{ sidebarTitle }}</span>
           </div>
         </div>
       </template>
