@@ -152,7 +152,7 @@ function handleCategoryReset() {
 
       <UiTabsContent value="category" class="mt-4">
         <p class="mb-3 text-sm text-muted-foreground">
-          居民端看到的类目在此维护；创建分类后需「分配人员」才会展示具体服务人员。
+          居民端看到的类目在此维护。本地馆分配到具体师傅，第三方网点按整馆分配。
         </p>
         <CategoryDataTable
           :loading="isCategoryLoading"

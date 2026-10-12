@@ -1,31 +1,24 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-
+import type { CategoryAssignmentDraft } from '@/services/api/housekeeper-assignment'
 import type { IHousekeeperStaff } from '@/services/api/housekeeper.api'
 
 import { Modal, ModalClose, ModalContent, ModalDescription, ModalFooter, ModalHeader, ModalTitle } from '@/components/prop-ui/modal'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { HOUSEKEEPER_PROVIDER_LOCAL, HOUSEKEEPER_PROVIDER_THIRD_PARTY } from '@/services/api/housekeeper-account'
+import { assignmentKey } from '@/services/api/housekeeper-assignment'
 import { useGetHousekeeperServiceListQuery, useGetHousekeeperStaffListQuery } from '@/services/api/housekeeper.api'
-
-interface ProviderItem {
-  housekeeperId: string
-  staffId: string
-  housekeeperName?: string
-  staffName?: string
-  sortOrder: number
-}
 
 const props = defineProps<{
   open: boolean
-  currentStaffIds: Set<string>
+  assigned: CategoryAssignmentDraft[]
 }>()
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  'add': [item: ProviderItem]
-  'remove': [staffId: string]
+  'add': [item: CategoryAssignmentDraft]
+  'remove': [item: Pick<CategoryAssignmentDraft, 'housekeeperId' | 'staffId' | 'providerType'>]
 }>()
 
 const isOpen = computed({
@@ -34,35 +27,61 @@ const isOpen = computed({
 })
 
 const selectedHousekeeperId = ref<string | undefined>(undefined)
+const listEnabled = computed(() => props.open)
 
-const { data: serviceListData } = useGetHousekeeperServiceListQuery()
-const serviceOptions = computed(() =>
-  (serviceListData.value?.data ?? []).map(s => ({ value: s.housekeeperId, label: s.name })),
-)
+const { data: serviceListData } = useGetHousekeeperServiceListQuery(listEnabled)
+const services = computed(() => serviceListData.value?.data ?? [])
+const localServices = computed(() => services.value.filter(item => item.providerType !== HOUSEKEEPER_PROVIDER_THIRD_PARTY))
+const thirdPartyServices = computed(() => services.value.filter(item => item.providerType === HOUSEKEEPER_PROVIDER_THIRD_PARTY))
+const selectedService = computed(() => services.value.find(item => item.housekeeperId === selectedHousekeeperId.value))
+const isThirdParty = computed(() => selectedService.value?.providerType === HOUSEKEEPER_PROVIDER_THIRD_PARTY)
 
-const housekeeperIdRef = computed(() => selectedHousekeeperId.value)
-const { data: staffListData, isLoading: isStaffLoading } = useGetHousekeeperStaffListQuery(housekeeperIdRef)
+const staffHousekeeperId = computed(() => isThirdParty.value ? undefined : selectedHousekeeperId.value)
+const { data: staffListData, isLoading: isStaffLoading } = useGetHousekeeperStaffListQuery(staffHousekeeperId)
 const staffList = computed(() => staffListData.value?.data ?? [])
 
-function isChecked(staffId: string) {
-  return props.currentStaffIds.has(staffId)
+const assignedKeys = computed(() => new Set(props.assigned.map(item => assignmentKey(item))))
+
+function isStaffChecked(staffId: string) {
+  return assignedKeys.value.has(`staff:${staffId}`)
 }
 
-function handleToggle(staff: IHousekeeperStaff, val: boolean | string | number) {
-  const checked = !!val
-  if (checked) {
-    const service = serviceListData.value?.data?.find(s => s.housekeeperId === staff.housekeeperId)
+function isHouseChecked(housekeeperId: string) {
+  return assignedKeys.value.has(`house:${housekeeperId}`)
+}
+
+function handleStaffToggle(staff: IHousekeeperStaff, val: boolean | string | number) {
+  const service = selectedService.value
+  if (!service)
+    return
+  if (val) {
     emit('add', {
-      housekeeperId: staff.housekeeperId,
+      housekeeperId: service.housekeeperId,
       staffId: staff.staffId,
-      housekeeperName: service?.name,
+      housekeeperName: service.name,
       staffName: staff.staffName,
       sortOrder: 0,
+      providerType: HOUSEKEEPER_PROVIDER_LOCAL,
     })
+    return
   }
-  else {
-    emit('remove', staff.staffId)
+  emit('remove', { housekeeperId: service.housekeeperId, staffId: staff.staffId, providerType: HOUSEKEEPER_PROVIDER_LOCAL })
+}
+
+function handleHouseToggle(val: boolean | string | number) {
+  const service = selectedService.value
+  if (!service)
+    return
+  if (val) {
+    emit('add', {
+      housekeeperId: service.housekeeperId,
+      housekeeperName: service.name,
+      sortOrder: 0,
+      providerType: HOUSEKEEPER_PROVIDER_THIRD_PARTY,
+    })
+    return
   }
+  emit('remove', { housekeeperId: service.housekeeperId, providerType: HOUSEKEEPER_PROVIDER_THIRD_PARTY })
 }
 </script>
 
@@ -71,15 +90,14 @@ function handleToggle(staff: IHousekeeperStaff, val: boolean | string | number) 
     <ModalContent class="sm:max-w-lg">
       <ModalHeader>
         <ModalTitle class="text-base">
-          添加人员
+          添加分配
         </ModalTitle>
         <ModalDescription>
-          选择主体后勾选要分配的人员,已分配的默认勾选。
+          本地馆勾选师傅。第三方没有师傅，勾选服务主体即按整馆分配。
         </ModalDescription>
       </ModalHeader>
 
       <div class="space-y-4 px-1">
-        <!-- 主体下拉 -->
         <div class="space-y-1.5">
           <label class="text-sm font-medium">服务主体</label>
           <Select v-model="selectedHousekeeperId">
@@ -87,17 +105,37 @@ function handleToggle(staff: IHousekeeperStaff, val: boolean | string | number) 
               <SelectValue placeholder="请选择服务主体" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem v-for="s in serviceOptions" :key="s.value" :value="s.value">
-                {{ s.label }}
-              </SelectItem>
+              <SelectGroup v-if="localServices.length">
+                <SelectLabel>本地馆</SelectLabel>
+                <SelectItem v-for="item in localServices" :key="item.housekeeperId" :value="item.housekeeperId">
+                  {{ item.name }}
+                </SelectItem>
+              </SelectGroup>
+              <SelectGroup v-if="thirdPartyServices.length">
+                <SelectLabel>第三方</SelectLabel>
+                <SelectItem v-for="item in thirdPartyServices" :key="item.housekeeperId" :value="item.housekeeperId">
+                  {{ item.name }}
+                </SelectItem>
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
 
-        <!-- 人员列表 -->
-        <div v-if="selectedHousekeeperId === undefined" class="py-8 text-center text-sm text-muted-foreground">
+        <div v-if="!selectedService" class="py-8 text-center text-sm text-muted-foreground">
           请先选择服务主体
         </div>
+
+        <label
+          v-else-if="isThirdParty"
+          class="flex cursor-pointer items-center gap-3 rounded-md border px-3 py-3 text-sm"
+        >
+          <Checkbox
+            :model-value="isHouseChecked(selectedService.housekeeperId)"
+            @update:model-value="handleHouseToggle"
+          />
+          <span class="flex-1 font-medium">{{ selectedService.name }}</span>
+          <span class="text-xs text-muted-foreground">第三方 · 整馆</span>
+        </label>
 
         <div v-else-if="isStaffLoading" class="space-y-2">
           <Skeleton class="h-8 w-full" />
@@ -116,8 +154,8 @@ function handleToggle(staff: IHousekeeperStaff, val: boolean | string | number) 
             class="flex cursor-pointer items-center gap-3 rounded px-2 py-2 text-sm transition-colors hover:bg-accent"
           >
             <Checkbox
-              :model-value="isChecked(staff.staffId)"
-              @update:model-value="(val) => handleToggle(staff, val)"
+              :model-value="isStaffChecked(staff.staffId)"
+              @update:model-value="(val) => handleStaffToggle(staff, val)"
             />
             <span class="flex-1 font-medium">{{ staff.staffName }}</span>
             <span v-if="staff.serviceSkills?.length" class="text-xs text-muted-foreground">{{ staff.serviceSkills.join('、') }}</span>

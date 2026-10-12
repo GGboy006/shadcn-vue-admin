@@ -41,8 +41,8 @@ export const columns: ColumnDef<IHousekeeperCategory>[] = [
   },
   {
     accessorKey: 'providerCount',
-    header: ({ column }) => h(DataTableColumnHeader<IHousekeeperCategory>, { column, title: '已分配人数' }),
-    meta: { title: '已分配人数' },
+    header: ({ column }) => h(DataTableColumnHeader<IHousekeeperCategory>, { column, title: '已分配' }),
+    meta: { title: '已分配' },
     cell: ({ row }) => {
       const count = row.original.providerCount ?? 0
       return h(

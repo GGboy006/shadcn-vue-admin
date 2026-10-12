@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
 
-import type { IHousekeeperCategoryProviderVO } from '@/services/api/housekeeper.api'
+import type { CategoryAssignmentDraft } from '@/services/api/housekeeper-assignment'
 
 import { FormSheet, FormSheetContent, FormSheetDescription, FormSheetHeader, FormSheetTitle } from '@/components/prop-ui/form-sheet'
 import { Modal, ModalContent, ModalDescription, ModalFooter, ModalHeader, ModalTitle } from '@/components/prop-ui/modal'
@@ -9,20 +9,19 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
+  assignmentKey,
+  assignmentPersonLabel,
+  buildCategoryProviderPayload,
+  decorateAssignment,
+} from '@/services/api/housekeeper-assignment'
+import {
   useGetHousekeeperCategoryDetailQuery,
   useGetHousekeeperCategoryProvidersQuery,
+  useGetHousekeeperServiceListQuery,
   useSaveHousekeeperCategoryProvidersMutation,
 } from '@/services/api/housekeeper.api'
 
 import ProviderPicker from './provider-picker.vue'
-
-interface ProviderItem {
-  housekeeperId: string
-  staffId: string
-  housekeeperName?: string
-  staffName?: string
-  sortOrder: number
-}
 
 const props = defineProps<{
   open: boolean
@@ -41,49 +40,45 @@ const categoryIdRef = computed(() => props.categoryId)
 const { data: categoryData } = useGetHousekeeperCategoryDetailQuery(categoryIdRef, computed(() => props.open && !!props.categoryId))
 const categoryName = computed(() => categoryData.value?.data?.categoryName ?? '')
 
-const { data: providersData, isLoading } = useGetHousekeeperCategoryProvidersQuery(
-  categoryIdRef,
-  computed(() => props.open && !!props.categoryId),
-)
+const listEnabled = computed(() => props.open && !!props.categoryId)
+const { data: providersData, isLoading } = useGetHousekeeperCategoryProvidersQuery(categoryIdRef, listEnabled)
+const { data: serviceListData } = useGetHousekeeperServiceListQuery(listEnabled)
 
-const original = ref<IHousekeeperCategoryProviderVO[]>([])
-const current = ref<ProviderItem[]>([])
+const original = ref<CategoryAssignmentDraft[]>([])
+const current = ref<CategoryAssignmentDraft[]>([])
 
-watch(providersData, (val) => {
-  const list = val?.data ?? []
-  original.value = list.map(p => ({ ...p }))
-  current.value = list.map(p => ({
-    housekeeperId: p.housekeeperId,
-    staffId: p.staffId ?? '',
-    housekeeperName: p.housekeeperName,
-    staffName: p.staffName,
-    sortOrder: p.sortOrder ?? 0,
-  }))
+function applyServerRows() {
+  const services = serviceListData.value?.data ?? []
+  const rows = (providersData.value?.data ?? []).map(item => decorateAssignment(item, services))
+  original.value = rows
+  current.value = rows.map(item => ({ ...item }))
+}
+
+watch(providersData, () => {
+  applyServerRows()
 }, { immediate: true })
 
-watch(() => props.categoryId, () => {
-  if (!props.open)
-    return
-  original.value = []
-  current.value = []
-})
+function sameRow(left: CategoryAssignmentDraft, right: CategoryAssignmentDraft) {
+  return assignmentKey(left) === assignmentKey(right)
+}
 
 const added = computed(() =>
-  current.value.filter(c => !original.value.some(o => o.staffId === c.staffId)))
+  current.value.filter(item => !original.value.some(saved => sameRow(saved, item))))
 const removed = computed(() =>
-  original.value.filter(o => !current.value.some(c => c.staffId === o.staffId)))
+  original.value.filter(item => !current.value.some(draft => sameRow(draft, item))))
 
 const isDirty = computed(() => {
   if (current.value.length !== original.value.length)
     return true
-  for (const c of current.value) {
-    const o = original.value.find(o => o.staffId === c.staffId)
-    if (!o)
-      return true
-    if ((o.sortOrder ?? 0) !== c.sortOrder)
-      return true
-  }
-  return false
+  return current.value.some((item) => {
+    const saved = original.value.find(row => sameRow(row, item))
+    return !saved || saved.sortOrder !== item.sortOrder
+  })
+})
+
+watch(serviceListData, () => {
+  if (!isDirty.value)
+    applyServerRows()
 })
 
 const isOpen = computed({
@@ -100,27 +95,22 @@ const isOpen = computed({
 })
 
 const isClearing = computed(() => current.value.length === 0 && original.value.length > 0)
-const currentStaffIds = computed(() => new Set(current.value.map(c => c.staffId)))
 
 const isPickerOpen = ref(false)
 
-function handleAdd(item: ProviderItem) {
-  if (current.value.some(c => c.staffId === item.staffId))
+function handleAdd(item: CategoryAssignmentDraft) {
+  if (current.value.some(row => sameRow(row, item)))
     return
-  item.sortOrder = current.value.length + 1
-  current.value.push(item)
+  current.value.push({ ...item, sortOrder: current.value.length + 1 })
 }
 
-function handleRemoveByStaff(staffId: string) {
-  current.value = current.value.filter(c => c.staffId !== staffId)
+function handleRemove(item: Pick<CategoryAssignmentDraft, 'housekeeperId' | 'staffId' | 'providerType'>) {
+  const key = assignmentKey(item)
+  current.value = current.value.filter(row => assignmentKey(row) !== key)
 }
 
-function handleRemove(staffId: string) {
-  current.value = current.value.filter(c => c.staffId !== staffId)
-}
-
-function handleSortChange(staffId: string, val: string | number) {
-  const item = current.value.find(c => c.staffId === staffId)
+function handleSortChange(key: string, val: string | number) {
+  const item = current.value.find(row => assignmentKey(row) === key)
   if (item)
     item.sortOrder = val === '' ? 0 : Number(val)
 }
@@ -131,21 +121,21 @@ const isConfirmOpen = ref(false)
 
 const confirmTitle = computed(() => {
   if (isClearing.value)
-    return '确认清空人员分配?'
-  return '确认保存人员分配?'
+    return '确认清空分配?'
+  return '确认保存分配?'
 })
 
 const confirmDesc = computed(() => {
   if (isClearing.value)
-    return '此操作将清空该分类下所有已分配人员,该操作不可撤销。'
+    return '此操作将清空该分类下的全部分配，该操作不可撤销。'
   const parts: string[] = []
   if (added.value.length)
-    parts.push(`新增 ${added.value.length} 人`)
+    parts.push(`新增 ${added.value.length} 条`)
   if (removed.value.length)
-    parts.push(`移除 ${removed.value.length} 人`)
+    parts.push(`移除 ${removed.value.length} 条`)
   if (parts.length === 0)
-    return '将提交排序调整。'
-  return `将${parts.join('、')},确认提交?`
+    return '将提交排序调整。保存会覆盖该分类现有的全部分配。'
+  return `将${parts.join('、')}。保存会覆盖该分类现有的全部分配。`
 })
 
 function handleSaveClick() {
@@ -160,11 +150,7 @@ function handleConfirmSave() {
   save(
     {
       categoryId: props.categoryId,
-      providers: current.value.map(c => ({
-        housekeeperId: c.housekeeperId,
-        staffId: c.staffId,
-        sortOrder: c.sortOrder,
-      })),
+      providers: buildCategoryProviderPayload(current.value),
     },
     {
       onSuccess: () => {
@@ -173,7 +159,7 @@ function handleConfirmSave() {
         emit('update:open', false)
         emit('close')
       },
-      onError: (err: any) => {
+      onError: (err: Error) => {
         toast.error(err.message || '保存失败')
       },
     },
@@ -198,10 +184,10 @@ function handleCancelDiscardClose() {
         <div class="flex items-center justify-between gap-3">
           <div>
             <FormSheetTitle class="text-base">
-              分配人员：{{ categoryName || '加载中...' }}
+              分配：{{ categoryName || '加载中...' }}
             </FormSheetTitle>
             <FormSheetDescription class="mt-1 text-xs">
-              选择具体服务人员挂到该分类；保存后居民端可见
+              本地馆勾选师傅，第三方只选服务主体。保存会覆盖该分类现有的全部分配。
             </FormSheetDescription>
           </div>
           <Button :disabled="!isDirty || isSaving" @click="handleSaveClick">
@@ -213,7 +199,7 @@ function handleCancelDiscardClose() {
       <div class="flex-1 overflow-y-auto p-4">
         <div v-if="isDirty" class="mb-3 rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-sm">
           <template v-if="isClearing">
-            ⚠ 将清空所有人员分配
+            ⚠ 将清空全部分配
           </template>
           <template v-else>
             未保存改动:
@@ -231,14 +217,14 @@ function handleCancelDiscardClose() {
 
         <div v-else>
           <div class="mb-3 flex items-center justify-between">
-            <span class="text-sm text-muted-foreground">当前已分配 {{ current.length }} 人</span>
+            <span class="text-sm text-muted-foreground">当前已分配 {{ current.length }} 条</span>
             <Button size="sm" variant="outline" @click="isPickerOpen = true">
-              + 添加人员
+              + 添加
             </Button>
           </div>
 
           <div v-if="current.length === 0" class="rounded-md border border-dashed py-10 text-center text-sm text-muted-foreground">
-            暂未分配人员。请先在「机构与人员」中配置机构及人员，再在此勾选要展示的服务人员。
+            暂未分配。本地馆选择师傅，第三方选择服务主体。
           </div>
 
           <div v-else class="overflow-hidden rounded-md border">
@@ -262,25 +248,25 @@ function handleCancelDiscardClose() {
               <tbody>
                 <tr
                   v-for="item in current"
-                  :key="item.staffId"
+                  :key="assignmentKey(item)"
                   class="border-t"
                 >
                   <td class="px-3 py-2 text-muted-foreground">
                     {{ item.housekeeperName || '-' }}
                   </td>
                   <td class="px-3 py-2 font-medium">
-                    {{ item.staffName || '-' }}
+                    {{ assignmentPersonLabel(item) }}
                   </td>
                   <td class="px-3 py-2">
                     <Input
                       type="number"
                       :model-value="item.sortOrder"
                       class="h-8 w-20"
-                      @update:model-value="(val: string | number) => handleSortChange(item.staffId, val)"
+                      @update:model-value="(val: string | number) => handleSortChange(assignmentKey(item), val)"
                     />
                   </td>
                   <td class="px-3 py-2 text-right">
-                    <Button size="sm" variant="ghost" class="text-destructive hover:text-destructive" @click="handleRemove(item.staffId)">
+                    <Button size="sm" variant="ghost" class="text-destructive hover:text-destructive" @click="handleRemove(item)">
                       移除
                     </Button>
                   </td>
@@ -295,9 +281,9 @@ function handleCancelDiscardClose() {
 
   <ProviderPicker
     v-model:open="isPickerOpen"
-    :current-staff-ids="currentStaffIds"
+    :assigned="current"
     @add="handleAdd"
-    @remove="handleRemoveByStaff"
+    @remove="handleRemove"
   />
 
   <Modal v-model:open="isConfirmOpen">
