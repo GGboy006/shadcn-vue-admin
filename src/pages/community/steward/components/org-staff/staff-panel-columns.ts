@@ -4,7 +4,7 @@ import { h } from 'vue'
 
 import type { IHousekeeperStaff } from '@/services/api/housekeeper.api'
 
-import { DataTableColumnHeader, DataTableImageCell, SelectColumn } from '@/components/data-table'
+import { DataTableColumnHeader, DataTableImageCell, OverflowText, SelectColumn } from '@/components/data-table'
 import Badge from '@/components/ui/badge/Badge.vue'
 import { housekeeperEnableStatusConfig } from '@/services/api/housekeeper.api'
 
@@ -44,7 +44,7 @@ export const staffPanelColumns: ColumnDef<IHousekeeperStaff>[] = [
     accessorKey: 'serviceSkills',
     header: ({ column }) => h(DataTableColumnHeader<IHousekeeperStaff>, { column, title: '技能' }),
     meta: { title: '技能' },
-    cell: ({ row }) => h('div', { class: 'text-sm text-muted-foreground' }, row.original.serviceSkills?.join('、') || '-'),
+    cell: ({ row }) => h(OverflowText, { text: row.original.serviceSkills?.join('、') }),
     enableSorting: false,
     enableHiding: true,
     enableResizing: true,

@@ -29,10 +29,10 @@ function getCommonPinningStyles(column: Column<T>): CSSProperties {
 </script>
 
 <template>
-  <div class="space-y-4">
+  <div class="min-w-0 space-y-4">
     <slot name="toolbar" />
 
-    <div class="border rounded-md">
+    <div class="min-w-0 rounded-md border">
       <Table>
         <TableHeader>
           <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">

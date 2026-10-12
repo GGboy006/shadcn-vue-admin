@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
-import { housekeeperPayModeLabel } from '@/services/api/housekeeper-account'
+import { housekeeperPayModeLabel, isThirdPartyHousekeeper } from '@/services/api/housekeeper-account'
 import { housekeeperEnableStatusConfig } from '@/services/api/housekeeper.api'
 
 const props = defineProps<{
@@ -31,7 +31,7 @@ const searchModel = computed({
 </script>
 
 <template>
-  <div class="flex h-full flex-col rounded-lg border bg-card">
+  <div class="flex h-full min-w-0 flex-col rounded-lg border bg-card">
     <div class="space-y-2 border-b p-3">
       <div class="text-sm font-medium">
         服务机构
@@ -64,21 +64,32 @@ const searchModel = computed({
         @click="emit('select', org.housekeeperId)"
       >
         <div class="min-w-0 flex-1">
-          <div class="truncate text-sm font-medium">
-            {{ org.name }}
+          <div class="flex min-w-0 items-center gap-1.5">
+            <span class="truncate text-sm font-medium">{{ org.name }}</span>
+            <Badge
+              v-if="isThirdPartyHousekeeper(org)"
+              variant="info"
+              class="h-5 shrink-0 px-1.5 text-[10px]"
+            >
+              第三方
+            </Badge>
           </div>
-          <div class="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+          <div class="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
             <span>{{ org.staffCount ?? 0 }} 人</span>
             <Badge
-              v-if="org.status"
-              variant="outline"
+              v-if="org.status && housekeeperEnableStatusConfig[org.status]"
+              :variant="housekeeperEnableStatusConfig[org.status].variant"
               class="h-5 px-1.5 text-[10px]"
             >
-              {{ housekeeperEnableStatusConfig[org.status]?.label }}
+              {{ housekeeperEnableStatusConfig[org.status].label }}
             </Badge>
-            <span v-if="housekeeperPayModeLabel(org.payMode)">
+            <Badge
+              v-if="housekeeperPayModeLabel(org.payMode)"
+              :variant="org.payMode === 1 ? 'info' : 'gold'"
+              class="h-5 px-1.5 text-[10px]"
+            >
               {{ housekeeperPayModeLabel(org.payMode) }}
-            </span>
+            </Badge>
           </div>
         </div>
       </button>

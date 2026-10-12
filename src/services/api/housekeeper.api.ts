@@ -16,9 +16,9 @@ export type HousekeeperProviderType = 1 | 2
 export type HousekeeperPayMode = 1 | 2
 
 /** 启用状态映射配置 */
-export const housekeeperEnableStatusConfig: Record<HousekeeperEnableStatus, { label: string, variant: 'default' | 'secondary' }> = {
-  1: { label: '启用', variant: 'default' },
-  2: { label: '禁用', variant: 'secondary' },
+export const housekeeperEnableStatusConfig: Record<HousekeeperEnableStatus, { label: string, variant: 'success' | 'destructive' }> = {
+  1: { label: '启用', variant: 'success' },
+  2: { label: '禁用', variant: 'destructive' },
 }
 
 // =====================================================================

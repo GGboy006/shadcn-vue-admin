@@ -5,6 +5,7 @@ import { toast } from 'vue-sonner'
 
 import type { IHousekeeperStaffListQuery } from '@/services/api/housekeeper.api'
 
+import { OverflowText } from '@/components/data-table'
 import { Copy } from '@/components/prop-ui/copy'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
 import { Button } from '@/components/ui/button'
@@ -134,7 +135,7 @@ const isDesktop = useMediaQuery('(min-width: 1024px)')
 </script>
 
 <template>
-  <div class="flex h-full min-h-[480px] flex-col rounded-lg border bg-card">
+  <div class="flex h-full min-h-[480px] min-w-0 flex-col rounded-lg border bg-card">
     <template v-if="!orgId">
       <div class="flex flex-1 items-center justify-center p-8 text-center text-sm text-muted-foreground">
         <div class="space-y-2">
@@ -147,7 +148,7 @@ const isDesktop = useMediaQuery('(min-width: 1024px)')
     </template>
 
     <template v-else>
-      <div class="border-b px-4 py-3">
+      <div class="min-w-0 border-b px-4 py-3">
         <div v-if="showBack" class="mb-1.5">
           <Button variant="ghost" size="sm" class="-ml-2 h-7" @click="emit('back')">
             <ChevronLeftIcon class="size-4" />
@@ -162,39 +163,44 @@ const isDesktop = useMediaQuery('(min-width: 1024px)')
               <Skeleton class="h-3.5 w-48" />
             </div>
             <template v-else-if="org">
-              <div class="flex min-w-0 items-center gap-2">
+              <div class="min-w-0">
                 <h3 class="truncate text-base font-semibold">
                   {{ org.name }}
                 </h3>
-                <span v-if="!isSelf" class="inline-flex shrink-0 items-center gap-0.5 text-xs text-muted-foreground">
-                  {{ housekeeperAccountLabel(org) }}
-                  <template v-if="org.loginPhone">
-                    · {{ org.loginPhone }}
-                    <Copy
-                      :content="org.loginPhone"
-                      variant="ghost"
-                      class="size-6"
-                      copy-tooltip-text="复制账号"
-                      copied-tooltip-text="已复制"
-                    />
-                  </template>
-                </span>
-                <span v-if="housekeeperPayModeLabel(org.payMode)" class="shrink-0 text-xs text-muted-foreground">
-                  {{ housekeeperPayModeLabel(org.payMode) }}支付
-                </span>
-                <span class="shrink-0 text-xs text-muted-foreground">
-                  <template v-if="org.contactName || org.contactPhone">
-                    <span v-if="org.contactName">{{ org.contactName }}</span>
-                    <span v-if="org.contactPhone" class="ml-1">{{ org.contactPhone }}</span>
-                  </template>
-                  <template v-else>
-                    暂无联系信息
-                  </template>
-                </span>
+                <div v-if="!isSelf" class="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+                  <span class="inline-flex items-center gap-0.5">
+                    {{ housekeeperAccountLabel(org) }}
+                    <template v-if="org.loginPhone">
+                      · {{ org.loginPhone }}
+                      <Copy
+                        :content="org.loginPhone"
+                        variant="ghost"
+                        class="size-6"
+                        copy-tooltip-text="复制账号"
+                        copied-tooltip-text="已复制"
+                      />
+                    </template>
+                  </span>
+                  <span v-if="housekeeperPayModeLabel(org.payMode)">
+                    {{ housekeeperPayModeLabel(org.payMode) }}支付
+                  </span>
+                  <span>
+                    <template v-if="org.contactName || org.contactPhone">
+                      <span v-if="org.contactName">{{ org.contactName }}</span>
+                      <span v-if="org.contactPhone" class="ml-1">{{ org.contactPhone }}</span>
+                    </template>
+                    <template v-else>
+                      暂无联系信息
+                    </template>
+                  </span>
+                </div>
               </div>
-              <p v-if="org.description" class="mt-0.5 truncate text-xs text-muted-foreground" :title="org.description">
-                {{ org.description }}
-              </p>
+              <OverflowText
+                v-if="org.description"
+                block
+                class="mt-0.5"
+                :text="org.description"
+              />
             </template>
           </div>
 
@@ -223,7 +229,7 @@ const isDesktop = useMediaQuery('(min-width: 1024px)')
         </div>
       </div>
 
-      <div class="flex min-h-0 flex-1 flex-col p-4">
+      <div class="flex min-h-0 min-w-0 flex-1 flex-col p-4">
         <div class="mb-3 flex items-center justify-between">
           <div class="text-sm font-medium">
             本机构人员

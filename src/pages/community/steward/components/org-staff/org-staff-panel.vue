@@ -87,7 +87,7 @@ function handleOrgCreated() {
     </p>
 
     <!-- 桌面：左右主从 -->
-    <div v-if="isDesktop" class="grid min-h-[560px] grid-cols-1 gap-4 lg:grid-cols-[280px_1fr]">
+    <div v-if="isDesktop" class="grid min-h-[560px] min-w-0 grid-cols-1 gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
       <OrgList
         :loading="isLoading"
         :orgs="filteredOrgs"
