@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useSidebar } from '@/composables/use-sidebar'
 import { useAuthStore } from '@/stores/auth'
@@ -32,6 +32,10 @@ function leafTitles(group: { items: unknown[] }): string[] {
 describe('useSidebar navData', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
   })
 
   it('商户(userType=4):经营 + AI + 设置', () => {
@@ -73,7 +77,18 @@ describe('useSidebar navData', () => {
     expect(navData.value.some(g => g.title === '经营')).toBe(false)
   })
 
+  it('居委会(userType=6)开发环境:额外展示村务治理 / 居民服务骨架菜单', () => {
+    vi.stubEnv('DEV', true)
+    setUser(6)
+    const { navData } = useSidebar()
+
+    const titles = leafTitles(navData.value[0])
+    expect(titles).toEqual(expect.arrayContaining(['村情数据', '财务公开', '党建管理', '报事报修', '村民议事', '书记信箱', '医疗健康']))
+  })
+
   it('居委会(userType=6):走居委会专属菜单,与商户菜单不同', () => {
+    // 生产环境不展示尚未对接接口的村务治理 / 居民服务
+    vi.stubEnv('DEV', false)
     setUser(6)
     const { navData } = useSidebar()
 

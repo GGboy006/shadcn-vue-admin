@@ -1,4 +1,4 @@
-import { BookmarkIcon, BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, CalendarDaysIcon, CalendarRangeIcon, Columns3Icon, ConciergeBellIcon, CreditCardIcon, FolderTreeIcon, HeadsetIcon, HelpCircleIcon, HomeIcon, ImageIcon, LandmarkIcon, LayoutDashboardIcon, LayoutGridIcon, LibraryIcon, LifeBuoyIcon, LightbulbIcon, ListOrderedIcon, MegaphoneIcon, MessageSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, ReceiptIcon, ShoppingCartIcon, StoreIcon, TagIcon, TagsIcon, UserIcon, UsersIcon, WrenchIcon } from '@lucide/vue'
+import { BookmarkIcon, BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, CalendarDaysIcon, CalendarRangeIcon, ChartColumnIcon, CoinsIcon, Columns3Icon, ConciergeBellIcon, CreditCardIcon, FlagIcon, FolderTreeIcon, HandHeartIcon, HandshakeIcon, HeadsetIcon, HeartHandshakeIcon, HeartPulseIcon, HelpCircleIcon, HomeIcon, ImageIcon, LandmarkIcon, LayoutDashboardIcon, LayoutGridIcon, LibraryIcon, LifeBuoyIcon, LightbulbIcon, ListOrderedIcon, MailIcon, MegaphoneIcon, MessageSquareIcon, MessagesSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, ReceiptIcon, ShoppingCartIcon, StoreIcon, TagIcon, TagsIcon, UserIcon, UsersIcon, UsersRoundIcon, WalletIcon, WrenchIcon } from '@lucide/vue'
 
 import type { NavGroup, NavItem } from '@/components/app-sidebar/types'
 
@@ -113,6 +113,32 @@ export function useSidebar() {
     { title: '服务订单', url: '/housekeeper/orders', icon: ListOrderedIcon },
   ]
 
+  const villageNavItems: NavItem[] = [
+    {
+      title: '村务治理',
+      icon: LandmarkIcon,
+      items: [
+        { title: '村情数据', url: '/neighborhood/village-data', icon: ChartColumnIcon },
+        { title: '财务公开', url: '/neighborhood/finance', icon: WalletIcon },
+        { title: '党建管理', url: '/neighborhood/party-building', icon: FlagIcon },
+      ],
+    },
+    {
+      title: '居民服务',
+      icon: HeartHandshakeIcon,
+      items: [
+        { title: '报事报修', url: '/neighborhood/repairs', icon: WrenchIcon },
+        { title: '积分管理', url: '/neighborhood/points', icon: CoinsIcon },
+        { title: '村民议事', url: '/neighborhood/affairs', icon: MessagesSquareIcon },
+        { title: '书记信箱', url: '/neighborhood/mailbox', icon: MailIcon },
+        { title: '志愿服务', url: '/neighborhood/volunteers', icon: HandHeartIcon },
+        { title: '矛盾调解', url: '/neighborhood/mediation', icon: HandshakeIcon },
+        { title: '养老服务', url: '/neighborhood/elderly', icon: UsersRoundIcon },
+        { title: '医疗健康', url: '/neighborhood/healthcare', icon: HeartPulseIcon },
+      ],
+    },
+  ]
+
   const neighborhoodNavItems: NavItem[] = [
     { title: '首页', url: '/neighborhood/home', icon: HomeIcon },
     { title: '公告管理', url: '/neighborhood/notice', icon: MegaphoneIcon },
@@ -138,7 +164,8 @@ export function useSidebar() {
     { title: '服务热线', url: '/neighborhood/service-guide', icon: PhoneIcon },
     { title: '在线留言', url: '/neighborhood/leave-message', icon: MessageSquareIcon },
     // 居委会服务 /neighborhood/service 暂不开放
-
+    // 村务治理 / 居民服务:页面骨架已就位,接口未对接,仅开发环境展示,避免线上出现空页面
+    ...(import.meta.env.DEV ? villageNavItems : []),
   ]
 
   const allSettingsNavItems = [

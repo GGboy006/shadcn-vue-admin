@@ -539,6 +539,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/neighborhood/affairs/': RouteRecordInfo<
+      '/neighborhood/affairs/',
+      '/neighborhood/affairs',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/neighborhood/banner/': RouteRecordInfo<
       '/neighborhood/banner/',
       '/neighborhood/banner',
@@ -549,6 +556,27 @@ declare module 'vue-router/auto-routes' {
     '/neighborhood/dynamic/': RouteRecordInfo<
       '/neighborhood/dynamic/',
       '/neighborhood/dynamic',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/neighborhood/elderly/': RouteRecordInfo<
+      '/neighborhood/elderly/',
+      '/neighborhood/elderly',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/neighborhood/finance/': RouteRecordInfo<
+      '/neighborhood/finance/',
+      '/neighborhood/finance',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/neighborhood/healthcare/': RouteRecordInfo<
+      '/neighborhood/healthcare/',
+      '/neighborhood/healthcare',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -567,6 +595,20 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/neighborhood/mailbox/': RouteRecordInfo<
+      '/neighborhood/mailbox/',
+      '/neighborhood/mailbox',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/neighborhood/mediation/': RouteRecordInfo<
+      '/neighborhood/mediation/',
+      '/neighborhood/mediation',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/neighborhood/notice/': RouteRecordInfo<
       '/neighborhood/notice/',
       '/neighborhood/notice',
@@ -577,6 +619,27 @@ declare module 'vue-router/auto-routes' {
     '/neighborhood/org-info/': RouteRecordInfo<
       '/neighborhood/org-info/',
       '/neighborhood/org-info',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/neighborhood/party-building/': RouteRecordInfo<
+      '/neighborhood/party-building/',
+      '/neighborhood/party-building',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/neighborhood/points/': RouteRecordInfo<
+      '/neighborhood/points/',
+      '/neighborhood/points',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/neighborhood/repairs/': RouteRecordInfo<
+      '/neighborhood/repairs/',
+      '/neighborhood/repairs',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -612,6 +675,20 @@ declare module 'vue-router/auto-routes' {
     '/neighborhood/unified/': RouteRecordInfo<
       '/neighborhood/unified/',
       '/neighborhood/unified',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/neighborhood/village-data/': RouteRecordInfo<
+      '/neighborhood/village-data/',
+      '/neighborhood/village-data',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/neighborhood/volunteers/': RouteRecordInfo<
+      '/neighborhood/volunteers/',
+      '/neighborhood/volunteers',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -1117,6 +1194,12 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
+    'src/pages/neighborhood/affairs/index.vue': {
+      routes:
+        | '/neighborhood/affairs/'
+      views:
+        | never
+    }
     'src/pages/neighborhood/banner/index.vue': {
       routes:
         | '/neighborhood/banner/'
@@ -1126,6 +1209,24 @@ declare module 'vue-router/auto-routes' {
     'src/pages/neighborhood/dynamic/index.vue': {
       routes:
         | '/neighborhood/dynamic/'
+      views:
+        | never
+    }
+    'src/pages/neighborhood/elderly/index.vue': {
+      routes:
+        | '/neighborhood/elderly/'
+      views:
+        | never
+    }
+    'src/pages/neighborhood/finance/index.vue': {
+      routes:
+        | '/neighborhood/finance/'
+      views:
+        | never
+    }
+    'src/pages/neighborhood/healthcare/index.vue': {
+      routes:
+        | '/neighborhood/healthcare/'
       views:
         | never
     }
@@ -1141,6 +1242,18 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
+    'src/pages/neighborhood/mailbox/index.vue': {
+      routes:
+        | '/neighborhood/mailbox/'
+      views:
+        | never
+    }
+    'src/pages/neighborhood/mediation/index.vue': {
+      routes:
+        | '/neighborhood/mediation/'
+      views:
+        | never
+    }
     'src/pages/neighborhood/notice/index.vue': {
       routes:
         | '/neighborhood/notice/'
@@ -1150,6 +1263,24 @@ declare module 'vue-router/auto-routes' {
     'src/pages/neighborhood/org-info/index.vue': {
       routes:
         | '/neighborhood/org-info/'
+      views:
+        | never
+    }
+    'src/pages/neighborhood/party-building/index.vue': {
+      routes:
+        | '/neighborhood/party-building/'
+      views:
+        | never
+    }
+    'src/pages/neighborhood/points/index.vue': {
+      routes:
+        | '/neighborhood/points/'
+      views:
+        | never
+    }
+    'src/pages/neighborhood/repairs/index.vue': {
+      routes:
+        | '/neighborhood/repairs/'
       views:
         | never
     }
@@ -1180,6 +1311,18 @@ declare module 'vue-router/auto-routes' {
     'src/pages/neighborhood/unified/index.vue': {
       routes:
         | '/neighborhood/unified/'
+      views:
+        | never
+    }
+    'src/pages/neighborhood/village-data/index.vue': {
+      routes:
+        | '/neighborhood/village-data/'
+      views:
+        | never
+    }
+    'src/pages/neighborhood/volunteers/index.vue': {
+      routes:
+        | '/neighborhood/volunteers/'
       views:
         | never
     }
