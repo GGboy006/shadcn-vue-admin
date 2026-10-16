@@ -19,8 +19,11 @@ import { Textarea } from '@/components/ui/textarea'
 import { useOwnHousekeeperService } from '@/composables/use-own-housekeeper'
 import { useUpload } from '@/composables/use-upload'
 import { buildHousekeeperSelfProfilePayload } from '@/services/api/housekeeper-account'
+import { localBusinessHourIssues } from '@/services/api/housekeeper-hours'
 import { useUpdateHousekeeperServiceMutation } from '@/services/api/housekeeper.api'
 import { CONTACT_PHONE_MAX_LENGTH, optionalContactPhone, optionalString, showInvalidSubmitToast } from '@/validators/common'
+
+import BusinessHoursFields from '../community/steward/components/service/business-hours-fields.vue'
 
 const profileValidator = z.object({
   housekeeperId: optionalString,
@@ -30,6 +33,12 @@ const profileValidator = z.object({
   coverImage: optionalString,
   contactName: optionalString,
   contactPhone: optionalContactPhone,
+  openTime: optionalString,
+  closeTime: optionalString,
+  openDays: optionalString,
+}).superRefine((values, ctx) => {
+  for (const issue of localBusinessHourIssues(values))
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: [issue.path], message: issue.message })
 })
 
 const { service, isLoading } = useOwnHousekeeperService()
@@ -56,6 +65,9 @@ watch(service, (item) => {
       coverImage: item.coverImage || undefined,
       contactName: item.contactName || undefined,
       contactPhone: item.contactPhone || undefined,
+      openTime: item.openTime || undefined,
+      closeTime: item.closeTime || undefined,
+      openDays: item.openDays || undefined,
     },
   })
 }, { immediate: true })
@@ -87,6 +99,9 @@ const onSubmit = handleSubmit((formValues) => {
     coverImage: formValues.coverImage,
     contactName: formValues.contactName,
     contactPhone: formValues.contactPhone,
+    openTime: formValues.openTime,
+    closeTime: formValues.closeTime,
+    openDays: formValues.openDays,
   }), {
     onSuccess: () => toast.success('已保存'),
     onError: (err: any) => toast.error(err.message || '保存失败'),
@@ -97,7 +112,7 @@ const onSubmit = handleSubmit((formValues) => {
 <template>
   <BasicPage
     title="本馆资料"
-    description="可改名称、介绍和对外联系方式。登录号、密码和启停由站长维护"
+    description="可改名称、介绍、对外联系方式和营业时间。登录号、密码和启停由站长维护"
     sticky
   >
     <div v-if="isLoading" class="text-sm text-muted-foreground">
@@ -178,6 +193,8 @@ const onSubmit = handleSubmit((formValues) => {
           </FormItem>
         </FormField>
       </div>
+
+      <BusinessHoursFields />
 
       <p v-if="service.loginPhone" class="text-sm text-muted-foreground">
         登录手机号 {{ service.loginPhone }}，如需修改请联系站长

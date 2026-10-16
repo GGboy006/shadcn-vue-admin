@@ -21,6 +21,9 @@ export const housekeeperServiceValidator = z.object({
   password: optionalString,
   accountOpened: z.boolean().optional(),
   payMode: optionalNumber,
+  openTime: optionalString,
+  closeTime: optionalString,
+  openDays: optionalString,
 }).superRefine((values, ctx) => {
   const providerType = values.providerType === 2 ? 2 : 1
   for (const issue of stationHousekeeperAccountIssues({
@@ -30,6 +33,9 @@ export const housekeeperServiceValidator = z.object({
     loginPhone: values.loginPhone,
     password: values.password,
     accountOpened: values.accountOpened,
+    openTime: values.openTime,
+    closeTime: values.closeTime,
+    openDays: values.openDays,
   })) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: [issue.path], message: issue.message })
   }

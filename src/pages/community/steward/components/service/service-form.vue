@@ -7,19 +7,21 @@ import { toast } from 'vue-sonner'
 import type { IHousekeeperService, IHousekeeperServiceSaveDTO } from '@/services/api/housekeeper.api'
 
 import ImageUpload from '@/components/image-upload/image-upload.vue'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useUpload } from '@/composables/use-upload'
-import { buildStationHousekeeperSavePayload, HOUSEKEEPER_PROVIDER_LOCAL, HOUSEKEEPER_PROVIDER_THIRD_PARTY, isHousekeeperAccountOpened } from '@/services/api/housekeeper-account'
-import { useCreateHousekeeperServiceMutation, useGetHousekeeperFulfillProvidersQuery, useUpdateHousekeeperServiceMutation } from '@/services/api/housekeeper.api'
+import { availableFulfillChannels, buildStationHousekeeperSavePayload, HOUSEKEEPER_PROVIDER_LOCAL, HOUSEKEEPER_PROVIDER_THIRD_PARTY, isHousekeeperAccountOpened } from '@/services/api/housekeeper-account'
+import { useCreateHousekeeperServiceMutation, useGetHousekeeperFulfillProvidersQuery, useGetHousekeeperServiceListQuery, useUpdateHousekeeperServiceMutation } from '@/services/api/housekeeper.api'
 import { CONTACT_PHONE_MAX_LENGTH, PHONE_MAX_LENGTH, showInvalidSubmitToast } from '@/validators/common'
 
 import type { HousekeeperServiceValidator } from '../../validators/service.validator'
 
 import { housekeeperServiceValidator } from '../../validators/service.validator'
+import BusinessHoursFields from './business-hours-fields.vue'
 
 const { service } = defineProps<{
   service?: IHousekeeperService
@@ -62,6 +64,9 @@ const initialValues = reactive<HousekeeperServiceValidator>({
   password: undefined,
   accountOpened: isHousekeeperAccountOpened(service),
   payMode: service?.payMode === 2 ? 2 : 1,
+  openTime: service?.openTime || (service?.housekeeperId ? undefined : '09:00:00'),
+  closeTime: service?.closeTime || (service?.housekeeperId ? undefined : '18:00:00'),
+  openDays: service?.openDays || (service?.housekeeperId ? undefined : '1,2,3,4,5,6,7'),
 })
 
 const formSchema = toTypedSchema(housekeeperServiceValidator)
@@ -98,8 +103,22 @@ async function handleCoverUpload(event: Event) {
 }
 
 const isThirdParty = computed(() => Number(formValues.providerType) === HOUSEKEEPER_PROVIDER_THIRD_PARTY)
+const thirdPartyType = computed(() => isThirdParty.value ? HOUSEKEEPER_PROVIDER_THIRD_PARTY : undefined)
 const { data: fulfillProviders } = useGetHousekeeperFulfillProvidersQuery(isThirdParty)
-const channelOptions = computed(() => fulfillProviders.value?.data ?? [])
+const { data: thirdPartyHouses } = useGetHousekeeperServiceListQuery(isThirdParty, thirdPartyType)
+const channelOptions = computed(() => availableFulfillChannels(
+  fulfillProviders.value?.data ?? [],
+  thirdPartyHouses.value?.data ?? [],
+  service?.housekeeperId,
+))
+const channelEmptyText = computed(() => {
+  const authorized = fulfillProviders.value?.data ?? []
+  if (!authorized.length)
+    return '当前没有已授权的第三方渠道'
+  if (!channelOptions.value.length)
+    return '已授权渠道都创建过管家服务'
+  return ''
+})
 
 function buildPayload(values: HousekeeperServiceValidator): IHousekeeperServiceSaveDTO {
   return buildStationHousekeeperSavePayload({
@@ -118,6 +137,9 @@ function buildPayload(values: HousekeeperServiceValidator): IHousekeeperServiceS
     loginPhone: values.loginPhone,
     password: values.password,
     payMode: Number(values.payMode) === 2 ? 2 : 1,
+    openTime: values.openTime,
+    closeTime: values.closeTime,
+    openDays: values.openDays,
   })
 }
 
@@ -220,13 +242,21 @@ const onSubmit = handleSubmit((values) => {
             </FormControl>
             <SelectContent>
               <SelectItem v-for="item in channelOptions" :key="item.providerCode" :value="item.providerCode">
-                {{ item.providerName }}
+                <span class="flex items-center gap-2">
+                  {{ item.providerName }}
+                  <Badge v-if="item.integrationMode === 'MINI_JUMP'" variant="info">打开小程序</Badge>
+                </span>
               </SelectItem>
             </SelectContent>
           </Select>
+          <p v-if="channelEmptyText" class="text-xs text-muted-foreground">
+            {{ channelEmptyText }}
+          </p>
           <FormMessage />
         </FormItem>
       </FormField>
+
+      <BusinessHoursFields v-if="!isThirdParty" />
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
         <FormField v-slot="{ componentField }" name="loginPhone">
@@ -253,41 +283,41 @@ const onSubmit = handleSubmit((values) => {
         </FormField>
       </div>
 
-      <!-- 封面图 -->
-      <FormField name="coverImage">
-        <FormItem>
-          <FormLabel>封面图</FormLabel>
-          <FormControl>
-            <div class="flex items-center gap-3">
-              <img v-if="formValues.coverImage" :src="formValues.coverImage" alt="封面" class="h-16 w-28 rounded border object-cover">
-              <div v-else class="flex h-16 w-28 items-center justify-center rounded bg-muted text-xs text-muted-foreground">
-                无
+      <div class="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
+        <FormField name="coverImage">
+          <FormItem>
+            <FormLabel>封面图</FormLabel>
+            <FormControl>
+              <div class="flex items-center gap-3">
+                <img v-if="formValues.coverImage" :src="formValues.coverImage" alt="封面" class="h-16 w-28 rounded border object-cover">
+                <div v-else class="flex h-16 w-28 items-center justify-center rounded bg-muted text-xs text-muted-foreground">
+                  无
+                </div>
+                <label class="inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground">
+                  <LoaderIcon v-if="isUploading" class="size-4 animate-spin" />
+                  <span>{{ isUploading ? '上传中' : '上传' }}</span>
+                  <input type="file" accept="image/*" class="sr-only" @change="handleCoverUpload">
+                </label>
               </div>
-              <label class="inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground">
-                <LoaderIcon v-if="isUploading" class="size-4 animate-spin" />
-                <span>{{ isUploading ? '上传中' : '上传' }}</span>
-                <input type="file" accept="image/*" class="sr-only" @change="handleCoverUpload">
-              </label>
-            </div>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
 
-      <!-- 图标 -->
-      <FormField name="icon">
-        <FormItem>
-          <FormLabel>图标</FormLabel>
-          <FormControl>
-            <ImageUpload
-              :model-value="formValues.icon"
-              alt="图标"
-              @update:model-value="(url) => setFieldValue('icon', url)"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
+        <FormField name="icon">
+          <FormItem>
+            <FormLabel>图标</FormLabel>
+            <FormControl>
+              <ImageUpload
+                :model-value="formValues.icon"
+                alt="图标"
+                @update:model-value="(url) => setFieldValue('icon', url)"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+      </div>
 
       <!-- 描述 -->
       <FormField v-slot="{ componentField }" name="description">

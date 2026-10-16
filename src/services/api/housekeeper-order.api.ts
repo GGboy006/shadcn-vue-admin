@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import { useApiFetch } from '@/composables/use-fetch'
+import { buildReassignPayload } from '@/services/api/housekeeper-hours'
 
 import type { IPageParam, IPageResult, IResponse } from '../types/response.type'
 
@@ -83,8 +84,10 @@ export interface IHousekeeperOrder {
   contactPhone?: string | null
   /** 服务地址 */
   serviceAddress?: string
-  /** 预约时间 */
+  /** 预约开始 */
   appointmentTime?: string
+  /** 预约结束 */
+  appointmentEndTime?: string
   /** 订单金额(元) */
   totalAmount?: number
   /** 实付金额(未支付时后端可能返回 null) */
@@ -180,10 +183,11 @@ export interface IHousekeeperOrderCancelDTO {
   cancelReason?: string
 }
 
-/** 改派请求体(对接文档 §7.1) */
+/** 改派请求体。改时间时开始和结束一起传，不改时间则两个都不传 */
 export interface IHousekeeperOrderReassignDTO {
   staffId: string
   appointmentTime?: string
+  appointmentEndTime?: string
   remark?: string
 }
 
@@ -252,13 +256,8 @@ export function useReassignHousekeeperOrderMutation() {
 
   return useMutation<IResponse<boolean>, Error, { orderId: string } & IHousekeeperOrderReassignDTO>({
     mutationKey: ['reassignHousekeeperOrder'],
-    mutationFn: async ({ orderId, staffId, appointmentTime, remark }) => {
-      const body: IHousekeeperOrderReassignDTO = { staffId }
-      const trimmedRemark = remark?.trim()
-      if (appointmentTime)
-        body.appointmentTime = appointmentTime
-      if (trimmedRemark)
-        body.remark = trimmedRemark
+    mutationFn: async ({ orderId, ...input }) => {
+      const body = buildReassignPayload(input)
       return await apiFetch<IResponse<boolean>>(`/housekeeper/order/${orderId}/reassign`, {
         method: 'put',
         body,

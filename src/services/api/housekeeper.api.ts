@@ -53,6 +53,12 @@ export interface IHousekeeperService {
   providerCode?: string
   /** 支付方式:1 线上 / 2 线下。空=第三方或未设置 */
   payMode?: HousekeeperPayMode
+  /** 营业开始。第三方为空 */
+  openTime?: string
+  /** 营业结束。第三方为空 */
+  closeTime?: string
+  /** 营业日，1-7 表示周一到周日，英文逗号分隔。第三方为空 */
+  openDays?: string
   /** 商户ID */
   merchantId?: string
   /** 排序 */
@@ -101,6 +107,12 @@ export interface IHousekeeperServiceSaveDTO {
   providerCode?: string
   /** 支付方式。仅本地馆提交；第三方不传 */
   payMode?: HousekeeperPayMode
+  /** 营业开始。仅本地馆提交 */
+  openTime?: string
+  /** 营业结束。仅本地馆提交 */
+  closeTime?: string
+  /** 营业日。仅本地馆提交 */
+  openDays?: string
   /** 商户ID */
   merchantId?: string
   /** 排序 */
@@ -109,10 +121,12 @@ export interface IHousekeeperServiceSaveDTO {
   status?: HousekeeperEnableStatus
 }
 
-/** 已授权第三方渠道 */
+/** 已授权第三方渠道。这里的 providerType 是渠道品类，不是管家网点类型 */
 export interface IHousekeeperFulfillProvider {
   providerCode: string
   providerName: string
+  /** API 接口推单 / MINI_JUMP 只跳微信小程序 */
+  integrationMode?: string
 }
 
 /** 主体分页响应 */
@@ -129,7 +143,11 @@ function normalizeFulfillProvider(raw: IHousekeeperFulfillProvider | string): IH
     return { providerCode: raw, providerName: raw }
   const providerCode = String(raw.providerCode ?? '')
   const providerName = String(raw.providerName || providerCode)
-  return { providerCode, providerName }
+  return {
+    providerCode,
+    providerName,
+    integrationMode: raw.integrationMode || undefined,
+  }
 }
 
 /** 已授权第三方渠道(`GET /housekeeper/fulfill/providers`) */
@@ -165,12 +183,16 @@ export function useGetHousekeeperServicePageQuery(query: Ref<IHousekeeperService
 }
 
 /** 获取启用管家服务列表(下拉用,对接文档 4.1,`/housekeeper/service/list`) */
-export function useGetHousekeeperServiceListQuery(enabled?: Ref<boolean>) {
+export function useGetHousekeeperServiceListQuery(enabled?: Ref<boolean>, providerType?: Ref<HousekeeperProviderType | undefined>) {
   const { apiFetch } = useApiFetch()
+  const type = computed(() => providerType?.value)
 
   return useQuery<IHousekeeperServiceListAllResponse, Error>({
-    queryKey: ['housekeeperServiceAll'],
-    queryFn: async () => await apiFetch<IHousekeeperServiceListAllResponse>('/housekeeper/service/list'),
+    queryKey: ['housekeeperServiceAll', type],
+    queryFn: async () => await apiFetch<IHousekeeperServiceListAllResponse>('/housekeeper/service/list', {
+      method: 'get',
+      query: type.value ? { providerType: type.value } : undefined,
+    }),
     enabled: () => enabled?.value ?? true,
     retry: false,
   })
