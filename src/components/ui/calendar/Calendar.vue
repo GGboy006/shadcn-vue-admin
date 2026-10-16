@@ -11,20 +11,29 @@ import { cn } from "@/lib/utils"
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell, CalendarHeader, CalendarHeading, CalendarNextButton, CalendarPrevButton } from "."
 
-const props = withDefaults(defineProps<CalendarRootProps & { class?: HTMLAttributes["class"], layout?: LayoutTypes, yearRange?: DateValue[] }>(), {
+const props = withDefaults(defineProps<CalendarRootProps & {
+  class?: HTMLAttributes["class"]
+  layout?: LayoutTypes
+  yearRange?: DateValue[]
+  /** 外层已有月份导航时隐藏日历自带标题，避免再画出一行英文月份 */
+  hideHeader?: boolean
+}>(), {
   modelValue: undefined,
   layout: undefined,
+  locale: "zh-CN",
+  calendarLabel: "日期",
+  hideHeader: false,
 })
 const emits = defineEmits<CalendarRootEmits>()
 
-const delegatedProps = reactiveOmit(props, "class", "layout", "placeholder")
+const delegatedProps = reactiveOmit(props, "class", "layout", "placeholder", "hideHeader")
 
 const placeholder = useVModel(props, "placeholder", emits, {
   passive: true,
   defaultValue: props.defaultPlaceholder ?? today(getLocalTimeZone()),
 }) as Ref<DateValue>
 
-const formatter = useDateFormatter(props.locale ?? "en")
+const formatter = useDateFormatter(props.locale)
 
 const yearRange = computed(() => {
   return props.yearRange ?? createYearRange({
@@ -94,7 +103,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
     data-slot="calendar"
     :class="cn('p-3', props.class)"
   >
-    <CalendarHeader class="pt-0">
+    <CalendarHeader v-if="!hideHeader" class="pt-0">
       <nav class="flex items-center gap-1 absolute top-0 inset-x-0 justify-between">
         <CalendarPrevButton>
           <slot name="calendar-prev-icon" />
@@ -129,7 +138,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
       </slot>
     </CalendarHeader>
 
-    <div class="flex flex-col gap-y-4 mt-4 sm:flex-row sm:gap-x-4 sm:gap-y-0">
+    <div :class="cn('flex flex-col gap-y-4 sm:flex-row sm:gap-x-4 sm:gap-y-0', !hideHeader && 'mt-4')">
       <CalendarGrid v-for="month in grid" :key="month.value.toString()">
         <CalendarGridHead>
           <CalendarGridRow>

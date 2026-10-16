@@ -169,6 +169,9 @@ const timeFormat = computed(() => {
 const displayText = computed(() => {
   if (!modelValue.value)
     return props.placeholder || (props.hideTime ? '选择日期' : '选择日期时间')
+  // 月份等不含「日」的格式按 valueFormat 展示，避免被补成当月 1 日
+  if (!props.valueFormat.includes('D'))
+    return dayjs(modelValue.value).format(props.valueFormat)
   return dayjs(modelValue.value).format(`YYYY-MM-DD${timeFormat.value}`)
 })
 
@@ -236,10 +239,11 @@ const yearLabel = computed(() => dayjs(month.value).format('YYYY'))
       <div class="relative overflow-hidden">
         <Calendar
           v-model:placeholder="placeholderDate"
+          hide-header
           :model-value="selectedCalendarDate"
           :min-value="minDate ? toCalendarDate(minDate) : undefined"
           :max-value="maxDate ? toCalendarDate(maxDate) : undefined"
-          class="p-0"
+          class="p-0 [&_[data-slot=calendar-header]]:hidden"
           @update:model-value="onDaySelect"
         />
         <div :class="cn('absolute inset-0', monthYearPicker ? 'bg-popover' : 'hidden')" />
