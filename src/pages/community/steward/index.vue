@@ -1,6 +1,7 @@
 <route lang="yaml">
 meta:
   roles: [3]
+  reuseOnQuery: true
 </route>
 
 <script setup lang="ts">
@@ -40,12 +41,15 @@ let syncingFromRoute = false
 function readRouteQuery() {
   syncingFromRoute = true
   activeTab.value = route.query.tab === 'category' ? 'category' : 'org'
-  selectedOrgId.value = typeof route.query.orgId === 'string' ? route.query.orgId : undefined
+  if (typeof route.query.orgId === 'string')
+    selectedOrgId.value = route.query.orgId
   assignCategoryId.value = typeof route.query.assign === 'string' ? route.query.assign : undefined
   if (assignCategoryId.value)
     activeTab.value = 'category'
   nextTick(() => {
     syncingFromRoute = false
+    if (selectedOrgId.value && route.query.orgId !== selectedOrgId.value)
+      writeRouteQuery()
   })
 }
 
@@ -55,7 +59,7 @@ function writeRouteQuery() {
   const query: Record<string, string> = {
     tab: activeTab.value,
   }
-  if (activeTab.value === 'org' && selectedOrgId.value)
+  if (selectedOrgId.value)
     query.orgId = selectedOrgId.value
   if (assignCategoryId.value) {
     query.tab = 'category'
@@ -129,8 +133,7 @@ function handleCategoryReset() {
 <template>
   <BasicPage
     title="管家服务"
-    description="先配置服务机构与人员，再在展示分类中分配居民可见的服务人员"
-    sticky
+    description=""
   >
     <template #actions>
       <CategoryCreate v-if="activeTab === 'category'" />
@@ -152,7 +155,7 @@ function handleCategoryReset() {
 
       <UiTabsContent value="category" class="mt-4">
         <p class="mb-3 text-sm text-muted-foreground">
-          居民端看到的类目在此维护。本地馆分配到具体师傅，第三方网点按整馆分配。
+          居民端看到的类目在此维护。本地馆分配到具体师傅，跳转和接口渠道按整馆，合作方可以整馆或指定人员。
         </p>
         <CategoryDataTable
           :loading="isCategoryLoading"

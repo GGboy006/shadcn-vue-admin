@@ -41,12 +41,12 @@ export function isHousekeeperUser(userType: number | undefined | null): boolean 
   return userType === UserType.housekeeper
 }
 
-/** 登录后的首页。商户仍进经营概览；站长进数据看板；管家进本馆资料 */
-export function homePathForUser(userType: number | undefined | null): string {
+/** 登录后的首页。商户仍进经营概览；站长进数据看板；本地馆进本馆资料，合作方进人员 */
+export function homePathForUser(userType: number | undefined | null, housekeeperKind?: 'local' | 'partner' | null): string {
   if (userType === UserType.committee)
     return '/neighborhood/home'
   if (userType === UserType.housekeeper)
-    return '/housekeeper/profile'
+    return housekeeperKind === 'partner' ? '/housekeeper/staff' : '/housekeeper/profile'
   if (isMerchantBusinessUser(userType))
     return '/merchant-business/overview'
   return '/dashboard'

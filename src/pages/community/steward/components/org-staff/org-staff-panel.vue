@@ -43,7 +43,7 @@ const selectedOrgId = computed({
   set: value => emit('update:orgId', value),
 })
 
-watch(allOrgs, (list) => {
+watch([allOrgs, selectedOrgId], ([list]) => {
   if (!list.length) {
     if (selectedOrgId.value)
       selectedOrgId.value = undefined
@@ -81,13 +81,9 @@ function handleOrgCreated() {
 </script>
 
 <template>
-  <div class="space-y-3">
-    <p class="text-sm text-muted-foreground">
-      先配置服务机构与人员，再在「展示分类与分配」里把人员挂到居民可见的类目上。
-    </p>
-
-    <!-- 桌面：左右主从 -->
-    <div v-if="isDesktop" class="grid min-h-[560px] min-w-0 grid-cols-1 gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
+  <div>
+    <!-- 桌面：左侧机构列表限高自滚动，右侧人员表按内容展开 -->
+    <div v-if="isDesktop" class="grid items-start gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
       <OrgList
         :loading="isLoading"
         :orgs="filteredOrgs"
@@ -101,7 +97,7 @@ function handleOrgCreated() {
     </div>
 
     <!-- 移动：列表 ↔ 详情 -->
-    <div v-else class="min-h-[560px]">
+    <div v-else class="min-h-0 flex-1">
       <OrgList
         v-if="mobileView === 'list'"
         :loading="isLoading"

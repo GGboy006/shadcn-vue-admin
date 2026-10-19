@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
 
-import { BanIcon, EyeIcon, UsersIcon } from '@lucide/vue'
+import { BanIcon, EyeIcon, PlayIcon, UsersIcon } from '@lucide/vue'
 
 import type { RowActionItem } from '@/components/data-table'
 import type { IHousekeeperOrder } from '@/services/api/housekeeper-order.api'
 
 import { DataTableRowActions } from '@/components/data-table'
 import { useLazyMount } from '@/composables/use-lazy-mount'
-import { canCancelHousekeeperOrder, canReassignHousekeeperOrder } from '@/services/api/housekeeper-order.rules'
+import { advanceHousekeeperOrderLabel, canCancelHousekeeperOrder, canReassignHousekeeperOrder, nextHousekeeperOrderStatus } from '@/services/api/housekeeper-order.rules'
 
+import { housekeeperOrderScopeKey } from '../order-scope'
+import OrderAdvanceDialog from './order-advance-dialog.vue'
 import OrderCancelDialog from './order-cancel-dialog.vue'
 import OrderDetailSheet from './order-detail-sheet.vue'
 import OrderReassignDialog from './order-reassign-dialog.vue'
@@ -26,14 +28,21 @@ const isCancelOpen = ref(false)
 const isCancelRendered = useLazyMount(isCancelOpen)
 const isReassignOpen = ref(false)
 const isReassignRendered = useLazyMount(isReassignOpen)
+const isAdvanceOpen = ref(false)
+const isAdvanceRendered = useLazyMount(isAdvanceOpen)
+
+const scope = inject(housekeeperOrderScopeKey, computed(() => 'station' as const))
+const nextStatus = computed(() => scope.value === 'partner' ? nextHousekeeperOrderStatus(order.value.orderStatus) : undefined)
 
 const items = computed(() => {
   const actions: RowActionItem[] = [
     { key: 'view', label: '查看详情', icon: EyeIcon },
   ]
-  if (canReassignHousekeeperOrder(order.value))
+  if (nextStatus.value)
+    actions.push({ key: 'advance', label: advanceHousekeeperOrderLabel(nextStatus.value), icon: PlayIcon })
+  if (scope.value !== 'partner' && canReassignHousekeeperOrder(order.value))
     actions.push({ key: 'reassign', label: '改派', icon: UsersIcon })
-  if (canCancelHousekeeperOrder(order.value))
+  if (scope.value !== 'partner' && canCancelHousekeeperOrder(order.value))
     actions.push({ key: 'cancel', label: '取消', icon: BanIcon, variant: 'destructive' as const })
   return actions
 })
@@ -45,6 +54,8 @@ function handleAction(key: string) {
     isCancelOpen.value = true
   else if (key === 'reassign')
     isReassignOpen.value = true
+  else if (key === 'advance')
+    isAdvanceOpen.value = true
 }
 </script>
 
@@ -67,5 +78,12 @@ function handleAction(key: string) {
     v-if="isReassignRendered"
     v-model:open="isReassignOpen"
     :order="order"
+  />
+
+  <OrderAdvanceDialog
+    v-if="isAdvanceRendered && nextStatus"
+    v-model:open="isAdvanceOpen"
+    :order="order"
+    :status="nextStatus"
   />
 </template>

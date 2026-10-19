@@ -3,10 +3,12 @@ import { describe, expect, it } from 'vitest'
 import type { HousekeeperOrderActionFields } from '@/services/api/housekeeper-order.rules'
 
 import {
+  advanceHousekeeperOrderLabel,
   canCancelHousekeeperOrder,
   canReassignHousekeeperOrder,
   isLocalFulfill,
   isPaidWithAmount,
+  nextHousekeeperOrderStatus,
 } from '@/services/api/housekeeper-order.rules'
 
 function order(overrides: Partial<HousekeeperOrderActionFields> = {}): HousekeeperOrderActionFields {
@@ -113,6 +115,19 @@ describe('housekeeper order action rules', () => {
 
     it('allows reassign when fulfillProviderCode is empty', () => {
       expect(canReassignHousekeeperOrder(order({ fulfillProviderCode: '', orderStatus: 0 }))).toBe(true)
+    })
+  })
+
+  describe('nextHousekeeperOrderStatus', () => {
+    it('只允许待接单、已接单、服务中往前一步', () => {
+      expect(nextHousekeeperOrderStatus(0)).toBe(1)
+      expect(nextHousekeeperOrderStatus(1)).toBe(2)
+      expect(nextHousekeeperOrderStatus(2)).toBe(4)
+      expect(nextHousekeeperOrderStatus(4)).toBeUndefined()
+      expect(nextHousekeeperOrderStatus(5)).toBeUndefined()
+      expect(advanceHousekeeperOrderLabel(1)).toBe('接单')
+      expect(advanceHousekeeperOrderLabel(2)).toBe('开始服务')
+      expect(advanceHousekeeperOrderLabel(4)).toBe('完成服务')
     })
   })
 })

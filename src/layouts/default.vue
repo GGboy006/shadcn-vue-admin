@@ -53,7 +53,7 @@ const isFixedLayout = computed(() => route.meta.layout === 'fixed')
         )"
       >
         <router-view v-slot="{ Component }">
-          <component :is="Component" :key="route.fullPath" />
+          <component :is="Component" :key="route.meta.reuseOnQuery ? route.path : route.fullPath" />
         </router-view>
       </main>
     </UiSidebarInset>

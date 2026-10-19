@@ -43,3 +43,22 @@ export function canReassignHousekeeperOrder(order: HousekeeperOrderActionFields)
     return false
   return order.orderStatus === 0 || order.orderStatus === 1
 }
+
+/** 合作方推进的下一步。待接单→已接单，已接单→服务中，服务中→已完成 */
+export function nextHousekeeperOrderStatus(orderStatus: number): 1 | 2 | 4 | undefined {
+  if (orderStatus === 0)
+    return 1
+  if (orderStatus === 1)
+    return 2
+  if (orderStatus === 2)
+    return 4
+  return undefined
+}
+
+export function advanceHousekeeperOrderLabel(status: 1 | 2 | 4) {
+  if (status === 1)
+    return '接单'
+  if (status === 2)
+    return '开始服务'
+  return '完成服务'
+}

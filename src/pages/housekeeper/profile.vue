@@ -20,6 +20,7 @@ import { useOwnHousekeeperService } from '@/composables/use-own-housekeeper'
 import { useUpload } from '@/composables/use-upload'
 import { buildHousekeeperSelfProfilePayload } from '@/services/api/housekeeper-account'
 import { localBusinessHourIssues } from '@/services/api/housekeeper-hours'
+import { housekeeperKind } from '@/services/api/housekeeper-partner.access'
 import { useUpdateHousekeeperServiceMutation } from '@/services/api/housekeeper.api'
 import { CONTACT_PHONE_MAX_LENGTH, optionalContactPhone, optionalString, showInvalidSubmitToast } from '@/validators/common'
 
@@ -41,7 +42,13 @@ const profileValidator = z.object({
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: [issue.path], message: issue.message })
 })
 
+const router = useRouter()
 const { service, isLoading } = useOwnHousekeeperService()
+
+watch(housekeeperKind(), (value) => {
+  if (value === 'partner')
+    router.replace('/housekeeper/staff')
+}, { immediate: true })
 const { mutate, isPending } = useUpdateHousekeeperServiceMutation()
 const { upload } = useUpload()
 const isUploading = ref(false)

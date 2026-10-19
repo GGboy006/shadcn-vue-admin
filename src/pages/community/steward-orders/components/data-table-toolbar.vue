@@ -10,7 +10,7 @@ import { DatePicker } from '@/components/prop-ui/date-picker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useGetHousekeeperServiceListQuery } from '@/services/api/housekeeper.api'
+import { useGetHousekeeperFulfillProvidersQuery, useGetHousekeeperServiceListQuery } from '@/services/api/housekeeper.api'
 
 import { housekeeperOrderPayStatusFilterOptions, housekeeperOrderStatusFilterOptions } from '../data/status'
 
@@ -20,16 +20,20 @@ interface DataTableToolbarProps {
   orderStatusFilter?: string
   payStatusFilter?: string
   housekeeperIdFilter?: string
+  providerCodeFilter?: string
   dateBegin?: string
   dateEnd?: string
   showHousekeeperFilter?: boolean
+  showProviderFilter?: boolean
 }
 
 const props = withDefaults(defineProps<DataTableToolbarProps>(), {
   orderStatusFilter: 'all',
   payStatusFilter: 'all',
   housekeeperIdFilter: 'all',
+  providerCodeFilter: 'all',
   showHousekeeperFilter: true,
+  showProviderFilter: false,
 })
 
 const emits = defineEmits<{
@@ -37,15 +41,21 @@ const emits = defineEmits<{
   (e: 'update:orderStatusFilter', value: string): void
   (e: 'update:payStatusFilter', value: string): void
   (e: 'update:housekeeperIdFilter', value: string): void
+  (e: 'update:providerCodeFilter', value: string): void
   (e: 'update:dateBegin', value: string | undefined): void
   (e: 'update:dateEnd', value: string | undefined): void
   (e: 'reset'): void
 }>()
 
 const showHousekeeperFilter = computed(() => props.showHousekeeperFilter)
+const showProviderFilter = computed(() => props.showProviderFilter)
 const { data: serviceListData } = useGetHousekeeperServiceListQuery(showHousekeeperFilter)
+const { data: channelData } = useGetHousekeeperFulfillProvidersQuery(showProviderFilter)
 const serviceOptions = computed(() => {
   return (serviceListData.value?.data ?? []).map(item => ({ value: item.housekeeperId, label: item.name }))
+})
+const providerOptions = computed(() => {
+  return (channelData.value?.data ?? []).map(item => ({ value: item.providerCode, label: item.providerName || item.providerCode }))
 })
 
 const isFiltered = computed(() =>
@@ -53,6 +63,7 @@ const isFiltered = computed(() =>
   || props.orderStatusFilter !== 'all'
   || props.payStatusFilter !== 'all'
   || (props.showHousekeeperFilter && props.housekeeperIdFilter !== 'all')
+  || (props.showProviderFilter && props.providerCodeFilter !== 'all')
   || !!props.dateBegin
   || !!props.dateEnd,
 )
@@ -75,6 +86,11 @@ const payStatusModel = computed({
 const housekeeperIdModel = computed({
   get: () => props.housekeeperIdFilter,
   set: val => emits('update:housekeeperIdFilter', val || 'all'),
+})
+
+const providerCodeModel = computed({
+  get: () => props.providerCodeFilter,
+  set: val => emits('update:providerCodeFilter', val || 'all'),
 })
 
 const dateBeginModel = computed({
@@ -127,6 +143,24 @@ const dateEndModel = computed({
             v-for="item in housekeeperOrderPayStatusFilterOptions"
             :key="item.value"
             :value="String(item.value)"
+          >
+            {{ item.label }}
+          </SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Select v-if="showProviderFilter" v-model="providerCodeModel">
+        <SelectTrigger class="h-8 w-[140px]">
+          <SelectValue placeholder="履约渠道" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">
+            全部渠道
+          </SelectItem>
+          <SelectItem
+            v-for="item in providerOptions"
+            :key="item.value"
+            :value="item.value"
           >
             {{ item.label }}
           </SelectItem>

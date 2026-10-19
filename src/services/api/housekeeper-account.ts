@@ -22,6 +22,34 @@ export function isThirdPartyHousekeeper(service?: Pick<IHousekeeperService, 'pro
   return service?.providerType === HOUSEKEEPER_PROVIDER_THIRD_PARTY
 }
 
+export type HousekeeperOrgKind = 'local' | 'partner' | 'third-party'
+
+/** 合作方也是外部网点，但有自己的人员；接口、小程序、H5 按整馆，没有人员列表 */
+export function housekeeperOrgKind(
+  service?: Pick<IHousekeeperService, 'providerType' | 'integrationMode'> | null,
+): HousekeeperOrgKind {
+  const mode = service?.integrationMode?.trim()
+  if (mode === 'PARTNER')
+    return 'partner'
+  if (mode === 'API' || mode === 'MINI_JUMP' || mode === 'H5_JUMP')
+    return 'third-party'
+  if (isThirdPartyHousekeeper(service))
+    return 'third-party'
+  return 'local'
+}
+
+export function housekeeperIntegrationLabel(mode?: string | null) {
+  if (mode === 'PARTNER')
+    return '合作方'
+  if (mode === 'API')
+    return '接口'
+  if (mode === 'MINI_JUMP')
+    return '小程序'
+  if (mode === 'H5_JUMP')
+    return 'H5'
+  return undefined
+}
+
 /** 站长可维护本地馆人员，含已开户的馆。第三方网点不能加师傅 */
 export function canStationManageStaff(service?: AccountFields | null): boolean {
   if (!service || isThirdPartyHousekeeper(service))

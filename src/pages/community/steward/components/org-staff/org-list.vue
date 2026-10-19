@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
-import { housekeeperPayModeLabel, isThirdPartyHousekeeper } from '@/services/api/housekeeper-account'
+import { housekeeperIntegrationLabel, housekeeperOrgKind, housekeeperPayModeLabel, isThirdPartyHousekeeper } from '@/services/api/housekeeper-account'
 import { housekeeperEnableStatusConfig } from '@/services/api/housekeeper.api'
 
 const props = defineProps<{
@@ -28,10 +28,18 @@ const searchModel = computed({
   get: () => props.search,
   set: v => emit('update:search', v),
 })
+
+function kindOf(org: IHousekeeperService) {
+  return housekeeperOrgKind(org)
+}
+
+function kindLabel(org: IHousekeeperService) {
+  return housekeeperIntegrationLabel(org.integrationMode) || '第三方'
+}
 </script>
 
 <template>
-  <div class="flex h-full min-w-0 flex-col rounded-lg border bg-card">
+  <div class="flex h-[calc(100dvh-10rem)] min-h-0 min-w-0 flex-col overflow-hidden rounded-lg border bg-card lg:sticky lg:top-4">
     <div class="space-y-2 border-b p-3">
       <div class="text-sm font-medium">
         服务机构
@@ -44,6 +52,10 @@ const searchModel = computed({
           class="h-9 pl-8"
         />
       </div>
+      <Button variant="outline" class="w-full" @click="emit('create')">
+        <PlusIcon class="size-4" />
+        新建机构
+      </Button>
     </div>
 
     <div class="min-h-0 flex-1 overflow-y-auto p-2">
@@ -67,15 +79,15 @@ const searchModel = computed({
           <div class="flex min-w-0 items-center gap-1.5">
             <span class="truncate text-sm font-medium">{{ org.name }}</span>
             <Badge
-              v-if="isThirdPartyHousekeeper(org)"
-              variant="info"
+              v-if="kindOf(org) !== 'local'"
+              :variant="kindOf(org) === 'partner' ? 'gold' : 'info'"
               class="h-5 shrink-0 px-1.5 text-[10px]"
             >
-              第三方
+              {{ kindLabel(org) }}
             </Badge>
           </div>
           <div class="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-            <span>{{ org.staffCount ?? 0 }} 人</span>
+            <span v-if="!isThirdPartyHousekeeper(org)">{{ org.staffCount ?? 0 }} 人</span>
             <Badge
               v-if="org.status && housekeeperEnableStatusConfig[org.status]"
               :variant="housekeeperEnableStatusConfig[org.status].variant"
@@ -93,13 +105,6 @@ const searchModel = computed({
           </div>
         </div>
       </button>
-    </div>
-
-    <div class="border-t p-3">
-      <Button variant="outline" class="w-full" @click="emit('create')">
-        <PlusIcon class="size-4" />
-        新建机构
-      </Button>
     </div>
   </div>
 </template>

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useSidebar } from '@/composables/use-sidebar'
 import { isMerchantBusinessUser } from '@/constants/user-type'
+import { housekeeperKind } from '@/services/api/housekeeper-partner.access'
 import { useAuthStore } from '@/stores/auth'
 import { useUserInfoStore } from '@/stores/user-info'
 
@@ -29,6 +30,8 @@ const isMerchant = computed(() => isMerchantBusinessUser(userType.value))
 const sidebarTitle = computed(() => {
   if (isStationMaster.value)
     return '小区站长驾驶舱'
+  if (housekeeperKind().value === 'partner')
+    return '合作方工作台'
   if (isMerchant.value)
     return userInfoStore.merchantInfo?.merchantName || '商户工作台'
   return '小区站长'

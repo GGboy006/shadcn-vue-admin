@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import { BanIcon, ChevronLeftIcon, CircleCheckIcon, PencilIcon, PlusIcon, Trash2Icon } from '@lucide/vue'
+import { BanIcon, ChevronLeftIcon, CircleCheckIcon, PencilIcon, PlusIcon, Trash2Icon, UsersIcon } from '@lucide/vue'
 import { useDebounceFn, useMediaQuery } from '@vueuse/core'
 import { toast } from 'vue-sonner'
 
-import type { IHousekeeperStaffListQuery } from '@/services/api/housekeeper.api'
+import type { IPartnerStaff } from '@/services/api/housekeeper-partner.api'
+import type { IHousekeeperStaff, IHousekeeperStaffListQuery } from '@/services/api/housekeeper.api'
 
 import { OverflowText } from '@/components/data-table'
 import { Copy } from '@/components/prop-ui/copy'
 import { Modal, ModalContent } from '@/components/prop-ui/modal'
 import { Button } from '@/components/ui/button'
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useLazyMount } from '@/composables/use-lazy-mount'
-import { canStationManageStaff, housekeeperAccountLabel, housekeeperPayModeLabel } from '@/services/api/housekeeper-account'
+import { canStationManageStaff, housekeeperAccountLabel, housekeeperIntegrationLabel, housekeeperOrgKind, housekeeperPayModeLabel } from '@/services/api/housekeeper-account'
+import { useGetFulfillProviderStaffQuery } from '@/services/api/housekeeper-partner.api'
 import {
   useGetHousekeeperServiceDetailQuery,
   useGetHousekeeperStaffPageQuery,
@@ -43,11 +46,13 @@ const orgIdRef = computed(() => props.orgId)
 const { data: detailData, isLoading: isDetailLoading } = useGetHousekeeperServiceDetailQuery(orgIdRef)
 const org = computed(() => detailData.value?.data)
 const isSelf = computed(() => props.manageMode === 'self')
-const staffWritable = computed(() => isSelf.value || canStationManageStaff(org.value))
-const staffLockHint = computed(() => {
-  if (staffWritable.value || !org.value)
-    return ''
-  return '第三方网点不能添加师傅'
+const orgKind = computed(() => housekeeperOrgKind(org.value))
+const isPartner = computed(() => orgKind.value === 'partner')
+const isPlainThirdParty = computed(() => orgKind.value === 'third-party')
+const orgOperable = computed(() => !!org.value && !isSelf.value && orgKind.value === 'local')
+const staffWritable = computed(() => (isSelf.value || canStationManageStaff(org.value)) && !isPartner.value)
+const accountLabel = computed(() => {
+  return housekeeperIntegrationLabel(org.value?.integrationMode) || housekeeperAccountLabel(org.value)
 })
 
 const staffQuery = ref<IHousekeeperStaffListQuery>({
@@ -80,16 +85,51 @@ watch(orgIdRef, (id) => {
   staffQuery.value.status = undefined
 }, { immediate: true })
 
-const { data: staffData, isLoading: isStaffLoading } = useGetHousekeeperStaffPageQuery(staffQuery)
+const staffListEnabled = computed(() => !!orgIdRef.value && !!org.value && orgKind.value === 'local')
+const { data: staffData, isLoading: isStaffLoading } = useGetHousekeeperStaffPageQuery(staffQuery, staffListEnabled)
+const partnerProviderCode = computed(() => isPartner.value ? org.value?.providerCode : undefined)
+const { data: partnerStaffData, isLoading: isPartnerStaffLoading } = useGetFulfillProviderStaffQuery(partnerProviderCode)
+
+function toStaffRow(staff: IPartnerStaff): IHousekeeperStaff {
+  return {
+    staffId: staff.staffId,
+    housekeeperId: org.value?.housekeeperId ?? '',
+    staffName: staff.staffName,
+    phone: staff.phone,
+    avatar: staff.avatar,
+    serviceScope: staff.serviceScope,
+    serviceSkills: staff.serviceSkills,
+    description: staff.description,
+    unitPrice: staff.unitPrice,
+    priceUnit: staff.priceUnit,
+    score: staff.score,
+    sortOrder: staff.sortOrder,
+    status: staff.status,
+  }
+}
+
+const staffList = computed(() => staffData.value?.data?.list ?? [])
+const staffTotal = computed(() => staffData.value?.data?.total ?? 0)
+
+const partnerRows = computed(() => {
+  const keyword = staffSearch.value.trim()
+  const status = staffStatusFilter.value
+  return (partnerStaffData.value?.data ?? [])
+    .filter(item => !keyword || item.staffName.includes(keyword))
+    .filter(item => status == null || item.status === status)
+    .map(toStaffRow)
+})
 
 const staffColumns = computed(() => {
+  if (isPartner.value)
+    return staffPanelColumns.filter(column => column.id !== 'select' && column.id !== 'actions')
   if (staffWritable.value)
     return staffPanelColumns
   return staffPanelColumns.filter(column => column.id !== 'actions')
 })
 
-const staffList = computed(() => staffData.value?.data?.list ?? [])
-const staffTotal = computed(() => staffData.value?.data?.total ?? 0)
+const tableRows = computed(() => isPartner.value ? partnerRows.value : staffList.value)
+const tableLoading = computed(() => isPartner.value ? isPartnerStaffLoading.value : isStaffLoading.value)
 
 const staffServerPagination = computed(() => ({
   page: staffQuery.value.pageNum,
@@ -135,7 +175,7 @@ const isDesktop = useMediaQuery('(min-width: 1024px)')
 </script>
 
 <template>
-  <div class="flex h-full min-h-[480px] min-w-0 flex-col rounded-lg border bg-card">
+  <div class="flex min-w-0 flex-col rounded-lg border bg-card">
     <template v-if="!orgId">
       <div class="flex flex-1 items-center justify-center p-8 text-center text-sm text-muted-foreground">
         <div class="space-y-2">
@@ -148,7 +188,7 @@ const isDesktop = useMediaQuery('(min-width: 1024px)')
     </template>
 
     <template v-else>
-      <div class="min-w-0 border-b px-4 py-3">
+      <div class="min-w-0 shrink-0 border-b px-4 py-3">
         <div v-if="showBack" class="mb-1.5">
           <Button variant="ghost" size="sm" class="-ml-2 h-7" @click="emit('back')">
             <ChevronLeftIcon class="size-4" />
@@ -169,7 +209,7 @@ const isDesktop = useMediaQuery('(min-width: 1024px)')
                 </h3>
                 <div v-if="!isSelf" class="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
                   <span class="inline-flex items-center gap-0.5">
-                    {{ housekeeperAccountLabel(org) }}
+                    {{ accountLabel }}
                     <template v-if="org.loginPhone">
                       · {{ org.loginPhone }}
                       <Copy
@@ -204,7 +244,7 @@ const isDesktop = useMediaQuery('(min-width: 1024px)')
             </template>
           </div>
 
-          <div v-if="org && !isSelf" class="flex shrink-0 items-center gap-1.5">
+          <div v-if="org && orgOperable" class="flex shrink-0 items-center gap-1.5">
             <Button size="sm" variant="outline" class="h-8" :disabled="isToggling" @click="handleToggleStatus">
               <BanIcon v-if="org.status === 1" class="size-3.5" />
               <CircleCheckIcon v-else class="size-3.5" />
@@ -229,37 +269,58 @@ const isDesktop = useMediaQuery('(min-width: 1024px)')
         </div>
       </div>
 
-      <div class="flex min-h-0 min-w-0 flex-1 flex-col p-4">
-        <div class="mb-3 flex items-center justify-between">
-          <div class="text-sm font-medium">
-            本机构人员
-          </div>
-          <Button v-if="staffWritable" size="sm" @click="isStaffCreateOpen = true">
-            <PlusIcon class="size-4" />
-            添加人员
-          </Button>
+      <div class="min-w-0 p-4">
+        <div v-if="isDetailLoading && !org" class="space-y-2">
+          <Skeleton class="h-8 w-40" />
+          <Skeleton class="h-40 w-full" />
         </div>
-        <p v-if="staffLockHint" class="mb-3 text-xs text-muted-foreground">
-          {{ staffLockHint }}
-        </p>
-
-        <StaffDataTable
-          :loading="isStaffLoading"
-          :data="staffList"
-          :columns="staffColumns"
-          :server-pagination="staffServerPagination"
+        <Empty
+          v-else-if="isPlainThirdParty"
+          class="border border-dashed"
         >
-          <template #toolbar="{ table }">
-            <StaffPanelToolbar
-              :table="table"
-              :search="staffSearch"
-              :status-filter="staffStatusFilter"
-              @update:search="staffSearch = $event"
-              @update:status-filter="staffStatusFilter = $event"
-              @reset="handleStaffReset"
-            />
-          </template>
-        </StaffDataTable>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <UsersIcon />
+            </EmptyMedia>
+            <EmptyTitle>第三方机构不在这里维护人员</EmptyTitle>
+            <EmptyDescription>
+              人员由渠道侧维护。分类分配时按整馆选择。
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+
+        <template v-else-if="!isPlainThirdParty || isPartner">
+          <div class="mb-3 flex items-center justify-between">
+            <div class="text-sm font-medium">
+              本机构人员
+            </div>
+            <Button v-if="staffWritable" size="sm" @click="isStaffCreateOpen = true">
+              <PlusIcon class="size-4" />
+              添加人员
+            </Button>
+          </div>
+          <p v-if="isPartner" class="mb-3 text-xs text-muted-foreground">
+            合作方人员由对方维护，这里只可查看。
+          </p>
+
+          <StaffDataTable
+            :loading="tableLoading"
+            :data="tableRows"
+            :columns="staffColumns"
+            :server-pagination="isPartner ? undefined : staffServerPagination"
+          >
+            <template #toolbar="{ table }">
+              <StaffPanelToolbar
+                :table="table"
+                :search="staffSearch"
+                :status-filter="staffStatusFilter"
+                @update:search="staffSearch = $event"
+                @update:status-filter="staffStatusFilter = $event"
+                @reset="handleStaffReset"
+              />
+            </template>
+          </StaffDataTable>
+        </template>
       </div>
     </template>
 

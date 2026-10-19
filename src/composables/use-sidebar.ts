@@ -5,6 +5,7 @@ import type { NavGroup, NavItem } from '@/components/app-sidebar/types'
 import { filterMerchantBusinessItems } from '@/composables/filter-merchant-business-items'
 import { filterNavItemsByRoles } from '@/composables/filter-nav-items-by-roles'
 import { isHousekeeperUser, isMerchantBusinessUser, UserType } from '@/constants/user-type'
+import { housekeeperKind } from '@/services/api/housekeeper-partner.access'
 
 export function useSidebar() {
   const authStore = useAuthStore()
@@ -112,6 +113,11 @@ export function useSidebar() {
     { title: '服务订单', url: '/housekeeper/orders', icon: ListOrderedIcon },
   ]
 
+  const partnerNavItems: NavItem[] = [
+    { title: '服务人员', url: '/housekeeper/staff', icon: UsersIcon },
+    { title: '服务订单', url: '/housekeeper/orders', icon: ListOrderedIcon },
+  ]
+
   const villageNavItems: NavItem[] = [
     {
       title: '村务治理',
@@ -211,10 +217,18 @@ export function useSidebar() {
     settingsGroup(),
   ])
 
-  const housekeeperNavData = computed<NavGroup[]>(() => [
-    { title: '本馆', items: housekeeperNavItems },
-    settingsGroup(),
-  ])
+  const housekeeperNavData = computed<NavGroup[]>(() => {
+    if (housekeeperKind().value === 'partner') {
+      return [
+        { title: '合作方', items: partnerNavItems },
+        settingsGroup(),
+      ]
+    }
+    return [
+      { title: '本馆', items: housekeeperNavItems },
+      settingsGroup(),
+    ]
+  })
 
   const navData = computed<NavGroup[]>(() => {
     if (isHousekeeperUser(userType.value))

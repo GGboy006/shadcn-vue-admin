@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 
+import { clearHousekeeperKind } from '@/services/api/housekeeper-partner.access'
 import { lazyAuthStorage } from '@/utils/proxy-auth'
 
 export interface LoginUserVO {
@@ -28,6 +29,7 @@ export const useAuthStore = defineStore('user', () => {
     token.value = ''
     userInfo.value = null
     isLogin.value = false
+    clearHousekeeperKind()
   }
 
   function getUserType(): number | undefined {

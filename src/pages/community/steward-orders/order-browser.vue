@@ -6,18 +6,31 @@ import type { HousekeeperOrderPayStatus, HousekeeperOrderStatus, IHousekeeperOrd
 import { BasicPage } from '@/components/global-layout'
 import { useGetHousekeeperOrderPageQuery } from '@/services/api/housekeeper-order.api'
 
+import type { HousekeeperOrderScope } from './order-scope'
+
 import { columns } from './components/columns'
 import DataTableToolbar from './components/data-table-toolbar.vue'
 import DataTable from './components/data-table.vue'
+import { housekeeperOrderScopeKey } from './order-scope'
 
 const props = withDefaults(defineProps<{
-  /** station 看全站；self 只看本馆，不传 housekeeperId */
-  scope?: 'station' | 'self'
+  /** station 看全站；self 只看本馆；partner 看该渠道在各小区的订单 */
+  scope?: HousekeeperOrderScope
 }>(), {
   scope: 'station',
 })
 
-const showHousekeeperFilter = computed(() => props.scope === 'station')
+provide(housekeeperOrderScopeKey, computed(() => props.scope))
+
+const showHousekeeperFilter = computed(() => props.scope !== 'self')
+const showProviderFilter = computed(() => props.scope === 'station')
+const pageDescription = computed(() => {
+  if (props.scope === 'partner')
+    return '查看各小区订单，并推进接单、服务和完成'
+  if (props.scope === 'self')
+    return '查看本馆订单，取消未支付本地单或改派本馆师傅'
+  return '查看本站家政订单。可按渠道筛选，合作方订单不能取消或改派'
+})
 
 const query = ref<IHousekeeperOrderPageQuery>({
   pageNum: 1,
@@ -46,6 +59,7 @@ const search = ref('')
 const orderStatusFilter = ref('all')
 const payStatusFilter = ref('all')
 const housekeeperIdFilter = ref('all')
+const providerCodeFilter = ref('all')
 const dateBegin = ref<string | undefined>()
 const dateEnd = ref<string | undefined>()
 
@@ -73,6 +87,13 @@ watch(housekeeperIdFilter, (val) => {
   query.value.pageNum = 1
 })
 
+watch(providerCodeFilter, (val) => {
+  if (!showProviderFilter.value)
+    return
+  query.value.fulfillProviderCode = val === 'all' ? undefined : val
+  query.value.pageNum = 1
+})
+
 watch(dateBegin, (val) => {
   query.value.createTimeBegin = val ? `${val} 00:00:00` : undefined
   query.value.pageNum = 1
@@ -88,12 +109,14 @@ function handleReset() {
   orderStatusFilter.value = 'all'
   payStatusFilter.value = 'all'
   housekeeperIdFilter.value = 'all'
+  providerCodeFilter.value = 'all'
   dateBegin.value = undefined
   dateEnd.value = undefined
   query.value.keyword = undefined
   query.value.orderStatus = undefined
   query.value.payStatus = undefined
   query.value.housekeeperId = undefined
+  query.value.fulfillProviderCode = undefined
   query.value.createTimeBegin = undefined
   query.value.createTimeEnd = undefined
   query.value.pageNum = 1
@@ -103,7 +126,7 @@ function handleReset() {
 <template>
   <BasicPage
     title="服务订单"
-    :description="scope === 'self' ? '查看本馆订单，取消未支付本地单或改派本馆师傅' : '查看本站家政订单，取消未支付本地单或改派师傅'"
+    :description="pageDescription"
     sticky
   >
     <DataTable
@@ -119,13 +142,16 @@ function handleReset() {
           :order-status-filter="orderStatusFilter"
           :pay-status-filter="payStatusFilter"
           :housekeeper-id-filter="housekeeperIdFilter"
+          :provider-code-filter="providerCodeFilter"
           :date-begin="dateBegin"
           :date-end="dateEnd"
           :show-housekeeper-filter="showHousekeeperFilter"
+          :show-provider-filter="showProviderFilter"
           @update:search="search = $event"
           @update:order-status-filter="orderStatusFilter = $event"
           @update:pay-status-filter="payStatusFilter = $event"
           @update:housekeeper-id-filter="housekeeperIdFilter = $event"
+          @update:provider-code-filter="providerCodeFilter = $event"
           @update:date-begin="dateBegin = $event"
           @update:date-end="dateEnd = $event"
           @reset="handleReset"

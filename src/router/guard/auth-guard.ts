@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia'
 
 import { homePathForUser, isPropertyUser, UserType } from '@/constants/user-type'
 import pinia from '@/plugins/pinia/setup'
+import { ensureHousekeeperKind, housekeeperKind } from '@/services/api/housekeeper-partner.access'
 import { useAuthStore } from '@/stores/auth'
 import { useUserInfoStore } from '@/stores/user-info'
 
@@ -12,7 +13,7 @@ import { isPublicPath, MARKETING_HOME } from './public-path'
 export { isPublicPath, MARKETING_HOME }
 
 export function setupAuthGuard(router: Router) {
-  router.beforeEach((to, from) => {
+  router.beforeEach(async (to, from) => {
     const authStore = useAuthStore(pinia)
     const { isLogin } = storeToRefs(authStore)
 
@@ -35,8 +36,10 @@ export function setupAuthGuard(router: Router) {
         return from
       }
       // 居委会、管家各自回自己的首页；站长和商户仍回数据看板
+      if (userType === UserType.housekeeper)
+        await ensureHousekeeperKind(authStore.token)
       if (userType === UserType.committee || userType === UserType.housekeeper)
-        return { path: homePathForUser(userType) }
+        return { path: homePathForUser(userType, housekeeperKind().value) }
       return { path: '/dashboard' }
     }
 
@@ -56,6 +59,12 @@ export function setupAuthGuard(router: Router) {
     const requiredRoles = to.meta.roles as number[] | undefined
     if (requiredRoles && (!userType || !requiredRoles.includes(userType))) {
       return { path: '/errors/403' }
+    }
+
+    if (userType === UserType.housekeeper && to.path.startsWith('/housekeeper')) {
+      await ensureHousekeeperKind(authStore.token)
+      if (housekeeperKind().value === 'partner' && to.path.startsWith('/housekeeper/profile'))
+        return { path: '/housekeeper/staff' }
     }
   })
 }

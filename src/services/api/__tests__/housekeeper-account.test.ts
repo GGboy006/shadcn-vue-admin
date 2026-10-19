@@ -6,6 +6,7 @@ import {
   buildStationHousekeeperSavePayload,
   canStationManageStaff,
   housekeeperAccountLabel,
+  housekeeperOrgKind,
   isHousekeeperAccountOpened,
   stationHousekeeperAccountIssues,
 } from '@/services/api/housekeeper-account'
@@ -25,6 +26,16 @@ describe('housekeeper account', () => {
     expect(housekeeperAccountLabel({ providerType: 2 })).toBe('第三方网点')
     expect(housekeeperAccountLabel({ userId: '100' })).toBe('已开户')
     expect(housekeeperAccountLabel({})).toBe('未开户')
+  })
+
+  it('机构上的 integrationMode 区分本地馆、渠道和合作方', () => {
+    expect(housekeeperOrgKind({})).toBe('local')
+    expect(housekeeperOrgKind({ integrationMode: '' })).toBe('local')
+    expect(housekeeperOrgKind({ integrationMode: 'PARTNER' })).toBe('partner')
+    expect(housekeeperOrgKind({ integrationMode: 'API' })).toBe('third-party')
+    expect(housekeeperOrgKind({ integrationMode: 'MINI_JUMP' })).toBe('third-party')
+    expect(housekeeperOrgKind({ integrationMode: 'H5_JUMP' })).toBe('third-party')
+    expect(housekeeperOrgKind({ providerType: 2 })).toBe('third-party')
   })
 
   it('新建本地馆必须同时有登录号、密码和营业时间', () => {

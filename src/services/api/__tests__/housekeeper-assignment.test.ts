@@ -60,4 +60,26 @@ describe('housekeeper category assignment', () => {
     expect(row.providerType).toBe(2)
     expect(assignmentPersonLabel(row)).toBe('第三方 · 整馆')
   })
+
+  it('合作方人员单独成行，保存只带 partnerStaffId', () => {
+    const row = decorateAssignment({
+      housekeeperId: 'third-1',
+      partnerStaffId: 9001,
+      staffId: 'should-drop',
+      staffName: '李师傅',
+      sortOrder: 3,
+    }, services)
+    expect(row.staffId).toBeUndefined()
+    expect(row.partnerStaffId).toBe('9001')
+    expect(assignmentPersonLabel(row)).toBe('李师傅')
+    expect(assignmentKey(row)).toBe('partner:third-1:9001')
+    expect(buildCategoryProviderPayload([row])).toEqual([
+      { housekeeperId: 'third-1', partnerStaffId: '9001', sortOrder: 3 },
+    ])
+    const whole = decorateAssignment({ housekeeperId: 'third-1' }, services)
+    expect(assignmentKey(whole)).not.toBe(assignmentKey(row))
+    expect(buildCategoryProviderPayload([whole])).toEqual([
+      { housekeeperId: 'third-1', sortOrder: 0 },
+    ])
+  })
 })

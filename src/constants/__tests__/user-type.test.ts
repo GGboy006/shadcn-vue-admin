@@ -41,8 +41,9 @@ describe('user-type', () => {
       expect(isHousekeeperUser(3)).toBe(false)
     })
 
-    it('管家登录后进入本馆资料', () => {
+    it('管家登录后进入本馆资料，合作方进入人员', () => {
       expect(homePathForUser(9)).toBe('/housekeeper/profile')
+      expect(homePathForUser(9, 'partner')).toBe('/housekeeper/staff')
       expect(homePathForUser(6)).toBe('/neighborhood/home')
       expect(homePathForUser(3)).toBe('/dashboard')
     })

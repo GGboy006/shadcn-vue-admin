@@ -51,6 +51,10 @@ export interface IHousekeeperService {
   providerType?: HousekeeperProviderType
   /** 第三方渠道编码 */
   providerCode?: string
+  /**
+   * 履约方式。空=本地馆，API=接口渠道，MINI_JUMP=小程序，H5_JUMP=H5，PARTNER=合作方
+   */
+  integrationMode?: string
   /** 支付方式:1 线上 / 2 线下。空=第三方或未设置 */
   payMode?: HousekeeperPayMode
   /** 营业开始。第三方为空 */
@@ -377,7 +381,7 @@ export type IHousekeeperStaffListAllResponse = IResponse<IHousekeeperStaff[]>
 export type IHousekeeperStaffDetailResponse = IResponse<IHousekeeperStaff>
 
 /** 获取服务人员分页列表(对接文档 4.2,`/housekeeper/staff/page`) */
-export function useGetHousekeeperStaffPageQuery(query: Ref<IHousekeeperStaffListQuery>) {
+export function useGetHousekeeperStaffPageQuery(query: Ref<IHousekeeperStaffListQuery>, enabled?: Ref<boolean>) {
   const { apiFetch } = useApiFetch()
 
   return useQuery<IHousekeeperStaffListResponse, Error>({
@@ -386,6 +390,7 @@ export function useGetHousekeeperStaffPageQuery(query: Ref<IHousekeeperStaffList
       method: 'get',
       query: query.value,
     }),
+    enabled: () => enabled?.value ?? true,
     retry: false,
   })
 }
@@ -670,8 +675,10 @@ export function useDeleteHousekeeperCategoryMutation() {
 export interface IHousekeeperCategoryProvider {
   /** 管家服务ID */
   housekeeperId: string
-  /** 人员ID */
+  /** 人员ID。本站师傅 */
   staffId?: string
+  /** 合作方人员。PARTNER 到人时传，整馆不传 */
+  partnerStaffId?: string
   /** 排序 */
   sortOrder?: number
 }
@@ -694,9 +701,11 @@ export interface IHousekeeperCategoryProviderVO {
   housekeeperId: string
   /** 管家服务名称 */
   housekeeperName?: string
-  /** 人员ID */
+  /** 人员ID。本站师傅，合作方为空 */
   staffId?: string
-  /** 人员名称 */
+  /** 合作方人员。本地馆为空 */
+  partnerStaffId?: string
+  /** 人员名称。两个 ID 都空时为空，表示整馆 */
   staffName?: string
   /** 排序 */
   sortOrder?: number

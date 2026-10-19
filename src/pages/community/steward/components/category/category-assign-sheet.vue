@@ -17,6 +17,7 @@ import {
 import {
   useGetHousekeeperCategoryDetailQuery,
   useGetHousekeeperCategoryProvidersQuery,
+  useGetHousekeeperFulfillProvidersQuery,
   useGetHousekeeperServiceListQuery,
   useSaveHousekeeperCategoryProvidersMutation,
 } from '@/services/api/housekeeper.api'
@@ -43,13 +44,20 @@ const categoryName = computed(() => categoryData.value?.data?.categoryName ?? ''
 const listEnabled = computed(() => props.open && !!props.categoryId)
 const { data: providersData, isLoading } = useGetHousekeeperCategoryProvidersQuery(categoryIdRef, listEnabled)
 const { data: serviceListData } = useGetHousekeeperServiceListQuery(listEnabled)
+const { data: channelData } = useGetHousekeeperFulfillProvidersQuery(listEnabled)
 
 const original = ref<CategoryAssignmentDraft[]>([])
 const current = ref<CategoryAssignmentDraft[]>([])
 
 function applyServerRows() {
   const services = serviceListData.value?.data ?? []
-  const rows = (providersData.value?.data ?? []).map(item => decorateAssignment(item, services))
+  const channels = channelData.value?.data ?? []
+  const rows = (providersData.value?.data ?? []).map((item) => {
+    const service = services.find(row => row.housekeeperId === item.housekeeperId)
+    const integrationMode = service?.integrationMode
+      || channels.find(channel => channel.providerCode === service?.providerCode)?.integrationMode
+    return decorateAssignment({ ...item, integrationMode }, services)
+  })
   original.value = rows
   current.value = rows.map(item => ({ ...item }))
 }
@@ -76,7 +84,7 @@ const isDirty = computed(() => {
   })
 })
 
-watch(serviceListData, () => {
+watch([serviceListData, channelData], () => {
   if (!isDirty.value)
     applyServerRows()
 })
@@ -104,7 +112,7 @@ function handleAdd(item: CategoryAssignmentDraft) {
   current.value.push({ ...item, sortOrder: current.value.length + 1 })
 }
 
-function handleRemove(item: Pick<CategoryAssignmentDraft, 'housekeeperId' | 'staffId' | 'providerType'>) {
+function handleRemove(item: Pick<CategoryAssignmentDraft, 'housekeeperId' | 'staffId' | 'partnerStaffId' | 'providerType'>) {
   const key = assignmentKey(item)
   current.value = current.value.filter(row => assignmentKey(row) !== key)
 }
@@ -187,7 +195,7 @@ function handleCancelDiscardClose() {
               分配：{{ categoryName || '加载中...' }}
             </FormSheetTitle>
             <FormSheetDescription class="mt-1 text-xs">
-              本地馆勾选师傅，第三方只选服务主体。保存会覆盖该分类现有的全部分配。
+              本地馆勾选师傅。跳转和接口渠道按整馆，合作方可以整馆或指定人员。保存会覆盖该分类现有的全部分配。
             </FormSheetDescription>
           </div>
           <Button :disabled="!isDirty || isSaving" @click="handleSaveClick">
@@ -224,7 +232,7 @@ function handleCancelDiscardClose() {
           </div>
 
           <div v-if="current.length === 0" class="rounded-md border border-dashed py-10 text-center text-sm text-muted-foreground">
-            暂未分配。本地馆选择师傅，第三方选择服务主体。
+            暂未分配。本地馆选择师傅，合作方可以指定人员。
           </div>
 
           <div v-else class="overflow-hidden rounded-md border">

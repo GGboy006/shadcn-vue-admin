@@ -2,6 +2,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useSidebar } from '@/composables/use-sidebar'
+import { clearHousekeeperKind, housekeeperKind } from '@/services/api/housekeeper-partner.access'
 import { useAuthStore } from '@/stores/auth'
 
 interface LoginUserVO {
@@ -35,6 +36,7 @@ describe('useSidebar navData', () => {
   })
 
   afterEach(() => {
+    clearHousekeeperKind()
     vi.unstubAllEnvs()
   })
 
@@ -67,6 +69,15 @@ describe('useSidebar navData', () => {
     expect(navData.value.map(g => g.title)).toEqual(['本馆', '设置'])
     expect(leafTitles(navData.value[0])).toEqual(['本馆资料', '服务人员', '服务订单'])
     expect(leafTitles(navData.value[1])).toEqual(['个人资料'])
+  })
+
+  it('合作方(userType=9):服务人员 + 服务订单', () => {
+    setUser(9)
+    housekeeperKind().value = 'partner'
+    const { navData } = useSidebar()
+
+    expect(navData.value.map(g => g.title)).toEqual(['合作方', '设置'])
+    expect(leafTitles(navData.value[0])).toEqual(['服务人员', '服务订单'])
   })
 
   it('物业(userType=5)不再走商户后台菜单', () => {

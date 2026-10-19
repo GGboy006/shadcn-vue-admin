@@ -44,6 +44,8 @@ export interface IHousekeeperOrderPageQuery extends IPageParam {
   housekeeperId?: string
   /** 服务人员 ID */
   staffId?: string
+  /** 渠道编码。站长用来只看某一家合作方；合作方登录时不要传 */
+  fulfillProviderCode?: string
   /** 服务分类 ID */
   categoryId?: string
   /** 匹配订单号 / 联系人 / 手机 / 服务名 / 师傅名 */
@@ -68,9 +70,11 @@ export interface IHousekeeperOrder {
   housekeeperId?: string
   /** 管家馆名称 */
   housekeeperName?: string
-  /** 师傅 ID;整馆待抢时可能为空 */
+  /** 师傅 ID;整馆待抢或合作方到人时为空 */
   staffId?: string
-  /** 师傅姓名 */
+  /** 合作方人员。指定到人时有值 */
+  partnerStaffId?: string
+  /** 师傅姓名。合作方到人时仍是人员姓名 */
   staffName?: string
   /** 分配模式:1 到人指定 / 2 整馆派单 */
   assignMode?: HousekeeperAssignMode
@@ -263,6 +267,24 @@ export function useReassignHousekeeperOrderMutation() {
         body,
       })
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['housekeeperOrderList'] })
+      queryClient.invalidateQueries({ queryKey: ['housekeeperOrderDetail'] })
+    },
+  })
+}
+
+/** 合作方推进订单(`PUT /housekeeper/order/{orderId}/advance?status=`) */
+export function useAdvanceHousekeeperOrderMutation() {
+  const { apiFetch } = useApiFetch()
+  const queryClient = useQueryClient()
+
+  return useMutation<IResponse<boolean>, Error, { orderId: string, status: 1 | 2 | 4 }>({
+    mutationKey: ['advanceHousekeeperOrder'],
+    mutationFn: async ({ orderId, status }) => await apiFetch<IResponse<boolean>>(`/housekeeper/order/${orderId}/advance`, {
+      method: 'put',
+      query: { status },
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['housekeeperOrderList'] })
       queryClient.invalidateQueries({ queryKey: ['housekeeperOrderDetail'] })

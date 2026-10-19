@@ -97,6 +97,16 @@ function localLabel(code?: string) {
   return code
 }
 
+function fulfillStaffLabel(item: { staffName?: string, partnerStaffId?: string, fulfillProviderCode?: string }) {
+  if (item.staffName)
+    return item.staffName
+  if (item.partnerStaffId)
+    return '-'
+  if (item.fulfillProviderCode && item.fulfillProviderCode !== 'LOCAL')
+    return '整馆'
+  return '待抢单'
+}
+
 function paymentStatusText(payment: IHousekeeperOrderPayment) {
   if (payment.payStatusLabel)
     return payment.payStatusLabel
@@ -142,7 +152,7 @@ const serviceSections = computed(() => {
 
   const fulfill = pack([
     field('服务馆', item.housekeeperName),
-    field('师傅', item.staffName || '待抢单'),
+    field('师傅', fulfillStaffLabel(item)),
     field('师傅电话', item.servicePersonPhone),
     field('分配方式', item.assignMode ? housekeeperAssignModeLabel[item.assignMode] : undefined),
     field('履约方', localLabel(item.fulfillProviderCode)),

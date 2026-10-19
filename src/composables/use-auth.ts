@@ -1,6 +1,7 @@
 import { toast } from 'vue-sonner'
 
 import { homePathForUser, isHousekeeperUser, isMerchantBusinessUser, isPropertyUser, PROPERTY_ACCESS_DENIED, UserType } from '@/constants/user-type'
+import { ensureHousekeeperKind, housekeeperKind } from '@/services/api/housekeeper-partner.access'
 import { useAuthStore } from '@/stores/auth'
 import { useUserInfoStore } from '@/stores/user-info'
 
@@ -28,10 +29,12 @@ export function useAuth() {
     }
   }
 
-  function toHome() {
+  async function toHome() {
     const userType = authStore.userInfo?.userType
+    if (isHousekeeperUser(userType))
+      await ensureHousekeeperKind(authStore.token)
     if (userType === UserType.committee || isHousekeeperUser(userType)) {
-      router.push({ path: homePathForUser(userType) })
+      router.push({ path: homePathForUser(userType, housekeeperKind().value) })
       return
     }
     router.push({ path: '/dashboard' })
@@ -68,7 +71,7 @@ export function useAuth() {
       const redirectIsSafe = !!redirect && !redirect.startsWith('//')
       const housekeeperLeavesOwnArea = isHousekeeperUser(userType) && !redirect?.startsWith('/housekeeper')
       if (!redirectIsSafe || housekeeperLeavesOwnArea) {
-        toHome()
+        await toHome()
       }
       else {
         router.push(redirect)
