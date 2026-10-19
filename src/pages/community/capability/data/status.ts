@@ -4,13 +4,30 @@ export const capabilityAccessTypeLabel: Record<CapabilityAccessType, string> = {
   1: 'MCP',
   2: 'Skill',
   3: '智能体',
+  4: '小程序',
+  5: 'H5',
+  6: '应用内页',
+  7: '外部应用',
 }
+
+export const capabilityAccessTypeOptions = (Object.keys(capabilityAccessTypeLabel) as `${CapabilityAccessType}`[]).map(value => ({
+  value,
+  label: capabilityAccessTypeLabel[Number(value) as CapabilityAccessType],
+}))
 
 export function accessTypeBadgeVariant(accessType: CapabilityAccessType) {
   if (accessType === 1)
     return 'info'
   if (accessType === 3)
     return 'success'
+  if (accessType === 4)
+    return 'warning'
+  if (accessType === 5)
+    return 'gold'
+  if (accessType === 6)
+    return 'outline'
+  if (accessType === 7)
+    return 'default'
   return 'secondary'
 }
 

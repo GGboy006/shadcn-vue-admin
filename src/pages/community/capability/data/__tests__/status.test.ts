@@ -8,18 +8,26 @@ import {
 } from '../status'
 
 describe('capability status labels', () => {
-  it('labels MCP / Skill / 智能体', () => {
+  it('labels all access types', () => {
     expect(capabilityAccessTypeLabel).toEqual({
       1: 'MCP',
       2: 'Skill',
       3: '智能体',
+      4: '小程序',
+      5: 'H5',
+      6: '应用内页',
+      7: '外部应用',
     })
   })
 
-  it('gives 智能体 a badge variant distinct from MCP and Skill', () => {
+  it('gives each access type a badge variant', () => {
     expect(accessTypeBadgeVariant(1)).toBe('info')
     expect(accessTypeBadgeVariant(2)).toBe('secondary')
     expect(accessTypeBadgeVariant(3)).toBe('success')
+    expect(accessTypeBadgeVariant(4)).toBe('warning')
+    expect(accessTypeBadgeVariant(5)).toBe('gold')
+    expect(accessTypeBadgeVariant(6)).toBe('outline')
+    expect(accessTypeBadgeVariant(7)).toBe('default')
   })
 
   it('uses Chinese category values as both filter value and label', () => {

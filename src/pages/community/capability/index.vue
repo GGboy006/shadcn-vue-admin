@@ -17,7 +17,7 @@ import { useGetCapabilityListQuery } from '@/services/api/capability.api'
 
 import CapabilityCard from './components/capability-card.vue'
 import CapabilityDetailSheet from './components/capability-detail-sheet.vue'
-import { capabilityCategoryFilterOptions } from './data/status'
+import { capabilityAccessTypeOptions, capabilityCategoryFilterOptions } from './data/status'
 
 const query = ref<ICapabilityListQuery>({})
 const { data, isLoading, isError, error } = useGetCapabilityListQuery(query)
@@ -53,26 +53,24 @@ function handleSelect(item: ICapability) {
 <template>
   <BasicPage
     title="居民AI服务"
-    description="本站已接入的 MCP / Skill / 智能体，只读展示"
+    description="本站已接入的能力，只读展示"
     sticky
   >
     <div class="mb-4 flex flex-wrap items-center gap-2">
       <Select v-model="accessTypeFilter">
-        <SelectTrigger class="h-8 w-[120px]">
+        <SelectTrigger class="h-8 w-36">
           <SelectValue placeholder="接入方式" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">
             全部类型
           </SelectItem>
-          <SelectItem value="1">
-            MCP
-          </SelectItem>
-          <SelectItem value="2">
-            Skill
-          </SelectItem>
-          <SelectItem value="3">
-            智能体
+          <SelectItem
+            v-for="item in capabilityAccessTypeOptions"
+            :key="item.value"
+            :value="item.value"
+          >
+            {{ item.label }}
           </SelectItem>
         </SelectContent>
       </Select>
