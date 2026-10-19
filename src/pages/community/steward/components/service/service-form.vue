@@ -258,7 +258,7 @@ const onSubmit = handleSubmit((values) => {
 
       <BusinessHoursFields v-if="!isThirdParty" />
 
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+      <div v-if="!isThirdParty" class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
         <FormField v-slot="{ componentField }" name="loginPhone">
           <FormItem>
             <FormLabel :required="!isEdit">
