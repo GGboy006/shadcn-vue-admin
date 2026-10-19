@@ -1,4 +1,4 @@
-import { BookmarkIcon, BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, CalendarDaysIcon, CalendarRangeIcon, ChartColumnIcon, CoinsIcon, Columns3Icon, ConciergeBellIcon, CreditCardIcon, FlagIcon, FolderTreeIcon, HandHeartIcon, HandshakeIcon, HeadsetIcon, HeartHandshakeIcon, HeartPulseIcon, HelpCircleIcon, HomeIcon, ImageIcon, LandmarkIcon, LayoutDashboardIcon, LayoutGridIcon, LibraryIcon, LifeBuoyIcon, LightbulbIcon, ListOrderedIcon, MailIcon, MegaphoneIcon, MessageSquareIcon, MessagesSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, ReceiptIcon, ShoppingCartIcon, StoreIcon, TagIcon, TagsIcon, UserIcon, UsersIcon, UsersRoundIcon, WalletIcon, WrenchIcon } from '@lucide/vue'
+import { BookmarkIcon, BookOpenIcon, BotIcon, BoxesIcon, Building2Icon, CalendarDaysIcon, CalendarRangeIcon, ChartColumnIcon, CoinsIcon, Columns3Icon, ConciergeBellIcon, CreditCardIcon, FlagIcon, FolderTreeIcon, HandHeartIcon, HandshakeIcon, HeadsetIcon, HeartHandshakeIcon, HeartPulseIcon, HelpCircleIcon, HomeIcon, ImageIcon, LandmarkIcon, LayoutDashboardIcon, LayoutGridIcon, LibraryIcon, LifeBuoyIcon, ListOrderedIcon, MailIcon, MegaphoneIcon, MessageSquareIcon, MessagesSquareIcon, NewspaperIcon, PackageIcon, PhoneIcon, ReceiptIcon, ShoppingCartIcon, StoreIcon, TagIcon, TagsIcon, UserIcon, UsersIcon, UsersRoundIcon, WalletIcon, WrenchIcon } from '@lucide/vue'
 
 import type { NavGroup, NavItem } from '@/components/app-sidebar/types'
 
@@ -65,7 +65,6 @@ export function useSidebar() {
       items: [
         { title: '小区公告', url: '/community/announcement', icon: MegaphoneIcon, roles: [3] },
         { title: '小区动态', url: '/community/news', icon: NewspaperIcon, roles: [3] },
-        { title: '知识服务', url: '/community/knowledge', icon: LightbulbIcon, roles: [3] },
       ],
     },
     {

@@ -1,6 +1,7 @@
 <route lang="yaml">
 meta:
-  roles: [3]
+  # 知识服务改由公司后台统一维护，站长端不再开放
+  roles: []
 </route>
 
 <script setup lang="ts">

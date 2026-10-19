@@ -146,7 +146,6 @@ describe('useSidebar navData', () => {
     expect(leafTitles(navData.value[4])).toEqual([
       '小区公告',
       '小区动态',
-      '知识服务',
       '办事指南',
       '小区服务',
       '管家服务',
