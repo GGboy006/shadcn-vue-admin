@@ -155,7 +155,7 @@ function handleCategoryReset() {
 
       <UiTabsContent value="category" class="mt-4">
         <p class="mb-3 text-sm text-muted-foreground">
-          居民端看到的类目在此维护。本地馆分配到具体师傅，跳转和接口渠道按整馆，合作方可以整馆或指定人员。
+          居民端看到的类目在此维护。本地馆分配到具体师傅，跳转和接口渠道按整馆，合作方勾选具体人员。
         </p>
         <CategoryDataTable
           :loading="isCategoryLoading"

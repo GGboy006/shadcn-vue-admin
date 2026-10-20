@@ -195,7 +195,7 @@ function handleCancelDiscardClose() {
               分配：{{ categoryName || '加载中...' }}
             </FormSheetTitle>
             <FormSheetDescription class="mt-1 text-xs">
-              本地馆勾选师傅。跳转和接口渠道按整馆，合作方可以整馆或指定人员。保存会覆盖该分类现有的全部分配。
+              本地馆勾选师傅。跳转和接口渠道按整馆，合作方勾选具体人员。保存会覆盖该分类现有的全部分配。
             </FormSheetDescription>
           </div>
           <Button :disabled="!isDirty || isSaving" @click="handleSaveClick">

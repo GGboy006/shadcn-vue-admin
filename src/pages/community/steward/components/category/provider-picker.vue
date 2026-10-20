@@ -144,7 +144,7 @@ function handleHouseToggle(val: boolean | string | number) {
           添加分配
         </ModalTitle>
         <ModalDescription>
-          本地馆勾选师傅。跳转和接口渠道按整馆分配，合作方可以整馆，也可以勾选具体人员。
+          本地馆勾选师傅。跳转和接口渠道按整馆分配，合作方勾选具体人员。
         </ModalDescription>
       </ModalHeader>
 
@@ -177,21 +177,12 @@ function handleHouseToggle(val: boolean | string | number) {
         </div>
 
         <div v-else-if="isPartnerChannel" class="space-y-2">
-          <label class="flex cursor-pointer items-center gap-3 rounded-md border px-3 py-3 text-sm">
-            <Checkbox
-              :model-value="isHouseChecked(selectedService.housekeeperId)"
-              @update:model-value="handleHouseToggle"
-            />
-            <span class="flex-1 font-medium">{{ selectedService.name }}</span>
-            <span class="text-xs text-muted-foreground">合作方 · 整馆</span>
-          </label>
-
           <div v-if="isPartnerStaffLoading" class="space-y-2">
             <Skeleton class="h-8 w-full" />
             <Skeleton class="h-8 w-full" />
           </div>
           <div v-else-if="partnerStaffList.length === 0" class="py-6 text-center text-sm text-muted-foreground">
-            该渠道暂无启用人员，可以只分配整馆
+            该合作方暂无启用人员
           </div>
           <div v-else class="max-h-[40vh] space-y-1 overflow-y-auto rounded-md border p-2">
             <label
