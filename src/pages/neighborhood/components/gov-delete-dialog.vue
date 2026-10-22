@@ -12,10 +12,13 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 
-defineProps<{
+withDefaults(defineProps<{
   title: string
+  description?: string
   pending?: boolean
-}>()
+}>(), {
+  description: '删除后不能恢复。',
+})
 
 const emit = defineEmits<{ confirm: [] }>()
 
@@ -28,7 +31,7 @@ const open = defineModel<boolean>('open', { required: true })
       <AlertDialogHeader>
         <AlertDialogTitle>{{ title }}</AlertDialogTitle>
         <AlertDialogDescription>
-          删除后不能恢复。
+          {{ description }}
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>

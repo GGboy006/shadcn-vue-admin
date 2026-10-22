@@ -567,9 +567,23 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/neighborhood/environment/': RouteRecordInfo<
+      '/neighborhood/environment/',
+      '/neighborhood/environment',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/neighborhood/finance/': RouteRecordInfo<
       '/neighborhood/finance/',
       '/neighborhood/finance',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/neighborhood/fire/': RouteRecordInfo<
+      '/neighborhood/fire/',
+      '/neighborhood/fire',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -1218,9 +1232,21 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
+    'src/pages/neighborhood/environment/index.vue': {
+      routes:
+        | '/neighborhood/environment/'
+      views:
+        | never
+    }
     'src/pages/neighborhood/finance/index.vue': {
       routes:
         | '/neighborhood/finance/'
+      views:
+        | never
+    }
+    'src/pages/neighborhood/fire/index.vue': {
+      routes:
+        | '/neighborhood/fire/'
       views:
         | never
     }

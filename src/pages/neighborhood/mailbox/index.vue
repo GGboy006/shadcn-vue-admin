@@ -4,9 +4,13 @@ meta:
 </route>
 
 <script setup lang="ts">
-import ModulePlaceholder from '../components/module-placeholder.vue'
+import { BasicPage } from '@/components/global-layout'
+
+import MailPanel from './components/mail-panel.vue'
 </script>
 
 <template>
-  <ModulePlaceholder title="书记信箱" description="查看并回复居民来信" />
+  <BasicPage title="书记信箱" description="回复和办结居民来信，不能代写来信" sticky>
+    <MailPanel />
+  </BasicPage>
 </template>
