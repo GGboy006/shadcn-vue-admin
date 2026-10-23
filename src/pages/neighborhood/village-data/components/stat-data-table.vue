@@ -8,9 +8,7 @@ import DataTableToolbar from './stat-data-table-toolbar.vue'
 
 const props = defineProps<DataTableProps<VillageStat>>()
 
-const table = useGenerateVueTable<VillageStat>(props, {
-  initialColumnVisibility: { icon: false },
-})
+const table = useGenerateVueTable<VillageStat>(props)
 </script>
 
 <template>

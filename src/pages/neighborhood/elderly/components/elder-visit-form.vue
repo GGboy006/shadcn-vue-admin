@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useCreateElderVisitMutation, useUpdateElderVisitMutation } from '@/services/api/neighborhood-resident.api'
+import { useCreateElderVisitMutation, useGetElderVisitorListQuery, useUpdateElderVisitMutation } from '@/services/api/neighborhood-resident.api'
 import { optionalInt, optionalNumber, optionalString } from '@/validators/common'
 
 const props = defineProps<{ row?: ElderVisit }>()
@@ -36,6 +36,7 @@ const schema = z.object({
   age: optionalInt.refine(value => value === undefined || value >= 0, '请填写不小于 0 的整数'),
   address: optionalString,
   contactName: optionalString,
+  visitorId: optionalString,
   signDate: optionalString,
   status: optionalNumber,
 })
@@ -48,9 +49,16 @@ const { handleSubmit } = useForm({
     age: props.row?.age ?? undefined,
     address: props.row?.address ?? '',
     contactName: props.row?.contactName ?? '',
+    visitorId: '',
     signDate: props.row?.signDate ?? '',
     status: props.row?.status ?? 1,
   },
+})
+
+const { data: visitorData, isLoading: isVisitorLoading } = useGetElderVisitorListQuery()
+const visitors = computed(() => {
+  const source = visitorData.value?.data
+  return Array.isArray(source) ? source : []
 })
 
 const { mutate: createRow, isPending: isCreating } = useCreateElderVisitMutation()
@@ -64,7 +72,9 @@ const onSubmit = handleSubmit((form) => {
     type: form.type === 1 || form.type === 2 || form.type === 3 || form.type === 4 ? form.type : 1,
     age: form.age,
     address: form.address?.trim() || undefined,
-    contactName: form.contactName?.trim() || undefined,
+    contactName: isEdit.value
+      ? form.contactName?.trim() || undefined
+      : visitors.value.find(item => item.visitorId === form.visitorId)?.name,
     signDate: form.signDate?.trim() || undefined,
     status: form.status === 1 || form.status === 2 ? form.status : 1,
   }
@@ -129,10 +139,31 @@ const onSubmit = handleSubmit((form) => {
           <FormMessage />
         </FormItem>
       </FormField>
-      <FormField v-slot="{ componentField }" name="contactName">
+      <FormField v-if="isEdit" v-slot="{ componentField }" name="contactName">
         <FormItem>
           <FormLabel>结对志愿者</FormLabel>
           <FormControl><Input v-bind="componentField" /></FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+      <FormField v-else v-slot="{ componentField }" name="visitorId">
+        <FormItem>
+          <FormLabel>结对志愿者</FormLabel>
+          <Select v-bind="componentField" :disabled="isVisitorLoading || visitors.length === 0">
+            <FormControl>
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="请选择" />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              <SelectItem v-for="item in visitors" :key="item.visitorId" :value="item.visitorId">
+                {{ item.phone ? `${item.name} ${item.phone}` : item.name }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <p v-if="!isVisitorLoading && visitors.length === 0" class="text-xs text-muted-foreground">
+            还没有探访志愿者。
+          </p>
           <FormMessage />
         </FormItem>
       </FormField>

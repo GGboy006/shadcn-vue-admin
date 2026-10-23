@@ -194,7 +194,7 @@ const onSubmit = handleSubmit((form) => {
         <FormItem>
           <FormLabel>公示开始</FormLabel>
           <FormControl>
-            <DateTimePicker v-bind="componentField" placeholder="选择开始时间" />
+            <DateTimePicker v-bind="componentField" default-time="00:00:00" placeholder="选择开始时间" />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -203,7 +203,7 @@ const onSubmit = handleSubmit((form) => {
         <FormItem>
           <FormLabel>公示结束</FormLabel>
           <FormControl>
-            <DateTimePicker v-bind="componentField" placeholder="选择结束时间" />
+            <DateTimePicker v-bind="componentField" default-time="00:00:00" placeholder="选择结束时间" />
           </FormControl>
           <FormMessage />
         </FormItem>

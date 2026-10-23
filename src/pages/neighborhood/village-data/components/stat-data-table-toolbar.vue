@@ -33,7 +33,7 @@ const searchModel = computed({
     <div class="flex flex-1 items-center space-x-2">
       <Input
         v-model="searchModel"
-        placeholder="搜索名称、数值、编码"
+        placeholder="搜索名称、数值"
         class="h-8 w-[150px] lg:w-[250px]"
       />
       <Button

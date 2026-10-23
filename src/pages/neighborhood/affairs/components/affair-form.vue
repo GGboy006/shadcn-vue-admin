@@ -74,14 +74,21 @@ const { handleSubmit, setFieldValue, values } = useForm({
   },
 })
 
+function optionNames(source: Array<string | undefined> | undefined) {
+  return (source ?? []).map(item => (item ?? '').trim()).filter(Boolean)
+}
+
+function votesFor(name: string) {
+  return props.row?.options?.find(item => item.name === name)?.votes ?? 0
+}
+
 const willRewriteVotes = computed(() => {
   const hasVotes = props.row?.options?.some(item => item.votes > 0)
-  if (!hasVotes || values.status !== 4)
+  if (!hasVotes)
     return false
-  const names = (values.options ?? []).map(item => item.trim()).filter(Boolean)
+  const names = optionNames(values.options)
   const original = (props.row?.options ?? []).map(item => item.name)
-  const changed = names.length !== original.length || names.some((name, index) => name !== original[index])
-  return changed || props.row?.status !== 4
+  return names.length !== original.length || names.some((name, index) => name !== original[index])
 })
 
 const { mutate: createRow, isPending: isCreating } = useCreateAffairMutation()
@@ -108,10 +115,9 @@ function removeOption(index: number) {
 const onSubmit = handleSubmit((form) => {
   const status = form.status === 2 ? 2 : form.status === 3 ? 3 : form.status === 4 ? 4 : form.status === 5 ? 5 : form.status === 6 ? 6 : 1
   const type = form.type === 2 ? 2 : form.type === 3 ? 3 : form.type === 4 ? 4 : form.type === 5 ? 5 : 1
-  const names = (form.options ?? []).map(item => item.trim()).filter(Boolean)
+  const names = optionNames(form.options)
   const original = (props.row?.options ?? []).map(item => item.name)
   const changed = names.length !== original.length || names.some((name, index) => name !== original[index])
-  const enteringVote = status === 4 && props.row?.status !== 4
   const payload: AffairSave = {
     affairId: isEdit.value ? props.row?.affairId : undefined,
     name: form.name.trim(),
@@ -123,8 +129,14 @@ const onSubmit = handleSubmit((form) => {
     content: form.content?.trim() || undefined,
     replyContent: form.replyContent?.trim() || undefined,
   }
-  if (status === 4 && (!isEdit.value || enteringVote || changed))
+  // 待审核等状态里填的选项也要保存。投票中名称没变时不传，避免把已有票数清掉。
+  if (!isEdit.value) {
+    if (names.length > 0)
+      payload.options = names
+  }
+  else if (changed) {
     payload.options = names
+  }
   const mutate = isEdit.value ? updateRow : createRow
   mutate(payload, {
     onSuccess: () => {
@@ -237,8 +249,9 @@ const onSubmit = handleSubmit((form) => {
       <FormItem>
         <FormLabel>投票选项</FormLabel>
         <div class="space-y-2">
-          <div v-for="(item, index) in values.options ?? []" :key="index" class="flex gap-2">
+          <div v-for="(item, index) in values.options ?? []" :key="index" class="flex items-center gap-2">
             <Input :model-value="item" placeholder="选项名称" @update:model-value="updateOption(index, $event)" />
+            <span v-if="votesFor(item) > 0" class="shrink-0 text-xs tabular-nums text-muted-foreground">{{ votesFor(item) }} 票</span>
             <Button type="button" variant="outline" @click="removeOption(index)">
               删除
             </Button>
@@ -248,7 +261,7 @@ const onSubmit = handleSubmit((form) => {
           </Button>
         </div>
         <p class="text-xs text-muted-foreground">
-          状态选「投票中」时要填 2 到 6 个。没改选项就不会重写已有票数。
+          这里填的选项会保存。状态是投票中时，要有 2 到 6 个。
         </p>
         <p v-if="willRewriteVotes" class="text-xs text-destructive">
           这次保存会按当前选项重写，已有票数会清掉。

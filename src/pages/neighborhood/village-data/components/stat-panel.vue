@@ -14,7 +14,7 @@ const rows = computed(() => {
   const q = search.value.trim()
   if (!q)
     return list
-  return list.filter(row => `${row.statName}${row.statValue ?? ''}${row.unit ?? ''}${row.statCode}`.includes(q))
+  return list.filter(row => `${row.statName}${row.statValue ?? ''}${row.unit ?? ''}`.includes(q))
 })
 
 function reset() {

@@ -40,6 +40,8 @@ const props = withDefaults(defineProps<{
   /** 是否为模态弹层(置于 Dialog 内时建议开启) */
   modal?: boolean
   triggerClass?: string
+  /** 空值打开时的默认时分秒，如 00:00:00。不传则用当前时间。 */
+  defaultTime?: string
 }>(), {
   valueFormat: 'YYYY-MM-DD HH:mm:ss',
   modal: false,
@@ -53,12 +55,16 @@ const monthYearPicker = ref<'month' | 'year' | false>(false)
 const minDate = computed(() => (props.min ? dayjs(props.min).toDate() : undefined))
 const maxDate = computed(() => (props.max ? dayjs(props.max).toDate() : undefined))
 
-/** 外部字符串值 → JS Date;无值时用当前时间作为初始锚点。 */
+/** 外部字符串值 → JS Date;无值时用默认时分秒，未指定则用当前时间。 */
 const initDate = computed(() => {
   if (modelValue.value)
     return dayjs(modelValue.value).toDate()
-  // 无值时用当前时间作锚点,但秒/毫秒清零,避免秒列停在当前真实秒
-  return dayjs().second(0).millisecond(0).toDate()
+  let anchor = dayjs().second(0).millisecond(0)
+  if (props.defaultTime) {
+    const [hour, minute, second] = props.defaultTime.split(':').map(part => Number(part))
+    anchor = anchor.hour(Number.isFinite(hour) ? hour : 0).minute(Number.isFinite(minute) ? minute : 0).second(Number.isFinite(second) ? second : 0)
+  }
+  return anchor.toDate()
 })
 
 // 弹层内的工作副本:date=待确认的完整日期时间,month=日历当前展示月

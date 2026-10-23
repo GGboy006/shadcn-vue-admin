@@ -43,15 +43,6 @@ export const columns: ColumnDef<VillageStat>[] = [
     enableResizing: true,
   },
   {
-    accessorKey: 'statCode',
-    header: ({ column }) => h(DataTableColumnHeader<VillageStat>, { column, title: '编码' }),
-    meta: { title: '编码' },
-    cell: ({ row }) => text(row.original.statCode),
-    enableSorting: false,
-    enableHiding: true,
-    enableResizing: true,
-  },
-  {
     accessorKey: 'statValue',
     header: ({ column }) => h(DataTableColumnHeader<VillageStat>, { column, title: '数值' }),
     meta: { title: '数值' },
