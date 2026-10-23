@@ -54,6 +54,15 @@ export const columns: ColumnDef<ElderVisit>[] = [
     enableResizing: true,
   },
   {
+    accessorKey: 'contactName',
+    header: ({ column }) => h(DataTableColumnHeader<ElderVisit>, { column, title: '结对志愿者' }),
+    meta: { title: '结对志愿者' },
+    cell: ({ row }) => text(row.original.contactName),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: true,
+  },
+  {
     accessorKey: 'status',
     header: ({ column }) => h(DataTableColumnHeader<ElderVisit>, { column, title: '状态' }),
     meta: { title: '状态' },

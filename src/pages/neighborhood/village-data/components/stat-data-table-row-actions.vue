@@ -4,6 +4,7 @@ import type { Row } from '@tanstack/vue-table'
 import { BanIcon, CircleCheckIcon, PencilIcon, Trash2Icon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
+import type { RowActionItem } from '@/components/data-table'
 import type { VillageStat } from '@/services/api/neighborhood-governance.api'
 
 import { DataTableRowActions } from '@/components/data-table'
@@ -24,11 +25,25 @@ const isDeleteRendered = useLazyMount(isDeleteOpen)
 const { mutate: removeRow, isPending } = useDeleteStatMutation()
 const { mutate: updateStatus, isPending: isToggling } = useUpdateStatStatusMutation()
 
-const items = computed(() => [
-  { key: 'toggle', label: record.value.status === 1 ? '禁用' : '启用', icon: record.value.status === 1 ? BanIcon : CircleCheckIcon, disabled: isToggling.value },
-  { key: 'edit', label: '编辑', icon: PencilIcon },
-  { key: 'delete', label: '删除', icon: Trash2Icon, variant: 'destructive' as const },
+const fixedCodes = new Set([
+  'household_count',
+  'population',
+  'party_member',
+  'leadership',
+  'garbage_rate',
+  'beautiful_yard',
+  'illegal_build',
 ])
+
+const items = computed(() => {
+  const next: RowActionItem[] = [
+    { key: 'toggle', label: record.value.status === 1 ? '禁用' : '启用', icon: record.value.status === 1 ? BanIcon : CircleCheckIcon, disabled: isToggling.value },
+    { key: 'edit', label: '编辑', icon: PencilIcon },
+  ]
+  if (!fixedCodes.has(record.value.statCode))
+    next.push({ key: 'delete', label: '删除', icon: Trash2Icon, variant: 'destructive' as const })
+  return next
+})
 
 function handleAction(key: string) {
   if (key === 'toggle') {

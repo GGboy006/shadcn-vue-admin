@@ -54,6 +54,15 @@ export const columns: ColumnDef<RepairOrder>[] = [
     enableResizing: true,
   },
   {
+    accessorKey: 'contactName',
+    header: ({ column }) => h(DataTableColumnHeader<RepairOrder>, { column, title: '网格员' }),
+    meta: { title: '网格员' },
+    cell: ({ row }) => text(row.original.contactName),
+    enableSorting: false,
+    enableHiding: true,
+    enableResizing: true,
+  },
+  {
     accessorKey: 'address',
     header: ({ column }) => h(DataTableColumnHeader<RepairOrder>, { column, title: '地点' }),
     meta: { title: '地点' },

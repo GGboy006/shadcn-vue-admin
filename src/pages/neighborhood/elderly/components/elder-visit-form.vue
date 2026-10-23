@@ -131,7 +131,7 @@ const onSubmit = handleSubmit((form) => {
       </FormField>
       <FormField v-slot="{ componentField }" name="contactName">
         <FormItem>
-          <FormLabel>联系人</FormLabel>
+          <FormLabel>结对志愿者</FormLabel>
           <FormControl><Input v-bind="componentField" /></FormControl>
           <FormMessage />
         </FormItem>

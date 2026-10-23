@@ -10,9 +10,9 @@ import { useGetStatListQuery, useUpdateStatMutation } from '@/services/api/neigh
 import { useGetEnvNewsListQuery } from '@/services/api/neighborhood-resident.api'
 
 const codes = [
-  { code: 'garbage_rate', label: '垃圾分类率' },
-  { code: 'beautiful_yard', label: '美丽庭院' },
-  { code: 'illegal_build', label: '违建摸排' },
+  { code: 'garbage_rate', fallback: '垃圾分类覆盖率' },
+  { code: 'beautiful_yard', fallback: '美丽庭院' },
+  { code: 'illegal_build', fallback: '本月违建' },
 ] as const
 
 const { data: statData, isLoading } = useGetStatListQuery()
@@ -63,9 +63,12 @@ function save(row: VillageStat, value: string) {
     <template v-else>
       <div v-for="item in stats" :key="item.code" class="rounded-lg border bg-card px-4 py-3">
         <div class="text-sm text-muted-foreground">
-          {{ item.label }}
+          {{ item.row?.statName || item.fallback }}
         </div>
         <template v-if="item.row">
+          <p v-if="item.row.status !== 1" class="mt-1 text-xs text-destructive">
+            已禁用，居民端不显示。
+          </p>
           <Input v-model="drafts[item.code]" class="mt-2" />
           <Button class="mt-2" size="sm" variant="outline" :disabled="isPending" @click="save(item.row, drafts[item.code] ?? '')">
             保存

@@ -7,6 +7,7 @@ import { z } from 'zod'
 import type { HealthBookSave } from '@/services/api/neighborhood-resident.api'
 
 import { Button } from '@/components/ui/button'
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -24,7 +25,9 @@ const statusOptions = [
   { value: 2, label: '禁用' },
 ] as const
 
+const editing = ref(false)
 const { data, isLoading } = useGetHealthBookQuery()
+const book = computed(() => data.value?.data)
 const { handleSubmit, resetForm, values } = useForm({
   validationSchema: toTypedSchema(z.object({
     type: optionalNumber.refine((value): value is number => value === 1 || value === 2, '请选择挂号方式'),
@@ -44,8 +47,8 @@ const { handleSubmit, resetForm, values } = useForm({
   },
 })
 
-watch(data, () => {
-  const row = data.value?.data
+function applyBook() {
+  const row = book.value
   resetForm({
     values: {
       type: row?.type ?? undefined,
@@ -56,7 +59,28 @@ watch(data, () => {
       intro: row?.intro ?? '',
     },
   })
+}
+
+watch(data, () => {
+  if (!editing.value)
+    applyBook()
 }, { immediate: true })
+
+function startEdit() {
+  applyBook()
+  editing.value = true
+}
+
+function cancelEdit() {
+  editing.value = false
+  applyBook()
+}
+
+function text(value: string | number | null | undefined) {
+  if (value === null || value === undefined || value === '')
+    return '-'
+  return String(value)
+}
 
 const { mutate, isPending } = useUpdateHealthBookMutation()
 const onSubmit = handleSubmit((form) => {
@@ -70,7 +94,10 @@ const onSubmit = handleSubmit((form) => {
     intro: form.intro?.trim() || undefined,
   }
   mutate(payload, {
-    onSuccess: () => toast.success('已保存'),
+    onSuccess: () => {
+      editing.value = false
+      toast.success('已保存')
+    },
     onError: (err: Error) => toast.error(err.message || '保存失败'),
   })
 }, (ctx) => {
@@ -81,88 +108,147 @@ const onSubmit = handleSubmit((form) => {
 </script>
 
 <template>
-  <div v-if="isLoading" class="space-y-3">
-    <Skeleton class="h-8 w-40" />
-    <Skeleton class="h-40 w-full" />
-  </div>
-  <form v-else class="space-y-4" @submit="onSubmit">
-    <p class="text-xs text-muted-foreground">
-      一个村只保留一条挂号配置。居民端只打开启用的这一条。
-    </p>
-    <div class="grid gap-4 sm:grid-cols-2">
-      <FormField v-slot="{ componentField }" name="type">
-        <FormItem>
-          <FormLabel required>
+  <Card>
+    <CardHeader class="border-b">
+      <CardTitle>挂号配置</CardTitle>
+      <CardDescription>一个村只保留一条挂号配置。居民端只打开启用的这一条。</CardDescription>
+      <CardAction v-if="!isLoading && !editing">
+        <Button type="button" variant="outline" size="sm" @click="startEdit">
+          编辑配置
+        </Button>
+      </CardAction>
+    </CardHeader>
+    <CardContent>
+      <div v-if="isLoading" class="space-y-3">
+        <Skeleton class="h-8 w-40" />
+        <Skeleton class="h-40 w-full" />
+      </div>
+      <dl v-else-if="!editing" class="grid gap-3 text-sm sm:grid-cols-2">
+        <div>
+          <dt class="text-muted-foreground">
             挂号方式
-          </FormLabel>
-          <Select v-bind="componentField">
-            <FormControl>
-              <SelectTrigger class="w-full">
-                <SelectValue placeholder="请选择" />
-              </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              <SelectItem v-for="item in typeOptions" :key="item.value" :value="item.value">
-                {{ item.label }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-      <FormField v-slot="{ componentField }" name="status">
-        <FormItem>
-          <FormLabel>状态</FormLabel>
-          <Select v-bind="componentField">
-            <FormControl>
-              <SelectTrigger class="w-full">
-                <SelectValue placeholder="请选择" />
-              </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              <SelectItem v-for="item in statusOptions" :key="item.value" :value="item.value">
-                {{ item.label }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-      <FormField v-if="Number(values.type) === 1" v-slot="{ componentField }" name="externalUrl">
-        <FormItem class="sm:col-span-2">
-          <FormLabel>H5 地址</FormLabel>
-          <FormControl><Input placeholder="https://" v-bind="componentField" /></FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-      <template v-if="Number(values.type) === 2">
-        <FormField v-slot="{ componentField }" name="name">
+          </dt>
+          <dd>{{ text(book?.typeLabel) }}</dd>
+        </div>
+        <div>
+          <dt class="text-muted-foreground">
+            状态
+          </dt>
+          <dd>{{ text(book?.statusLabel) }}</dd>
+        </div>
+        <div v-if="book?.type === 1" class="sm:col-span-2">
+          <dt class="text-muted-foreground">
+            H5 地址
+          </dt>
+          <dd class="break-all">
+            {{ text(book?.externalUrl) }}
+          </dd>
+        </div>
+        <template v-if="book?.type === 2">
+          <div>
+            <dt class="text-muted-foreground">
+              小程序名称
+            </dt>
+            <dd>{{ text(book?.name) }}</dd>
+          </div>
+          <div>
+            <dt class="text-muted-foreground">
+              小程序路径
+            </dt>
+            <dd class="break-all">
+              {{ text(book?.remark) }}
+            </dd>
+          </div>
+        </template>
+        <div class="sm:col-span-2">
+          <dt class="text-muted-foreground">
+            预约说明
+          </dt>
+          <dd class="whitespace-pre-wrap">
+            {{ text(book?.intro) }}
+          </dd>
+        </div>
+      </dl>
+      <form v-else class="space-y-4" @submit="onSubmit">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <FormField v-slot="{ componentField }" name="type">
+            <FormItem>
+              <FormLabel required>
+                挂号方式
+              </FormLabel>
+              <Select v-bind="componentField">
+                <FormControl>
+                  <SelectTrigger class="w-full">
+                    <SelectValue placeholder="请选择" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem v-for="item in typeOptions" :key="item.value" :value="item.value">
+                    {{ item.label }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <FormField v-slot="{ componentField }" name="status">
+            <FormItem>
+              <FormLabel>状态</FormLabel>
+              <Select v-bind="componentField">
+                <FormControl>
+                  <SelectTrigger class="w-full">
+                    <SelectValue placeholder="请选择" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem v-for="item in statusOptions" :key="item.value" :value="item.value">
+                    {{ item.label }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <FormField v-if="Number(values.type) === 1" v-slot="{ componentField }" name="externalUrl">
+            <FormItem class="sm:col-span-2">
+              <FormLabel>H5 地址</FormLabel>
+              <FormControl><Input placeholder="https://" v-bind="componentField" /></FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <template v-if="Number(values.type) === 2">
+            <FormField v-slot="{ componentField }" name="name">
+              <FormItem>
+                <FormLabel>小程序名称</FormLabel>
+                <FormControl><Input v-bind="componentField" /></FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <FormField v-slot="{ componentField }" name="remark">
+              <FormItem>
+                <FormLabel>小程序路径</FormLabel>
+                <FormControl><Input v-bind="componentField" /></FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </template>
+        </div>
+        <FormField v-slot="{ componentField }" name="intro">
           <FormItem>
-            <FormLabel>小程序名称</FormLabel>
-            <FormControl><Input v-bind="componentField" /></FormControl>
+            <FormLabel>预约说明</FormLabel>
+            <FormControl><Textarea rows="3" v-bind="componentField" /></FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
-        <FormField v-slot="{ componentField }" name="remark">
-          <FormItem>
-            <FormLabel>小程序路径</FormLabel>
-            <FormControl><Input v-bind="componentField" /></FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-      </template>
-    </div>
-    <FormField v-slot="{ componentField }" name="intro">
-      <FormItem>
-        <FormLabel>预约说明</FormLabel>
-        <FormControl><Textarea rows="3" v-bind="componentField" /></FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
-    <div class="flex justify-end">
-      <Button type="submit" :disabled="isPending">
-        {{ isPending ? '保存中...' : '保存' }}
-      </Button>
-    </div>
-  </form>
+        <div class="flex justify-end gap-2">
+          <Button type="button" variant="outline" :disabled="isPending" @click="cancelEdit">
+            取消
+          </Button>
+          <Button type="submit" :disabled="isPending">
+            {{ isPending ? '保存中...' : '保存' }}
+          </Button>
+        </div>
+      </form>
+    </CardContent>
+  </Card>
 </template>

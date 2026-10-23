@@ -8,9 +8,7 @@ import DataTableToolbar from './env-compare-data-table-toolbar.vue'
 
 const props = defineProps<DataTableProps<EnvCompare>>()
 
-const table = useGenerateVueTable<EnvCompare>(props, {
-  initialColumnVisibility: { poster: false, logo: false },
-})
+const table = useGenerateVueTable<EnvCompare>(props)
 </script>
 
 <template>
