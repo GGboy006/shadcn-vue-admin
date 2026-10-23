@@ -65,15 +65,24 @@ function save(row: VillageStat, value: string) {
         <div class="text-sm text-muted-foreground">
           {{ item.row?.statName || item.fallback }}
         </div>
-        <template v-if="item.row">
-          <p v-if="item.row.status !== 1" class="mt-1 text-xs text-destructive">
-            已禁用，居民端不显示。
-          </p>
+        <template v-if="item.row?.status === 1">
           <Input v-model="drafts[item.code]" class="mt-2" />
           <Button class="mt-2" size="sm" variant="outline" :disabled="isPending" @click="save(item.row, drafts[item.code] ?? '')">
             保存
           </Button>
         </template>
+        <div v-else-if="item.row" class="mt-2 space-y-2">
+          <div class="text-2xl font-semibold tabular-nums">
+            {{ item.row.statValue || '-' }}
+            <span v-if="item.row.unit" class="ml-1 text-sm font-normal text-muted-foreground">{{ item.row.unit }}</span>
+          </div>
+          <p class="text-xs text-muted-foreground">
+            这项在村情指标里是禁用的，这里不能改。
+          </p>
+          <router-link to="/neighborhood/village-data" class="text-sm text-primary hover:underline">
+            去村情数据启用
+          </router-link>
+        </div>
         <p v-else class="mt-2 text-sm text-muted-foreground">
           村情里还没有这项指标，请先在村情数据里建好。
         </p>
