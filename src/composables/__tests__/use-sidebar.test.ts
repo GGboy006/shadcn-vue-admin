@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { useSidebar } from '@/composables/use-sidebar'
 import { clearHousekeeperKind, housekeeperKind } from '@/services/api/housekeeper-partner.access'
@@ -37,7 +37,6 @@ describe('useSidebar navData', () => {
 
   afterEach(() => {
     clearHousekeeperKind()
-    vi.unstubAllEnvs()
   })
 
   it('商户(userType=4):经营 + AI + 设置', () => {
@@ -88,25 +87,12 @@ describe('useSidebar navData', () => {
     expect(navData.value.some(g => g.title === '经营')).toBe(false)
   })
 
-  it('居委会(userType=6)开发环境:额外展示村务治理 / 居民服务骨架菜单', () => {
-    vi.stubEnv('DEV', true)
-    setUser(6)
-    const { navData } = useSidebar()
-
-    const titles = leafTitles(navData.value[0])
-    expect(titles).toEqual(expect.arrayContaining(['村情数据', '财务公开', '党建管理', '报事报修', '村民议事', '书记信箱', '医疗健康']))
-  })
-
   it('居委会(userType=6):走居委会专属菜单,与商户菜单不同', () => {
-    // 生产环境不展示尚未对接接口的村务治理 / 居民服务
-    vi.stubEnv('DEV', false)
     setUser(6)
     const { navData } = useSidebar()
 
-    // 居委会后台内容与商户差别巨大,走独立菜单组(非商户后台那套)
     expect(navData.value.map(g => g.title)).toEqual(['居委会后台', '设置'])
 
-    // 居委会后台组:首页 + 公告/活动/广告/资讯/内容栏目 + 居委会信息等
     expect(leafTitles(navData.value[0])).toEqual([
       '首页',
       '公告管理',
@@ -119,6 +105,19 @@ describe('useSidebar navData', () => {
       '居委会信息',
       '服务热线',
       '在线留言',
+      '村情数据',
+      '财务公开',
+      '党建管理',
+      '报事报修',
+      '积分管理',
+      '村民议事',
+      '书记信箱',
+      '志愿服务',
+      '矛盾调解',
+      '养老服务',
+      '医疗健康',
+      '消防安全',
+      '环境治理',
     ])
   })
 

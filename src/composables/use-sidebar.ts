@@ -171,8 +171,7 @@ export function useSidebar() {
     { title: '服务热线', url: '/neighborhood/service-guide', icon: PhoneIcon },
     { title: '在线留言', url: '/neighborhood/leave-message', icon: MessageSquareIcon },
     // 居委会服务 /neighborhood/service 暂不开放
-    // 村务治理 / 居民服务已接接口，仍只在开发环境展示
-    ...(import.meta.env.DEV ? villageNavItems : []),
+    ...villageNavItems,
   ]
 
   const allSettingsNavItems = [
